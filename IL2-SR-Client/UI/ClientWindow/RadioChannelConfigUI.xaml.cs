@@ -2,6 +2,7 @@
 using System.Globalization;
 using System.Windows;
 using System.Windows.Controls;
+using Ciribob.IL2.SimpleRadio.Standalone.Client.Localization;
 using Ciribob.IL2.SimpleRadio.Standalone.Client.Settings;
 
 namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI
@@ -14,6 +15,7 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI
         public RadioChannelConfigUi()
         {
             InitializeComponent();
+            LocalizationManager.LocalizeElement(this);
 
             //I do this because at this point ProfileSettingKey hasn't been set
             //but it has when this is called

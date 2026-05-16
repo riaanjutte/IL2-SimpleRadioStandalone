@@ -1,6 +1,7 @@
 ﻿using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
+using Ciribob.IL2.SimpleRadio.Standalone.Client.Localization;
 using Ciribob.IL2.SimpleRadio.Standalone.Client.Network;
 using Ciribob.IL2.SimpleRadio.Standalone.Client.Singletons;
 using Ciribob.IL2.SimpleRadio.Standalone.Client.Utils;
@@ -20,6 +21,7 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Overlay
         public IntercomControlGroup()
         {
             InitializeComponent();
+            LocalizationManager.LocalizeElement(this);
         }
         public int RadioId { private get; set; }
 

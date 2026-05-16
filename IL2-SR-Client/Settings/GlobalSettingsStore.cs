@@ -66,6 +66,7 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.Settings
         RequireAdmin,
 
         SettingsProfiles,
+        Language,
 
         ShowTransmitterName
     }
@@ -167,6 +168,9 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.Settings
 
         RadioChannelDown = 132,
         ModifierRadioChannelDown = 232,
+
+        ToggleSelectedRadioMute = 133,
+        ModifierToggleSelectedRadioMute = 233,
 
     }
 
@@ -334,6 +338,8 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.Settings
             {GlobalSettingsKeys.PlayConnectionSounds.ToString(), "true"},
 
             {GlobalSettingsKeys.RequireAdmin.ToString(),"true" },
+
+            {GlobalSettingsKeys.Language.ToString(), "" },
 
             {GlobalSettingsKeys.ShowTransmitterName.ToString(), "true"},
 

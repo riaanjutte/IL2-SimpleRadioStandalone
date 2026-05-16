@@ -9,13 +9,22 @@
                       xmlns:settings="clr-namespace:Ciribob.IL2.SimpleRadio.Standalone.Client.Settings"
                       xmlns:converters="clr-namespace:Ciribob.IL2.SimpleRadio.Standalone.Client.Utils.ValueConverters"
                       Title="IL2-SRS Client"
-                      Width="550"
-                      Height="610"
+                      Width="700"
+                      MinWidth="700"
+                      Height="650"
+                      MinHeight="650"
                       d:DataContext="{d:DesignInstance local:MainWindow}"
-                      ResizeMode="CanMinimize"
+                      ResizeMode="CanResizeWithGrip"
                       mc:Ignorable="d">
 
     <TabControl x:Name="TabControl">
+        <TabControl.ItemTemplate>
+            <DataTemplate>
+                <TextBlock FontSize="22"
+                           Text="{Binding}"
+                           TextWrapping="NoWrap" />
+            </DataTemplate>
+        </TabControl.ItemTemplate>
         <TabControl.Resources>
             <converters:MicAvailabilityTooltipConverter x:Key="MicAvailabilityTooltipConverter"/>
         </TabControl.Resources>
@@ -28,7 +37,7 @@
                            HorizontalAlignment="Center"
                            Content="Microphone" />
                     <ComboBox x:Name="Mic"
-                              Width="250"
+                              Width="320"
                               HorizontalAlignment="Center"
                               VerticalAlignment="Top"
                               ItemsSource="{Binding Path=AudioInput.InputAudioDevices}"
@@ -69,13 +78,13 @@
                                 HorizontalAlignment="Center"
                                 Orientation="Horizontal">
                         <ComboBox x:Name="Speakers"
-                                  Width="200"
+                                  Width="250"
                                   HorizontalAlignment="Center"
                                   VerticalAlignment="Top" Margin="0,0,5,0"
                                   ItemsSource="{Binding Path=AudioOutput.OutputAudioDevices}"
                                   SelectedItem="{Binding Path=AudioOutput.SelectedAudioOutput, Mode=TwoWay}" />
                         <ComboBox x:Name="MicOutput"
-                                  Width="200"
+                                  Width="250"
                                   HorizontalAlignment="Center"
                                   VerticalAlignment="Top" Margin="5,0,0,0"
                                   ItemsSource="{Binding Path=AudioOutput.MicOutputAudioDevices}"
@@ -126,7 +135,7 @@
                                 Orientation="Horizontal">
 
                         <TextBox x:Name="ServerIp"
-                                 Width="150"
+                                 Width="185"
                                  Height="23"
                                  Margin="0,0,5,0"
                                  MaxLines="1"
@@ -134,7 +143,7 @@
                                  TextWrapping="Wrap" />
 
                         <ComboBox x:Name="ServerAddressPicker"
-                                  Width="150"
+                                  Width="185"
                                   Height="23"
                                   DisplayMemberPath="Name"
                                   ItemsSource="{Binding Path=FavouriteServersViewModel.Addresses}"
@@ -156,15 +165,15 @@
                                 HorizontalAlignment="Center"
                                 Orientation="Horizontal">
                         <Button x:Name="StartStop"
-                                Width="125"
-                                Margin="0,10,20,0"
+                                Width="220"
+                                Margin="0,10,12,0"
                                 HorizontalAlignment="Center"
                                 Command="{Binding Path=ConnectCommand}"
                                 Content="Connect"
                                 Style="{DynamicResource SquareButtonStyle}"
                                 ToolTip="{Binding Path=AudioInput.MicrophoneAvailable, Converter={StaticResource MicAvailabilityTooltipConverter}}" />
                         <Button x:Name="ToggleServerSettings"
-                                Width="125"
+                                Width="220"
                                 Margin="0,10,0,0"
                                 HorizontalAlignment="Center"
                                 Click="ToggleServerSettings_OnClick"
@@ -177,15 +186,15 @@
                                 HorizontalAlignment="Center"
                                 Orientation="Horizontal">
                         <Button x:Name="ShowOverlay"
-                                Width="125"
-                                Margin="0,15,20,0"
+                                Width="220"
+                                Margin="0,15,12,0"
                                 HorizontalAlignment="Center"
                                 Click="ShowOverlay_OnClick"
                                 Content="Toggle Radio Overlay"
                                 Style="{DynamicResource SquareButtonStyle}" />
 
                         <Button x:Name="ShowClientList"
-                                Width="125"
+                                Width="220"
                                 Margin="0,15,0,0"
                                 HorizontalAlignment="Center"
                                 Click="ShowClientList_OnClick"
@@ -257,8 +266,8 @@
                                Margin="5,0,5,0" />
                     </StackPanel>
                     <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
-                        <Button Content="Patreon - Support SRS" 
-                                Width="150" 
+                        <Button Content="Patreon - Support SRS"
+                                Width="190"
                                 Click="Donate_OnClick" Margin="5"
 
                         ></Button>
@@ -273,51 +282,56 @@
             <GroupBox x:Name="ControlsGroupBox" Header="Controls">
 
                 <ScrollViewer HorizontalScrollBarVisibility="Hidden" VerticalScrollBarVisibility="Visible">
-                    <StackPanel>
-                        <Button Width="150px" Content="Rescan Input Devices" Click="RescanInputDevices" />
-                        <Grid>
+                    <StackPanel HorizontalAlignment="Center">
+                        <Button Width="240"
+                                Content="Rescan Input Devices"
+                                Click="RescanInputDevices" />
+                        <Grid Width="610">
                             <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="2*" />
-                                <ColumnDefinition Width="2*" />
-                                <ColumnDefinition Width="1*" />
-                                <ColumnDefinition Width="1*" />
-                                <ColumnDefinition Width="1*" />
+                                <ColumnDefinition Width="240" />
+                                <ColumnDefinition Width="150" />
+                                <ColumnDefinition Width="70" />
+                                <ColumnDefinition Width="75" />
+                                <ColumnDefinition Width="75" />
                             </Grid.ColumnDefinitions>
                             <Grid.RowDefinitions>
-                                <RowDefinition />
-                                <RowDefinition />
-                                <RowDefinition />
-                                <RowDefinition />
-                                <RowDefinition />
-                                <RowDefinition />
-                                <RowDefinition />
-                                <RowDefinition />
-                                <RowDefinition />
-                                <RowDefinition />
-                                <RowDefinition />
-                                <RowDefinition />
-                                <RowDefinition />
-                                <RowDefinition />
-                                <RowDefinition />
-                                <RowDefinition />
-                                <RowDefinition />
-                                <RowDefinition />
-                                <RowDefinition />
-                                <RowDefinition />
-                                <RowDefinition />
-                                <RowDefinition />
-                                <RowDefinition />
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="Auto" />
                             </Grid.RowDefinitions>
 
                             <Label x:Name="DeviceLabel"
                                Grid.Row="0"
                                Grid.Column="1"
+                               Padding="4,0,4,0"
                                HorizontalContentAlignment="Center"
                                VerticalContentAlignment="Center"
                                Content="Device" />
                             <Label x:Name="ButtonLabel"
                                Grid.Row="0"
                                Grid.Column="2"
+                               Padding="4,0,4,0"
                                HorizontalContentAlignment="Center"
                                VerticalContentAlignment="Center"
                                Content="Button" />
@@ -345,7 +359,7 @@
 
                             <local:InputBindingControl x:Name="RadioOverlay"
                                                    Grid.Row="5"
-                                                   Grid.ColumnSpan="6"
+                                                   Grid.ColumnSpan="5"
                                                    ControlInputBinding="{x:Static settings:InputBinding.OverlayToggle}"
                                                    InputName="Overlay Toggle" />
 
@@ -446,6 +460,11 @@
                                                        Grid.ColumnSpan="5"
                                                        ControlInputBinding="{x:Static settings:InputBinding.ReadStatus}"
                                                        InputName="Read Status (TTS on required)" />
+                            <local:InputBindingControl x:Name="ToggleSelectedRadioMute"
+                                                       Grid.Row="23"
+                                                       Grid.ColumnSpan="5"
+                                                       ControlInputBinding="{x:Static settings:InputBinding.ToggleSelectedRadioMute}"
+                                                       InputName="Mute / Unmute Selected Radio" />
                         </Grid>
                     </StackPanel>
                 </ScrollViewer>
@@ -467,7 +486,7 @@
 
                         <Grid>
                             <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="271" />
+                                <ColumnDefinition Width="390" />
                                 <ColumnDefinition />
 
                             </Grid.ColumnDefinitions>
@@ -879,6 +898,20 @@
                                     </Style>
                                 </ToggleButton.Style>
                             </ToggleButton>
+
+                            <Label Grid.Row="18"
+                                   Grid.Column="0"
+                                   HorizontalContentAlignment="Center"
+                                   VerticalContentAlignment="Center"
+                                   Content="Language" />
+
+                            <ComboBox Name="LanguagePicker"
+                                      Grid.Row="18"
+                                      Grid.Column="1"
+                                      HorizontalContentAlignment="Center"
+                                      VerticalContentAlignment="Center"
+                                      DisplayMemberPath="DisplayName"
+                                      SelectionChanged="LanguagePicker_SelectionChanged" />
                         </Grid>
 
                     </GroupBox>

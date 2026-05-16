@@ -12,6 +12,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using Ciribob.IL2.SimpleRadio.Standalone.Client.Localization;
 
 namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI.ClientWindow
 {
@@ -23,6 +24,7 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI.ClientWindow
         public FavouriteServersView()
         {
             InitializeComponent();
+            LocalizationManager.LocalizeElement(this);
         }
     }
 }

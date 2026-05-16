@@ -6,6 +6,7 @@ using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
 using System.Windows.Threading;
+using Ciribob.IL2.SimpleRadio.Standalone.Client.Localization;
 using Ciribob.IL2.SimpleRadio.Standalone.Client.Singletons;
 using Ciribob.IL2.SimpleRadio.Standalone.Common;
 
@@ -24,6 +25,7 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI.ClientWindow.ClientList
         public ClientListWindow()
         {
             InitializeComponent();
+            LocalizationManager.LocalizeElement(this);
             ClientList.ItemsSource = _clientList;
             UpdateList();
 

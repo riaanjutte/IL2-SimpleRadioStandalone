@@ -12,6 +12,7 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
+using Ciribob.IL2.SimpleRadio.Standalone.Client.Localization;
 using Ciribob.IL2.SimpleRadio.Standalone.Client.Settings;
 using MahApps.Metro.Controls;
 
@@ -30,11 +31,12 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI.InputProfileWindow
         public InputProfileWindow(CreateProfileCallback callback, bool rename = false, string initialText = "")
         {
             InitializeComponent();
+            LocalizationManager.LocalizeElement(this);
             _callback = callback;
             if (rename)
             {
                 ProfileName.Text = initialText;
-                CreateRename.Content = "Rename";
+                CreateRename.Content = LocalizationManager.Get("Rename");
             }
 
         }

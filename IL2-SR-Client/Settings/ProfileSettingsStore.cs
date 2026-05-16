@@ -63,29 +63,32 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.Settings
 
         private readonly Dictionary<string, string> defaultSettingsProfileSettings = new Dictionary<string, string>()
         {
-            {ProfileSettingsKeys.RadioEffects.ToString(), "true"},
-            {ProfileSettingsKeys.RadioEffectsClipping.ToString(), "true"},
-            {ProfileSettingsKeys.RadioEncryptionEffects.ToString(), "true"},
+            {ProfileSettingsKeys.RadioEffects.ToString(), "false"},
+            {ProfileSettingsKeys.RadioEffectsClipping.ToString(), "false"},
+            {ProfileSettingsKeys.RadioEncryptionEffects.ToString(), "false"},
             {ProfileSettingsKeys.NATOTone.ToString(), "false"},
 
             {ProfileSettingsKeys.RadioRxEffects_Start.ToString(), "true"},
             {ProfileSettingsKeys.RadioRxEffects_End.ToString(), "true"},
             {ProfileSettingsKeys.RadioTxEffects_Start.ToString(), "true"},
             {ProfileSettingsKeys.RadioTxEffects_End.ToString(), "true"},
-            {ProfileSettingsKeys.MIDSRadioEffect.ToString(), "true"},
+            {ProfileSettingsKeys.MIDSRadioEffect.ToString(), "false"},
 
             {ProfileSettingsKeys.AutoSelectPresetChannel.ToString(), "true"},
 
             {ProfileSettingsKeys.AlwaysAllowHotasControls.ToString(),"false" },
             {ProfileSettingsKeys.AllowIL2PTT.ToString(),"true" },
-            {ProfileSettingsKeys.RadioSwitchIsPTT.ToString(), "false"},
+            {ProfileSettingsKeys.RadioSwitchIsPTT.ToString(), "true"},
             {ProfileSettingsKeys.RadioSwitchIsPTTOnlyWhenValid.ToString(), "false"},
             {ProfileSettingsKeys.AlwaysAllowTransponderOverlay.ToString(), "false"},
             {ProfileSettingsKeys.WrapNextRadio.ToString(), "true"},
-            {ProfileSettingsKeys.EnableTextToSpeech.ToString(), "false"},
+            {ProfileSettingsKeys.EnableTextToSpeech.ToString(), "true"},
             {ProfileSettingsKeys.TextToSpeechVolume.ToString(), "1.0"},
 
-            {ProfileSettingsKeys.PTTReleaseDelay.ToString(), "0"},
+            {ProfileSettingsKeys.PTTReleaseDelay.ToString(), "250"},
+            {ProfileSettingsKeys.Radio1Channel.ToString(), "-0.5"},
+            {ProfileSettingsKeys.Radio2Channel.ToString(), "0.5"},
+            {ProfileSettingsKeys.IntercomChannel.ToString(), "0"},
         };
 
 

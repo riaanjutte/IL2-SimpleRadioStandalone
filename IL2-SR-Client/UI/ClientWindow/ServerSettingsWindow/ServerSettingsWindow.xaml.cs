@@ -2,6 +2,7 @@
 using System.ComponentModel;
 using System.Windows;
 using System.Windows.Threading;
+using Ciribob.IL2.SimpleRadio.Standalone.Client.Localization;
 using Ciribob.IL2.SimpleRadio.Standalone.Client.Network;
 using Ciribob.IL2.SimpleRadio.Standalone.Client.Settings;
 using Ciribob.IL2.SimpleRadio.Standalone.Common.Setting;
@@ -23,6 +24,7 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI
         public ServerSettingsWindow()
         {
             InitializeComponent();
+            LocalizationManager.LocalizeElement(this);
 
             _updateTimer = new DispatcherTimer {Interval = TimeSpan.FromSeconds(1)};
             _updateTimer.Tick += UpdateUI;
@@ -38,24 +40,24 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI
             try
             {
                 SpectatorAudio.Content = settings.GetSettingAsBool(ServerSettingsKeys.SPECTATORS_AUDIO_DISABLED)
-                    ? "DISABLED"
-                    : "ENABLED";
+                    ? LocalizationManager.Get("DISABLED")
+                    : LocalizationManager.Get("ENABLED");
 
                 CoalitionSecurity.Content = settings.GetSettingAsBool(ServerSettingsKeys.COALITION_AUDIO_SECURITY)
-                    ? "ON"
-                    : "OFF";
+                    ? LocalizationManager.Get("ON")
+                    : LocalizationManager.Get("OFF");
 
-                RealRadio.Content = settings.GetSettingAsBool(ServerSettingsKeys.IRL_RADIO_TX) ? "ON" : "OFF";
+                RealRadio.Content = settings.GetSettingAsBool(ServerSettingsKeys.IRL_RADIO_TX) ? LocalizationManager.Get("ON") : LocalizationManager.Get("OFF");
 
-                TunedClientCount.Content = settings.GetSettingAsBool(ServerSettingsKeys.SHOW_TUNED_COUNT) ? "ON" : "OFF";
+                TunedClientCount.Content = settings.GetSettingAsBool(ServerSettingsKeys.SHOW_TUNED_COUNT) ? LocalizationManager.Get("ON") : LocalizationManager.Get("OFF");
 
-                ShowTransmitterName.Content = settings.GetSettingAsBool(ServerSettingsKeys.SHOW_TRANSMITTER_NAME) ? "ON" : "OFF";
+                ShowTransmitterName.Content = settings.GetSettingAsBool(ServerSettingsKeys.SHOW_TRANSMITTER_NAME) ? LocalizationManager.Get("ON") : LocalizationManager.Get("OFF");
 
                 ServerVersion.Content = SRSClientSyncHandler.ServerVersion;
 
                 SecondRadio.Content = settings.GetSettingAsBool(ServerSettingsKeys.SECOND_RADIO_ENABLED)
-                    ? "ON"
-                    : "OFF";
+                    ? LocalizationManager.Get("ON")
+                    : LocalizationManager.Get("OFF");
 
                 ChannelLimit.Content = settings.GetSetting(ServerSettingsKeys.CHANNEL_LIMIT);
             }

@@ -6,6 +6,7 @@ using System.Windows;
 using System.Windows.Input;
 using System.Windows.Interop;
 using System.Windows.Threading;
+using Ciribob.IL2.SimpleRadio.Standalone.Client.Localization;
 using NLog;
 using Ciribob.IL2.SimpleRadio.Standalone.Client.Settings;
 using Ciribob.IL2.SimpleRadio.Standalone.Client.Singletons;
@@ -36,6 +37,7 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Overlay
             //load opacity before the intialising as the slider changed
             //method fires after initialisation
             InitializeComponent();
+            LocalizationManager.LocalizeElement(this);
 
             this.WindowStartupLocation = WindowStartupLocation.Manual;
 

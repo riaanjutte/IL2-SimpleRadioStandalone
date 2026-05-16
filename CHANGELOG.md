@@ -1,0 +1,72 @@
+# Changelog
+
+## IL2-SRS 1.0.3.0 community update
+
+### Added
+
+- Added client localization support for English, German, French, and Spanish.
+- Added a language picker in the client settings.
+- Added first-run OS language detection so new installs can start in the detected supported language.
+- Added restart-to-apply behavior for language changes.
+- Added external `.resx` translation files in `IL2-SR-Client/Localization/` so the community can improve machine-translated text without rebuilding the app.
+- Added translation contribution documentation in `IL2-SR-Client/Localization/README.md`.
+- Added automatic input-device rediscovery so joystick PTT bindings can recover after a temporary disconnect/reconnect without restarting SRS, when Windows exposes the same DirectInput device instance again.
+- Added a bindable control to mute or unmute the currently selected radio while preserving the previous radio volume.
+
+### Changed
+
+- Expanded the client localization pass across the main client tabs, settings, controls, favourites, help text, buttons, labels, headers, and related client windows.
+- Updated localized UI layout so longer German, French, and Spanish text has more room.
+- Enabled text wrapping for long control labels where needed.
+- Aligned the controls page columns so device, button, assign, and clear controls stay visually consistent.
+- Increased the main client window minimum size and allowed resizing to reduce clipping in translated layouts.
+- Improved on/off toggle localization so toggles display the translated current state while preserving click behavior.
+- Changed new profile defaults:
+  - Radio voice effects off.
+  - Radio clipping effects off.
+  - PTT-as-switch on.
+  - PTT release delay set to `250 ms`.
+  - Radio 1 panned 50% left.
+  - Radio 2 panned 50% right.
+  - Radio RX start/end effects on.
+  - Radio TX start/end effects on.
+  - Text to Speech beta on.
+- Updated packaged Release `default.cfg` to match the new defaults.
+- Hardened installer `startup.cfg` telemetry setup:
+  - Adds `[KEY = telemetrydevice]` when missing.
+  - Enables telemetry when the section exists but is disabled.
+  - Preserves existing third-party telemetry devices by adding the next free `addrN` SRS endpoint.
+  - Handles read-only `startup.cfg` files and restores their original attributes.
+  - Retries file access and verifies the final config contains the SRS telemetry endpoint.
+- Replaced the old input-device restart error dialog with logging plus automatic rediscovery attempts, reducing interruption while flying.
+
+### Fixed
+
+- Fixed a startup crash caused by modifying a collection while it was being enumerated during localization.
+- Fixed untranslated English text remaining visible after switching the client to German, French, or Spanish.
+- Fixed translated text being clipped in the General, Controls, and Settings tabs.
+- Fixed controls page rows and columns drifting out of alignment in Spanish and other longer translations.
+- Fixed settings/profile toggles showing `OFF` even when enabled.
+- Fixed settings/profile toggles not responding correctly after localization changed their displayed content.
+- Fixed brittle installer telemetry insertion that relied on raw substring checks and could fail with existing telemetry sections.
+- Fixed unsafe read-only handling in the installer that could overwrite file attributes incorrectly.
+- Fixed stale DirectInput devices blocking joystick PTT after a temporary disconnect.
+
+### Build Notes
+
+- Rebuilt the Release client executable:
+  - `IL2-SR-Client/bin/Release/IL2-SR-ClientRadio.exe`
+- Rebuilt the Release installer executable after the telemetry fix:
+  - `Installer/bin/Release/Installer.exe`
+- Verified telemetry config handling with smoke tests for missing, disabled, existing third-party, idempotent, and read-only `startup.cfg` cases.
+- Verified fresh profile defaults load with the updated profile settings.
+
+### Investigated
+
+- Reviewed feasibility for optional server-controlled voice proximity falloff/distance attenuation.
+- Confirmed the routing/audio architecture can support proximity attenuation, but player position data is not currently present in `PlayerGameState`.
+- Recommended implementation path:
+  - Parse player position from IL-2 telemetry if available.
+  - Add position fields to `PlayerGameState`.
+  - Add server settings to enable proximity attenuation and configure falloff distances.
+  - Apply attenuation client-side during voice receive, with optional server-side max-distance routing cutoff.

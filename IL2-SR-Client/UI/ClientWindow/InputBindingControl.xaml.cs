@@ -1,5 +1,6 @@
 ﻿using System.Windows;
 using System.Windows.Controls;
+using Ciribob.IL2.SimpleRadio.Standalone.Client.Localization;
 using Ciribob.IL2.SimpleRadio.Standalone.Client.Settings;
 
 namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI
@@ -14,6 +15,7 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI
         public InputBindingControl()
         {
             InitializeComponent();
+            LocalizationManager.LocalizeElement(this);
         }
 
         public InputDeviceManager InputDeviceManager
@@ -32,8 +34,8 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI
 
         public void LoadInputSettings()
         {
-            DeviceLabel.Content = InputName;
-            ModifierLabel.Content = InputName + " Modifier";
+            DeviceLabel.Text = InputName;
+            ModifierLabel.Text = InputName + " " + LocalizationManager.Get("Modifier");
             ModifierBinding = (InputBinding) ((int) ControlInputBinding) + 100; //add 100 gets the enum of the modifier
 
             var currentInputProfile = GlobalSettingsStore.Instance.ProfileSettingsStore.GetCurrentInputProfile();
@@ -49,8 +51,8 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI
                 }
                 else
                 {
-                    DeviceText.Text = "None";
-                    Device.Text = "None";
+                    DeviceText.Text = LocalizationManager.Get("None");
+                    Device.Text = LocalizationManager.Get("None");
                 }
 
                 if (currentInputProfile.ContainsKey(ModifierBinding))
@@ -61,8 +63,8 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI
                 }
                 else
                 {
-                    ModifierText.Text = "None";
-                    ModifierDevice.Text = "None";
+                    ModifierText.Text = LocalizationManager.Get("None");
+                    ModifierDevice.Text = LocalizationManager.Get("None");
                 }
             }
         }
@@ -93,8 +95,8 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI
         {
             GlobalSettingsStore.Instance.ProfileSettingsStore.RemoveControlSetting(ControlInputBinding);
 
-            Device.Text = "None";
-            DeviceText.Text = "None";
+            Device.Text = LocalizationManager.Get("None");
+            DeviceText.Text = LocalizationManager.Get("None");
         }
 
         private void Modifier_Click(object sender, RoutedEventArgs e)
@@ -121,8 +123,8 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI
         private void ModifierClear_Click(object sender, RoutedEventArgs e)
         {
             GlobalSettingsStore.Instance.ProfileSettingsStore.RemoveControlSetting(ModifierBinding);
-            ModifierDevice.Text = "None";
-            ModifierText.Text = "None";
+            ModifierDevice.Text = LocalizationManager.Get("None");
+            ModifierText.Text = LocalizationManager.Get("None");
         }
     }
 }

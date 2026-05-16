@@ -9,8 +9,11 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
+using Ciribob.IL2.SimpleRadio.Standalone.Client.Localization;
 using Ciribob.IL2.SimpleRadio.Standalone.Client.Settings;
+using Ciribob.IL2.SimpleRadio.Standalone.Client.Utils;
 using MahApps.Metro.Controls;
+using Microsoft.Win32;
 using NLog;
 using NLog.Config;
 using NLog.Targets;
@@ -60,6 +63,7 @@ namespace IL2_SR_Client
             SetupLogging();
 
             ListArgs();
+            LocalizationManager.Initialize(GlobalSettingsStore.Instance);
 
 #if !DEBUG
             if (IsClientRunning())
@@ -99,7 +103,12 @@ namespace IL2_SR_Client
             }
 #endif
 
-            RequireAdmin();
+            if (RequireAdmin())
+            {
+                return;
+            }
+
+            VerifyIL2StartupTelemetry();
 
             InitNotificationIcon();
 
@@ -115,11 +124,11 @@ namespace IL2_SR_Client
             }
         }
 
-        private void RequireAdmin()
+        private bool RequireAdmin()
         {
             if (!GlobalSettingsStore.Instance.GetClientSettingBool(GlobalSettingsKeys.RequireAdmin))
             {
-                return;
+                return false;
             }
             
             WindowsPrincipal principal = new WindowsPrincipal(WindowsIdentity.GetCurrent());
@@ -160,12 +169,65 @@ namespace IL2_SR_Client
 
                     }
                 });
+
+                return true;
             }
-            else
+
+            return false;
+        }
+
+        private void VerifyIL2StartupTelemetry()
+        {
+            string il2Path = ReadInstallerPath("IL2Path");
+            if (string.IsNullOrWhiteSpace(il2Path))
             {
-                
+                Logger.Info("No saved IL-2 path found; skipping startup.cfg telemetry check");
+                return;
             }
-           
+
+            string cfgPath = Path.Combine(il2Path, "data", "startup.cfg");
+            if (!File.Exists(cfgPath))
+            {
+                Logger.Warn($"Saved IL-2 path does not contain data\\startup.cfg; skipping telemetry check. Path: {il2Path}");
+                return;
+            }
+
+            try
+            {
+                bool repaired = StartupConfigTelemetry.EnsureEnabled(cfgPath, message => Logger.Info(message));
+                if (repaired)
+                {
+                    Logger.Info($"Repaired IL-2 startup.cfg telemetry settings at {cfgPath}");
+                }
+                else
+                {
+                    Logger.Info($"Verified IL-2 startup.cfg telemetry settings at {cfgPath}");
+                }
+            }
+            catch (Exception ex)
+            {
+                Logger.Error(ex, $"Unable to verify or repair IL-2 startup.cfg telemetry settings at {cfgPath}");
+                MessageBox.Show(
+                    "SRS could not verify or repair the IL-2 telemetry settings in startup.cfg.\n\n" +
+                    "Auto-connect and in-game radio data may not work until startup.cfg contains an enabled telemetrydevice section for 127.0.0.1:4322.\n\n" +
+                    "Try running SRS as administrator, or reinstall/repair using the installer.",
+                    "IL2-SRS Telemetry Check",
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Warning);
+            }
+        }
+
+        private string ReadInstallerPath(string key)
+        {
+            try
+            {
+                return (string)Registry.GetValue("HKEY_CURRENT_USER\\SOFTWARE\\IL2-SRS", key, "");
+            }
+            catch (Exception ex)
+            {
+                Logger.Error(ex, $"Unable to read installer registry path {key}");
+                return "";
+            }
         }
 
         private string GetArgsString()
@@ -265,14 +327,14 @@ namespace IL2_SR_Client
             System.Windows.Forms.MenuItem notifyIconContextMenuShow = new System.Windows.Forms.MenuItem
             {
                 Index = 0,
-                Text = "Show"
+                Text = LocalizationManager.Get("Show")
             };
             notifyIconContextMenuShow.Click += new EventHandler(NotifyIcon_Show);
 
             System.Windows.Forms.MenuItem notifyIconContextMenuQuit = new System.Windows.Forms.MenuItem
             {
                 Index = 1,
-                Text = "Quit"
+                Text = LocalizationManager.Get("Quit")
             };
             notifyIconContextMenuQuit.Click += new EventHandler(NotifyIcon_Quit);
 

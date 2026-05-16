@@ -18,6 +18,9 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.Utils
 {
     public static class RadioHelper
     {
+        private const float MutedVolume = 0.0f;
+        private const float DefaultRestoredVolume = 1.0f;
+        private static readonly Dictionary<int, float> PreviousRadioVolumes = new Dictionary<int, float>();
      
         public static bool SelectRadio(int radioId, bool tts = true)
         {
@@ -233,6 +236,56 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.Utils
                 && currentRadio.volMode == RadioInformation.VolumeMode.OVERLAY)
             {
                 currentRadio.volume = volume;
+            }
+        }
+
+        public static void ToggleSelectedRadioMute()
+        {
+            var IL2PlayerRadioInfo = ClientStateSingleton.Instance.PlayerGameState;
+            if (IL2PlayerRadioInfo == null)
+            {
+                return;
+            }
+
+            var selectedRadioId = IL2PlayerRadioInfo.selected;
+            if (!IsSecondRadioAvailable() && selectedRadioId == 0)
+            {
+                selectedRadioId = 1;
+            }
+
+            var currentRadio = GetRadio(selectedRadioId);
+            if (currentRadio == null ||
+                currentRadio.modulation == RadioInformation.Modulation.DISABLED ||
+                currentRadio.modulation == RadioInformation.Modulation.INTERCOM ||
+                currentRadio.volMode != RadioInformation.VolumeMode.OVERLAY)
+            {
+                return;
+            }
+
+            if (currentRadio.volume > MutedVolume)
+            {
+                PreviousRadioVolumes[selectedRadioId] = currentRadio.volume;
+                currentRadio.volume = MutedVolume;
+
+                MessageHub.Instance.Publish(new TextToSpeechMessage()
+                {
+                    Message = "Radio " + selectedRadioId + " muted"
+                });
+            }
+            else
+            {
+                float restoredVolume;
+                if (!PreviousRadioVolumes.TryGetValue(selectedRadioId, out restoredVolume) || restoredVolume <= MutedVolume)
+                {
+                    restoredVolume = DefaultRestoredVolume;
+                }
+
+                currentRadio.volume = restoredVolume;
+
+                MessageHub.Instance.Publish(new TextToSpeechMessage()
+                {
+                    Message = "Radio " + selectedRadioId + " unmuted"
+                });
             }
         }
 

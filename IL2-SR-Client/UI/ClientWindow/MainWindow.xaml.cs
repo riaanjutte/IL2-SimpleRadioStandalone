@@ -14,11 +14,13 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Controls.Primitives;
 using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Threading;
 using Ciribob.IL2.SimpleRadio.Standalone.Client.Audio;
 using Ciribob.IL2.SimpleRadio.Standalone.Client.Audio.Managers;
+using Ciribob.IL2.SimpleRadio.Standalone.Client.Localization;
 using Ciribob.IL2.SimpleRadio.Standalone.Client.Network;
 using Ciribob.IL2.SimpleRadio.Standalone.Client.Network.IL2;
 using Ciribob.IL2.SimpleRadio.Standalone.Client.Network.IL2.Models;
@@ -74,6 +76,7 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI
         private readonly DispatcherTimer _updateTimer;
         private ServerAddress _serverAddress;
         private readonly DelegateCommand _connectCommand;
+        private bool _initialisingLanguagePicker;
 
         private readonly GlobalSettingsStore _globalSettings = GlobalSettingsStore.Instance;
 
@@ -97,6 +100,8 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI
             GCSettings.LatencyMode = GCLatencyMode.SustainedLowLatency;
 
             InitializeComponent();
+            LocalizationManager.LocalizeElement(this);
+            LocalizationManager.LocalizeFlowDocument(AboutFlowDocument);
 
             // Initialize ToolTip controls
             ToolTips.Init();
@@ -333,93 +338,97 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI
 
             ControlsProfile.SelectionChanged += OnProfileDropDownChanged;
 
-            Radio1.InputName = "Select First Radio";
+            Radio1.InputName = LocalizationManager.Get("Select First Radio");
             Radio1.ControlInputBinding = InputBinding.Switch1;
             Radio1.InputDeviceManager = InputManager;
 
-            Radio2.InputName = "Select Second Radio";
+            Radio2.InputName = LocalizationManager.Get("Select Second Radio");
             Radio2.ControlInputBinding = InputBinding.Switch2;
             Radio2.InputDeviceManager = InputManager;
 
-            PTT.InputName = "Push To Talk - PTT";
+            PTT.InputName = LocalizationManager.Get("Push To Talk - PTT");
             PTT.ControlInputBinding = InputBinding.Ptt;
             PTT.InputDeviceManager = InputManager;
 
-            Intercom.InputName = "Select Intercom";
+            Intercom.InputName = LocalizationManager.Get("Select Intercom");
             Intercom.ControlInputBinding = InputBinding.Intercom;
             Intercom.InputDeviceManager = InputManager;
 
-            RadioOverlay.InputName = "Overlay Toggle";
+            RadioOverlay.InputName = LocalizationManager.Get("Overlay Toggle");
             RadioOverlay.ControlInputBinding = InputBinding.OverlayToggle;
             RadioOverlay.InputDeviceManager = InputManager;
 
-            RadioChannelUp.InputName = "Radio Channel Up";
+            RadioChannelUp.InputName = LocalizationManager.Get("Radio Channel Up");
             RadioChannelUp.ControlInputBinding = InputBinding.RadioChannelUp;
             RadioChannelUp.InputDeviceManager = InputManager;
 
-            RadioChannelDown.InputName = "Radio Channel Down";
+            RadioChannelDown.InputName = LocalizationManager.Get("Radio Channel Down");
             RadioChannelDown.ControlInputBinding = InputBinding.RadioChannelDown;
             RadioChannelDown.InputDeviceManager = InputManager;
 
-            RadioChannel1.InputName = "Radio Channel 1";
+            RadioChannel1.InputName = LocalizationManager.Get("Radio Channel 1");
             RadioChannel1.ControlInputBinding = InputBinding.RadioChannel1;
             RadioChannel1.InputDeviceManager = InputManager;
 
-            RadioChannel2.InputName = "Radio Channel 2";
+            RadioChannel2.InputName = LocalizationManager.Get("Radio Channel 2");
             RadioChannel2.ControlInputBinding = InputBinding.RadioChannel2;
             RadioChannel2.InputDeviceManager = InputManager;
 
-            RadioChannel3.InputName = "Radio Channel 3";
+            RadioChannel3.InputName = LocalizationManager.Get("Radio Channel 3");
             RadioChannel3.ControlInputBinding = InputBinding.RadioChannel3;
             RadioChannel3.InputDeviceManager = InputManager;
 
-            RadioChannel4.InputName = "Radio Channel 4";
+            RadioChannel4.InputName = LocalizationManager.Get("Radio Channel 4");
             RadioChannel4.ControlInputBinding = InputBinding.RadioChannel4;
             RadioChannel4.InputDeviceManager = InputManager;
 
-            RadioChannel5.InputName = "Radio Channel 5";
+            RadioChannel5.InputName = LocalizationManager.Get("Radio Channel 5");
             RadioChannel5.ControlInputBinding = InputBinding.RadioChannel5;
             RadioChannel5.InputDeviceManager = InputManager;
 
-            RadioChannel6.InputName = "Radio Channel 6";
+            RadioChannel6.InputName = LocalizationManager.Get("Radio Channel 6");
             RadioChannel6.ControlInputBinding = InputBinding.RadioChannel6;
             RadioChannel6.InputDeviceManager = InputManager;
 
-            RadioChannel7.InputName = "Radio Channel 7";
+            RadioChannel7.InputName = LocalizationManager.Get("Radio Channel 7");
             RadioChannel7.ControlInputBinding = InputBinding.RadioChannel7;
             RadioChannel7.InputDeviceManager = InputManager;
 
-            RadioChannel8.InputName = "Radio Channel 8";
+            RadioChannel8.InputName = LocalizationManager.Get("Radio Channel 8");
             RadioChannel8.ControlInputBinding = InputBinding.RadioChannel8;
             RadioChannel8.InputDeviceManager = InputManager;
 
-            RadioChannel9.InputName = "Radio Channel 9";
+            RadioChannel9.InputName = LocalizationManager.Get("Radio Channel 9");
             RadioChannel9.ControlInputBinding = InputBinding.RadioChannel9;
             RadioChannel9.InputDeviceManager = InputManager;
 
-            RadioChannel10.InputName = "Radio Channel 10";
+            RadioChannel10.InputName = LocalizationManager.Get("Radio Channel 10");
             RadioChannel10.ControlInputBinding = InputBinding.RadioChannel10;
             RadioChannel10.InputDeviceManager = InputManager;
 
-            RadioChannel11.InputName = "Radio Channel 11";
+            RadioChannel11.InputName = LocalizationManager.Get("Radio Channel 11");
             RadioChannel11.ControlInputBinding = InputBinding.RadioChannel11;
             RadioChannel11.InputDeviceManager = InputManager;
 
-            RadioChannel12.InputName = "Radio Channel 12";
+            RadioChannel12.InputName = LocalizationManager.Get("Radio Channel 12");
             RadioChannel12.ControlInputBinding = InputBinding.RadioChannel12;
             RadioChannel12.InputDeviceManager = InputManager;
 
-            NextRadio.InputName = "Select Next Radio / Intercom";
+            NextRadio.InputName = LocalizationManager.Get("Select Next Radio / Intercom");
             NextRadio.ControlInputBinding = InputBinding.NextRadio;
             NextRadio.InputDeviceManager = InputManager;
 
-            PreviousRadio.InputName = "Select Previous Radio / Intercom";
+            PreviousRadio.InputName = LocalizationManager.Get("Select Previous Radio / Intercom");
             PreviousRadio.ControlInputBinding = InputBinding.PreviousRadio;
             PreviousRadio.InputDeviceManager = InputManager;
 
-            ReadStatus.InputName = "Read Status (TTS on required)";
+            ReadStatus.InputName = LocalizationManager.Get("Read Status (TTS on required)");
             ReadStatus.ControlInputBinding = InputBinding.ReadStatus;
             ReadStatus.InputDeviceManager = InputManager;
+
+            ToggleSelectedRadioMute.InputName = LocalizationManager.Get("Mute / Unmute Selected Radio");
+            ToggleSelectedRadioMute.ControlInputBinding = InputBinding.ToggleSelectedRadioMute;
+            ToggleSelectedRadioMute.InputDeviceManager = InputManager;
         }
 
         private void OnProfileDropDownChanged(object sender, SelectionChangedEventArgs e)
@@ -452,6 +461,7 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI
             NextRadio.LoadInputSettings();
             PreviousRadio.LoadInputSettings();
             ReadStatus.LoadInputSettings();
+            ToggleSelectedRadioMute.LoadInputSettings();
         }
 
         private void ReloadRadioAudioChannelSettings()
@@ -515,6 +525,8 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI
 
         private void InitSettingsScreen()
         {
+            InitLanguagePicker();
+
             AutoConnectPromptToggle.IsChecked = _globalSettings.GetClientSettingBool(GlobalSettingsKeys.AutoConnectPrompt);
             AutoConnectMismatchPromptToggle.IsChecked = _globalSettings.GetClientSettingBool(GlobalSettingsKeys.AutoConnectMismatchPrompt);
             RadioOverlayTaskbarItem.IsChecked =
@@ -534,6 +546,17 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI
             RequireAdminToggle.IsChecked = _globalSettings.GetClientSettingBool(GlobalSettingsKeys.RequireAdmin);
 
             ShowTransmitterName.IsChecked = _globalSettings.GetClientSettingBool(GlobalSettingsKeys.ShowTransmitterName);
+
+            RefreshOnOffToggleContent();
+        }
+
+        private void InitLanguagePicker()
+        {
+            _initialisingLanguagePicker = true;
+            LanguagePicker.ItemsSource = LocalizationManager.SupportedLanguages;
+            LanguagePicker.SelectedItem =
+                LocalizationManager.GetLanguageOption(_globalSettings.GetClientSetting(GlobalSettingsKeys.Language).RawValue);
+            _initialisingLanguagePicker = false;
         }
 
         private void ReloadProfileSettings()
@@ -563,6 +586,62 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI
             PTTReleaseDelay.ValueChanged += PushToTalkReleaseDelay_ValueChanged;
             PTTReleaseDelay.Value = double.Parse(_globalSettings.ProfileSettingsStore.GetClientSetting(ProfileSettingsKeys.PTTReleaseDelay).RawValue, CultureInfo.InvariantCulture);
             PTTReleaseDelay.IsEnabled = true;
+
+            RefreshOnOffToggleContent();
+        }
+
+        private void RefreshOnOffToggleContent()
+        {
+            foreach (var toggleButton in GetOnOffToggleButtons())
+            {
+                toggleButton.Checked -= OnOffToggleButtonStateChanged;
+                toggleButton.Unchecked -= OnOffToggleButtonStateChanged;
+                toggleButton.Checked += OnOffToggleButtonStateChanged;
+                toggleButton.Unchecked += OnOffToggleButtonStateChanged;
+
+                UpdateOnOffToggleContent(toggleButton);
+            }
+        }
+
+        private IEnumerable<ToggleButton> GetOnOffToggleButtons()
+        {
+            yield return AutoConnectPromptToggle;
+            yield return AutoConnectMismatchPromptToggle;
+            yield return RadioOverlayTaskbarItem;
+            yield return RefocusIL2;
+            yield return ExpandInputDevices;
+            yield return MinimiseToTray;
+            yield return StartMinimised;
+            yield return MicAGC;
+            yield return MicDenoise;
+            yield return CheckForBetaUpdates;
+            yield return PlayConnectionSounds;
+            yield return RequireAdminToggle;
+            yield return ShowTransmitterName;
+            yield return RadioSwitchIsPTT;
+            yield return RadioTxStartToggle;
+            yield return RadioTxEndToggle;
+            yield return RadioRxStartToggle;
+            yield return RadioRxEndToggle;
+            yield return RadioSoundEffects;
+            yield return RadioSoundEffectsClipping;
+            yield return EnableTextToSpeech;
+            yield return WrapNextRadio;
+        }
+
+        private void OnOffToggleButtonStateChanged(object sender, RoutedEventArgs e)
+        {
+            UpdateOnOffToggleContent(sender as ToggleButton);
+        }
+
+        private static void UpdateOnOffToggleContent(ToggleButton toggleButton)
+        {
+            if (toggleButton == null)
+            {
+                return;
+            }
+
+            toggleButton.Content = LocalizationManager.Get(toggleButton.IsChecked == true ? "ON" : "OFF");
         }
 
         private void Connect()
@@ -589,7 +668,7 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI
                         _client = new SRSClientSyncHandler(_guid, UpdateUICallback);
                         _client.TryConnect(new IPEndPoint(_resolvedIp, _port), ConnectCallback);
 
-                        StartStop.Content = "Connecting...";
+                        StartStop.Content = LocalizationManager.Get("Connecting...");
                         StartStop.IsEnabled = false;
                         Mic.IsEnabled = false;
                         Speakers.IsEnabled = false;
@@ -598,7 +677,7 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI
 
                         if (_audioPreview != null)
                         {
-                            Preview.Content = "Audio Preview";
+                            Preview.Content = LocalizationManager.Get("Audio Preview");
                             _audioPreview.StopEncoding();
                             _audioPreview = null;
                         }
@@ -606,7 +685,8 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI
                     else
                     {
                         //invalid ID
-                        MessageBox.Show("Invalid IP or Host Name!", "Host Name Error", MessageBoxButton.OK,
+                        MessageBox.Show(LocalizationManager.Get("Invalid IP or Host Name!"),
+                            LocalizationManager.Get("Host Name Error"), MessageBoxButton.OK,
                             MessageBoxImage.Error);
 
                         ClientState.IsConnected = false;
@@ -615,7 +695,8 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI
                 }
                 catch (Exception ex) when (ex is SocketException || ex is ArgumentException)
                 {
-                    MessageBox.Show("Invalid IP or Host Name!", "Host Name Error", MessageBoxButton.OK,
+                    MessageBox.Show(LocalizationManager.Get("Invalid IP or Host Name!"),
+                        LocalizationManager.Get("Host Name Error"), MessageBoxButton.OK,
                         MessageBoxImage.Error);
 
                     ClientState.IsConnected = false;
@@ -669,7 +750,7 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI
 
             ClientState.IsConnectionErrored = connectionError;
 
-            StartStop.Content = "Connect";
+            StartStop.Content = LocalizationManager.Get("Connect");
             StartStop.IsEnabled = true;
             Mic.IsEnabled = true;
             Speakers.IsEnabled = true;
@@ -747,7 +828,7 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI
                 {
                     try
                     {
-                        StartStop.Content = "Disconnect";
+                        StartStop.Content = LocalizationManager.Get("Disconnect");
                         StartStop.IsEnabled = true;
 
                         ClientState.IsConnected = true;
@@ -858,7 +939,7 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI
                     _audioPreview.SpeakerBoost = VolumeConversionHelper.ConvertVolumeSliderToScale((float)SpeakerBoost.Value);
                     _audioPreview.StartPreview(AudioOutput.WindowsN);
 
-                    Preview.Content = "Stop Preview";
+                    Preview.Content = LocalizationManager.Get("Stop Preview");
                 }
                 catch (Exception ex)
                 {
@@ -869,7 +950,7 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI
             }
             else
             {
-                Preview.Content = "Audio Preview";
+                Preview.Content = LocalizationManager.Get("Audio Preview");
                 _audioPreview.StopEncoding();
                 _audioPreview = null;
             }
@@ -912,7 +993,7 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI
 
         private void RadioSwitchPTT_Click(object sender, RoutedEventArgs e)
         {
-            _globalSettings.ProfileSettingsStore.SetClientSetting(ProfileSettingsKeys.RadioSwitchIsPTT, (string) RadioSwitchIsPTT.Content);
+            _globalSettings.ProfileSettingsStore.SetClientSetting(ProfileSettingsKeys.RadioSwitchIsPTT, (bool) RadioSwitchIsPTT.IsChecked);
         }
 
         private void ShowOverlay_OnClick(object sender, RoutedEventArgs e)
@@ -984,7 +1065,7 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI
                         MessageBoxButton.YesNo,
                         MessageBoxImage.Question);
 
-                    connectToServer = (result == MessageBoxResult.Yes) && (StartStop.Content.ToString().ToLower() == "connect");
+                    connectToServer = (result == MessageBoxResult.Yes) && !ClientState.IsConnected;
                 }
 
                 if (connectToServer)
@@ -1022,7 +1103,7 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI
                 Stop();
 
                 StartStop.IsEnabled = false;
-                StartStop.Content = "Connecting...";
+                StartStop.Content = LocalizationManager.Get("Connecting...");
                 await Task.Delay(2000);
                 StartStop.IsEnabled = true;
                 ServerIp.Text = advertisedConnection;
@@ -1171,8 +1252,31 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI
         {
             InputManager.InitDevices();
             MessageBox.Show(this,
-                "Input Devices Rescanned",
-                "New input devices can now be used.",
+                LocalizationManager.Get("Input Devices Rescanned"),
+                LocalizationManager.Get("New input devices can now be used."),
+                MessageBoxButton.OK,
+                MessageBoxImage.Information);
+        }
+
+        private void LanguagePicker_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            var selectedLanguage = LanguagePicker.SelectedItem as LanguageOption;
+            if (_initialisingLanguagePicker || selectedLanguage == null)
+            {
+                return;
+            }
+
+            var currentLanguage = LocalizationManager.NormalizeLanguage(
+                _globalSettings.GetClientSetting(GlobalSettingsKeys.Language).RawValue);
+            if (selectedLanguage.Code == currentLanguage)
+            {
+                return;
+            }
+
+            _globalSettings.SetClientSetting(GlobalSettingsKeys.Language, selectedLanguage.Code);
+            MessageBox.Show(this,
+                LocalizationManager.Get("Please restart SRS for the language change to take effect."),
+                LocalizationManager.Get("Restart Required"),
                 MessageBoxButton.OK,
                 MessageBoxImage.Information);
         }

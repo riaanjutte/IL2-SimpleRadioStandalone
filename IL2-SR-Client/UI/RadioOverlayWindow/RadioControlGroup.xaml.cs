@@ -4,6 +4,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
+using Ciribob.IL2.SimpleRadio.Standalone.Client.Localization;
 using Ciribob.IL2.SimpleRadio.Standalone.Client.Network;
 using Ciribob.IL2.SimpleRadio.Standalone.Client.Settings.RadioChannels;
 using Ciribob.IL2.SimpleRadio.Standalone.Common.Network;
@@ -28,6 +29,7 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI.RadioOverlayWindow
             this.DataContext = this; // set data context
 
             InitializeComponent();
+            LocalizationManager.LocalizeElement(this);
         }
 
         private int _radioId;
@@ -79,7 +81,7 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI.RadioOverlayWindow
             if (IL2PlayerRadioInfo == null || !_clientStateSingleton.IsConnected)
             {
                 RadioActive.Fill = new SolidColorBrush(Colors.Red);
-                RadioFrequency.Text = "Not Connected";
+                RadioFrequency.Text = LocalizationManager.Get("Not Connected");
 
 
                 //reset dragging just incase
@@ -112,7 +114,7 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI.RadioOverlayWindow
                     RadioActive.Fill = new SolidColorBrush(Colors.Orange);
                 }
 
-                RadioFrequency.Text = "CHN " + currentRadio.channel;
+                RadioFrequency.Text = LocalizationManager.Format("CHN {0}", currentRadio.channel);
 
                 int count = _connectClientsSingleton.ClientsOnFreq(currentRadio.freq, currentRadio.modulation);
 

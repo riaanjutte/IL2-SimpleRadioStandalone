@@ -363,6 +363,7 @@ namespace Installer
               //  DeleteFileIfExists(programPath + "\\global.cfg");
 
                 DeleteDirectory(programPath + "\\AudioEffects");
+                DeleteDirectory(programPath + "\\Localization");
             }
             Logger.Info($"Finished clearing config and program ");
         }
@@ -521,6 +522,7 @@ namespace Installer
             Logger.Info($"Creating Directories");
             CreateDirectory(path);
             CreateDirectory(path + "\\AudioEffects");
+            CreateDirectory(path + "\\Localization");
 
             //sleep! WTF directory is lagging behind state here...
             Task.Delay(TimeSpan.FromMilliseconds(200)).Wait();
@@ -537,6 +539,7 @@ namespace Installer
 
             Logger.Info($"Copying directories");
             DirectoryCopy(_currentDirectory+"\\AudioEffects", path+"\\AudioEffects");
+            DirectoryCopy(_currentDirectory+"\\Localization", path+"\\Localization");
 
             Logger.Info($"Finished installing IL2-SRS Program to {path}");
 
@@ -557,92 +560,16 @@ namespace Installer
             shortcut.Save();
         }
 
-        private bool IsReadOnly(string path)
-        {
-            var file = new FileInfo(path);
-
-            return file.IsReadOnly;
-        }
-
-        private void SetReadOnly(string path,bool readOnly)
-        {
-            var file = new FileInfo(path);
-
-            if (readOnly)
-            {
-                Logger.Info($"Config present at {path} set to Read Only");
-                File.SetAttributes(path, FileAttributes.ReadOnly);
-            }
-            else
-            {
-                Logger.Info($"Config present at {path} set to Writable");
-                File.SetAttributes(path, ~FileAttributes.ReadOnly);
-            }
-        }
-
         private void EnableTelemetry(string path)
         {
             var cfgPath = path + "\\data\\startup.cfg";
             Logger.Info($"Installing Config to {cfgPath}");
 
-            //check if its read only
-            bool readOnly = IsReadOnly(cfgPath);
-
-            if (readOnly)
-            {
-                Logger.Info($"Config present at {path} is Read Only");
-                //temporarily make readable
-                SetReadOnly(cfgPath, false);
-            }
-
             _progressBarDialog.UpdateProgress(false, $"Enable SRS Telemetry @ {cfgPath}");
-            
-            var lines = File.ReadAllText(cfgPath);
 
-            if (lines.Contains("telemetrydevice"))
-            {
-                //handle existing file
-                if (lines.Contains("127.0.0.1:4322") 
-                    || ( lines.Contains("\"127.0.0.1\"") && lines.Contains("4322")) 
-                    || lines.Contains("addr1"))
-                {
-                    //already there
-                    Logger.Info($"Config present at {path}");
-                }
-                else
-                {
-                    //extract telemetry
-                    var allLines = File.ReadAllLines(cfgPath);
-                    
-                    for (int i=0;i<allLines.Length;i++)
-                    {
-                        if (allLines[i].Contains("addr") && !allLines[i].Contains("addr1"))
-                        {
-                            allLines[i] = allLines[i] + "\r\n\taddr1 = \"127.0.0.1:4322\"";
-
-                            Logger.Info($"Appending addr1 - likely JetSeat in use {cfgPath}");
-                        }
-                    }
-
-                    File.WriteAllLines(cfgPath, allLines);
-                }
-            }
-            else
-            {
-                var telemetry =
-                    "[KEY = telemetrydevice]\r\n\taddr = \"127.0.0.1\"\r\n\tdecimation = 2\r\n\tenable = true\r\n\tport = 4322\r\n[END]";
-                File.AppendAllText(cfgPath, telemetry);
-
-                Logger.Info($"No Telemtry - Appending to config {cfgPath}");
-            }
+            StartupConfigTelemetry.EnsureEnabled(cfgPath, message => Logger.Info(message));
 
             Logger.Info($"Config installed to {cfgPath}");
-
-            if (readOnly)
-            {
-                SetReadOnly(cfgPath,true);
-            }
-
 
             _progressBarDialog.UpdateProgress(false, $"Installed IL2-SRS Config @ {cfgPath}");
         }

@@ -155,6 +155,7 @@
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="StartupConfigTelemetry.cs" />
     <Page Include="ProgressDialog.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -250,11 +251,13 @@
   <PropertyGroup>
     <PostBuildEvent>
 if not exist "$(SolutionDir)install-build\AudioEffects" mkdir "$(SolutionDir)install-build\AudioEffects"
+if not exist "$(SolutionDir)install-build\Localization" mkdir "$(SolutionDir)install-build\Localization"
 copy /Y "$(SolutionDir)IL2-SimpleRadio Server\bin\x64\Release\IL2-SR-Server.exe" "$(SolutionDir)install-build\IL2-SR-Server.exe"
 copy /Y "$(SolutionDir)IL2-SR-Client\bin\x64\Release\IL2-SR-ClientRadio.exe" "$(SolutionDir)install-build\IL2-SR-ClientRadio.exe"
 copy /Y "$(SolutionDir)IL2-SR-Client\bin\x64\Release\opus.dll" "$(SolutionDir)install-build\opus.dll"
 copy /Y "$(SolutionDir)IL2-SR-Client\bin\x64\Release\speexdsp.dll" "$(SolutionDir)install-build\speexdsp.dll"
 xcopy /Y /e "$(SolutionDir)IL2-SR-Client\AudioEffects" "$(SolutionDir)install-build\AudioEffects"
+xcopy /Y /e "$(SolutionDir)IL2-SR-Client\bin\x64\Release\Localization" "$(SolutionDir)install-build\Localization"
 copy /Y "$(SolutionDir)Installer\bin\x64\Release\Installer.exe" "$(SolutionDir)install-build\Installer.exe"
 copy /Y "$(SolutionDir)AutoUpdater\bin\Release\IL2-SRS-AutoUpdater.exe" "$(SolutionDir)install-build\IL2-SRS-AutoUpdater.exe" 
 copy /Y "$(SolutionDir)IL2-SRS-External-Audio\bin\Release\IL2-SRS-External-Audio.exe" "$(SolutionDir)install-build\IL2-SRS-External-Audio.exe" 

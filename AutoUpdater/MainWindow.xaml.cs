@@ -31,7 +31,7 @@ namespace AutoUpdater
     /// </summary>
     public partial class MainWindow : Window
     {
-        public static readonly string GITHUB_USERNAME = "ciribob";
+        public static readonly string GITHUB_USERNAME = "riaanjutte";
         public static readonly string GITHUB_REPOSITORY = "IL2-SimpleRadioStandalone";
         // Required for all requests against the GitHub API, as per https://developer.github.com/v3/#user-agent-required
         public static readonly string GITHUB_USER_AGENT = $"{GITHUB_USERNAME}_{GITHUB_REPOSITORY}";
@@ -101,7 +101,7 @@ namespace AutoUpdater
         private async Task<Uri> GetPathToLatestVersion()
         {
             Status.Content = "Finding Latest IL2-SRS Version";
-            var githubClient = new GitHubClient(new ProductHeaderValue(GITHUB_USER_AGENT, "1.0.2.0"));
+            var githubClient = new GitHubClient(new ProductHeaderValue(GITHUB_USER_AGENT, "1.0.3.0"));
 
             var releases = await githubClient.Repository.Release.GetAll(GITHUB_USERNAME, GITHUB_REPOSITORY);
 
@@ -112,8 +112,6 @@ namespace AutoUpdater
             {
                 if ((release.Prerelease && allowBeta) || !release.Prerelease)
                 {
-                    var releaseAsset = release.Assets.First();
-
                     foreach (var asset in release.Assets)
                     {
                         if (asset.Name.ToLower().StartsWith("il2-simpleradiostandalone") &&
@@ -121,7 +119,7 @@ namespace AutoUpdater
                         {
                             changelogURL = release.HtmlUrl;
                             Status.Content = "Downloading Version "+release.TagName;
-                            return new System.Uri(releaseAsset.BrowserDownloadUrl);
+                            return new System.Uri(asset.BrowserDownloadUrl);
                         }
 
                     }
