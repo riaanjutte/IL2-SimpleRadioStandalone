@@ -14,6 +14,7 @@ The update focuses on six areas:
 - More reliable installer and client handling of IL-2 `startup.cfg` telemetry.
 - Joystick/input-device reconnect recovery for PTT.
 - IL-2 intercom routing fixes for vehicle owners and crew members.
+- More reliable update flow for automatic and manual GitHub release updates.
 - Documentation for translators and release/change tracking.
 
 ## Added Files
@@ -197,6 +198,31 @@ Current:
 - Normalizes intercom membership to an IL-2 vehicle group id.
 - Uses the parent vehicle/client id for crew members and the player unit id for the owner/commander.
 - Allows intercom only when both resolved group ids are valid and equal.
+
+### `IL2-SR-Common/Network/UpdaterChecker.cs`
+
+Original:
+
+- The update dialog's `No` button did not open the manual download page because the browser launch was commented out.
+
+Current:
+
+- Opens the GitHub release page through the shell when users choose manual update.
+- Uses the same browser launch helper when automatic update launch fails.
+
+### `AutoUpdater/MainWindow.xaml.cs`
+
+Original:
+
+- The auto updater selected the first matching release zip returned by the GitHub API.
+- It assumed API response order was equivalent to highest release version.
+
+Current:
+
+- Parses release tags as versions.
+- Ignores drafts and excludes prereleases unless beta updates are requested.
+- Selects the highest valid version with an `IL2-SimpleRadioStandalone*.zip` asset.
+- Shows an error if no matching asset can be found.
 
 ### `IL2-SimpleRadio Server/Network/UDPVoiceRouter.cs`
 

@@ -1,6 +1,6 @@
 # Changelog
 
-## IL2-SRS 1.0.3.1 community update
+## IL2-SRS 1.0.3.2 community update
 
 ### Added
 
@@ -53,6 +53,8 @@
 - Fixed unsafe read-only handling in the installer that could overwrite file attributes incorrectly.
 - Fixed stale DirectInput devices blocking joystick PTT after a temporary disconnect.
 - Fixed IL-2 intercom routing so vehicle owners and crew members can hear each other using IL-2 parent vehicle/client IDs.
+- Fixed manual update selection so clicking `No` opens the GitHub release page.
+- Fixed auto updater release selection so it downloads the highest available release version instead of relying on GitHub API response order.
 
 ### Build Notes
 

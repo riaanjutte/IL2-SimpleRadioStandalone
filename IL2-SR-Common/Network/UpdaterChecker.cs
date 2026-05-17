@@ -21,7 +21,7 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Common
 
         public static readonly string MINIMUM_PROTOCOL_VERSION = "1.0.0.0";
 
-        public static readonly string VERSION = "1.0.3.1";
+        public static readonly string VERSION = "1.0.3.2";
 
         private static readonly Logger _logger = LogManager.GetCurrentClassLogger();
 
@@ -119,15 +119,25 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Common
                 {
                     MessageBox.Show($"Unable to Auto Update - please download latest version manually",
                         "Auto Update Error", MessageBoxButton.YesNoCancel, MessageBoxImage.Information);
-                
-                    Process.Start(url);
+
+                    OpenBrowser(url);
                 }
             }
             else if (result == MessageBoxResult.No)
             {
-                //Process.Start(url);
+                OpenBrowser(url);
             }
         }
+
+        private static void OpenBrowser(string url)
+        {
+            Process.Start(new ProcessStartInfo
+            {
+                FileName = url,
+                UseShellExecute = true
+            });
+        }
+
         private static void LaunchUpdater(bool beta)
         {
             WindowsPrincipal principal = new WindowsPrincipal(WindowsIdentity.GetCurrent());

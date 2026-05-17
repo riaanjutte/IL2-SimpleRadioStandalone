@@ -101,32 +101,54 @@ namespace AutoUpdater
         private async Task<Uri> GetPathToLatestVersion()
         {
             Status.Content = "Finding Latest IL2-SRS Version";
-            var githubClient = new GitHubClient(new ProductHeaderValue(GITHUB_USER_AGENT, "1.0.3.1"));
+            var githubClient = new GitHubClient(new ProductHeaderValue(GITHUB_USER_AGENT, "1.0.3.2"));
 
             var releases = await githubClient.Repository.Release.GetAll(GITHUB_USERNAME, GITHUB_REPOSITORY);
 
             bool allowBeta = AllowBeta();
+            Release latestRelease = null;
+            ReleaseAsset latestAsset = null;
+            Version latestVersion = new Version();
 
-            // Retrieve last stable and beta branch release as tagged on GitHub
+            // GitHub API order is not a version contract, so select the highest valid semver tag explicitly.
             foreach (Release release in releases)
             {
-                if ((release.Prerelease && allowBeta) || !release.Prerelease)
+                if (release.Draft || (release.Prerelease && !allowBeta))
                 {
-                    foreach (var asset in release.Assets)
-                    {
-                        if (asset.Name.ToLower().StartsWith("il2-simpleradiostandalone") &&
-                            asset.Name.ToLower().Contains(".zip"))
-                        {
-                            changelogURL = release.HtmlUrl;
-                            Status.Content = "Downloading Version "+release.TagName;
-                            return new System.Uri(asset.BrowserDownloadUrl);
-                        }
-
-                    }
+                    continue;
                 }
+
+                if (!Version.TryParse(release.TagName.TrimStart('v', 'V'), out var releaseVersion) ||
+                    releaseVersion <= latestVersion)
+                {
+                    continue;
+                }
+
+                var asset = release.Assets.FirstOrDefault(IsReleaseZipAsset);
+                if (asset == null)
+                {
+                    continue;
+                }
+
+                latestRelease = release;
+                latestAsset = asset;
+                latestVersion = releaseVersion;
             }
 
-            return null;
+            if (latestRelease == null || latestAsset == null)
+            {
+                return null;
+            }
+
+            changelogURL = latestRelease.HtmlUrl;
+            Status.Content = "Downloading Version " + latestVersion;
+            return new Uri(latestAsset.BrowserDownloadUrl);
+        }
+
+        private static bool IsReleaseZipAsset(ReleaseAsset asset)
+        {
+            return asset.Name.StartsWith("IL2-SimpleRadioStandalone", StringComparison.OrdinalIgnoreCase)
+                   && asset.Name.EndsWith(".zip", StringComparison.OrdinalIgnoreCase);
         }
 
         private bool AllowBeta()
@@ -159,6 +181,11 @@ namespace AutoUpdater
             try
             {
                 _uri = await GetPathToLatestVersion();
+                if (_uri == null)
+                {
+                    ShowError();
+                    return;
+                }
 
                 _directory = GetTemporaryDirectory();
                 _file = _directory + "\\temp.zip";
