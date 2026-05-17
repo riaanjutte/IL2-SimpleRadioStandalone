@@ -1,6 +1,6 @@
 # Changelog
 
-## IL2-SRS 1.0.3.0 community update
+## IL2-SRS 1.0.3.1 community update
 
 ### Added
 
