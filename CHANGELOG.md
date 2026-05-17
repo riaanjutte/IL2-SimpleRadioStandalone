@@ -12,6 +12,7 @@
 - Added translation contribution documentation in `IL2-SR-Client/Localization/README.md`.
 - Added automatic input-device rediscovery so joystick PTT bindings can recover after a temporary disconnect/reconnect without restarting SRS, when Windows exposes the same DirectInput device instance again.
 - Added a bindable control to mute or unmute the currently selected radio while preserving the previous radio volume.
+- Added a profile setting slider for the selected-radio muted volume, configurable from 5% to 50%.
 
 ### Changed
 

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.ServiceModel.Channels;
 using System.Text;
@@ -18,7 +19,9 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.Utils
 {
     public static class RadioHelper
     {
-        private const float MutedVolume = 0.0f;
+        private const float MinimumMutedVolume = 0.05f;
+        private const float MaximumMutedVolume = 0.50f;
+        private const float DefaultMutedVolume = 0.25f;
         private const float DefaultRestoredVolume = 1.0f;
         private static readonly Dictionary<int, float> PreviousRadioVolumes = new Dictionary<int, float>();
      
@@ -262,10 +265,12 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.Utils
                 return;
             }
 
-            if (currentRadio.volume > MutedVolume)
+            var mutedVolume = GetSelectedRadioMutedVolume();
+
+            if (currentRadio.volume > mutedVolume)
             {
                 PreviousRadioVolumes[selectedRadioId] = currentRadio.volume;
-                currentRadio.volume = MutedVolume;
+                currentRadio.volume = mutedVolume;
 
                 MessageHub.Instance.Publish(new TextToSpeechMessage()
                 {
@@ -275,7 +280,7 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.Utils
             else
             {
                 float restoredVolume;
-                if (!PreviousRadioVolumes.TryGetValue(selectedRadioId, out restoredVolume) || restoredVolume <= MutedVolume)
+                if (!PreviousRadioVolumes.TryGetValue(selectedRadioId, out restoredVolume) || restoredVolume <= mutedVolume)
                 {
                     restoredVolume = DefaultRestoredVolume;
                 }
@@ -287,6 +292,30 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.Utils
                     Message = "Radio " + selectedRadioId + " unmuted"
                 });
             }
+        }
+
+        private static float GetSelectedRadioMutedVolume()
+        {
+            var rawValue = GlobalSettingsStore.Instance.ProfileSettingsStore
+                .GetClientSetting(ProfileSettingsKeys.SelectedRadioMutedVolume).RawValue;
+
+            float mutedVolume;
+            if (!float.TryParse(rawValue, NumberStyles.Float, CultureInfo.InvariantCulture, out mutedVolume))
+            {
+                mutedVolume = DefaultMutedVolume;
+            }
+
+            if (mutedVolume < MinimumMutedVolume)
+            {
+                return MinimumMutedVolume;
+            }
+
+            if (mutedVolume > MaximumMutedVolume)
+            {
+                return MaximumMutedVolume;
+            }
+
+            return mutedVolume;
         }
 
         public static void PreviousRadio()

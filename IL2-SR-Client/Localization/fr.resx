@@ -294,6 +294,9 @@
   <data name="Text To Speech Volume" xml:space="preserve">
     <value>Volume de la synthese vocale</value>
   </data>
+  <data name="Selected Radio Muted Volume" xml:space="preserve">
+    <value>Volume radio coupee selectionnee</value>
+  </data>
   <data name="Wrap Next Radio" xml:space="preserve">
     <value>Boucler la radio suivante</value>
   </data>

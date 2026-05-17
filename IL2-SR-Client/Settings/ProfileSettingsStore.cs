@@ -51,6 +51,7 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.Settings
 
         EnableTextToSpeech, // if true - all changes are read out to channels or radios
         TextToSpeechVolume,
+        SelectedRadioMutedVolume,
         PTTReleaseDelay, // How long to hold the PTT after release
     }
 
@@ -84,6 +85,7 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.Settings
             {ProfileSettingsKeys.WrapNextRadio.ToString(), "true"},
             {ProfileSettingsKeys.EnableTextToSpeech.ToString(), "true"},
             {ProfileSettingsKeys.TextToSpeechVolume.ToString(), "1.0"},
+            {ProfileSettingsKeys.SelectedRadioMutedVolume.ToString(), "0.25"},
 
             {ProfileSettingsKeys.PTTReleaseDelay.ToString(), "250"},
             {ProfileSettingsKeys.Radio1Channel.ToString(), "-0.5"},

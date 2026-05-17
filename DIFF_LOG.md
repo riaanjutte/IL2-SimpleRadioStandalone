@@ -204,6 +204,7 @@ Current:
 
 - Adds selected-radio mute toggling.
 - Stores the previous volume per radio before muting.
+- Uses the profile-configured selected-radio muted volume instead of hard-coding mute to zero.
 - Restores the previous volume when the same selected-radio mute control is pressed again.
 - Ignores disabled radios and intercom for the selected-radio mute action.
 
@@ -223,6 +224,7 @@ Current:
 - Adds localized language selection to settings.
 - Widens and aligns controls to better fit translated text.
 - Adds the `Mute / Unmute Selected Radio` control binding row.
+- Adds a `Selected Radio Muted Volume` profile slider with a 5% to 50% range.
 - Adds layout changes that reduce clipping in General, Controls, Settings, and Profile Settings areas.
 - Preserves existing client workflow while making translated UI usable.
 
@@ -241,6 +243,7 @@ Current:
 - Adds language selection handling and restart-to-apply messaging.
 - Updates localized on/off toggle text from `IsChecked`, not from stale content.
 - Saves toggle state from `IsChecked` rather than displayed text.
+- Saves and reloads the selected-radio muted volume profile setting.
 - Refreshes toggle labels after profile/settings reload.
 - Localizes several dynamically created or code-behind strings.
 

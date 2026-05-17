@@ -294,6 +294,9 @@
   <data name="Text To Speech Volume" xml:space="preserve">
     <value>Text-to-Speech-Lautstaerke</value>
   </data>
+  <data name="Selected Radio Muted Volume" xml:space="preserve">
+    <value>Lautstaerke fuer stummes Funkgeraet</value>
+  </data>
   <data name="Wrap Next Radio" xml:space="preserve">
     <value>Naechstes Funkgeraet umbrechen</value>
   </data>

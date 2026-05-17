@@ -577,12 +577,21 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI
 
             //disable to set without triggering onchange
             TextToSpeechVolume.IsEnabled = false;
+            TextToSpeechVolume.ValueChanged -= TextToSpeechVolume_ValueChanged;
             TextToSpeechVolume.ValueChanged += TextToSpeechVolume_ValueChanged;
             TextToSpeechVolume.Value = double.Parse(_globalSettings.ProfileSettingsStore.GetClientSetting(ProfileSettingsKeys.TextToSpeechVolume).RawValue,CultureInfo.InvariantCulture);
             TextToSpeechVolume.IsEnabled = true;
 
             //disable to set without triggering onchange
+            SelectedRadioMutedVolume.IsEnabled = false;
+            SelectedRadioMutedVolume.ValueChanged -= SelectedRadioMutedVolume_ValueChanged;
+            SelectedRadioMutedVolume.ValueChanged += SelectedRadioMutedVolume_ValueChanged;
+            SelectedRadioMutedVolume.Value = double.Parse(_globalSettings.ProfileSettingsStore.GetClientSetting(ProfileSettingsKeys.SelectedRadioMutedVolume).RawValue, CultureInfo.InvariantCulture);
+            SelectedRadioMutedVolume.IsEnabled = true;
+
+            //disable to set without triggering onchange
             PTTReleaseDelay.IsEnabled = false;
+            PTTReleaseDelay.ValueChanged -= PushToTalkReleaseDelay_ValueChanged;
             PTTReleaseDelay.ValueChanged += PushToTalkReleaseDelay_ValueChanged;
             PTTReleaseDelay.Value = double.Parse(_globalSettings.ProfileSettingsStore.GetClientSetting(ProfileSettingsKeys.PTTReleaseDelay).RawValue, CultureInfo.InvariantCulture);
             PTTReleaseDelay.IsEnabled = true;
@@ -1445,6 +1454,12 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI
         {
             if(TextToSpeechVolume.IsEnabled)
                 _globalSettings.ProfileSettingsStore.SetClientSetting(ProfileSettingsKeys.TextToSpeechVolume, e.NewValue.ToString(CultureInfo.InvariantCulture));
+        }
+
+        private void SelectedRadioMutedVolume_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
+        {
+            if (SelectedRadioMutedVolume.IsEnabled)
+                _globalSettings.ProfileSettingsStore.SetClientSetting(ProfileSettingsKeys.SelectedRadioMutedVolume, e.NewValue.ToString(CultureInfo.InvariantCulture));
         }
 
         private void PushToTalkReleaseDelay_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
