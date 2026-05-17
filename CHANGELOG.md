@@ -52,6 +52,7 @@
 - Fixed brittle installer telemetry insertion that relied on raw substring checks and could fail with existing telemetry sections.
 - Fixed unsafe read-only handling in the installer that could overwrite file attributes incorrectly.
 - Fixed stale DirectInput devices blocking joystick PTT after a temporary disconnect.
+- Fixed IL-2 intercom routing so vehicle owners and crew members can hear each other using IL-2 parent vehicle/client IDs.
 
 ### Build Notes
 

@@ -70,6 +70,7 @@
     </Otherwise>
   </Choose>
   <ItemGroup>
+    <Compile Include="DCSState\PlayerGameStateTests.cs" />
     <Compile Include="Helpers\ConversionHelpersTests.cs" />
     <Compile Include="Network\UDPVoicePacketTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

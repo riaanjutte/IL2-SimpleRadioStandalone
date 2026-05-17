@@ -13,6 +13,7 @@ The update focuses on six areas:
 - Safer default profile settings.
 - More reliable installer and client handling of IL-2 `startup.cfg` telemetry.
 - Joystick/input-device reconnect recovery for PTT.
+- IL-2 intercom routing fixes for vehicle owners and crew members.
 - Documentation for translators and release/change tracking.
 
 ## Added Files
@@ -69,6 +70,16 @@ Current:
 
 - Explains how contributors can edit translation `.resx` files.
 - Documents fallback behavior and how to test translation changes.
+
+### `IL2-SR-CommonTests/DCSState/PlayerGameStateTests.cs`
+
+Original:
+
+- No regression coverage existed for IL-2 intercom vehicle/crew matching.
+
+Current:
+
+- Adds tests covering owner-to-crew, crew-to-owner, crew-to-crew, and different-vehicle intercom routing.
 
 ### `Installer/StartupConfigTelemetry.cs`
 
@@ -173,6 +184,41 @@ Current profile defaults:
 - `Radio2Channel=0.5`
 - `IntercomChannel=0`
 - Top-level radio voice effect and clipping remain off.
+
+### `IL2-SR-Common/DCSState/PlayerGameState.cs`
+
+Original:
+
+- Intercom receive checks compared IDs in a way that excluded the IL-2 vehicle owner/commander, because that player is reported with `vehicleId=-1`.
+- Crew-to-owner and some owner-to-crew intercom cases could fail even when both players were in the same vehicle.
+
+Current:
+
+- Normalizes intercom membership to an IL-2 vehicle group id.
+- Uses the parent vehicle/client id for crew members and the player unit id for the owner/commander.
+- Allows intercom only when both resolved group ids are valid and equal.
+
+### `IL2-SimpleRadio Server/Network/UDPVoiceRouter.cs`
+
+Original:
+
+- Server-side voice routing passed the receiving client's `vehicleId` as the sender vehicle id when checking whether the recipient could hear an intercom transmission.
+
+Current:
+
+- Reads the sender's current `PlayerGameState`.
+- Passes the sender's `unitId` and `vehicleId` into intercom reachability checks.
+- Falls back to the packet unit id when sender state is unavailable.
+
+### `IL2-SR-Client/Singletons/ConnectedClientsSingleton.cs`
+
+Original:
+
+- Tuned-client counting passed each remote client's `vehicleId` as the sender vehicle id.
+
+Current:
+
+- Uses the local player's current unit id and vehicle id when asking whether remote clients can hear the local transmission.
 
 ### `IL2-SR-Client/Input/InputDeviceManager.cs`
 
@@ -500,6 +546,7 @@ Current:
   - read-only `startup.cfg`
   - second-pass idempotency
 - Verified fresh profile defaults after profile-setting changes.
+- Added and ran intercom regression tests for owner/crew vehicle matching.
 - Used UI screenshots during localization/layout iteration to check French and Spanish clipping and alignment.
 
 ## Known Limitations

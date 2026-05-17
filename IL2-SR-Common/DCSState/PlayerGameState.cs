@@ -176,6 +176,23 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Common
 
             return diff < 500;
         }
+
+        public static int GetIntercomVehicleGroupId(long unitId, long vehicleId)
+        {
+            return (int)(vehicleId > -1 ? vehicleId : unitId);
+        }
+
+        public static bool IsSameIntercomVehicle(long receivingUnitId,
+            long receivingVehicleId,
+            long sendingUnitId,
+            long sendingVehicleId)
+        {
+            var receivingGroupId = GetIntercomVehicleGroupId(receivingUnitId, receivingVehicleId);
+            var sendingGroupId = GetIntercomVehicleGroupId(sendingUnitId, sendingVehicleId);
+
+            return receivingGroupId > 0 && sendingGroupId > 0 && receivingGroupId == sendingGroupId;
+        }
+
         public RadioInformation CanHearTransmission(double frequency,
             RadioInformation.Modulation modulation,
             long sendingUnitId,
@@ -197,8 +214,7 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Common
                     if ((receivingRadio.modulation == RadioInformation.Modulation.INTERCOM) &&
                         (modulation == RadioInformation.Modulation.INTERCOM))
                     {
-                        if (((unitId == vehicleId && unitId > -1) 
-                             || (vehicleId == sendingVehicleId && vehicleId > -1)))
+                        if (IsSameIntercomVehicle(unitId, vehicleId, sendingUnitId, sendingVehicleId))
                         {
                             receivingState = new RadioReceivingState
                             {

@@ -288,6 +288,9 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Server.Network
             SRClient fromClient)
         {
             var outgoingList = new HashSet<IPEndPoint>();
+            var senderGameState = fromClient.GameState;
+            var senderUnitId = senderGameState?.unitId ?? udpVoice.UnitId;
+            var senderVehicleId = senderGameState?.vehicleId ?? -1;
 
             var coalitionSecurity =
                 _serverSettings.GetGeneralSetting(ServerSettingsKeys.COALITION_AUDIO_SECURITY).BoolValue;
@@ -333,8 +336,8 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Server.Network
                                     RadioReceivingState radioReceivingState = null;
                                     var receivingRadio = radioInfo.CanHearTransmission(udpVoice.Frequencies[i],
                                         (RadioInformation.Modulation)udpVoice.Modulations[i],
-                                        udpVoice.UnitId,
-                                        radioInfo.vehicleId,
+                                        senderUnitId,
+                                        senderVehicleId,
                                         _emptyBlockedRadios,
                                         out radioReceivingState);
 
