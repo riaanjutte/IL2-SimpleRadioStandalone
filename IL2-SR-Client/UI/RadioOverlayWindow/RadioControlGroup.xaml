@@ -3,106 +3,46 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              Width="130"
 
-             Height="55" >
+             Height="70" >
 
     
 
-    <StackPanel Orientation="Vertical" Background="#444" HorizontalAlignment="Center" 
+    <StackPanel Orientation="Vertical" Background="#444" HorizontalAlignment="Center" Width="130"
                 Style="{x:Null}">
 
-        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" >
-                    <Button x:Name="Channel1"
-                       Width="15"
-                       Height="15"
-                       Margin="0,0,5,0"
-                       HorizontalAlignment="Center"
-                       FontFamily="Courier New"
-                       Click="ChannelOne_Click"
-                       Foreground="White"
-                   
-                       FontSize="10"
-                       Content="1"
-                       IsEnabled="True"
-                       Style="{StaticResource DarkStyle-Button}"
-                       ToolTip="Channel 1" />
-            <Button x:Name="Channel2"
-                    Margin="0,0,5,0"
-                    Width="15"
-                    Height="15"
-                    HorizontalAlignment="Center"
-                    FontFamily="Courier New"
-                    Click="ChannelTwo_Click"
-                    Foreground="White"
-                 
-                    FontSize="10"
-                    Content="2"
-                    IsEnabled="True"
-                    Style="{StaticResource DarkStyle-Button}"
-                    ToolTip="Channel 2" />
-                    <Button x:Name="Channel3"
-                            Width="15"
-                            Height="15"
-                            Margin="0,0,5,0"
-                            HorizontalAlignment="Center"
-                            VerticalContentAlignment="Center"
-                            HorizontalContentAlignment="Center"
-                            FontFamily="Courier New"
-                            Click="ChannelThree_Click"
-                            Foreground="White"
-                          
-                            FontSize="10"
-                            Content="3"
-                            IsEnabled="True"
-                            Style="{StaticResource DarkStyle-Button}"
-                            ToolTip="Channel 3" />
-                    <Button x:Name="Channel4"
-                            Width="15"
-                            Height="15"
-                            HorizontalAlignment="Center"
-                            Margin="0,0,5,0"
-                            VerticalContentAlignment="Center"
-                            HorizontalContentAlignment="Center"
-                            FontFamily="Courier New"
-                            Click="ChannelFour_Click"
-                            Foreground="White"
-                           
-                            FontSize="10"
-                            Content="4"
-                            IsEnabled="True"
-                            Style="{StaticResource DarkStyle-Button}"
-                            ToolTip="Channel 4" />
-                    <Button x:Name="Channel5"
-                            Width="15"
-                            Height="15"
-                            HorizontalAlignment="Center"
-                            VerticalContentAlignment="Center"
-                            HorizontalContentAlignment="Center"
-                            FontFamily="Courier New"
-                            Click="ChannelFive_Click"
-                            Foreground="White"
-                           
-                            FontSize="10"
-                            Content="5"
-                            IsEnabled="True"
-                            Style="{StaticResource DarkStyle-Button}"
-                            ToolTip="Channel 5" />
+        <Grid HorizontalAlignment="Center" Height="31">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="104" />
+                <ColumnDefinition Width="18" />
+            </Grid.ColumnDefinitions>
 
-                    <Ellipse x:Name="RadioActive"
-                             Width="12"
-                             Height="12"
-                             Margin="2"
-                             HorizontalAlignment="Right"
-                             VerticalAlignment="Center"
-                             Fill="#FF9900"
-                             MouseDown="RadioSelectSwitch"
-                             Stroke="Black"
-                             Style="{x:Null}"
-                             ToolTip="Selected Radio" />
-        </StackPanel>
+            <UniformGrid x:Name="ChannelGrid"
+                         Grid.Column="0"
+                         Columns="6"
+                         Rows="2"
+                         Width="102"
+                         Height="31"
+                         HorizontalAlignment="Center"
+                         VerticalAlignment="Center" />
+
+            <Ellipse x:Name="RadioActive"
+                     Grid.Column="1"
+                     Width="12"
+                     Height="12"
+                     Margin="2,2,2,0"
+                     HorizontalAlignment="Center"
+                     VerticalAlignment="Top"
+                     Fill="#FF9900"
+                     MouseDown="RadioSelectSwitch"
+                     Stroke="Black"
+                     Style="{x:Null}"
+                     ToolTip="Selected Radio" />
+        </Grid>
              
                     <TextBlock x:Name="RadioFrequency"
-                               Width="110"
-                               HorizontalAlignment="Center"
+                               Width="118"
+                               Height="17"
+                               HorizontalAlignment="Left"
                                VerticalAlignment="Center"
                                FontFamily="Courier New"
                                Background="Black"
@@ -111,21 +51,22 @@
                                Style="{x:Null}"
                                Text="CHN 1"
                                TextAlignment="Center"
-                               TextWrapping="NoWrap" Margin="5" />
+                               TextWrapping="NoWrap" Margin="5,2,0,2" />
 
-                <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,1,0,0">
+                <Grid HorizontalAlignment="Center" Height="17" Margin="0,0,0,0">
          
             <Slider x:Name="RadioVolume"
                             Width="80"
-                            Height="30"
-                            Margin="0,1,0,0"
+                            Height="18"
+                            Margin="0,0,0,0"
+                            VerticalAlignment="Center"
                             IsEnabled="True"
                             Maximum="100"
                             Thumb.DragCompleted="RadioVolume_DragCompleted"
                             Thumb.DragStarted="RadioVolume_DragStarted"  />
 
 
-                </StackPanel>
+                </Grid>
             </StackPanel>
    
 </UserControl>

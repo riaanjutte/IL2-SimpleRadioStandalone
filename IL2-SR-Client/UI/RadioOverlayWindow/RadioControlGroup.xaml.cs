@@ -21,6 +21,7 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI.RadioOverlayWindow
     public partial class RadioControlGroup : UserControl
     {
         private bool _dragging;
+        private readonly ConcurrentDictionary<int, Button> _channelButtons = new ConcurrentDictionary<int, Button>();
         private readonly ClientStateSingleton _clientStateSingleton = ClientStateSingleton.Instance;
         private readonly ConnectedClientsSingleton _connectClientsSingleton = ConnectedClientsSingleton.Instance;
 
@@ -29,6 +30,7 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI.RadioOverlayWindow
             this.DataContext = this; // set data context
 
             InitializeComponent();
+            CreateChannelButtons();
             LocalizationManager.LocalizeElement(this);
         }
 
@@ -51,6 +53,48 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI.RadioOverlayWindow
         private void RadioFrequencyText_Click(object sender, MouseButtonEventArgs e)
         {
             RadioHelper.SelectRadio(RadioId);
+        }
+
+        private void CreateChannelButtons()
+        {
+            ChannelGrid.Children.Clear();
+            _channelButtons.Clear();
+
+            for (var channel = 1; channel <= 12; channel++)
+            {
+                var button = new Button
+                {
+                    Width = 15,
+                    Height = 15,
+                    Margin = new Thickness(0, 0, 2, 0),
+                    HorizontalAlignment = HorizontalAlignment.Center,
+                    VerticalAlignment = VerticalAlignment.Center,
+                    HorizontalContentAlignment = HorizontalAlignment.Center,
+                    VerticalContentAlignment = VerticalAlignment.Center,
+                    FontFamily = new FontFamily("Courier New"),
+                    FontSize = channel >= 10 ? 8 : 10,
+                    Foreground = Brushes.White,
+                    Content = channel.ToString(CultureInfo.InvariantCulture),
+                    Tag = channel,
+                    IsEnabled = true,
+                    ToolTip = LocalizationManager.Format("Channel {0}", channel)
+                };
+
+                button.Style = (Style)FindResource("DarkStyle-Button");
+                button.Click += Channel_Click;
+
+                _channelButtons[channel] = button;
+                ChannelGrid.Children.Add(button);
+            }
+        }
+
+        private void Channel_Click(object sender, RoutedEventArgs e)
+        {
+            var button = sender as Button;
+            if (button?.Tag is int channel)
+            {
+                RadioHelper.SelectRadioChannel(channel, RadioId);
+            }
         }
 
         private void RadioVolume_DragStarted(object sender, RoutedEventArgs e)
@@ -82,6 +126,7 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI.RadioOverlayWindow
             {
                 RadioActive.Fill = new SolidColorBrush(Colors.Red);
                 RadioFrequency.Text = LocalizationManager.Get("Not Connected");
+                UpdateChannelButtonState(-1);
 
 
                 //reset dragging just incase
@@ -115,6 +160,7 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI.RadioOverlayWindow
                 }
 
                 RadioFrequency.Text = LocalizationManager.Format("CHN {0}", currentRadio.channel);
+                UpdateChannelButtonState(currentRadio.channel);
 
                 int count = _connectClientsSingleton.ClientsOnFreq(currentRadio.freq, currentRadio.modulation);
 
@@ -126,6 +172,26 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI.RadioOverlayWindow
                 if (_dragging == false)
                 {
                     RadioVolume.Value = currentRadio.volume * 100.0;
+                }
+            }
+        }
+
+        private void UpdateChannelButtonState(int selectedChannel)
+        {
+            foreach (var pair in _channelButtons)
+            {
+                var button = pair.Value;
+                if (pair.Key == selectedChannel)
+                {
+                    button.Foreground = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#00FF00"));
+                    button.BorderBrush = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#00FF00"));
+                    button.BorderThickness = new Thickness(1.5);
+                }
+                else
+                {
+                    button.Foreground = Brushes.White;
+                    button.ClearValue(BorderBrushProperty);
+                    button.ClearValue(BorderThicknessProperty);
                 }
             }
         }
@@ -165,30 +231,5 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI.RadioOverlayWindow
             }
         }
 
-        private void ChannelOne_Click(object sender, RoutedEventArgs e)
-        {
-            RadioHelper.SelectRadioChannel(1, RadioId);
-        }
-
-        private void ChannelTwo_Click(object sender, RoutedEventArgs e)
-        {
-            RadioHelper.SelectRadioChannel(2, RadioId);
-
-        }
-        private void ChannelThree_Click(object sender, RoutedEventArgs e)
-        {
-
-            RadioHelper.SelectRadioChannel(3, RadioId);
-        }
-
-        private void ChannelFour_Click(object sender, RoutedEventArgs e)
-        {
-            RadioHelper.SelectRadioChannel(4, RadioId);
-
-        }
-        private void ChannelFive_Click(object sender, RoutedEventArgs e)
-        {
-            RadioHelper.SelectRadioChannel(5, RadioId);
-        }
     }
 }

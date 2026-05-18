@@ -20,7 +20,7 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Overlay
     /// </summary>
     public partial class RadioOverlayWindow : Window
     {
-        private  double _aspectRatio;
+        private double _aspectRatio;
         private readonly Logger Logger = LogManager.GetCurrentClassLogger();
 
 
@@ -31,6 +31,8 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Overlay
         private readonly GlobalSettingsStore _globalSettings = GlobalSettingsStore.Instance;
 
         private readonly double _originalMinHeight;
+        private const double DefaultOverlayWidth = 130.0;
+        private const double DefaultOverlayHeight = 150.0;
     
         public RadioOverlayWindow()
         {
@@ -55,8 +57,8 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Overlay
             Left = _globalSettings.GetPositionSetting(GlobalSettingsKeys.RadioX).DoubleValue;
             Top = _globalSettings.GetPositionSetting(GlobalSettingsKeys.RadioY).DoubleValue;
 
-            Width = _globalSettings.GetPositionSetting(GlobalSettingsKeys.RadioWidth).DoubleValue;
-            Height = _globalSettings.GetPositionSetting(GlobalSettingsKeys.RadioHeight).DoubleValue;
+            Width = GetOverlayWidth(_globalSettings.GetPositionSetting(GlobalSettingsKeys.RadioWidth).DoubleValue);
+            Height = GetOverlayHeight(_globalSettings.GetPositionSetting(GlobalSettingsKeys.RadioHeight).DoubleValue);
 
             //  Window_Loaded(null, null);
             CalculateScale();
@@ -90,7 +92,7 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Overlay
                     //show
                     Radio2.Visibility = Visibility.Visible;
                     Radio2Seperator.Visibility = Visibility.Visible;
-                    MinHeight = _originalMinHeight + 55 + 10;
+                    MinHeight = _originalMinHeight + 70 + 25;
                     Recalculate();
                 }
 
@@ -216,6 +218,39 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Overlay
                 Height = sizeInfo.NewSize.Width / _aspectRatio;
 
             // Console.WriteLine(this.Height +" width:"+ this.Width);
+        }
+
+        private double GetOverlayWidth(double configuredWidth)
+        {
+            if (double.IsNaN(configuredWidth) || configuredWidth < MinWidth)
+            {
+                return DefaultOverlayWidth;
+            }
+
+            // Older overlay height calculations could save a much wider window.
+            // Keep the default compact width instead of carrying that forward.
+            if (configuredWidth > DefaultOverlayWidth * 1.35)
+            {
+                return DefaultOverlayWidth;
+            }
+
+            return configuredWidth;
+        }
+
+        private double GetOverlayHeight(double configuredHeight)
+        {
+            if (double.IsNaN(configuredHeight) || configuredHeight < MinHeight)
+            {
+                return DefaultOverlayHeight;
+            }
+
+            // Reset oversized dimensions saved while experimenting with the taller overlay.
+            if (configuredHeight > DefaultOverlayHeight * 1.35)
+            {
+                return DefaultOverlayHeight;
+            }
+
+            return configuredHeight;
         }
 
         #region ScaleValue Depdency Property //StackOverflow: http://stackoverflow.com/questions/3193339/tips-on-developing-resolution-independent-application/5000120#5000120
