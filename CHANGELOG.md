@@ -1,5 +1,31 @@
 # Changelog
 
+## IL2-SRS 1.0.3.3 community update
+
+### Added
+
+- Added twelve-channel support to the radio overlay, allowing all IL-2 radio channels to be selected from the overlay.
+- Added compact two-row channel selector buttons for each radio in the overlay.
+
+### Changed
+
+- Refined the radio overlay layout to stay close to the original overlay footprint while supporting channels 1-12.
+- Aligned radio status dots, intercom status dot, channel selector buttons, channel display boxes, volume sliders, and the opacity slider for a cleaner compact overlay.
+- Preserved the fixed-aspect overlay resize behavior to reduce flicker while resizing.
+- Clamped oversized saved overlay dimensions from previous test layouts back to the intended compact defaults.
+
+### Fixed
+
+- Fixed the overlay footer spacing so the opacity slider is no longer clipped.
+- Fixed overlay status dot alignment between radio and intercom rows.
+- Fixed black channel display box alignment against the selected radio status dot.
+- Fixed IL-2 telemetry setup to allow SRS to reuse an existing telemetry device port when IL-2 already has a matching enabled endpoint.
+
+### Validation
+
+- Built `IL2-SimpleRadioStandalone.sln` Release/x64 successfully.
+- Ran `IL2-SR-CommonTests`: 11/11 passed.
+
 ## IL2-SRS 1.0.3.2 community update
 
 ### Added
