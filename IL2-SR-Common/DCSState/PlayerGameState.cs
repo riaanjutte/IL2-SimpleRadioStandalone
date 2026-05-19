@@ -88,9 +88,9 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Common
             };
             radios[2] = new RadioInformation()
             {
-                channel = 1,
+                channel = 2,
                 expansion = false,
-                freq = START_FREQ + CHANNEL_OFFSET,//add offset as channel 1
+                freq = START_FREQ + (CHANNEL_OFFSET * 2),//add offset as channel 2
                 freqMode = RadioInformation.FreqMode.OVERLAY,
                 freqMax = 3e+8,
                 freqMin = 2e+8,

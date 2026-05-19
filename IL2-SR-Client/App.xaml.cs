@@ -64,6 +64,14 @@ namespace IL2_SR_Client
 
             ListArgs();
             LocalizationManager.Initialize(GlobalSettingsStore.Instance);
+            var theme = GlobalSettingsStore.Instance.GetClientSetting(GlobalSettingsKeys.Theme).RawValue;
+            var normalizedTheme = ClientThemeManager.NormalizeTheme(theme);
+            if (!string.Equals(theme, normalizedTheme, StringComparison.Ordinal))
+            {
+                GlobalSettingsStore.Instance.SetClientSetting(GlobalSettingsKeys.Theme, normalizedTheme);
+            }
+
+            ClientThemeManager.ApplyTheme(normalizedTheme);
 
 #if !DEBUG
             if (IsClientRunning())

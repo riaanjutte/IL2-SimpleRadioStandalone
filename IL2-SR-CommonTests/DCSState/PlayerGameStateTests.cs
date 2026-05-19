@@ -77,6 +77,17 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Common.Tests
             Assert.IsNull(receivingState);
         }
 
+        [TestMethod]
+        public void NewPlayerGameStateDefaultsRadio1ToChannel1AndRadio2ToChannel2()
+        {
+            var state = new PlayerGameState();
+
+            Assert.AreEqual(1, state.radios[1].channel);
+            Assert.AreEqual(PlayerGameState.START_FREQ + PlayerGameState.CHANNEL_OFFSET, state.radios[1].freq);
+            Assert.AreEqual(2, state.radios[2].channel);
+            Assert.AreEqual(PlayerGameState.START_FREQ + (PlayerGameState.CHANNEL_OFFSET * 2), state.radios[2].freq);
+        }
+
         private static PlayerGameState CreateIntercomState(int unitId, int vehicleId)
         {
             return new PlayerGameState

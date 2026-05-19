@@ -4,7 +4,6 @@ using System.Globalization;
 using System.Linq;
 using System.ServiceModel.Channels;
 using System.Text;
-using System.Threading.Tasks;
 using Ciribob.IL2.SimpleRadio.Standalone.Client.Audio.Models;
 using Ciribob.IL2.SimpleRadio.Standalone.Client.Network;
 using Ciribob.IL2.SimpleRadio.Standalone.Client.Network.Models;
@@ -271,11 +270,7 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.Utils
             {
                 PreviousRadioVolumes[selectedRadioId] = currentRadio.volume;
                 currentRadio.volume = mutedVolume;
-
-                MessageHub.Instance.Publish(new TextToSpeechMessage()
-                {
-                    Message = "Radio " + selectedRadioId + " muted"
-                });
+                PlaySelectedRadioMuteCue(selectedRadioId, false);
             }
             else
             {
@@ -286,12 +281,17 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.Utils
                 }
 
                 currentRadio.volume = restoredVolume;
-
-                MessageHub.Instance.Publish(new TextToSpeechMessage()
-                {
-                    Message = "Radio " + selectedRadioId + " unmuted"
-                });
+                PlaySelectedRadioMuteCue(selectedRadioId, true);
             }
+        }
+
+        private static void PlaySelectedRadioMuteCue(int radioId, bool unmuted)
+        {
+            MessageHub.Instance.Publish(new SelectedRadioMuteCueMessage()
+            {
+                RadioId = radioId,
+                Unmuted = unmuted
+            });
         }
 
         private static float GetSelectedRadioMutedVolume()

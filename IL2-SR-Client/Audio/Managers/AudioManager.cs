@@ -6,8 +6,10 @@ using System.IO;
 using System.Net;
 using System.Speech.AudioFormat;
 using System.Threading;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Speech.Synthesis;
+using Ciribob.IL2.SimpleRadio.Standalone.Client.Audio.Models;
 using Ciribob.IL2.SimpleRadio.Standalone.Client.Audio.Utility;
 using Ciribob.IL2.SimpleRadio.Standalone.Client.DSP;
 using Ciribob.IL2.SimpleRadio.Standalone.Client.Network;
@@ -141,6 +143,7 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.Audio.Managers
 
                 //Audio manager should start / stop and cleanup based on connection successfull and disconnect
                 //Should use listeners to synchronise all the state
+                _subs.Add(MessageHub.Instance.Subscribe<SelectedRadioMuteCueMessage>(PlaySelectedRadioMuteCue));
 
                 _waveOut = new WasapiOut(speakers, AudioClientShareMode.Shared, true, 40,windowsN);
 
@@ -552,6 +555,46 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.Audio.Managers
             _effectBuffer.AddAudioSamples(
                 _cachedAudioEffects[(int) CachedAudioEffect.AudioEffectTypes.RADIO_RX].AudioEffectBytes,
                 transmitOnRadio);
+        }
+
+        private void PlaySelectedRadioMuteCue(SelectedRadioMuteCueMessage message)
+        {
+            Task.Run(() =>
+            {
+                try
+                {
+                    PlaySelectedRadioMuteCueOnce(message.RadioId);
+                    if (message.Unmuted)
+                    {
+                        Thread.Sleep(90);
+                        PlaySelectedRadioMuteCueOnce(message.RadioId);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Logger.Warn(ex, "Unable to play selected radio mute cue");
+                }
+            });
+        }
+
+        private void PlaySelectedRadioMuteCueOnce(int radioId)
+        {
+            var effectsOutputBuffer = _effectsOutputBuffer;
+            if (effectsOutputBuffer == null || radioId < 0 || radioId >= effectsOutputBuffer.Length)
+            {
+                return;
+            }
+
+            var effectBuffer = effectsOutputBuffer[radioId];
+            if (effectBuffer == null)
+            {
+                return;
+            }
+
+            effectBuffer.VolumeSampleProvider.Volume = 1.0f;
+            effectBuffer.AddAudioSamples(
+                _cachedAudioEffects[(int) CachedAudioEffect.AudioEffectTypes.RADIO_TX].AudioEffectBytes,
+                radioId);
         }
 
 

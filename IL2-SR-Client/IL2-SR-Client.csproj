@@ -197,6 +197,7 @@
     </ApplicationDefinition>
     <Compile Include="Audio\Managers\EventDrivenResampler.cs" />
     <Compile Include="Audio\Managers\TextToSpeechManger.cs" />
+    <Compile Include="Audio\Models\SelectedRadioMuteCueMessage.cs" />
     <Compile Include="Audio\Models\TextToSpeechMessage.cs" />
     <Compile Include="Audio\Providers\AudioProvider.cs" />
     <Compile Include="Audio\Models\CachedAudioEffect.cs" />
@@ -285,6 +286,7 @@
     <Compile Include="UI\ToolTips.cs" />
     <Compile Include="Utils\DelegateCommand.cs" />
     <Compile Include="Utils\RadioHelper.cs" />
+    <Compile Include="Utils\ClientThemeManager.cs" />
     <Compile Include="Utils\StartupConfigTelemetry.cs" />
     <Compile Include="Utils\TransponderHelper.cs" />
     <Compile Include="Utils\ValueConverters\BooleanInverterConverter.cs" />

@@ -192,6 +192,15 @@
   <data name="Language" xml:space="preserve">
     <value>Sprache</value>
   </data>
+  <data name="Theme" xml:space="preserve">
+    <value>Design</value>
+  </data>
+  <data name="Light" xml:space="preserve">
+    <value>Hell</value>
+  </data>
+  <data name="Dark" xml:space="preserve">
+    <value>Dunkel</value>
+  </data>
   <data name="Auto Connect Prompt" xml:space="preserve">
     <value>Auto-Verbindungsabfrage</value>
   </data>
@@ -206,6 +215,9 @@
   </data>
   <data name="Hide Overlay Taskbar Item" xml:space="preserve">
     <value>Overlay in Taskleiste ausblenden</value>
+  </data>
+  <data name="Auto Start Radio Overlay" xml:space="preserve">
+    <value>Funk-Overlay automatisch starten</value>
   </data>
   <data name="Auto Refocus IL2" xml:space="preserve">
     <value>IL2 automatisch fokussieren</value>

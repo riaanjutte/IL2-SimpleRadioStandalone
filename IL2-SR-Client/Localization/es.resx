@@ -192,6 +192,15 @@
   <data name="Language" xml:space="preserve">
     <value>Idioma</value>
   </data>
+  <data name="Theme" xml:space="preserve">
+    <value>Tema</value>
+  </data>
+  <data name="Light" xml:space="preserve">
+    <value>Claro</value>
+  </data>
+  <data name="Dark" xml:space="preserve">
+    <value>Oscuro</value>
+  </data>
   <data name="Auto Connect Prompt" xml:space="preserve">
     <value>Aviso de conexion automatica</value>
   </data>
@@ -206,6 +215,9 @@
   </data>
   <data name="Hide Overlay Taskbar Item" xml:space="preserve">
     <value>Ocultar superposicion en la barra de tareas</value>
+  </data>
+  <data name="Auto Start Radio Overlay" xml:space="preserve">
+    <value>Iniciar superposicion de radio automaticamente</value>
   </data>
   <data name="Auto Refocus IL2" xml:space="preserve">
     <value>Reenfocar IL2 automaticamente</value>

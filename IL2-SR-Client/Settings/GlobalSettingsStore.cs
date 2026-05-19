@@ -20,6 +20,7 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.Settings
         ExpandControls,
         AutoConnectPrompt, //message about auto connect
         RadioOverlayTaskbarHide,
+        AutoStartRadioOverlay,
 
         AudioInputDeviceId,
         AudioOutputDeviceId,
@@ -34,6 +35,8 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.Settings
         RadioHeight,
         ClientX,
         ClientY,
+        ClientWidth,
+        ClientHeight,
         AwacsX,
         AwacsY,
         MicAudioOutputDeviceId,
@@ -67,6 +70,7 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.Settings
 
         SettingsProfiles,
         Language,
+        Theme,
 
         ShowTransmitterName
     }
@@ -282,6 +286,7 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.Settings
             {GlobalSettingsKeys.AutoConnectPrompt.ToString(), "false"},
             {GlobalSettingsKeys.AutoConnectMismatchPrompt.ToString(), "true"},
             {GlobalSettingsKeys.RadioOverlayTaskbarHide.ToString(), "false"},
+            {GlobalSettingsKeys.AutoStartRadioOverlay.ToString(), "true"},
             {GlobalSettingsKeys.RefocusIL2.ToString(), "false"},
             {GlobalSettingsKeys.ExpandControls.ToString(), "false"},
 
@@ -303,11 +308,13 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.Settings
             {GlobalSettingsKeys.RadioSize.ToString(), "1.0"},
             {GlobalSettingsKeys.RadioOpacity.ToString(), "1.0"},
 
-            {GlobalSettingsKeys.RadioWidth.ToString(), "122"},
-            {GlobalSettingsKeys.RadioHeight.ToString(), "270"},
+            {GlobalSettingsKeys.RadioWidth.ToString(), "260"},
+            {GlobalSettingsKeys.RadioHeight.ToString(), "300"},
 
             {GlobalSettingsKeys.ClientX.ToString(), "200"},
             {GlobalSettingsKeys.ClientY.ToString(), "200"},
+            {GlobalSettingsKeys.ClientWidth.ToString(), "700"},
+            {GlobalSettingsKeys.ClientHeight.ToString(), "650"},
 
             {GlobalSettingsKeys.AwacsX.ToString(), "300"},
             {GlobalSettingsKeys.AwacsY.ToString(), "300"},
@@ -340,6 +347,7 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.Settings
             {GlobalSettingsKeys.RequireAdmin.ToString(),"true" },
 
             {GlobalSettingsKeys.Language.ToString(), "" },
+            {GlobalSettingsKeys.Theme.ToString(), "Light" },
 
             {GlobalSettingsKeys.ShowTransmitterName.ToString(), "true"},
 

@@ -1,5 +1,29 @@
 # Changelog
 
+## IL2-SRS 1.0.3.4 community update
+
+### Added
+
+- Added a light/dark theme picker in the client settings, with light mode as the default.
+- Added automatic radio overlay startup, controlled by a client setting.
+- Added saved main-window and radio-overlay size/position restore on startup.
+- Added mute/unmute audio cues for the selected-radio mute binding.
+
+### Changed
+
+- Changed selected-radio mute/unmute so it no longer announces through text-to-speech while muting.
+- Changed default IL-2 radio startup channels so radio 1 starts on channel 1 and radio 2 starts on channel 2.
+
+### Fixed
+
+- Fixed radio overlay startup sizing so the larger default size is applied once and does not double on every restart.
+- Fixed dark-mode readability for disabled buttons, hover states, favourites/server list headers and rows, generated grid cells, and themed button text.
+
+### Validation
+
+- Built `IL2-SimpleRadioStandalone.sln` Release/x64 successfully.
+- Ran `IL2-SR-CommonTests`: 12/12 passed.
+
 ## IL2-SRS 1.0.3.3 community update
 
 ### Added

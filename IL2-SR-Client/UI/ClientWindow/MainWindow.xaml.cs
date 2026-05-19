@@ -77,6 +77,7 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI
         private ServerAddress _serverAddress;
         private readonly DelegateCommand _connectCommand;
         private bool _initialisingLanguagePicker;
+        private bool _initialisingThemePicker;
 
         private readonly GlobalSettingsStore _globalSettings = GlobalSettingsStore.Instance;
 
@@ -102,6 +103,9 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI
             InitializeComponent();
             LocalizationManager.LocalizeElement(this);
             LocalizationManager.LocalizeFlowDocument(AboutFlowDocument);
+            ClientThemeManager.ApplyThemeToWindow(this, _globalSettings.GetClientSetting(GlobalSettingsKeys.Theme).RawValue);
+            Loaded += MainWindow_Loaded;
+            TabControl.SelectionChanged += MainTabControl_SelectionChanged;
 
             // Initialize ToolTip controls
             ToolTips.Init();
@@ -119,6 +123,8 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI
             WindowStartupLocation = WindowStartupLocation.Manual;
             Left = _globalSettings.GetPositionSetting(GlobalSettingsKeys.ClientX).DoubleValue;
             Top = _globalSettings.GetPositionSetting(GlobalSettingsKeys.ClientY).DoubleValue;
+            Width = GetClientWindowWidth(_globalSettings.GetPositionSetting(GlobalSettingsKeys.ClientWidth).DoubleValue);
+            Height = GetClientWindowHeight(_globalSettings.GetPositionSetting(GlobalSettingsKeys.ClientHeight).DoubleValue);
 
             Title = Title + " - " + UpdaterChecker.VERSION;
 
@@ -179,6 +185,27 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI
 
         }
 
+        private void MainWindow_Loaded(object sender, RoutedEventArgs e)
+        {
+            ApplyCurrentTheme();
+            AutoStartRadioOverlay();
+        }
+
+        private void MainTabControl_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            if (sender == TabControl)
+            {
+                ApplyCurrentTheme();
+            }
+        }
+
+        private void ApplyCurrentTheme()
+        {
+            Dispatcher.BeginInvoke(new Action(() =>
+                ClientThemeManager.ApplyThemeToWindow(this, _globalSettings.GetClientSetting(GlobalSettingsKeys.Theme).RawValue)),
+                DispatcherPriority.ContextIdle);
+        }
+
         private void CheckWindowVisibility()
         {
             if (_globalSettings.GetClientSettingBool(GlobalSettingsKeys.DisableWindowVisibilityCheck))
@@ -235,9 +262,13 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI
 
                 _globalSettings.SetPositionSetting(GlobalSettingsKeys.ClientX, 200);
                 _globalSettings.SetPositionSetting(GlobalSettingsKeys.ClientY, 200);
+                _globalSettings.SetPositionSetting(GlobalSettingsKeys.ClientWidth, 700);
+                _globalSettings.SetPositionSetting(GlobalSettingsKeys.ClientHeight, 650);
 
                 Left = 200;
                 Top = 200;
+                Width = 700;
+                Height = 650;
             }
 
             if (!radioWindowVisible)
@@ -526,11 +557,14 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI
         private void InitSettingsScreen()
         {
             InitLanguagePicker();
+            InitThemePicker();
 
             AutoConnectPromptToggle.IsChecked = _globalSettings.GetClientSettingBool(GlobalSettingsKeys.AutoConnectPrompt);
             AutoConnectMismatchPromptToggle.IsChecked = _globalSettings.GetClientSettingBool(GlobalSettingsKeys.AutoConnectMismatchPrompt);
             RadioOverlayTaskbarItem.IsChecked =
                 _globalSettings.GetClientSettingBool(GlobalSettingsKeys.RadioOverlayTaskbarHide);
+            AutoStartRadioOverlayToggle.IsChecked =
+                _globalSettings.GetClientSettingBool(GlobalSettingsKeys.AutoStartRadioOverlay);
             RefocusIL2.IsChecked = _globalSettings.GetClientSettingBool(GlobalSettingsKeys.RefocusIL2);
             ExpandInputDevices.IsChecked = _globalSettings.GetClientSettingBool(GlobalSettingsKeys.ExpandControls);
 
@@ -548,6 +582,21 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI
             ShowTransmitterName.IsChecked = _globalSettings.GetClientSettingBool(GlobalSettingsKeys.ShowTransmitterName);
 
             RefreshOnOffToggleContent();
+        }
+
+        private void InitThemePicker()
+        {
+            _initialisingThemePicker = true;
+            var theme = _globalSettings.GetClientSetting(GlobalSettingsKeys.Theme).RawValue;
+            var normalizedTheme = ClientThemeManager.NormalizeTheme(theme);
+            if (!string.Equals(theme, normalizedTheme, StringComparison.Ordinal))
+            {
+                _globalSettings.SetClientSetting(GlobalSettingsKeys.Theme, normalizedTheme);
+            }
+
+            DarkThemeRadioButton.IsChecked = ClientThemeManager.IsDarkTheme(normalizedTheme);
+            LightThemeRadioButton.IsChecked = !ClientThemeManager.IsDarkTheme(normalizedTheme);
+            _initialisingThemePicker = false;
         }
 
         private void InitLanguagePicker()
@@ -617,6 +666,7 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI
             yield return AutoConnectPromptToggle;
             yield return AutoConnectMismatchPromptToggle;
             yield return RadioOverlayTaskbarItem;
+            yield return AutoStartRadioOverlayToggle;
             yield return RefocusIL2;
             yield return ExpandInputDevices;
             yield return MinimiseToTray;
@@ -898,10 +948,14 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI
             MessageHub.Instance.ClearSubscriptions();
             _il2RadioSyncManager.Stop();
 
-            _globalSettings.SetPositionSetting(GlobalSettingsKeys.ClientX, Left);
-            _globalSettings.SetPositionSetting(GlobalSettingsKeys.ClientY, Top);
+            var bounds = WindowState == WindowState.Normal ? new Rect(Left, Top, Width, Height) : RestoreBounds;
 
-            //save window position
+            _globalSettings.SetPositionSetting(GlobalSettingsKeys.ClientX, bounds.Left);
+            _globalSettings.SetPositionSetting(GlobalSettingsKeys.ClientY, bounds.Top);
+            _globalSettings.SetPositionSetting(GlobalSettingsKeys.ClientWidth, bounds.Width);
+            _globalSettings.SetPositionSetting(GlobalSettingsKeys.ClientHeight, bounds.Height);
+
+            //save window position and size
             base.OnClosing(e);
 
             //stop timer
@@ -917,6 +971,26 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI
 
 
 
+        }
+
+        private double GetClientWindowWidth(double configuredWidth)
+        {
+            if (double.IsNaN(configuredWidth) || configuredWidth <= 0)
+            {
+                return 700;
+            }
+
+            return Math.Max(MinWidth, configuredWidth);
+        }
+
+        private double GetClientWindowHeight(double configuredHeight)
+        {
+            if (double.IsNaN(configuredHeight) || configuredHeight <= 0)
+            {
+                return 650;
+            }
+
+            return Math.Max(MinHeight, configuredHeight);
         }
 
         protected override void OnStateChanged(EventArgs e)
@@ -1019,15 +1093,7 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI
                 if ((_radioOverlayWindow == null) || !_radioOverlayWindow.IsVisible ||
                     (_radioOverlayWindow.WindowState == WindowState.Minimized))
                 {
-
-                    _radioOverlayWindow?.Close();
-
-                    _radioOverlayWindow = new Overlay.RadioOverlayWindow();
-
-
-                    _radioOverlayWindow.ShowInTaskbar =
-                        !_globalSettings.GetClientSettingBool(GlobalSettingsKeys.RadioOverlayTaskbarHide);
-                    _radioOverlayWindow.Show();
+                    ShowRadioOverlay();
                 }
                 else
                 {
@@ -1035,6 +1101,33 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI
                     _radioOverlayWindow = null;
                 }
             }
+        }
+
+        private void AutoStartRadioOverlay()
+        {
+            if (!_globalSettings.GetClientSettingBool(GlobalSettingsKeys.AutoStartRadioOverlay))
+            {
+                return;
+            }
+
+            Dispatcher.BeginInvoke(new Action(ShowRadioOverlay), DispatcherPriority.ContextIdle);
+        }
+
+        private void ShowRadioOverlay()
+        {
+            if (_radioOverlayWindow != null && _radioOverlayWindow.IsVisible &&
+                _radioOverlayWindow.WindowState != WindowState.Minimized)
+            {
+                return;
+            }
+
+            _radioOverlayWindow?.Close();
+
+            _radioOverlayWindow = new Overlay.RadioOverlayWindow
+            {
+                ShowInTaskbar = !_globalSettings.GetClientSettingBool(GlobalSettingsKeys.RadioOverlayTaskbarHide)
+            };
+            _radioOverlayWindow.Show();
         }
 
      
@@ -1129,8 +1222,8 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI
             _globalSettings.SetPositionSetting(GlobalSettingsKeys.RadioX, 300);
             _globalSettings.SetPositionSetting(GlobalSettingsKeys.RadioY,300);
                             
-            _globalSettings.SetPositionSetting(GlobalSettingsKeys.RadioWidth, 122);
-            _globalSettings.SetPositionSetting(GlobalSettingsKeys.RadioHeight, 270);
+            _globalSettings.SetPositionSetting(GlobalSettingsKeys.RadioWidth, 260);
+            _globalSettings.SetPositionSetting(GlobalSettingsKeys.RadioHeight, 300);
                          
             _globalSettings.SetPositionSetting(GlobalSettingsKeys.RadioOpacity, 1.0);
         }
@@ -1171,6 +1264,11 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI
             if (_radioOverlayWindow != null)
                 _radioOverlayWindow.ShowInTaskbar = !_globalSettings.GetClientSettingBool(GlobalSettingsKeys.RadioOverlayTaskbarHide);
          
+        }
+
+        private void AutoStartRadioOverlayToggle_Click(object sender, RoutedEventArgs e)
+        {
+            _globalSettings.SetClientSetting(GlobalSettingsKeys.AutoStartRadioOverlay, (bool) AutoStartRadioOverlayToggle.IsChecked);
         }
 
         private void IL2Refocus_OnClick_Click(object sender, RoutedEventArgs e)
@@ -1288,6 +1386,21 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI
                 LocalizationManager.Get("Restart Required"),
                 MessageBoxButton.OK,
                 MessageBoxImage.Information);
+        }
+
+        private void ThemeRadioButton_Checked(object sender, RoutedEventArgs e)
+        {
+            if (_initialisingThemePicker)
+            {
+                return;
+            }
+
+            var theme = DarkThemeRadioButton.IsChecked == true
+                ? ClientThemeManager.DarkTheme
+                : ClientThemeManager.LightTheme;
+
+            _globalSettings.SetClientSetting(GlobalSettingsKeys.Theme, theme);
+            ClientThemeManager.ApplyTheme(theme);
         }
 
         private void SetSRSPath_Click(object sender, RoutedEventArgs e)

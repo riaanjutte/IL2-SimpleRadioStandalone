@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Diagnostics;
 using System.Linq;
 using System.Net;
@@ -21,7 +21,7 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Common
 
         public static readonly string MINIMUM_PROTOCOL_VERSION = "1.0.0.0";
 
-        public static readonly string VERSION = "1.0.3.3";
+        public static readonly string VERSION = "1.0.3.4";
 
         private static readonly Logger _logger = LogManager.GetCurrentClassLogger();
 

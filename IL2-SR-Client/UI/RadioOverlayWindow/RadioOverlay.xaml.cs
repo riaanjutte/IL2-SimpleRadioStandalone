@@ -31,8 +31,11 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Overlay
         private readonly GlobalSettingsStore _globalSettings = GlobalSettingsStore.Instance;
 
         private readonly double _originalMinHeight;
-        private const double DefaultOverlayWidth = 130.0;
-        private const double DefaultOverlayHeight = 150.0;
+        private const double DefaultOverlayWidth = 260.0;
+        private const double DefaultOverlayHeight = 300.0;
+        private const double OldDefaultOverlayWidth = 122.0;
+        private const double OldDefaultOverlayHeight = 270.0;
+        private bool _suppressSizeHandling = true;
     
         public RadioOverlayWindow()
         {
@@ -57,11 +60,19 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Overlay
             Left = _globalSettings.GetPositionSetting(GlobalSettingsKeys.RadioX).DoubleValue;
             Top = _globalSettings.GetPositionSetting(GlobalSettingsKeys.RadioY).DoubleValue;
 
-            Width = GetOverlayWidth(_globalSettings.GetPositionSetting(GlobalSettingsKeys.RadioWidth).DoubleValue);
-            Height = GetOverlayHeight(_globalSettings.GetPositionSetting(GlobalSettingsKeys.RadioHeight).DoubleValue);
+            var configuredWidth = _globalSettings.GetPositionSetting(GlobalSettingsKeys.RadioWidth).DoubleValue;
+            var configuredHeight = _globalSettings.GetPositionSetting(GlobalSettingsKeys.RadioHeight).DoubleValue;
+            var migratedOldDefaultSize = IsOldDefaultOverlaySize(configuredWidth, configuredHeight);
+            Width = GetOverlayWidth(configuredWidth, migratedOldDefaultSize);
+            Height = GetOverlayHeight(configuredHeight, migratedOldDefaultSize);
 
-            //  Window_Loaded(null, null);
-            CalculateScale();
+            if (migratedOldDefaultSize)
+            {
+                _globalSettings.SetPositionSetting(GlobalSettingsKeys.RadioWidth, Width);
+                _globalSettings.SetPositionSetting(GlobalSettingsKeys.RadioHeight, Height);
+            }
+
+            Loaded += RadioOverlayWindow_Loaded;
 
             LocationChanged += Location_Changed;
 
@@ -75,6 +86,12 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Overlay
 
         private void Location_Changed(object sender, EventArgs e)
         {
+        }
+
+        private void RadioOverlayWindow_Loaded(object sender, RoutedEventArgs e)
+        {
+            _suppressSizeHandling = false;
+            CalculateScale();
         }
 
         private void RadioRefresh(object sender, EventArgs eventArgs)
@@ -118,8 +135,11 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Overlay
         private void Recalculate()
         {
             _aspectRatio = MinWidth / MinHeight;
-            containerPanel_SizeChanged(null, null);
-            Height = Height+1;
+            if (!_suppressSizeHandling)
+            {
+                Height = Width / _aspectRatio;
+                CalculateScale();
+            }
         }
 
         private long _lastFocus;
@@ -158,11 +178,13 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Overlay
 
         protected override void OnClosing(CancelEventArgs e)
         {
-            _globalSettings.SetPositionSetting(GlobalSettingsKeys.RadioWidth, Width);
-            _globalSettings.SetPositionSetting(GlobalSettingsKeys.RadioHeight,Height);
+            var bounds = WindowState == WindowState.Normal ? new Rect(Left, Top, Width, Height) : RestoreBounds;
+
+            _globalSettings.SetPositionSetting(GlobalSettingsKeys.RadioWidth, bounds.Width);
+            _globalSettings.SetPositionSetting(GlobalSettingsKeys.RadioHeight, bounds.Height);
             _globalSettings.SetPositionSetting(GlobalSettingsKeys.RadioOpacity,Opacity);
-            _globalSettings.SetPositionSetting(GlobalSettingsKeys.RadioX,Left);
-            _globalSettings.SetPositionSetting(GlobalSettingsKeys.RadioY, Top);
+            _globalSettings.SetPositionSetting(GlobalSettingsKeys.RadioX, bounds.Left);
+            _globalSettings.SetPositionSetting(GlobalSettingsKeys.RadioY, bounds.Top);
             base.OnClosing(e);
 
             _updateTimer.Stop();
@@ -195,6 +217,11 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Overlay
 
         private void containerPanel_SizeChanged(object sender, SizeChangedEventArgs e)
         {
+            if (_suppressSizeHandling)
+            {
+                return;
+            }
+
             //force aspect ratio
             CalculateScale();
 
@@ -204,7 +231,7 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Overlay
 
         private void CalculateScale()
         {
-            var yScale = ActualHeight / RadioOverlayWin.MinWidth;
+            var yScale = ActualHeight / RadioOverlayWin.MinHeight;
             var xScale = ActualWidth / RadioOverlayWin.MinWidth;
             var value = Math.Min(xScale, yScale);
             ScaleValue = (double) OnCoerceScaleValue(RadioOverlayWin, value);
@@ -212,42 +239,65 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Overlay
 
         protected override void OnRenderSizeChanged(SizeChangedInfo sizeInfo)
         {
-            if (sizeInfo.WidthChanged)
-                Width = sizeInfo.NewSize.Height * _aspectRatio;
-            else
-                Height = sizeInfo.NewSize.Width / _aspectRatio;
+            base.OnRenderSizeChanged(sizeInfo);
+
+            if (_suppressSizeHandling || !IsLoaded)
+            {
+                return;
+            }
+
+            try
+            {
+                _suppressSizeHandling = true;
+
+                if (sizeInfo.WidthChanged && !sizeInfo.HeightChanged)
+                {
+                    Height = sizeInfo.NewSize.Width / _aspectRatio;
+                }
+                else if (sizeInfo.HeightChanged && !sizeInfo.WidthChanged)
+                {
+                    Width = sizeInfo.NewSize.Height * _aspectRatio;
+                }
+            }
+            finally
+            {
+                _suppressSizeHandling = false;
+            }
 
             // Console.WriteLine(this.Height +" width:"+ this.Width);
         }
 
-        private double GetOverlayWidth(double configuredWidth)
+        private bool IsOldDefaultOverlaySize(double configuredWidth, double configuredHeight)
         {
-            if (double.IsNaN(configuredWidth) || configuredWidth < MinWidth)
+            return Math.Abs(configuredWidth - OldDefaultOverlayWidth) < 0.5 &&
+                   Math.Abs(configuredHeight - OldDefaultOverlayHeight) < 0.5;
+        }
+
+        private double GetOverlayWidth(double configuredWidth, bool useDefaultSize)
+        {
+            if (useDefaultSize || double.IsNaN(configuredWidth) || configuredWidth <= 0)
             {
                 return DefaultOverlayWidth;
             }
 
-            // Older overlay height calculations could save a much wider window.
-            // Keep the default compact width instead of carrying that forward.
-            if (configuredWidth > DefaultOverlayWidth * 1.35)
+            if (configuredWidth < MinWidth)
             {
-                return DefaultOverlayWidth;
+                return MinWidth;
             }
 
             return configuredWidth;
         }
 
-        private double GetOverlayHeight(double configuredHeight)
+        private double GetOverlayHeight(double configuredHeight, bool useDefaultSize)
         {
-            if (double.IsNaN(configuredHeight) || configuredHeight < MinHeight)
+            if (useDefaultSize || double.IsNaN(configuredHeight) || configuredHeight <= 0)
             {
                 return DefaultOverlayHeight;
             }
 
-            // Reset oversized dimensions saved while experimenting with the taller overlay.
-            if (configuredHeight > DefaultOverlayHeight * 1.35)
+            if (configuredHeight < MinHeight)
             {
-                return DefaultOverlayHeight;
+                return MinHeight;
             }
 
             return configuredHeight;
