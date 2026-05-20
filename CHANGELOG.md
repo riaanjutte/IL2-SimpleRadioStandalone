@@ -1,5 +1,18 @@
 # Changelog
 
+## IL2-SRS 1.0.3.6 community update
+
+### Fixed
+
+- Fixed radio and intercom overlay volume sliders so user value changes are applied immediately, including track clicks and other non-drag slider changes.
+- Hardened microphone capture and encoding against bad audio states that could produce distorted outgoing voice until the client was restarted.
+- Added recovery for unexpected microphone capture stops so the client attempts to restart capture without requiring a full app restart.
+
+### Validation
+
+- Built `IL2-SimpleRadioStandalone.sln` Release/x64 successfully.
+- Ran `IL2-SR-CommonTests`: 12/12 passed.
+
 ## IL2-SRS 1.0.3.5 community update
 
 ### Added

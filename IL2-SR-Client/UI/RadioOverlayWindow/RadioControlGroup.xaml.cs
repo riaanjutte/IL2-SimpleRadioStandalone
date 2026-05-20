@@ -21,6 +21,7 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI.RadioOverlayWindow
     public partial class RadioControlGroup : UserControl
     {
         private bool _dragging;
+        private bool _syncingSliderFromState;
         private readonly ConcurrentDictionary<int, Button> _channelButtons = new ConcurrentDictionary<int, Button>();
         private readonly ClientStateSingleton _clientStateSingleton = ClientStateSingleton.Instance;
         private readonly ConnectedClientsSingleton _connectClientsSingleton = ConnectedClientsSingleton.Instance;
@@ -105,16 +106,23 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI.RadioOverlayWindow
 
         private void RadioVolume_DragCompleted(object sender, RoutedEventArgs e)
         {
-            var currentRadio = _clientStateSingleton.PlayerGameState.radios[RadioId];
+            SetVolumeFromSlider();
+            _dragging = false;
+        }
 
-            if (currentRadio.volMode == RadioInformation.VolumeMode.OVERLAY)
+        private void RadioVolume_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
+        {
+            SetVolumeFromSlider();
+        }
+
+        private void SetVolumeFromSlider()
+        {
+            if (!IsLoaded || _syncingSliderFromState || _clientStateSingleton.PlayerGameState == null)
             {
-                var clientRadio = _clientStateSingleton.PlayerGameState.radios[RadioId];
-
-                clientRadio.volume = (float) RadioVolume.Value / 100.0f;
+                return;
             }
 
-            _dragging = false;
+            RadioHelper.SetRadioVolume((float)RadioVolume.Value / 100.0f, RadioId);
         }
 
 
@@ -171,7 +179,9 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI.RadioOverlayWindow
 
                 if (_dragging == false)
                 {
+                    _syncingSliderFromState = true;
                     RadioVolume.Value = currentRadio.volume * 100.0;
+                    _syncingSliderFromState = false;
                 }
             }
         }

@@ -41,6 +41,10 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.Audio.Managers
         public static readonly int SEGMENT_FRAMES = (INPUT_SAMPLE_RATE / 1000) * INPUT_AUDIO_LENGTH_MS
             ; //640 is 40ms as INPUT_SAMPLE_RATE / 1000 *40 = 640
 
+        private const int MIC_PIPELINE_RESET_COOLDOWN_MS = 5000;
+        private const int BAD_MIC_FRAMES_BEFORE_RESET = 12;
+        private const int ENCODE_ERRORS_BEFORE_RESET = 3;
+
         private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
 
         private readonly CachedAudioEffect[] _cachedAudioEffects;
@@ -80,6 +84,10 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.Audio.Managers
         private Preprocessor _speex;
         private readonly bool windowsN;
         private int _errorCount = 0;
+        private int _badMicFrameCount = 0;
+        private long _lastMicPipelineResetUtcTicks = DateTime.MinValue.Ticks;
+        private bool _stoppingEncoding = false;
+        private int _micCaptureRestartInProgress = 0;
         //Stopwatch _stopwatch = new Stopwatch();
 
         object lockObj = new object();
@@ -135,6 +143,9 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.Audio.Managers
 
             try
             {
+                _stoppingEncoding = false;
+                _badMicFrameCount = 0;
+                _errorCount = 0;
                 _micInputQueue.Clear();
 
                 InitMixers();
@@ -313,107 +324,283 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.Audio.Managers
 
         private void WasapiCaptureOnRecordingStopped(object sender, StoppedEventArgs e)
         {
-            Logger.Error("Recording Stopped");
+            if (_stoppingEncoding)
+            {
+                Logger.Info("Recording stopped during audio shutdown");
+                return;
+            }
+
+            if (e?.Exception != null)
+            {
+                Logger.Error(e.Exception, "Recording stopped unexpectedly. Restarting microphone capture.");
+            }
+            else
+            {
+                Logger.Warn("Recording stopped unexpectedly. Restarting microphone capture.");
+            }
+
+            RestartMicCaptureAfterUnexpectedStop();
         }
         Stopwatch _stopwatch = new Stopwatch();
        
         private void WasapiCaptureOnDataAvailable(object sender, WaveInEventArgs e)
         {
-            if (_resampler == null)
+            lock (lockObj)
             {
-                //create and use in the same thread or COM issues
-                _resampler = new EventDrivenResampler(windowsN, _wasapiCapture.WaveFormat, new WaveFormat(AudioManager.INPUT_SAMPLE_RATE, 16, 1));
-            }
-
-            if (e.BytesRecorded > 0)
-            {
-                //Logger.Info($"Time: {_stopwatch.ElapsedMilliseconds} - Bytes: {e.BytesRecorded}");
-                short[] resampledPCM16Bit = _resampler.Resample(e.Buffer, e.BytesRecorded);
-
-                // Logger.Info($"Time: {_stopwatch.ElapsedMilliseconds} - Bytes: {resampledPCM16Bit.Length}");
-                //fill sound buffer
-                for (var i = 0; i < resampledPCM16Bit.Length; i++)
+                if (_stoppingEncoding || _wasapiCapture == null || _encoder == null || _speex == null)
                 {
-                    _micInputQueue.Enqueue(resampledPCM16Bit[i]);
+                    return;
                 }
 
-                //read out the queue
-                while (_micInputQueue.Count >= AudioManager.SEGMENT_FRAMES)
+                if (_resampler == null)
                 {
-                    short[] pcmShort  = new short[AudioManager.SEGMENT_FRAMES];
+                    //create and use in the same thread or COM issues
+                    _resampler = new EventDrivenResampler(windowsN, _wasapiCapture.WaveFormat, new WaveFormat(AudioManager.INPUT_SAMPLE_RATE, 16, 1));
+                }
 
-                    for (var i = 0; i < AudioManager.SEGMENT_FRAMES; i++)
+                if (e.BytesRecorded > 0)
+                {
+                    //Logger.Info($"Time: {_stopwatch.ElapsedMilliseconds} - Bytes: {e.BytesRecorded}");
+                    short[] resampledPCM16Bit = _resampler.Resample(e.Buffer, e.BytesRecorded);
+
+                    // Logger.Info($"Time: {_stopwatch.ElapsedMilliseconds} - Bytes: {resampledPCM16Bit.Length}");
+                    //fill sound buffer
+                    for (var i = 0; i < resampledPCM16Bit.Length; i++)
                     {
-                        pcmShort[i] = _micInputQueue.Dequeue();
+                        _micInputQueue.Enqueue(resampledPCM16Bit[i]);
                     }
 
-                    try
+                    //read out the queue
+                    while (_micInputQueue.Count >= AudioManager.SEGMENT_FRAMES)
                     {
-                        //volume boost pre
-                        for (var i = 0; i < pcmShort.Length; i++)
+                        short[] pcmShort  = new short[AudioManager.SEGMENT_FRAMES];
+
+                        for (var i = 0; i < AudioManager.SEGMENT_FRAMES; i++)
                         {
-                            // n.b. no clipping test going on here
-                            pcmShort[i] = (short)(pcmShort[i] * MicBoost);
+                            pcmShort[i] = _micInputQueue.Dequeue();
                         }
 
-                        //process with Speex
-                        _speex.Process(new ArraySegment<short>(pcmShort));
-
-                        float max = 0;
-                        for (var i = 0; i < pcmShort.Length; i++)
+                        try
                         {
-                            //determine peak
-                            if (pcmShort[i] > max)
+                            //volume boost pre
+                            for (var i = 0; i < pcmShort.Length; i++)
                             {
-                                max = pcmShort[i];
+                                pcmShort[i] = ClampToShort(pcmShort[i] * MicBoost);
+                            }
+
+                            //process with Speex
+                            _speex.Process(new ArraySegment<short>(pcmShort));
+
+                            if (ShouldResetMicPipeline(pcmShort))
+                            {
+                                ResetMicProcessingPipeline("sustained clipped or saturated microphone frames");
+                                return;
+                            }
+
+                            float max = 0;
+                            for (var i = 0; i < pcmShort.Length; i++)
+                            {
+                                //determine peak
+                                var sample = Math.Abs((float) pcmShort[i]);
+                                if (sample > max)
+                                {
+                                    max = sample;
+                                }
+                            }
+                            //convert to dB
+                            MicMax = (float)VolumeConversionHelper.ConvertFloatToDB(max / 32768F);
+
+                            var pcmBytes = new byte[pcmShort.Length * 2];
+                            Buffer.BlockCopy(pcmShort, 0, pcmBytes, 0, pcmBytes.Length);
+
+                            //encode as opus bytes
+                            int len;
+                            var buff = _encoder.Encode(pcmBytes, pcmBytes.Length, out len);
+
+                            if ((_udpVoiceHandler != null) && (buff != null) && (len > 0))
+                            {
+                                //create copy with small buffer
+                                var encoded = new byte[len];
+
+                                Buffer.BlockCopy(buff, 0, encoded, 0, len);
+
+                                // Console.WriteLine("Sending: " + e.BytesRecorded);
+                                if (_udpVoiceHandler.Send(encoded, len))
+                                {
+                                    //send audio so play over local too
+                                    _micWaveOutBuffer?.AddSamples(pcmBytes, 0, pcmBytes.Length);
+                                }
+                            }
+                            else
+                            {
+                                Logger.Error($"Invalid Bytes for Encoding - {pcmShort.Length} should be {SEGMENT_FRAMES} ");
+                            }
+
+                            _errorCount = 0;
+                        }
+                        catch (Exception ex)
+                        {
+                            _errorCount++;
+                            if (_errorCount < 10)
+                            {
+                                Logger.Error(ex, "Error encoding Opus! " + ex.Message);
+                            }
+                            else if (_errorCount == 10)
+                            {
+                                Logger.Error(ex, "Final Log of Error encoding Opus! " + ex.Message);
+                            }
+
+                            if (_errorCount >= ENCODE_ERRORS_BEFORE_RESET)
+                            {
+                                ResetMicProcessingPipeline("repeated Opus encode errors");
+                                return;
                             }
                         }
-                        //convert to dB
-                        MicMax = (float)VolumeConversionHelper.ConvertFloatToDB(max / 32768F);
-
-                        var pcmBytes = new byte[pcmShort.Length * 2];
-                        Buffer.BlockCopy(pcmShort, 0, pcmBytes, 0, pcmBytes.Length);
-
-                        //encode as opus bytes
-                        int len;
-                        var buff = _encoder.Encode(pcmBytes, pcmBytes.Length, out len);
-
-                        if ((_udpVoiceHandler != null) && (buff != null) && (len > 0))
-                        {
-                            //create copy with small buffer
-                            var encoded = new byte[len];
-
-                            Buffer.BlockCopy(buff, 0, encoded, 0, len);
-
-                            // Console.WriteLine("Sending: " + e.BytesRecorded);
-                            if (_udpVoiceHandler.Send(encoded, len))
-                            {
-                                //send audio so play over local too
-                                _micWaveOutBuffer?.AddSamples(pcmBytes, 0, pcmBytes.Length);
-                            }
-                        }
-                        else
-                        {
-                            Logger.Error($"Invalid Bytes for Encoding - {pcmShort.Length} should be {SEGMENT_FRAMES} ");
-                        }
-
-                        _errorCount = 0;
-                    }
-                    catch (Exception ex)
-                    {
-                        _errorCount++;
-                        if (_errorCount < 10)
-                        {
-                            Logger.Error(ex, "Error encoding Opus! " + ex.Message);
-                        }
-                        else if (_errorCount == 10)
-                        {
-                            Logger.Error(ex, "Final Log of Error encoding Opus! " + ex.Message);
-                        }
-
                     }
                 }
             }
+        }
+
+        private short ClampToShort(float sample)
+        {
+            if (sample > short.MaxValue)
+            {
+                return short.MaxValue;
+            }
+
+            if (sample < short.MinValue)
+            {
+                return short.MinValue;
+            }
+
+            return (short) sample;
+        }
+
+        private bool ShouldResetMicPipeline(short[] pcmShort)
+        {
+            if (pcmShort == null || pcmShort.Length == 0)
+            {
+                _badMicFrameCount = 0;
+                return false;
+            }
+
+            var clippedSamples = 0;
+            long squareSum = 0;
+
+            for (var i = 0; i < pcmShort.Length; i++)
+            {
+                var sample = Math.Abs((int) pcmShort[i]);
+                if (sample >= 32760)
+                {
+                    clippedSamples++;
+                }
+
+                squareSum += (long) sample * sample;
+            }
+
+            var clippedRatio = clippedSamples / (double) pcmShort.Length;
+            var rms = Math.Sqrt(squareSum / (double) pcmShort.Length) / short.MaxValue;
+
+            if (clippedRatio > 0.25 || rms > 0.98)
+            {
+                _badMicFrameCount++;
+            }
+            else
+            {
+                _badMicFrameCount = 0;
+            }
+
+            return _badMicFrameCount >= BAD_MIC_FRAMES_BEFORE_RESET;
+        }
+
+        private void ResetMicProcessingPipeline(string reason)
+        {
+            var now = DateTime.UtcNow;
+            var lastReset = new DateTime(Interlocked.Read(ref _lastMicPipelineResetUtcTicks), DateTimeKind.Utc);
+            if ((now - lastReset).TotalMilliseconds < MIC_PIPELINE_RESET_COOLDOWN_MS)
+            {
+                return;
+            }
+
+            Interlocked.Exchange(ref _lastMicPipelineResetUtcTicks, now.Ticks);
+            Logger.Warn($"Resetting microphone audio processing pipeline after {reason}");
+
+            lock (lockObj)
+            {
+                _badMicFrameCount = 0;
+                _errorCount = 0;
+                _micInputQueue.Clear();
+
+                _resampler?.Dispose(true);
+                _resampler = null;
+
+                try
+                {
+                    _speex?.Reset();
+                }
+                catch (Exception ex)
+                {
+                    Logger.Warn(ex, "Failed to reset Speex preprocessor; recreating it.");
+                    _speex?.Dispose();
+                    _speex = new Preprocessor(AudioManager.SEGMENT_FRAMES, AudioManager.INPUT_SAMPLE_RATE);
+                }
+
+                _encoder?.Dispose();
+                _encoder = OpusEncoder.Create(INPUT_SAMPLE_RATE, 1, Application.Voip);
+                _encoder.ForwardErrorCorrection = false;
+            }
+        }
+
+        private void RestartMicCaptureAfterUnexpectedStop()
+        {
+            if (Interlocked.Exchange(ref _micCaptureRestartInProgress, 1) == 1)
+            {
+                return;
+            }
+
+            Task.Run(() =>
+            {
+                try
+                {
+                    Thread.Sleep(500);
+                    if (_stoppingEncoding || !_audioInputSingleton.MicrophoneAvailable)
+                    {
+                        return;
+                    }
+
+                    lock (lockObj)
+                    {
+                        _wasapiCapture?.Dispose();
+                        _wasapiCapture = null;
+
+                        ResetMicProcessingPipeline("unexpected microphone capture stop");
+
+                        var device = (MMDevice)_audioInputSingleton.SelectedAudioInput.Value;
+                        if (device == null)
+                        {
+                            device = WasapiCapture.GetDefaultCaptureDevice();
+                        }
+
+                        device.AudioEndpointVolume.Mute = false;
+
+                        _wasapiCapture = new WasapiCapture(device, true);
+                        _wasapiCapture.ShareMode = AudioClientShareMode.Shared;
+                        _wasapiCapture.DataAvailable += WasapiCaptureOnDataAvailable;
+                        _wasapiCapture.RecordingStopped += WasapiCaptureOnRecordingStopped;
+                        _wasapiCapture.StartRecording();
+                    }
+
+                    Logger.Info("Restarted microphone capture after unexpected stop");
+                }
+                catch (Exception ex)
+                {
+                    Logger.Error(ex, "Failed to restart microphone capture after unexpected stop");
+                }
+                finally
+                {
+                    Interlocked.Exchange(ref _micCaptureRestartInProgress, 0);
+                }
+            });
         }
 
         private void ShowInputError(string message)
@@ -602,6 +789,7 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.Audio.Managers
         {
             lock(lockObj)
             {
+                _stoppingEncoding = true;
                 _textToSpeech?.Dispose();
                 _textToSpeech = null;
 

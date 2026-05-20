@@ -59,7 +59,8 @@
                     IsEnabled="True"
                     Maximum="100"
                     Thumb.DragCompleted="RadioVolume_DragCompleted"
-                    Thumb.DragStarted="RadioVolume_DragStarted" />
+                    Thumb.DragStarted="RadioVolume_DragStarted"
+                    ValueChanged="RadioVolume_ValueChanged" />
         
 
       
