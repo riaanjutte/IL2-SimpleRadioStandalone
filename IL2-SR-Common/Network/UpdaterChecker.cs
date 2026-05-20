@@ -1,5 +1,6 @@
 using System;
 using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using System.Net;
 using System.Security.Principal;
@@ -21,7 +22,7 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Common
 
         public static readonly string MINIMUM_PROTOCOL_VERSION = "1.0.0.0";
 
-        public static readonly string VERSION = "1.0.3.4";
+        public static readonly string VERSION = "1.0.3.5";
 
         private static readonly Logger _logger = LogManager.GetCurrentClassLogger();
 
@@ -117,8 +118,9 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Common
                 }
                 catch (Exception ex)
                 {
+                    _logger.Error(ex, "Failed to launch IL2-SRS AutoUpdater");
                     MessageBox.Show($"Unable to Auto Update - please download latest version manually",
-                        "Auto Update Error", MessageBoxButton.YesNoCancel, MessageBoxImage.Information);
+                        "Auto Update Error", MessageBoxButton.OK, MessageBoxImage.Information);
 
                     OpenBrowser(url);
                 }
@@ -140,18 +142,24 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Common
 
         private static void LaunchUpdater(bool beta)
         {
+            var updaterPath = ResolveUpdaterPath();
+            if (string.IsNullOrEmpty(updaterPath))
+            {
+                throw new FileNotFoundException(
+                    $"Could not find IL2-SRS-AutoUpdater.exe in {AppDomain.CurrentDomain.BaseDirectory}");
+            }
+
+            var updaterDirectory = Path.GetDirectoryName(updaterPath);
             WindowsPrincipal principal = new WindowsPrincipal(WindowsIdentity.GetCurrent());
             bool hasAdministrativeRight = principal.IsInRole(WindowsBuiltInRole.Administrator);
         
             if (!hasAdministrativeRight)
             {
-                var location = AppDomain.CurrentDomain.BaseDirectory;
-        
                 ProcessStartInfo startInfo = new ProcessStartInfo
                 {
                     UseShellExecute = true,
-                    WorkingDirectory = location,
-                    FileName = location + "IL2-SRS-AutoUpdater.exe",
+                    WorkingDirectory = updaterDirectory,
+                    FileName = updaterPath,
                     Verb = "runas"
                 };
     
@@ -173,15 +181,28 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Common
             }
             else
             {
-                if (beta)
+                ProcessStartInfo startInfo = new ProcessStartInfo
                 {
-                    Process.Start("IL2-SRS-AutoUpdater.exe", "-beta");
-                }
-                else
-                {
-                    Process.Start("IL2-SRS-AutoUpdater.exe");
-                }
+                    UseShellExecute = true,
+                    WorkingDirectory = updaterDirectory,
+                    FileName = updaterPath,
+                    Arguments = beta ? "-beta" : string.Empty
+                };
+
+                Process.Start(startInfo);
             }
+        }
+
+        private static string ResolveUpdaterPath()
+        {
+            var baseDirectory = AppDomain.CurrentDomain.BaseDirectory;
+            var candidates = new[]
+            {
+                Path.Combine(baseDirectory, "IL2-SRS-AutoUpdater.exe"),
+                Path.Combine(baseDirectory, "AutoUpdater.exe")
+            };
+
+            return candidates.FirstOrDefault(File.Exists);
         }
     }
 }

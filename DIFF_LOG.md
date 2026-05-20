@@ -15,6 +15,8 @@ The update focuses on six areas:
 - Joystick/input-device reconnect recovery for PTT.
 - IL-2 intercom routing fixes for vehicle owners and crew members.
 - More reliable update flow for automatic and manual GitHub release updates.
+- One-time opt-in migration prompt for community recommended profile settings.
+- PTT fail-safe handling to clear local transmit state if input polling fails.
 - Documentation for translators and release/change tracking.
 
 ## Added Files
@@ -163,6 +165,9 @@ Original:
 Current:
 
 - Adds a client language setting used by first-run OS language detection and the language picker.
+- Adds a theme setting for light/dark mode.
+- Adds an auto-start radio overlay setting.
+- Adds `CommunityRecommendedSettingsChoice` so the community recommended profile settings prompt is shown only once.
 
 ### `IL2-SR-Client/Settings/ProfileSettingsStore.cs`
 
@@ -209,6 +214,9 @@ Current:
 
 - Opens the GitHub release page through the shell when users choose manual update.
 - Uses the same browser launch helper when automatic update launch fails.
+- Resolves the updater executable path before launch.
+- Supports the packaged `IL2-SRS-AutoUpdater.exe` name and the legacy `AutoUpdater.exe` name.
+- Shows a simple manual-update fallback if the updater cannot be launched.
 
 ### `AutoUpdater/MainWindow.xaml.cs`
 
@@ -264,6 +272,8 @@ Current:
 - Lets PTT bindings resume when Windows exposes the same DirectInput device instance again.
 - Keeps the existing manual "Rescan Input Devices" behavior, but makes it better at clearing stale devices.
 - Adds the bindable `Mute / Unmute Selected Radio` action and handles it as a one-shot control.
+- Keeps the PTT input polling thread alive after polling exceptions.
+- Clears active PTT state and requests device rediscovery when the polling loop catches an exception.
 
 ### `IL2-SR-Client/Utils/RadioHelper.cs`
 
@@ -279,6 +289,18 @@ Current:
 - Uses the profile-configured selected-radio muted volume instead of hard-coding mute to zero.
 - Restores the previous volume when the same selected-radio mute control is pressed again.
 - Ignores disabled radios and intercom for the selected-radio mute action.
+
+### `IL2-SR-Client/Network/UDPVoiceHandler.cs`
+
+Original:
+
+- Local PTT state could remain set if the input polling loop stopped updating after a DirectInput failure.
+
+Current:
+
+- Tracks the last successful PTT input poll.
+- Clears local PTT state if input polling is stale for more than two seconds.
+- Rate-limits failsafe logging so repeated stale-poll checks do not flood the client log.
 
 ### `IL2-SR-Client/UI/ClientWindow/MainWindow.xaml`
 
@@ -313,6 +335,8 @@ Current:
 
 - Applies runtime localization to the main window.
 - Adds language selection handling and restart-to-apply messaging.
+- Adds a one-time startup prompt that lets users opt into community recommended profile settings without silently overwriting existing profiles.
+- Applies the accepted community recommended settings to the current profile and records accepted/declined state so the prompt is not shown again.
 - Updates localized on/off toggle text from `IsChecked`, not from stale content.
 - Saves toggle state from `IsChecked` rather than displayed text.
 - Saves and reloads the selected-radio muted volume profile setting.

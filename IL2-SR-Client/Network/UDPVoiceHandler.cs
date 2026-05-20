@@ -49,6 +49,7 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.Network
         private readonly int UDP_VOIP_TIMEOUT = 42; // seconds for timeout before redoing VoIP
 
         private readonly int JITTER_BUFFER = 50; //in milliseconds
+        private const int PTT_INPUT_WATCHDOG_TIMEOUT_MS = 2000;
 
         private ClientStateSingleton _clientStateSingleton = ClientStateSingleton.Instance;
 
@@ -59,6 +60,7 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.Network
 
         private volatile bool _ptt;
         private long _lastPTTPress; // to handle dodgy PTT - release time
+        private long _lastPttFailsafeLog;
 
         private volatile bool _ready;
 
@@ -621,6 +623,8 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.Network
             List<RadioInformation> transmittingRadios;
             //if either PTT is true, a microphone is available && socket connected etc
             var sendingOn = -1;
+            ApplyPttFailsafe();
+
             if (_ready
                 && _listener != null
                 && _audioInputSingleton.MicrophoneAvailable
@@ -721,6 +725,31 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.Network
             }
 
             return false;
+        }
+
+        private void ApplyPttFailsafe()
+        {
+            if (!_ptt || _inputManager == null)
+            {
+                return;
+            }
+
+            var lastInputPoll = _inputManager.LastPttInputPollUtc;
+            var staleFor = DateTime.UtcNow - lastInputPoll;
+            if (staleFor.TotalMilliseconds <= PTT_INPUT_WATCHDOG_TIMEOUT_MS)
+            {
+                return;
+            }
+
+            _ptt = false;
+            _lastPTTPress = 0;
+
+            var now = DateTime.UtcNow.Ticks;
+            if (new TimeSpan(now - _lastPttFailsafeLog).TotalSeconds >= 5)
+            {
+                _lastPttFailsafeLog = now;
+                Logger.Warn($"PTT input polling has not updated for {staleFor.TotalMilliseconds:0}ms. Clearing local PTT state to prevent hot mic.");
+            }
         }
 
         private void StartPing()

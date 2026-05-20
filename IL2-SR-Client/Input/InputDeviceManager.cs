@@ -58,6 +58,9 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.Settings
         private volatile bool _detectPtt;
         private DateTime _nextDeviceReconnectAttemptUtc = DateTime.MinValue;
         private const int DeviceReconnectRetryMs = 2000;
+        private long _lastPttInputPollUtcTicks = DateTime.UtcNow.Ticks;
+
+        public DateTime LastPttInputPollUtc => new DateTime(Interlocked.Read(ref _lastPttInputPollUtcTicks), DateTimeKind.Utc);
 
         //used to trigger the update to a frequency
         private InputBinding _lastActiveBinding = InputBinding.ModifierIntercom
@@ -506,6 +509,8 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.Settings
             {
                 while (_detectPtt)
                 {
+                    try
+                    {
                     var bindStates = GenerateBindStateList();
 
                     for (var i = 0; i < bindStates.Count; i++)
@@ -572,6 +577,7 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.Settings
                     }
 
                     callback(bindStates);
+                    MarkPttInputPoll();
                     //handle overlay
 
                     foreach (var bindState in bindStates)
@@ -770,10 +776,29 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.Settings
                             }
                         }
                     }
+                    }
+                    catch (Exception ex)
+                    {
+                        Logger.Error(ex, "Exception in PTT input polling loop. Clearing PTT state and waiting for input recovery.");
+
+                        try
+                        {
+                            callback(new List<InputBindState>());
+                            MarkPttInputPoll();
+                        }
+                        catch (Exception callbackEx)
+                        {
+                            Logger.Error(callbackEx, "Failed to publish cleared PTT state after input polling failure.");
+                        }
+
+                        _lastActiveBinding = InputBinding.ModifierIntercom;
+                        RequestDeviceReconnect();
+                    }
 
                     Thread.Sleep(40);
                 }
             });
+            pttInputThread.IsBackground = true;
             pttInputThread.Start();
         }
 
@@ -781,6 +806,11 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.Settings
         public void StopPtt()
         {
             _detectPtt = false;
+        }
+
+        private void MarkPttInputPoll()
+        {
+            Interlocked.Exchange(ref _lastPttInputPollUtcTicks, DateTime.UtcNow.Ticks);
         }
 
         private bool GetButtonState(InputDevice inputDeviceBinding)

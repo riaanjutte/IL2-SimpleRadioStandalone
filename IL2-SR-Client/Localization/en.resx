@@ -618,4 +618,16 @@
   <data name="Mute / Unmute Selected Radio" xml:space="preserve">
     <value>Mute / Unmute Selected Radio</value>
   </data>
+  <data name="Community Recommended Profile Settings" xml:space="preserve">
+    <value>Community Recommended Profile Settings</value>
+  </data>
+  <data name="Would you like to apply the community recommended profile settings to the current profile?" xml:space="preserve">
+    <value>Would you like to apply the community recommended profile settings to the current profile?</value>
+  </data>
+  <data name="This will set:" xml:space="preserve">
+    <value>This will set:</value>
+  </data>
+  <data name="Select Yes to apply these settings. Select No to keep your current settings. You will not be asked again." xml:space="preserve">
+    <value>Select Yes to apply these settings. Select No to keep your current settings. You will not be asked again.</value>
+  </data>
 </root>

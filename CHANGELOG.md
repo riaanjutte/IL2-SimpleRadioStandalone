@@ -1,5 +1,37 @@
 # Changelog
 
+## IL2-SRS 1.0.3.5 community update
+
+### Added
+
+- Added a one-time first-run prompt asking users whether they want to apply the community recommended profile settings to their current profile.
+- Added localized prompt text for English, German, French, and Spanish.
+- Added a PTT input watchdog that clears local transmit state if input polling stops updating, reducing the chance of a stuck hot mic after input-device failures.
+
+### Changed
+
+- The community recommended settings prompt now applies only after the user explicitly accepts it, and stores either the accepted or declined choice so the prompt is not shown again.
+- The accepted settings are:
+  - Radio switch works as PTT on.
+  - Radio voice effect off.
+  - Clipping effect off.
+  - Text to speech on.
+  - Selected radio muted volume set to `15%`.
+  - PTT release delay set to `250 ms`.
+  - Radio 1 audio channel set to `-0.75`.
+  - Radio 2 audio channel set to `0.75`.
+
+### Fixed
+
+- Fixed local Release/x64 client builds so `IL2-SRS-AutoUpdater.exe` is copied into the client output folder.
+- Fixed updater launch handling so the client resolves the updater executable path before launching it and falls back to the manual download page if launch fails.
+- Fixed the PTT input polling loop so polling exceptions clear PTT state, request device rediscovery, and keep the polling thread alive.
+
+### Validation
+
+- Built `IL2-SimpleRadioStandalone.sln` Release/x64 successfully.
+- Ran `IL2-SR-CommonTests`: 12/12 passed.
+
 ## IL2-SRS 1.0.3.4 community update
 
 ### Added

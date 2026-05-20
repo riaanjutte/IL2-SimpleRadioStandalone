@@ -72,6 +72,8 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.Settings
         Language,
         Theme,
 
+        CommunityRecommendedSettingsChoice,
+
         ShowTransmitterName
     }
 
@@ -348,6 +350,7 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.Settings
 
             {GlobalSettingsKeys.Language.ToString(), "" },
             {GlobalSettingsKeys.Theme.ToString(), "Light" },
+            {GlobalSettingsKeys.CommunityRecommendedSettingsChoice.ToString(), "" },
 
             {GlobalSettingsKeys.ShowTransmitterName.ToString(), "true"},
 

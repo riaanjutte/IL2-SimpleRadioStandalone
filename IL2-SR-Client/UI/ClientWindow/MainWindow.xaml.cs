@@ -80,6 +80,12 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI
         private bool _initialisingThemePicker;
 
         private readonly GlobalSettingsStore _globalSettings = GlobalSettingsStore.Instance;
+        private const string CommunitySettingsAccepted = "Accepted";
+        private const string CommunitySettingsDeclined = "Declined";
+        private const string RecommendedSelectedRadioMutedVolume = "0.15";
+        private const string RecommendedPttReleaseDelay = "250";
+        private const string RecommendedRadio1AudioChannel = "-0.75";
+        private const string RecommendedRadio2AudioChannel = "0.75";
 
         /// <remarks>Used in the XAML for DataBinding many things</remarks>
         public ClientStateSingleton ClientState { get; } = ClientStateSingleton.Instance;
@@ -149,6 +155,7 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI
 
             InitSettingsProfiles();
             ReloadProfile();
+            PromptForCommunityRecommendedSettingsOnce();
 
             InitInput();
 
@@ -204,6 +211,76 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI
             Dispatcher.BeginInvoke(new Action(() =>
                 ClientThemeManager.ApplyThemeToWindow(this, _globalSettings.GetClientSetting(GlobalSettingsKeys.Theme).RawValue)),
                 DispatcherPriority.ContextIdle);
+        }
+
+        private void PromptForCommunityRecommendedSettingsOnce()
+        {
+            var savedChoice = _globalSettings.GetClientSetting(GlobalSettingsKeys.CommunityRecommendedSettingsChoice).RawValue;
+            if (!string.IsNullOrWhiteSpace(savedChoice))
+            {
+                return;
+            }
+
+            var result = MessageBox.Show(this,
+                BuildCommunityRecommendedSettingsPrompt(),
+                LocalizationManager.Get("Community Recommended Profile Settings"),
+                MessageBoxButton.YesNo,
+                MessageBoxImage.Question);
+
+            if (result == MessageBoxResult.Yes)
+            {
+                ApplyCommunityRecommendedProfileSettings();
+                _globalSettings.SetClientSetting(GlobalSettingsKeys.CommunityRecommendedSettingsChoice, CommunitySettingsAccepted);
+                ReloadProfileSettings();
+                return;
+            }
+
+            _globalSettings.SetClientSetting(GlobalSettingsKeys.CommunityRecommendedSettingsChoice, CommunitySettingsDeclined);
+        }
+
+        private string BuildCommunityRecommendedSettingsPrompt()
+        {
+            return LocalizationManager.Get("Would you like to apply the community recommended profile settings to the current profile?")
+                   + Environment.NewLine
+                   + Environment.NewLine
+                   + LocalizationManager.Get("This will set:")
+                   + Environment.NewLine
+                   + " - " + LocalizationManager.Get("Radio Switch works as Push To Talk (PTT)") + ": "
+                   + LocalizationManager.Get("ON")
+                   + Environment.NewLine
+                   + " - " + LocalizationManager.Get("Enable Radio Voice Effect") + ": "
+                   + LocalizationManager.Get("OFF")
+                   + Environment.NewLine
+                   + " - " + LocalizationManager.Get("Enable Clipping Effect (Requires Radio effects on!)") + ": "
+                   + LocalizationManager.Get("OFF")
+                   + Environment.NewLine
+                   + " - " + LocalizationManager.Get("Enable Text to Speech (beta)") + ": "
+                   + LocalizationManager.Get("ON")
+                   + Environment.NewLine
+                   + " - " + LocalizationManager.Get("Selected Radio Muted Volume") + ": 15%"
+                   + Environment.NewLine
+                   + " - " + LocalizationManager.Get("Push to Talk Release Delay (ms)") + ": 250"
+                   + Environment.NewLine
+                   + " - " + LocalizationManager.Get("First Radio Audio Channel") + ": "
+                   + RecommendedRadio1AudioChannel
+                   + Environment.NewLine
+                   + " - " + LocalizationManager.Get("Second Radio Audio Channel") + ": "
+                   + RecommendedRadio2AudioChannel
+                   + Environment.NewLine
+                   + Environment.NewLine
+                   + LocalizationManager.Get("Select Yes to apply these settings. Select No to keep your current settings. You will not be asked again.");
+        }
+
+        private void ApplyCommunityRecommendedProfileSettings()
+        {
+            _globalSettings.ProfileSettingsStore.SetClientSetting(ProfileSettingsKeys.RadioSwitchIsPTT, true);
+            _globalSettings.ProfileSettingsStore.SetClientSetting(ProfileSettingsKeys.RadioEffects, false);
+            _globalSettings.ProfileSettingsStore.SetClientSetting(ProfileSettingsKeys.RadioEffectsClipping, false);
+            _globalSettings.ProfileSettingsStore.SetClientSetting(ProfileSettingsKeys.EnableTextToSpeech, true);
+            _globalSettings.ProfileSettingsStore.SetClientSetting(ProfileSettingsKeys.SelectedRadioMutedVolume, RecommendedSelectedRadioMutedVolume);
+            _globalSettings.ProfileSettingsStore.SetClientSetting(ProfileSettingsKeys.PTTReleaseDelay, RecommendedPttReleaseDelay);
+            _globalSettings.ProfileSettingsStore.SetClientSetting(ProfileSettingsKeys.Radio1Channel, RecommendedRadio1AudioChannel);
+            _globalSettings.ProfileSettingsStore.SetClientSetting(ProfileSettingsKeys.Radio2Channel, RecommendedRadio2AudioChannel);
         }
 
         private void CheckWindowVisibility()
