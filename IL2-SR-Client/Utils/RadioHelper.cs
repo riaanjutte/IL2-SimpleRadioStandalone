@@ -255,34 +255,129 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.Utils
                 selectedRadioId = 1;
             }
 
-            var currentRadio = GetRadio(selectedRadioId);
-            if (currentRadio == null ||
-                currentRadio.modulation == RadioInformation.Modulation.DISABLED ||
-                currentRadio.modulation == RadioInformation.Modulation.INTERCOM ||
-                currentRadio.volMode != RadioInformation.VolumeMode.OVERLAY)
+            ToggleRadioMute(selectedRadioId, GetSelectedRadioMutedVolume());
+        }
+
+        public static void ToggleOtherRadioMute()
+        {
+            var playerGameState = ClientStateSingleton.Instance.PlayerGameState;
+            if (playerGameState == null)
             {
                 return;
             }
 
             var mutedVolume = GetSelectedRadioMutedVolume();
+            var selectedRadioId = playerGameState.selected;
+            var otherRadioId = selectedRadioId == 1 ? 2 : 1;
+
+            if (IsMutableRadio(otherRadioId))
+            {
+                ToggleRadioMute(otherRadioId, mutedVolume);
+            }
+        }
+
+        public static void ToggleAllRadiosMute()
+        {
+            if (ClientStateSingleton.Instance.PlayerGameState == null)
+            {
+                return;
+            }
+
+            var mutedVolume = GetSelectedRadioMutedVolume();
+            var radioIds = new List<int>();
+
+            for (var radioId = 1; radioId <= 2; radioId++)
+            {
+                if (IsMutableRadio(radioId))
+                {
+                    radioIds.Add(radioId);
+                }
+            }
+
+            if (radioIds.Count == 0)
+            {
+                return;
+            }
+
+            var restore = radioIds.TrueForAll(radioId => GetRadio(radioId).volume <= mutedVolume);
+            foreach (var radioId in radioIds)
+            {
+                if (restore)
+                {
+                    RestoreRadioVolume(radioId, mutedVolume);
+                }
+                else
+                {
+                    MuteRadio(radioId, mutedVolume);
+                }
+            }
+        }
+
+        private static void ToggleRadioMute(int radioId, float mutedVolume)
+        {
+            var currentRadio = GetRadio(radioId);
+            if (!IsMutableRadio(currentRadio))
+            {
+                return;
+            }
 
             if (currentRadio.volume > mutedVolume)
             {
-                PreviousRadioVolumes[selectedRadioId] = currentRadio.volume;
-                currentRadio.volume = mutedVolume;
-                PlaySelectedRadioMuteCue(selectedRadioId, false);
+                MuteRadio(radioId, mutedVolume);
             }
             else
             {
-                float restoredVolume;
-                if (!PreviousRadioVolumes.TryGetValue(selectedRadioId, out restoredVolume) || restoredVolume <= mutedVolume)
-                {
-                    restoredVolume = DefaultRestoredVolume;
-                }
-
-                currentRadio.volume = restoredVolume;
-                PlaySelectedRadioMuteCue(selectedRadioId, true);
+                RestoreRadioVolume(radioId, mutedVolume);
             }
+        }
+
+        private static void MuteRadio(int radioId, float mutedVolume)
+        {
+            var currentRadio = GetRadio(radioId);
+            if (currentRadio == null)
+            {
+                return;
+            }
+
+            if (currentRadio.volume <= mutedVolume)
+            {
+                return;
+            }
+
+            PreviousRadioVolumes[radioId] = currentRadio.volume;
+            currentRadio.volume = mutedVolume;
+            PlaySelectedRadioMuteCue(radioId, false);
+        }
+
+        private static void RestoreRadioVolume(int radioId, float mutedVolume)
+        {
+            var currentRadio = GetRadio(radioId);
+            if (currentRadio == null)
+            {
+                return;
+            }
+
+            float restoredVolume;
+            if (!PreviousRadioVolumes.TryGetValue(radioId, out restoredVolume) || restoredVolume <= mutedVolume)
+            {
+                restoredVolume = DefaultRestoredVolume;
+            }
+
+            currentRadio.volume = restoredVolume;
+            PlaySelectedRadioMuteCue(radioId, true);
+        }
+
+        private static bool IsMutableRadio(int radioId)
+        {
+            return IsMutableRadio(GetRadio(radioId));
+        }
+
+        private static bool IsMutableRadio(RadioInformation radio)
+        {
+            return radio != null
+                   && radio.modulation != RadioInformation.Modulation.DISABLED
+                   && radio.modulation != RadioInformation.Modulation.INTERCOM
+                   && radio.volMode == RadioInformation.VolumeMode.OVERLAY;
         }
 
         private static void PlaySelectedRadioMuteCue(int radioId, bool unmuted)

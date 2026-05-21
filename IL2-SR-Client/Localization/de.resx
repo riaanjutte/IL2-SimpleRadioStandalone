@@ -618,6 +618,30 @@
   <data name="Mute / Unmute Selected Radio" xml:space="preserve">
     <value>Ausgewaehltes Funkgeraet stumm / laut</value>
   </data>
+  <data name="Mute / Unmute Other Radio" xml:space="preserve">
+    <value>Anderes Funkgeraet stumm / laut</value>
+  </data>
+  <data name="Mute / Unmute Both Radios" xml:space="preserve">
+    <value>Beide Funkgeraete stumm / laut</value>
+  </data>
+  <data name="RCI" xml:space="preserve">
+    <value>RCI</value>
+  </data>
+  <data name="No RCI active" xml:space="preserve">
+    <value>RCI nicht aktiv</value>
+  </data>
+  <data name="Friendly RCI active" xml:space="preserve">
+    <value>RCI - Friendly only</value>
+  </data>
+  <data name="Enemy RCI active" xml:space="preserve">
+    <value>RCI - Opposition only</value>
+  </data>
+  <data name="Both sides have RCI active" xml:space="preserve">
+    <value>RCI - Both coallitions</value>
+  </data>
+  <data name="RCI active" xml:space="preserve">
+    <value>RCI aktiv</value>
+  </data>
   <data name="Community Recommended Profile Settings" xml:space="preserve">
     <value>Von der Community empfohlene Profileinstellungen</value>
   </data>

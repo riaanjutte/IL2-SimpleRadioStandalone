@@ -17,6 +17,7 @@ using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
 using System.Windows.Documents;
 using System.Windows.Input;
+using System.Windows.Media;
 using System.Windows.Threading;
 using Ciribob.IL2.SimpleRadio.Standalone.Client.Audio;
 using Ciribob.IL2.SimpleRadio.Standalone.Client.Audio.Managers;
@@ -86,6 +87,7 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI
         private const string RecommendedPttReleaseDelay = "250";
         private const string RecommendedRadio1AudioChannel = "-0.75";
         private const string RecommendedRadio2AudioChannel = "0.75";
+        private const string CombatBoxRciServerHost = "srs.combatbox.net";
 
         /// <remarks>Used in the XAML for DataBinding many things</remarks>
         public ClientStateSingleton ClientState { get; } = ClientStateSingleton.Instance;
@@ -108,6 +110,8 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI
 
             InitializeComponent();
             LocalizationManager.LocalizeElement(this);
+            RciStatusLabel.Text = LocalizationManager.Get("RCI");
+            RciStatusIndicator.ToolTip = LocalizationManager.Get("No RCI active");
             LocalizationManager.LocalizeFlowDocument(AboutFlowDocument);
             ClientThemeManager.ApplyThemeToWindow(this, _globalSettings.GetClientSetting(GlobalSettingsKeys.Theme).RawValue);
             Loaded += MainWindow_Loaded;
@@ -537,6 +541,14 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI
             ToggleSelectedRadioMute.InputName = LocalizationManager.Get("Mute / Unmute Selected Radio");
             ToggleSelectedRadioMute.ControlInputBinding = InputBinding.ToggleSelectedRadioMute;
             ToggleSelectedRadioMute.InputDeviceManager = InputManager;
+
+            ToggleOtherRadioMute.InputName = LocalizationManager.Get("Mute / Unmute Other Radio");
+            ToggleOtherRadioMute.ControlInputBinding = InputBinding.ToggleOtherRadioMute;
+            ToggleOtherRadioMute.InputDeviceManager = InputManager;
+
+            ToggleAllRadiosMute.InputName = LocalizationManager.Get("Mute / Unmute Both Radios");
+            ToggleAllRadiosMute.ControlInputBinding = InputBinding.ToggleAllRadiosMute;
+            ToggleAllRadiosMute.InputDeviceManager = InputManager;
         }
 
         private void OnProfileDropDownChanged(object sender, SelectionChangedEventArgs e)
@@ -570,6 +582,8 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI
             PreviousRadio.LoadInputSettings();
             ReadStatus.LoadInputSettings();
             ToggleSelectedRadioMute.LoadInputSettings();
+            ToggleOtherRadioMute.LoadInputSettings();
+            ToggleAllRadiosMute.LoadInputSettings();
         }
 
         private void ReloadRadioAudioChannelSettings()
@@ -894,6 +908,8 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI
             Preview.IsEnabled = true;
             ClientState.IsConnected = false;
             ToggleServerSettings.IsEnabled = false;
+            UpdateRciStatusIndicator();
+            _radioOverlayWindow?.SetRciIndicatorEnabled(false);
 
             try
             {
@@ -1126,6 +1142,86 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI
             {
                 ToggleServerSettings.IsEnabled = false;
             }
+
+            var showRciStatus = ShouldShowRciStatus();
+            UpdateRciStatusIndicator(showRciStatus);
+            _radioOverlayWindow?.SetRciIndicatorEnabled(showRciStatus);
+        }
+
+        private void UpdateRciStatusIndicator()
+        {
+            UpdateRciStatusIndicator(ShouldShowRciStatus());
+        }
+
+        private void UpdateRciStatusIndicator(bool showRciStatus)
+        {
+            RciStatusPanel.Visibility = showRciStatus ? Visibility.Visible : Visibility.Collapsed;
+            if (!showRciStatus)
+            {
+                RciStatusLabel.Text = LocalizationManager.Get("No RCI active");
+                RciStatusLabel.Foreground = Brushes.White;
+                RciStatusIndicator.Background = GetRciStatusBrush(RciStatus.None);
+                RciStatusIndicator.ToolTip = LocalizationManager.Get("No RCI active");
+                return;
+            }
+
+            var status = Clients.GetRciStatus(ClientState.PlayerGameState.coalition);
+            RciStatusLabel.Text = GetRciStatusText(status);
+            RciStatusLabel.Foreground = GetRciStatusForeground(status);
+            RciStatusIndicator.Background = GetRciStatusBrush(status);
+            RciStatusIndicator.ToolTip = GetRciStatusText(status);
+        }
+
+        private bool ShouldShowRciStatus()
+        {
+            return ClientState.IsConnected
+                   && string.Equals(GetAddressFromTextBox(), CombatBoxRciServerHost, StringComparison.OrdinalIgnoreCase);
+        }
+
+        private Brush GetRciStatusBrush(RciStatus status)
+        {
+            switch (status)
+            {
+                case RciStatus.FriendlyOnly:
+                    return new SolidColorBrush((Color)ColorConverter.ConvertFromString("#00FF00"));
+                case RciStatus.EnemyOnly:
+                    return new SolidColorBrush((Color)ColorConverter.ConvertFromString("#D60000"));
+                case RciStatus.Both:
+                    return new SolidColorBrush((Color)ColorConverter.ConvertFromString("#FFB000"));
+                case RciStatus.Neutral:
+                    return new SolidColorBrush((Color)ColorConverter.ConvertFromString("#999999"));
+                default:
+                    return new SolidColorBrush((Color)ColorConverter.ConvertFromString("#444444"));
+            }
+        }
+
+        private Brush GetRciStatusForeground(RciStatus status)
+        {
+            switch (status)
+            {
+                case RciStatus.FriendlyOnly:
+                case RciStatus.Both:
+                    return Brushes.Black;
+                default:
+                    return Brushes.White;
+            }
+        }
+
+        private string GetRciStatusText(RciStatus status)
+        {
+            switch (status)
+            {
+                case RciStatus.FriendlyOnly:
+                    return LocalizationManager.Get("Friendly RCI active");
+                case RciStatus.EnemyOnly:
+                    return LocalizationManager.Get("Enemy RCI active");
+                case RciStatus.Both:
+                    return LocalizationManager.Get("Both sides have RCI active");
+                case RciStatus.Neutral:
+                    return LocalizationManager.Get("RCI active");
+                default:
+                    return LocalizationManager.Get("No RCI active");
+            }
         }
 
         private void SpeakerBoost_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
@@ -1204,6 +1300,7 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI
             {
                 ShowInTaskbar = !_globalSettings.GetClientSettingBool(GlobalSettingsKeys.RadioOverlayTaskbarHide)
             };
+            _radioOverlayWindow.SetRciIndicatorEnabled(ShouldShowRciStatus());
             _radioOverlayWindow.Show();
         }
 

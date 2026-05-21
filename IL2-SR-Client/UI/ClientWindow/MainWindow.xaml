@@ -273,6 +273,28 @@
                         ></Button>
                         
                     </StackPanel>
+
+                    <StackPanel x:Name="RciStatusPanel"
+                                Margin="0,0,0,5"
+                                HorizontalAlignment="Center"
+                                Visibility="Collapsed">
+                        <Grid Width="190"
+                              Height="18">
+                            <Border x:Name="RciStatusIndicator"
+                                    Background="#444"
+                                    BorderBrush="#666"
+                                    BorderThickness="1"
+                                    ToolTip="RCI Status" />
+                            <TextBlock x:Name="RciStatusLabel"
+                                       HorizontalAlignment="Center"
+                                       VerticalAlignment="Center"
+                                       FontFamily="Courier New"
+                                       FontSize="10"
+                                       FontWeight="Bold"
+                                       Foreground="#E7E7E7"
+                                       Text="RCI" />
+                        </Grid>
+                    </StackPanel>
                     
                 </StackPanel>
             </GroupBox>
@@ -295,6 +317,8 @@
                                 <ColumnDefinition Width="75" />
                             </Grid.ColumnDefinitions>
                             <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="Auto" />
                                 <RowDefinition Height="Auto" />
                                 <RowDefinition Height="Auto" />
                                 <RowDefinition Height="Auto" />
@@ -465,6 +489,16 @@
                                                        Grid.ColumnSpan="5"
                                                        ControlInputBinding="{x:Static settings:InputBinding.ToggleSelectedRadioMute}"
                                                        InputName="Mute / Unmute Selected Radio" />
+                            <local:InputBindingControl x:Name="ToggleOtherRadioMute"
+                                                       Grid.Row="24"
+                                                       Grid.ColumnSpan="5"
+                                                       ControlInputBinding="{x:Static settings:InputBinding.ToggleOtherRadioMute}"
+                                                       InputName="Mute / Unmute Other Radio" />
+                            <local:InputBindingControl x:Name="ToggleAllRadiosMute"
+                                                       Grid.Row="25"
+                                                       Grid.ColumnSpan="5"
+                                                       ControlInputBinding="{x:Static settings:InputBinding.ToggleAllRadiosMute}"
+                                                       InputName="Mute / Unmute Both Radios" />
                         </Grid>
                     </StackPanel>
                 </ScrollViewer>

@@ -590,7 +590,7 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.Settings
                             break;
                         }
                         else if ((int)bindState.MainDevice.InputBind >= (int)InputBinding.RadioChannel1 &&
-                                 (int)bindState.MainDevice.InputBind <= (int)InputBinding.ToggleSelectedRadioMute)
+                                 (int)bindState.MainDevice.InputBind <= (int)InputBinding.ToggleAllRadiosMute)
                         {
                             if (bindState.MainDevice.InputBind == _lastActiveBinding && !bindState.IsActive)
                             {
@@ -765,6 +765,12 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.Settings
                                             break;
                                         case InputBinding.ToggleSelectedRadioMute:
                                             RadioHelper.ToggleSelectedRadioMute();
+                                            break;
+                                        case InputBinding.ToggleOtherRadioMute:
+                                            RadioHelper.ToggleOtherRadioMute();
+                                            break;
+                                        case InputBinding.ToggleAllRadiosMute:
+                                            RadioHelper.ToggleAllRadiosMute();
                                             break;
 
                                         default:
@@ -977,7 +983,7 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.Settings
 
             //REMEMBER TO UPDATE THIS WHEN NEW BINDINGS ARE ADDED
             //MIN + MAX bind numbers
-            for (int i = (int)InputBinding.Intercom; i <= (int)InputBinding.ToggleSelectedRadioMute; i++)
+            for (int i = (int)InputBinding.Intercom; i <= (int)InputBinding.ToggleAllRadiosMute; i++)
             {
                 if (!currentInputProfile.ContainsKey((InputBinding)i))
                 {

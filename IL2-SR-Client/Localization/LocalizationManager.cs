@@ -212,7 +212,15 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.Localization
             {"Select Next Radio / Intercom", "Select Next Radio / Intercom"},
             {"Select Previous Radio / Intercom", "Select Previous Radio / Intercom"},
             {"Read Status (TTS on required)", "Read Status (TTS on required)"},
-            {"Mute / Unmute Selected Radio", "Mute / Unmute Selected Radio"}
+            {"Mute / Unmute Selected Radio", "Mute / Unmute Selected Radio"},
+            {"Mute / Unmute Other Radio", "Mute / Unmute Other Radio"},
+            {"Mute / Unmute Both Radios", "Mute / Unmute Both Radios"},
+            {"RCI", "RCI"},
+            {"No RCI active", "RCI not active"},
+            {"Friendly RCI active", "RCI - Friendly only"},
+            {"Enemy RCI active", "RCI - Opposition only"},
+            {"Both sides have RCI active", "RCI - Both coallitions"},
+            {"RCI active", "RCI active"}
         };
 
         private static readonly Dictionary<string, Dictionary<string, string>> Translations =
@@ -387,7 +395,15 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.Localization
                     {"Select Next Radio / Intercom", "Naechstes Funkgeraet / Intercom waehlen"},
                     {"Select Previous Radio / Intercom", "Vorheriges Funkgeraet / Intercom waehlen"},
                     {"Read Status (TTS on required)", "Status vorlesen (TTS erforderlich)"},
-                    {"Mute / Unmute Selected Radio", "Ausgewaehltes Funkgeraet stumm / laut"}
+                    {"Mute / Unmute Selected Radio", "Ausgewaehltes Funkgeraet stumm / laut"},
+                    {"Mute / Unmute Other Radio", "Anderes Funkgeraet stumm / laut"},
+                    {"Mute / Unmute Both Radios", "Beide Funkgeraete stumm / laut"},
+                    {"RCI", "RCI"},
+                    {"No RCI active", "RCI nicht aktiv"},
+                    {"Friendly RCI active", "RCI - Friendly only"},
+                    {"Enemy RCI active", "RCI - Opposition only"},
+                    {"Both sides have RCI active", "RCI - Both coallitions"},
+                    {"RCI active", "RCI aktiv"}
                 }},
                 {"fr", new Dictionary<string, string>
                 {
@@ -557,7 +573,15 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.Localization
                     {"Select Next Radio / Intercom", "Selectionner radio suivante / intercom"},
                     {"Select Previous Radio / Intercom", "Selectionner radio precedente / intercom"},
                     {"Read Status (TTS on required)", "Lire l'etat (TTS requis)"},
-                    {"Mute / Unmute Selected Radio", "Couper / retablir la radio selectionnee"}
+                    {"Mute / Unmute Selected Radio", "Couper / retablir la radio selectionnee"},
+                    {"Mute / Unmute Other Radio", "Couper / retablir l'autre radio"},
+                    {"Mute / Unmute Both Radios", "Couper / retablir les deux radios"},
+                    {"RCI", "RCI"},
+                    {"No RCI active", "RCI inactif"},
+                    {"Friendly RCI active", "RCI - Friendly only"},
+                    {"Enemy RCI active", "RCI - Opposition only"},
+                    {"Both sides have RCI active", "RCI - Both coallitions"},
+                    {"RCI active", "RCI actif"}
                 }},
                 {"es", new Dictionary<string, string>
                 {
@@ -727,7 +751,15 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.Localization
                     {"Select Next Radio / Intercom", "Seleccionar radio siguiente / intercomunicador"},
                     {"Select Previous Radio / Intercom", "Seleccionar radio anterior / intercomunicador"},
                     {"Read Status (TTS on required)", "Leer estado (requiere TTS)"},
-                    {"Mute / Unmute Selected Radio", "Silenciar / reactivar radio seleccionada"}
+                    {"Mute / Unmute Selected Radio", "Silenciar / reactivar radio seleccionada"},
+                    {"Mute / Unmute Other Radio", "Silenciar / reactivar otra radio"},
+                    {"Mute / Unmute Both Radios", "Silenciar / reactivar ambas radios"},
+                    {"RCI", "RCI"},
+                    {"No RCI active", "RCI no activo"},
+                    {"Friendly RCI active", "RCI - Friendly only"},
+                    {"Enemy RCI active", "RCI - Opposition only"},
+                    {"Both sides have RCI active", "RCI - Both coallitions"},
+                    {"RCI active", "RCI activo"}
                 }}
             };
 

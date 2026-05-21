@@ -12,6 +12,7 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.Singletons
 {
     public sealed class ConnectedClientsSingleton : INotifyPropertyChanged
     {
+        private const string RciNameSuffix = "__RCI";
         private readonly ConcurrentDictionary<string, SRClient> _clients = new ConcurrentDictionary<string, SRClient>();
         private static volatile ConnectedClientsSingleton _instance;
         private static object _lock = new Object();
@@ -76,6 +77,51 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.Singletons
             {
                 return _clients.Count();
             }
+        }
+
+        public RciStatus GetRciStatus(int ownCoalition)
+        {
+            var friendlyRci = false;
+            var enemyRci = false;
+            var anyRci = false;
+
+            foreach (var client in _clients)
+            {
+                var srClient = client.Value;
+                if (srClient == null || string.IsNullOrWhiteSpace(srClient.Name) ||
+                    !srClient.Name.Trim().EndsWith(RciNameSuffix, StringComparison.OrdinalIgnoreCase))
+                {
+                    continue;
+                }
+
+                anyRci = true;
+
+                if (ownCoalition > 0 && srClient.Coalition == ownCoalition)
+                {
+                    friendlyRci = true;
+                }
+                else if (ownCoalition > 0 && srClient.Coalition > 0)
+                {
+                    enemyRci = true;
+                }
+            }
+
+            if (friendlyRci && enemyRci)
+            {
+                return RciStatus.Both;
+            }
+
+            if (friendlyRci)
+            {
+                return RciStatus.FriendlyOnly;
+            }
+
+            if (enemyRci)
+            {
+                return RciStatus.EnemyOnly;
+            }
+
+            return anyRci ? RciStatus.Neutral : RciStatus.None;
         }
 
         public bool TryRemove(string key, out SRClient value)

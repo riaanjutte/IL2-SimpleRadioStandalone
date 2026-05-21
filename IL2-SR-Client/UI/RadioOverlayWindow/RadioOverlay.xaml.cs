@@ -5,6 +5,7 @@ using System.Linq;
 using System.Windows;
 using System.Windows.Input;
 using System.Windows.Interop;
+using System.Windows.Media;
 using System.Windows.Threading;
 using Ciribob.IL2.SimpleRadio.Standalone.Client.Localization;
 using NLog;
@@ -32,10 +33,11 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Overlay
 
         private readonly double _originalMinHeight;
         private const double DefaultOverlayWidth = 260.0;
-        private const double DefaultOverlayHeight = 300.0;
+        private const double DefaultOverlayHeight = 312.0;
         private const double OldDefaultOverlayWidth = 122.0;
         private const double OldDefaultOverlayHeight = 270.0;
         private bool _suppressSizeHandling = true;
+        private bool _rciIndicatorEnabled;
     
         public RadioOverlayWindow()
         {
@@ -43,6 +45,8 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Overlay
             //method fires after initialisation
             InitializeComponent();
             LocalizationManager.LocalizeElement(this);
+            RciStatusLabel.Text = LocalizationManager.Get("RCI");
+            RciStatusIndicator.ToolTip = LocalizationManager.Get("No RCI active");
 
             this.WindowStartupLocation = WindowStartupLocation.Manual;
 
@@ -128,8 +132,77 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Overlay
             }
 
             Intercom.RepaintRadioStatus();
+            UpdateRciStatusIndicator();
 
             FocusIL2();
+        }
+
+        public void UpdateRciStatusIndicator()
+        {
+            RciStatusPanel.Visibility = _rciIndicatorEnabled ? Visibility.Visible : Visibility.Collapsed;
+            if (!_rciIndicatorEnabled)
+            {
+                return;
+            }
+
+            var status = ConnectedClientsSingleton.Instance.GetRciStatus(_clientStateSingleton.PlayerGameState.coalition);
+            RciStatusIndicator.Background = GetRciStatusBrush(status);
+            RciStatusLabel.Text = GetRciStatusText(status);
+            RciStatusLabel.Foreground = GetRciStatusForeground(status);
+            RciStatusIndicator.ToolTip = GetRciStatusText(status);
+            RciStatusLabel.ToolTip = RciStatusIndicator.ToolTip;
+        }
+
+        public void SetRciIndicatorEnabled(bool enabled)
+        {
+            _rciIndicatorEnabled = enabled;
+            UpdateRciStatusIndicator();
+        }
+
+        private Brush GetRciStatusBrush(RciStatus status)
+        {
+            switch (status)
+            {
+                case RciStatus.FriendlyOnly:
+                    return new SolidColorBrush((Color)ColorConverter.ConvertFromString("#00FF00"));
+                case RciStatus.EnemyOnly:
+                    return new SolidColorBrush((Color)ColorConverter.ConvertFromString("#D60000"));
+                case RciStatus.Both:
+                    return new SolidColorBrush((Color)ColorConverter.ConvertFromString("#FFB000"));
+                case RciStatus.Neutral:
+                    return new SolidColorBrush((Color)ColorConverter.ConvertFromString("#999999"));
+                default:
+                    return new SolidColorBrush((Color)ColorConverter.ConvertFromString("#444444"));
+            }
+        }
+
+        private Brush GetRciStatusForeground(RciStatus status)
+        {
+            switch (status)
+            {
+                case RciStatus.FriendlyOnly:
+                case RciStatus.Both:
+                    return Brushes.Black;
+                default:
+                    return Brushes.White;
+            }
+        }
+
+        private string GetRciStatusText(RciStatus status)
+        {
+            switch (status)
+            {
+                case RciStatus.FriendlyOnly:
+                    return LocalizationManager.Get("Friendly RCI active");
+                case RciStatus.EnemyOnly:
+                    return LocalizationManager.Get("Enemy RCI active");
+                case RciStatus.Both:
+                    return LocalizationManager.Get("Both sides have RCI active");
+                case RciStatus.Neutral:
+                    return LocalizationManager.Get("RCI active");
+                default:
+                    return LocalizationManager.Get("No RCI active");
+            }
         }
 
         private void Recalculate()

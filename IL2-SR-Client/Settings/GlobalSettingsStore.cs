@@ -178,6 +178,12 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.Settings
         ToggleSelectedRadioMute = 133,
         ModifierToggleSelectedRadioMute = 233,
 
+        ToggleOtherRadioMute = 134,
+        ModifierToggleOtherRadioMute = 234,
+
+        ToggleAllRadiosMute = 135,
+        ModifierToggleAllRadiosMute = 235,
+
     }
 
 

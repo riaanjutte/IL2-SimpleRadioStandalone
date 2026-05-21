@@ -1,5 +1,23 @@
 # Changelog
 
+## IL2-SRS 1.0.3.7 community update
+
+### Added
+
+- Added Combat Box RCI status detection for clients whose player name ends with `__RCI`.
+- Added Combat Box-only RCI status indicators to the radio overlay and main client window.
+- Added input bindings to mute/unmute the opposite radio and mute/unmute both radios, using the existing selected-radio muted volume setting.
+
+### Changed
+
+- RCI indicators are only visible while connected to `srs.combatbox.net`.
+- RCI status text now shows friendly-only, both-coalitions, opposition-only, inactive, and neutral/unknown states directly inside a color status bar.
+
+### Validation
+
+- Built `IL2-SimpleRadioStandalone.sln` Release/x64 successfully.
+- Ran `IL2-SR-CommonTests`: 12/12 passed.
+
 ## IL2-SRS 1.0.3.6 community update
 
 ### Fixed
