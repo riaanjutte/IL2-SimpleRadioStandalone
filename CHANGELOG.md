@@ -1,5 +1,22 @@
 # Changelog
 
+## IL2-SRS 1.0.3.9 community update
+
+### Added
+
+- Added `Use Windows setting` to the client theme picker so SRS can follow the Windows light/dark app theme.
+- Added localized labels for the new theme option in English, German, French, and Spanish.
+
+### Changed
+
+- New installs now default to `Use Windows setting`; if Windows theme detection is unavailable, the client falls back to light mode.
+- When `Use Windows setting` is selected, the client updates its theme while running after Windows theme changes.
+
+### Validation
+
+- Built `IL2-SimpleRadioStandalone.sln` Release/x64 successfully.
+- Ran `IL2-SR-CommonTests`: 12/12 passed.
+
 ## IL2-SRS 1.0.3.8 community update
 
 ### Changed

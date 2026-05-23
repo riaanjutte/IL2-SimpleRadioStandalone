@@ -201,6 +201,9 @@
   <data name="Dark" xml:space="preserve">
     <value>Dark</value>
   </data>
+  <data name="Use Windows setting" xml:space="preserve">
+    <value>Use Windows setting</value>
+  </data>
   <data name="Auto Connect Prompt" xml:space="preserve">
     <value>Auto Connect Prompt</value>
   </data>

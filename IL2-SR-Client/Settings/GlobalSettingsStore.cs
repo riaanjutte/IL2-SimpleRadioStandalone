@@ -355,7 +355,7 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.Settings
             {GlobalSettingsKeys.RequireAdmin.ToString(),"true" },
 
             {GlobalSettingsKeys.Language.ToString(), "" },
-            {GlobalSettingsKeys.Theme.ToString(), "Light" },
+            {GlobalSettingsKeys.Theme.ToString(), "System" },
             {GlobalSettingsKeys.CommunityRecommendedSettingsChoice.ToString(), "" },
 
             {GlobalSettingsKeys.ShowTransmitterName.ToString(), "true"},

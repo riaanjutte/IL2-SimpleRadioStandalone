@@ -1007,6 +1007,11 @@
                                              Content="Dark"
                                              GroupName="ClientTheme"
                                              Checked="ThemeRadioButton_Checked" />
+                                <RadioButton Name="SystemThemeRadioButton"
+                                             Margin="5,0"
+                                             Content="Use Windows setting"
+                                             GroupName="ClientTheme"
+                                             Checked="ThemeRadioButton_Checked" />
                             </StackPanel>
                         </Grid>
 

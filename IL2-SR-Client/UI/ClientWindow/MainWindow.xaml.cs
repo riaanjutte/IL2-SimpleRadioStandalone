@@ -685,8 +685,9 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI
                 _globalSettings.SetClientSetting(GlobalSettingsKeys.Theme, normalizedTheme);
             }
 
-            DarkThemeRadioButton.IsChecked = ClientThemeManager.IsDarkTheme(normalizedTheme);
-            LightThemeRadioButton.IsChecked = !ClientThemeManager.IsDarkTheme(normalizedTheme);
+            SystemThemeRadioButton.IsChecked = ClientThemeManager.IsSystemTheme(normalizedTheme);
+            DarkThemeRadioButton.IsChecked = string.Equals(normalizedTheme, ClientThemeManager.DarkTheme, StringComparison.OrdinalIgnoreCase);
+            LightThemeRadioButton.IsChecked = string.Equals(normalizedTheme, ClientThemeManager.LightTheme, StringComparison.OrdinalIgnoreCase);
             _initialisingThemePicker = false;
         }
 
@@ -1580,7 +1581,9 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI
                 return;
             }
 
-            var theme = DarkThemeRadioButton.IsChecked == true
+            var theme = SystemThemeRadioButton.IsChecked == true
+                ? ClientThemeManager.SystemTheme
+                : DarkThemeRadioButton.IsChecked == true
                 ? ClientThemeManager.DarkTheme
                 : ClientThemeManager.LightTheme;
 

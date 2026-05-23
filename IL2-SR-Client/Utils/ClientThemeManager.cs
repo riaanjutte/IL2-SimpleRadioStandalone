@@ -5,6 +5,7 @@ using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
 using System.Windows.Documents;
 using System.Windows.Media;
+using Microsoft.Win32;
 
 namespace Ciribob.IL2.SimpleRadio.Standalone.Client.Utils
 {
@@ -12,24 +13,54 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.Utils
     {
         public const string LightTheme = "Light";
         public const string DarkTheme = "Dark";
+        public const string SystemTheme = "System";
 
         private const string BaseThemePrefix = "pack://application:,,,/MahApps.Metro;component/Styles/Accents/Base";
+        private const string WindowsPersonalizeKey = @"Software\Microsoft\Windows\CurrentVersion\Themes\Personalize";
+        private const string WindowsAppsUseLightThemeValue = "AppsUseLightTheme";
         private static string _currentTheme = LightTheme;
 
         public static string NormalizeTheme(string theme)
         {
-            return string.Equals(theme, DarkTheme, StringComparison.OrdinalIgnoreCase) ? DarkTheme : LightTheme;
+            if (string.Equals(theme, DarkTheme, StringComparison.OrdinalIgnoreCase))
+            {
+                return DarkTheme;
+            }
+
+            if (string.Equals(theme, SystemTheme, StringComparison.OrdinalIgnoreCase))
+            {
+                return SystemTheme;
+            }
+
+            return LightTheme;
         }
 
         public static bool IsDarkTheme(string theme)
         {
-            return string.Equals(NormalizeTheme(theme), DarkTheme, StringComparison.OrdinalIgnoreCase);
+            return string.Equals(ResolveTheme(theme), DarkTheme, StringComparison.OrdinalIgnoreCase);
+        }
+
+        public static bool IsSystemTheme(string theme)
+        {
+            return string.Equals(NormalizeTheme(theme), SystemTheme, StringComparison.OrdinalIgnoreCase);
+        }
+
+        public static string ResolveTheme(string theme)
+        {
+            var normalizedTheme = NormalizeTheme(theme);
+            if (!string.Equals(normalizedTheme, SystemTheme, StringComparison.OrdinalIgnoreCase))
+            {
+                return normalizedTheme;
+            }
+
+            return GetWindowsAppTheme();
         }
 
         public static void ApplyTheme(string theme)
         {
             var normalizedTheme = NormalizeTheme(theme);
-            _currentTheme = normalizedTheme;
+            var resolvedTheme = ResolveTheme(normalizedTheme);
+            _currentTheme = resolvedTheme;
 
             var resources = Application.Current?.Resources;
             if (resources == null)
@@ -42,7 +73,7 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.Utils
                     dictionary.Source != null &&
                     dictionary.Source.OriginalString.IndexOf("/Styles/Accents/Base", StringComparison.OrdinalIgnoreCase) >= 0);
 
-            var themeSource = new Uri($"{BaseThemePrefix}{normalizedTheme}.xaml", UriKind.Absolute);
+            var themeSource = new Uri($"{BaseThemePrefix}{resolvedTheme}.xaml", UriKind.Absolute);
             if (baseThemeDictionary == null)
             {
                 resources.MergedDictionaries.Add(new ResourceDictionary { Source = themeSource });
@@ -56,7 +87,7 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.Utils
 
             foreach (Window window in Application.Current.Windows)
             {
-                ApplyThemeToWindow(window, normalizedTheme);
+                ApplyThemeToWindow(window, resolvedTheme);
             }
         }
 
@@ -67,8 +98,29 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.Utils
                 return;
             }
 
-            _currentTheme = NormalizeTheme(theme);
+            _currentTheme = ResolveTheme(theme);
             ApplyElementTheme(window, IsDarkTheme(_currentTheme) ? ThemePalette.Dark : ThemePalette.Light);
+        }
+
+        private static string GetWindowsAppTheme()
+        {
+            try
+            {
+                using (var key = Registry.CurrentUser.OpenSubKey(WindowsPersonalizeKey))
+                {
+                    var value = key?.GetValue(WindowsAppsUseLightThemeValue);
+                    if (value is int intValue)
+                    {
+                        return intValue == 0 ? DarkTheme : LightTheme;
+                    }
+                }
+            }
+            catch
+            {
+                // Fall back to light if Windows theme detection is unavailable.
+            }
+
+            return LightTheme;
         }
 
         private static void ApplyElementTheme(DependencyObject element, ThemePalette palette, ToggleButton parentToggleButton = null)
