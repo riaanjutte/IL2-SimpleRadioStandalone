@@ -679,6 +679,11 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.Audio.Managers
 
         public void PlaySoundEffectStartReceive(int transmitOnRadio, bool encrypted, float volume, RadioInformation.Modulation modulation)
         {
+            if (EffectBufferUnavailable(transmitOnRadio))
+            {
+                return;
+            }
+
             if (!_globalSettings.ProfileSettingsStore.GetClientSettingBool(ProfileSettingsKeys.RadioRxEffects_Start))
             {
                 return;
@@ -698,6 +703,11 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.Audio.Managers
 
         public void PlaySoundEffectStartTransmit(int transmitOnRadio, float volume, RadioInformation.Modulation modulation)
         {
+            if (EffectBufferUnavailable(transmitOnRadio))
+            {
+                return;
+            }
+
             if (!_globalSettings.ProfileSettingsStore.GetClientSettingBool(ProfileSettingsKeys.RadioTxEffects_Start))
             {
                 return;
@@ -714,7 +724,11 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.Audio.Managers
 
         public void PlaySoundEffectEndReceive(int transmitOnRadio, float volume, RadioInformation.Modulation modulation)
         {
-            
+            if (EffectBufferUnavailable(transmitOnRadio))
+            {
+                return;
+            }
+
             if (!_globalSettings.ProfileSettingsStore.GetClientSettingBool(ProfileSettingsKeys.RadioRxEffects_End))
             {
                 return;
@@ -731,6 +745,11 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.Audio.Managers
         public void PlaySoundEffectEndTransmit(int transmitOnRadio, float volume,
             RadioInformation.Modulation modulation)
         {
+            if (EffectBufferUnavailable(transmitOnRadio))
+            {
+                return;
+            }
+
             if (!_globalSettings.ProfileSettingsStore.GetClientSettingBool(ProfileSettingsKeys.RadioTxEffects_End))
             {
                 return;
@@ -742,6 +761,15 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.Audio.Managers
             _effectBuffer.AddAudioSamples(
                 _cachedAudioEffects[(int) CachedAudioEffect.AudioEffectTypes.RADIO_RX].AudioEffectBytes,
                 transmitOnRadio);
+        }
+
+        private bool EffectBufferUnavailable(int transmitOnRadio)
+        {
+            return _stoppingEncoding
+                   || _effectsOutputBuffer == null
+                   || transmitOnRadio < 0
+                   || transmitOnRadio >= _effectsOutputBuffer.Length
+                   || _effectsOutputBuffer[transmitOnRadio] == null;
         }
 
         private void PlaySelectedRadioMuteCue(SelectedRadioMuteCueMessage message)
@@ -766,6 +794,11 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.Audio.Managers
 
         private void PlaySelectedRadioMuteCueOnce(int radioId)
         {
+            if (EffectBufferUnavailable(radioId))
+            {
+                return;
+            }
+
             var effectsOutputBuffer = _effectsOutputBuffer;
             if (effectsOutputBuffer == null || radioId < 0 || radioId >= effectsOutputBuffer.Length)
             {
@@ -787,61 +820,76 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.Audio.Managers
 
         public void StopEncoding()
         {
-            lock(lockObj)
+            UdpVoiceHandler udpVoiceHandler = null;
+
+            lock (lockObj)
             {
                 _stoppingEncoding = true;
-                _textToSpeech?.Dispose();
-                _textToSpeech = null;
-
-                _wasapiCapture?.StopRecording();
-                _wasapiCapture?.Dispose();
-                _wasapiCapture = null;
-
-                _resampler?.Dispose(true);
-                _resampler = null;
-
-                _waveOut?.Stop();
-                _waveOut?.Dispose();
-                _waveOut = null;
-
-                _micWaveOut?.Stop();
-                _micWaveOut?.Dispose();
-                _micWaveOut = null;
-
-                _volumeSampleProvider = null;
-                _clientAudioMixer?.RemoveAllMixerInputs();
-                _clientAudioMixer = null;
-
-                _clientsBufferedAudio.Clear();
-
-                _encoder?.Dispose();
-                _encoder = null;
-
-                if (_udpVoiceHandler != null)
-                {
-                    _udpVoiceHandler.RequestStop();
-                    _udpVoiceHandler = null;
-                }
-
-                _speex?.Dispose();
-                _speex = null;
-
-                SpeakerMax = -100;
-                MicMax = -100;
-
-                _effectsOutputBuffer = null;
-
-                foreach (var guid in _subs)
-                {
-                    MessageHub.Instance.UnSubscribe(guid);
-                }
-                _subs.Clear();
-              
+                udpVoiceHandler = _udpVoiceHandler;
+                _udpVoiceHandler = null;
             }
+
+            if (udpVoiceHandler != null)
+            {
+                try
+                {
+                    udpVoiceHandler.RequestStop();
+                }
+                catch (Exception ex)
+                {
+                    Logger.Warn(ex, "Exception stopping UDP voice handler during audio shutdown");
+                }
+            }
+
+            _textToSpeech?.Dispose();
+            _textToSpeech = null;
+
+            _wasapiCapture?.StopRecording();
+            _wasapiCapture?.Dispose();
+            _wasapiCapture = null;
+
+            _resampler?.Dispose(true);
+            _resampler = null;
+
+            _waveOut?.Stop();
+            _waveOut?.Dispose();
+            _waveOut = null;
+
+            _micWaveOut?.Stop();
+            _micWaveOut?.Dispose();
+            _micWaveOut = null;
+
+            _volumeSampleProvider = null;
+            _clientAudioMixer?.RemoveAllMixerInputs();
+            _clientAudioMixer = null;
+
+            _clientsBufferedAudio.Clear();
+
+            _encoder?.Dispose();
+            _encoder = null;
+
+            _speex?.Dispose();
+            _speex = null;
+
+            SpeakerMax = -100;
+            MicMax = -100;
+
+            _effectsOutputBuffer = null;
+
+            foreach (var guid in _subs)
+            {
+                MessageHub.Instance.UnSubscribe(guid);
+            }
+            _subs.Clear();
         }
 
         public void AddClientAudio(ClientAudio audio)
         {
+            if (_stoppingEncoding || _clientAudioMixer == null)
+            {
+                return;
+            }
+
             //sort out effects!
 
             //16bit PCM Audio

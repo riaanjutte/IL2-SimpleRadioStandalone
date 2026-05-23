@@ -1,5 +1,23 @@
 # Changelog
 
+## IL2-SRS 1.0.3.8 community update
+
+### Changed
+
+- RCI/RCO detection now accepts common callsign marker variations using `RCI_` prefixes or `_RCI` suffixes.
+- Friendly RCI/RCO callsigns are displayed without marker underscores.
+
+### Fixed
+
+- Hardened client disconnect so UDP voice receive/decode is stopped before audio devices are torn down, reducing disconnect freezes and lingering audio.
+- Cleared pending receive audio, transmit state, receive state, and PTT state during disconnect.
+- Fixed overlay clipping when a Combat Box RCI/RCO callsign is shown below the RCI status bar.
+
+### Validation
+
+- Built `IL2-SimpleRadioStandalone.sln` Release/x64 successfully.
+- Ran `IL2-SR-CommonTests`: 12/12 passed.
+
 ## IL2-SRS 1.0.3.7 community update
 
 ### Added

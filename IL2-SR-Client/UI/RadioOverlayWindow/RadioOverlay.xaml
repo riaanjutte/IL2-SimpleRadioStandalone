@@ -87,29 +87,43 @@
        
         <Separator Width="130" Margin="0 2" />
 
-        <Grid x:Name="RciStatusPanel"
-              Width="118"
-              Height="14"
-              Margin="5,0,0,0"
-              HorizontalAlignment="Left"
-              Visibility="Collapsed">
-            <Border x:Name="RciStatusIndicator"
-                    Background="#444"
-                    BorderBrush="#777"
-                    BorderThickness="1"
-                    Style="{x:Null}" />
-            <TextBlock x:Name="RciStatusLabel"
+        <StackPanel x:Name="RciStatusPanel"
+                    Width="118"
+                    Margin="5,0,0,0"
+                    HorizontalAlignment="Left"
+                    Visibility="Collapsed">
+            <Grid Height="14">
+                <Border x:Name="RciStatusIndicator"
+                        Background="#444"
+                        BorderBrush="#777"
+                        BorderThickness="1"
+                        Style="{x:Null}" />
+                <TextBlock x:Name="RciStatusLabel"
+                           HorizontalAlignment="Center"
+                           VerticalAlignment="Center"
+                           FontFamily="Courier New"
+                           FontSize="7"
+                           FontWeight="Bold"
+                           Foreground="#E7E7E7"
+                           Style="{x:Null}"
+                           Text="RCI" />
+            </Grid>
+            <TextBlock x:Name="RciCallsignLabel"
+                       Width="118"
+                       Height="9"
+                       Margin="0,1,0,0"
                        HorizontalAlignment="Center"
-                       VerticalAlignment="Center"
                        FontFamily="Courier New"
                        FontSize="7"
                        FontWeight="Bold"
                        Foreground="#E7E7E7"
                        Style="{x:Null}"
-                       Text="RCI" />
-        </Grid>
+                       TextAlignment="Center"
+                       TextTrimming="CharacterEllipsis"
+                       Visibility="Collapsed" />
+        </StackPanel>
 
-        <Slider Margin="0,5,0,0" x:Name="WindowOpacitySlider"
+        <Slider Margin="0,3,0,0" x:Name="WindowOpacitySlider"
                 Width="80"
                 Height="30"
                 VerticalAlignment="Center"

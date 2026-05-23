@@ -3,6 +3,7 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
+using System.Text.RegularExpressions;
 using Ciribob.IL2.SimpleRadio.Standalone.Client.Settings;
 using Ciribob.IL2.SimpleRadio.Standalone.Common;
 using Ciribob.IL2.SimpleRadio.Standalone.Common.Network;
@@ -12,7 +13,8 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.Singletons
 {
     public sealed class ConnectedClientsSingleton : INotifyPropertyChanged
     {
-        private const string RciNameSuffix = "__RCI";
+        private static readonly Regex RciNameSuffixPattern = new Regex(@"_+RCI_*$", RegexOptions.IgnoreCase | RegexOptions.Compiled);
+        private static readonly Regex RciNamePrefixPattern = new Regex(@"^_*RCI_+", RegexOptions.IgnoreCase | RegexOptions.Compiled);
         private readonly ConcurrentDictionary<string, SRClient> _clients = new ConcurrentDictionary<string, SRClient>();
         private static volatile ConnectedClientsSingleton _instance;
         private static object _lock = new Object();
@@ -88,8 +90,7 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.Singletons
             foreach (var client in _clients)
             {
                 var srClient = client.Value;
-                if (srClient == null || string.IsNullOrWhiteSpace(srClient.Name) ||
-                    !srClient.Name.Trim().EndsWith(RciNameSuffix, StringComparison.OrdinalIgnoreCase))
+                if (srClient == null || !TryGetRciCallsign(srClient.Name, out var callsign))
                 {
                     continue;
                 }
@@ -122,6 +123,79 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.Singletons
             }
 
             return anyRci ? RciStatus.Neutral : RciStatus.None;
+        }
+
+        public string GetFriendlyRciCallsign(int ownCoalition)
+        {
+            if (ownCoalition <= 0)
+            {
+                return string.Empty;
+            }
+
+            var friendlyRciCallsigns = _clients.Values
+                .Where(client => client != null &&
+                                 client.ClientGuid != _guid &&
+                                 client.Coalition == ownCoalition &&
+                                 TryGetRciCallsign(client.Name, out var callsign) &&
+                                 !string.IsNullOrWhiteSpace(callsign))
+                .Select(client =>
+                {
+                    TryGetRciCallsign(client.Name, out var callsign);
+                    return callsign;
+                })
+                .Where(name => !string.IsNullOrWhiteSpace(name))
+                .Distinct(StringComparer.OrdinalIgnoreCase)
+                .ToList();
+
+            return friendlyRciCallsigns.Count == 0 ? string.Empty : string.Join(", ", friendlyRciCallsigns);
+        }
+
+        public string GetRciDebugSummary(int ownCoalition)
+        {
+            var candidates = _clients.Values
+                .Where(client => client != null &&
+                                 TryGetRciCallsign(client.Name, out var callsign))
+                .Select(client => $"{client.Name} c{client.Coalition} age {GetAgeSeconds(client.LastUpdate):0}s")
+                .ToList();
+            var allClients = _clients.Values
+                .Where(client => client != null && client.ClientGuid != _guid)
+                .OrderBy(client => client.Name)
+                .Take(30)
+                .Select(client => $"{client.Name} c{client.Coalition}")
+                .ToList();
+
+            return $"Own coalition: {ownCoalition}\nKnown RCI clients: {(candidates.Count == 0 ? "none" : string.Join(", ", candidates))}\nConnected clients: {(allClients.Count == 0 ? "none" : string.Join(", ", allClients))}";
+        }
+
+        private static double GetAgeSeconds(long ticks)
+        {
+            return ticks <= 0 ? -1 : new TimeSpan(DateTime.Now.Ticks - ticks).TotalSeconds;
+        }
+
+        private static bool TryGetRciCallsign(string name, out string callsign)
+        {
+            callsign = string.Empty;
+
+            if (string.IsNullOrWhiteSpace(name))
+            {
+                return false;
+            }
+
+            var trimmedName = name.Trim();
+
+            if (RciNameSuffixPattern.IsMatch(trimmedName))
+            {
+                callsign = RciNameSuffixPattern.Replace(trimmedName, string.Empty).Trim().TrimEnd('_').Trim();
+                return true;
+            }
+
+            if (RciNamePrefixPattern.IsMatch(trimmedName))
+            {
+                callsign = RciNamePrefixPattern.Replace(trimmedName, string.Empty).Trim().TrimStart('_').Trim();
+                return true;
+            }
+
+            return false;
         }
 
         public bool TryRemove(string key, out SRClient value)

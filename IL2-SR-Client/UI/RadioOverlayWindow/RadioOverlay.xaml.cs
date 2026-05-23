@@ -32,6 +32,9 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Overlay
         private readonly GlobalSettingsStore _globalSettings = GlobalSettingsStore.Instance;
 
         private readonly double _originalMinHeight;
+        private const double Radio2MinHeightDelta = 95.0;
+        private const double RciStatusMinHeightDelta = 15.0;
+        private const double RciCallsignMinHeightDelta = 10.0;
         private const double DefaultOverlayWidth = 260.0;
         private const double DefaultOverlayHeight = 312.0;
         private const double OldDefaultOverlayWidth = 122.0;
@@ -113,8 +116,7 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Overlay
                     //show
                     Radio2.Visibility = Visibility.Visible;
                     Radio2Seperator.Visibility = Visibility.Visible;
-                    MinHeight = _originalMinHeight + 70 + 25;
-                    Recalculate();
+                    UpdateOverlayMinimumHeight();
                 }
 
                 Radio2.RepaintRadioStatus();
@@ -125,9 +127,8 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Overlay
                 if (Radio2.Visibility != Visibility.Collapsed)
                 {
                     Radio2.Visibility = Visibility.Collapsed;
-                    MinHeight = _originalMinHeight;
                     Radio2Seperator.Visibility = Visibility.Collapsed;
-                    Recalculate();
+                    UpdateOverlayMinimumHeight();
                 }
             }
 
@@ -139,9 +140,14 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Overlay
 
         public void UpdateRciStatusIndicator()
         {
+            var previousRciVisibility = RciStatusPanel.Visibility;
+            var previousCallsignVisibility = RciCallsignLabel.Visibility;
+
             RciStatusPanel.Visibility = _rciIndicatorEnabled ? Visibility.Visible : Visibility.Collapsed;
             if (!_rciIndicatorEnabled)
             {
+                UpdateRciCallsignLabel(string.Empty);
+                UpdateOverlayMinimumHeightIfChanged(previousRciVisibility, previousCallsignVisibility);
                 return;
             }
 
@@ -149,14 +155,63 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Overlay
             RciStatusIndicator.Background = GetRciStatusBrush(status);
             RciStatusLabel.Text = GetRciStatusText(status);
             RciStatusLabel.Foreground = GetRciStatusForeground(status);
-            RciStatusIndicator.ToolTip = GetRciStatusText(status);
+            RciStatusIndicator.ToolTip = GetRciStatusText(status) + "\n\n" +
+                                         ConnectedClientsSingleton.Instance.GetRciDebugSummary(_clientStateSingleton.PlayerGameState.coalition);
             RciStatusLabel.ToolTip = RciStatusIndicator.ToolTip;
+            UpdateRciCallsignLabel(ConnectedClientsSingleton.Instance.GetFriendlyRciCallsign(_clientStateSingleton.PlayerGameState.coalition));
+            UpdateOverlayMinimumHeightIfChanged(previousRciVisibility, previousCallsignVisibility);
         }
 
         public void SetRciIndicatorEnabled(bool enabled)
         {
             _rciIndicatorEnabled = enabled;
             UpdateRciStatusIndicator();
+        }
+
+        private void UpdateRciCallsignLabel(string callsigns)
+        {
+            RciCallsignLabel.Text = callsigns ?? string.Empty;
+            RciCallsignLabel.ToolTip = RciCallsignLabel.Text;
+            RciCallsignLabel.Visibility = string.IsNullOrWhiteSpace(RciCallsignLabel.Text)
+                ? Visibility.Collapsed
+                : Visibility.Visible;
+        }
+
+        private void UpdateOverlayMinimumHeightIfChanged(Visibility previousRciVisibility, Visibility previousCallsignVisibility)
+        {
+            if (previousRciVisibility != RciStatusPanel.Visibility ||
+                previousCallsignVisibility != RciCallsignLabel.Visibility)
+            {
+                UpdateOverlayMinimumHeight();
+            }
+        }
+
+        private void UpdateOverlayMinimumHeight()
+        {
+            var minHeight = _originalMinHeight;
+
+            if (Radio2.Visibility == Visibility.Visible)
+            {
+                minHeight += Radio2MinHeightDelta;
+            }
+
+            if (RciStatusPanel.Visibility == Visibility.Visible)
+            {
+                minHeight += RciStatusMinHeightDelta;
+
+                if (RciCallsignLabel.Visibility == Visibility.Visible)
+                {
+                    minHeight += RciCallsignMinHeightDelta;
+                }
+            }
+
+            if (Math.Abs(MinHeight - minHeight) < 0.1)
+            {
+                return;
+            }
+
+            MinHeight = minHeight;
+            Recalculate();
         }
 
         private Brush GetRciStatusBrush(RciStatus status)

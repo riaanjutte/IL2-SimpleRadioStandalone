@@ -294,6 +294,17 @@
                                        Foreground="#E7E7E7"
                                        Text="RCI" />
                         </Grid>
+                        <TextBlock x:Name="RciCallsignLabel"
+                                   Width="190"
+                                   Margin="0,2,0,0"
+                                   HorizontalAlignment="Center"
+                                   FontFamily="Courier New"
+                                   FontSize="10"
+                                   FontWeight="Bold"
+                                   Foreground="{StaticResource ForegroundBrush}"
+                                   TextAlignment="Center"
+                                   TextTrimming="CharacterEllipsis"
+                                   Visibility="Collapsed" />
                     </StackPanel>
                     
                 </StackPanel>

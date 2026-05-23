@@ -55,6 +55,7 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.Network
 
         //    private readonly JitterBuffer _jitterBuffer = new JitterBuffer();
         private UdpClient _listener;
+        private Thread _decoderThread;
 
         private ulong _packetNumber = 1;
 
@@ -146,8 +147,11 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.Network
             // _listener.Connect(_serverEndpoint);
 
             //start 2 audio processing threads
-            var decoderThread = new Thread(UdpAudioDecode);
-            decoderThread.Start();
+            _decoderThread = new Thread(UdpAudioDecode)
+            {
+                IsBackground = true
+            };
+            _decoderThread.Start();
 
             var settings = GlobalSettingsStore.Instance;
             _inputManager.StartDetectPtt(pressed =>
@@ -251,7 +255,10 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.Network
                         else if (bytes?.Length > 22)
                         {
                             _udpLastReceived = DateTime.Now.Ticks;
-                            _encodedAudio.Add(bytes);
+                            if (!_stop && !_encodedAudio.IsAddingCompleted)
+                            {
+                                _encodedAudio.Add(bytes);
+                            }
                         }
                     }
                     catch (Exception e)
@@ -264,9 +271,10 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.Network
             _ready = false;
 
             //stop UI Refreshing
-            _updateTimer.Stop();
+            _updateTimer?.Stop();
 
             _clientStateSingleton.IsVoipConnected = false;
+            ResetTransmitReceiveState();
         }
 
         public void StartTimer()
@@ -291,20 +299,80 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.Network
         public void RequestStop()
         {
             _stop = true;
+            _ready = false;
+
             try
             {
-                _listener.Close();
+                _listener?.Close();
             }
             catch (Exception e)
             {
+                Logger.Warn(e, "Exception closing UDP listener during disconnect");
             }
 
-            _stopFlag.Cancel();
-            _pingStop.Cancel();
+            try
+            {
+                if (!_stopFlag.IsCancellationRequested)
+                {
+                    _stopFlag.Cancel();
+                }
+            }
+            catch (Exception e)
+            {
+                Logger.Warn(e, "Exception cancelling UDP decoder during disconnect");
+            }
 
-            _inputManager.StopPtt();
+            try
+            {
+                if (!_pingStop.IsCancellationRequested)
+                {
+                    _pingStop.Cancel();
+                }
+            }
+            catch (Exception e)
+            {
+                Logger.Warn(e, "Exception cancelling UDP ping during disconnect");
+            }
+
+            ClearPendingAudio();
+            ResetTransmitReceiveState();
+
+            try
+            {
+                _inputManager.StopPtt();
+            }
+            catch (Exception e)
+            {
+                Logger.Warn(e, "Exception stopping PTT input during disconnect");
+            }
 
             StopTimer();
+        }
+
+        private void ClearPendingAudio()
+        {
+            byte[] discarded;
+            while (_encodedAudio.TryTake(out discarded))
+            {
+            }
+        }
+
+        private void ResetTransmitReceiveState()
+        {
+            _ptt = false;
+            _lastPTTPress = 0;
+            _clientStateSingleton.IsVoipConnected = false;
+            _clientStateSingleton.RadioSendingState = new RadioSendingState();
+
+            if (_radioReceivingState == null)
+            {
+                return;
+            }
+
+            for (var i = 0; i < _radioReceivingState.Length; i++)
+            {
+                _radioReceivingState[i] = null;
+            }
         }
 
         private SRClient IsClientMetaDataValid(string clientGuid)
