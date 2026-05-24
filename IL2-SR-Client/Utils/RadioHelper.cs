@@ -21,8 +21,8 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.Utils
         private const float MinimumMutedVolume = 0.05f;
         private const float MaximumMutedVolume = 0.50f;
         private const float DefaultMutedVolume = 0.25f;
-        private const float DefaultRestoredVolume = 1.0f;
-        private static readonly Dictionary<int, float> PreviousRadioVolumes = new Dictionary<int, float>();
+        private static readonly HashSet<int> MutedRadios = new HashSet<int>();
+        private static readonly object MutedRadiosLock = new object();
      
         public static bool SelectRadio(int radioId, bool tts = true)
         {
@@ -241,6 +241,29 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.Utils
             }
         }
 
+        public static float GetEffectiveReceiveVolume(int radioId, RadioInformation radio)
+        {
+            if (radio == null)
+            {
+                return 0;
+            }
+
+            if (IsRadioMuted(radioId))
+            {
+                return Math.Min(radio.volume, GetSelectedRadioMutedVolume());
+            }
+
+            return radio.volume;
+        }
+
+        public static bool IsRadioMuted(int radioId)
+        {
+            lock (MutedRadiosLock)
+            {
+                return MutedRadios.Contains(radioId);
+            }
+        }
+
         public static void ToggleSelectedRadioMute()
         {
             var IL2PlayerRadioInfo = ClientStateSingleton.Instance.PlayerGameState;
@@ -299,7 +322,7 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.Utils
                 return;
             }
 
-            var restore = radioIds.TrueForAll(radioId => GetRadio(radioId).volume <= mutedVolume);
+            var restore = radioIds.TrueForAll(IsRadioMuted);
             foreach (var radioId in radioIds)
             {
                 if (restore)
@@ -321,13 +344,13 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.Utils
                 return;
             }
 
-            if (currentRadio.volume > mutedVolume)
+            if (IsRadioMuted(radioId))
             {
-                MuteRadio(radioId, mutedVolume);
+                RestoreRadioVolume(radioId, mutedVolume);
             }
             else
             {
-                RestoreRadioVolume(radioId, mutedVolume);
+                MuteRadio(radioId, mutedVolume);
             }
         }
 
@@ -339,13 +362,14 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.Utils
                 return;
             }
 
-            if (currentRadio.volume <= mutedVolume)
+            lock (MutedRadiosLock)
             {
-                return;
+                if (!MutedRadios.Add(radioId))
+                {
+                    return;
+                }
             }
 
-            PreviousRadioVolumes[radioId] = currentRadio.volume;
-            currentRadio.volume = mutedVolume;
             PlaySelectedRadioMuteCue(radioId, false);
         }
 
@@ -357,13 +381,14 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.Utils
                 return;
             }
 
-            float restoredVolume;
-            if (!PreviousRadioVolumes.TryGetValue(radioId, out restoredVolume) || restoredVolume <= mutedVolume)
+            lock (MutedRadiosLock)
             {
-                restoredVolume = DefaultRestoredVolume;
+                if (!MutedRadios.Remove(radioId))
+                {
+                    return;
+                }
             }
 
-            currentRadio.volume = restoredVolume;
             PlaySelectedRadioMuteCue(radioId, true);
         }
 

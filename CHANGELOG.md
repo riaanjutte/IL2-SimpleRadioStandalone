@@ -1,5 +1,17 @@
 # Changelog
 
+## IL2-SRS 1.0.4.0 community update
+
+### Fixed
+
+- Fixed radio mute/unmute so muting a radio only lowers received audio for that radio and no longer affects microphone/transmit audio.
+- Radio mute state is now tracked separately from the radio's actual volume, so normal volume settings are preserved while muted.
+
+### Validation
+
+- Built `IL2-SimpleRadioStandalone.sln` Release/x64 successfully.
+- Ran `IL2-SR-CommonTests`: 12/12 passed.
+
 ## IL2-SRS 1.0.3.9 community update
 
 ### Added

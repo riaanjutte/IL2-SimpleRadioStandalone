@@ -129,7 +129,8 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.Network
                     radioState.PlayedEndOfTransmission = true;
 
                     var radioInfo = _clientStateSingleton.PlayerGameState;
-                    _audioManager.PlaySoundEffectEndReceive(i, radioInfo.radios[i].volume, radioInfo.radios[i].modulation);
+                    var radio = radioInfo.radios[i];
+                    _audioManager.PlaySoundEffectEndReceive(i, RadioHelper.GetEffectiveReceiveVolume(i, radio), radio.modulation);
                 }
             }
         }
@@ -498,7 +499,7 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.Network
                                                 ReceiveTime = DateTime.Now.Ticks,
                                                 Frequency = destinationRadio.Frequency,
                                                 Modulation = destinationRadio.Modulation,
-                                                Volume = destinationRadio.ReceivingRadio.volume,
+                                                Volume = RadioHelper.GetEffectiveReceiveVolume(destinationRadio.ReceivingState.ReceivedOn, destinationRadio.ReceivingRadio),
                                                 ReceivedRadio = destinationRadio.ReceivingState.ReceivedOn,
                                                 UnitId = udpVoicePacket.UnitId,
                                             
@@ -623,12 +624,12 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.Network
                 yScore += 8;
             }
 
-            if (x.ReceivingRadio.volume > 0)
+            if (RadioHelper.GetEffectiveReceiveVolume(x.ReceivingState.ReceivedOn, x.ReceivingRadio) > 0)
             {
                 xScore += 4;
             }
 
-            if (y.ReceivingRadio.volume > 0)
+            if (RadioHelper.GetEffectiveReceiveVolume(y.ReceivingState.ReceivedOn, y.ReceivingRadio) > 0)
             {
                 yScore += 4;
             }
