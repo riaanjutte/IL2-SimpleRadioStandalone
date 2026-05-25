@@ -1,5 +1,19 @@
 # Changelog
 
+## IL2-SRS 1.0.4.2 community update
+
+### Fixed
+
+- Fixed joystick/controller hot reconnect so PTT and channel-select bindings recover after a temporary USB disconnect/reconnect.
+- Fixed automatic input-device rediscovery failing from the background input thread due to WPF window-handle thread affinity.
+- Added product GUID persistence for input bindings so recovered devices can be matched more reliably when Windows changes the DirectInput instance ID.
+
+### Validation
+
+- Built `IL2-SimpleRadioStandalone.sln` Release/x64 successfully.
+- Ran `IL2-SR-CommonTests`: 12/12 passed.
+- Confirmed by RufusK that joystick PTT reconnect now works after disconnect/reconnect.
+
 ## IL2-SRS 1.0.4.1 community update
 
 ### Fixed

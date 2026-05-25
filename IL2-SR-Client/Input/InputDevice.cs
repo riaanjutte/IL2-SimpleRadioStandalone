@@ -11,6 +11,7 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.Settings
 
         public int Button { get; set; }
         public Guid InstanceGuid { get; internal set; }
+        public Guid ProductGuid { get; internal set; }
         public int ButtonValue { get; internal set; }
 
         public bool IsSameBind(InputDevice compare)

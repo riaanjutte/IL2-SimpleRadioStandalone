@@ -280,6 +280,11 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.Settings
                 device.Button = configuration[key.ToString()]["button"].IntValue;
                 device.InstanceGuid =
                     Guid.Parse(configuration[key.ToString()]["guid"].RawValue);
+                if (configuration[key.ToString()].Contains("productGuid"))
+                {
+                    device.ProductGuid = Guid.Parse(configuration[key.ToString()]["productGuid"].RawValue);
+                }
+
                 device.InputBind = key;
 
                 device.ButtonValue = configuration[key.ToString()]["value"].IntValue;
@@ -309,6 +314,7 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.Settings
             section.Add(new Setting("button", device.Button));
             section.Add(new Setting("value", device.ButtonValue));
             section.Add(new Setting("guid", device.InstanceGuid.ToString()));
+            section.Add(new Setting("productGuid", device.ProductGuid.ToString()));
 
             var inputDevices = GetCurrentInputProfile();
 
