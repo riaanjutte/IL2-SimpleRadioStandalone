@@ -283,8 +283,7 @@
                             <Border x:Name="RciStatusIndicator"
                                     Background="#444"
                                     BorderBrush="#666"
-                                    BorderThickness="1"
-                                    ToolTip="RCI Status" />
+                                    BorderThickness="1" />
                             <TextBlock x:Name="RciStatusLabel"
                                        HorizontalAlignment="Center"
                                        VerticalAlignment="Center"

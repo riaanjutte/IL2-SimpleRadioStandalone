@@ -2,6 +2,7 @@
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Windows;
 using System.Windows.Input;
 using System.Windows.Interop;
@@ -32,11 +33,12 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Overlay
         private readonly GlobalSettingsStore _globalSettings = GlobalSettingsStore.Instance;
 
         private readonly double _originalMinHeight;
-        private const double Radio2MinHeightDelta = 95.0;
-        private const double RciStatusMinHeightDelta = 15.0;
+        private HwndSource _hwndSource;
+        private const double Radio2MinHeightDelta = 71.0;
+        private const double RciStatusMinHeightDelta = 14.0;
         private const double RciCallsignMinHeightDelta = 10.0;
         private const double DefaultOverlayWidth = 260.0;
-        private const double DefaultOverlayHeight = 312.0;
+        private const double DefaultOverlayHeight = 320.0;
         private const double OldDefaultOverlayWidth = 122.0;
         private const double OldDefaultOverlayHeight = 270.0;
         private bool _suppressSizeHandling = true;
@@ -49,7 +51,6 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Overlay
             InitializeComponent();
             LocalizationManager.LocalizeElement(this);
             RciStatusLabel.Text = LocalizationManager.Get("RCI");
-            RciStatusIndicator.ToolTip = LocalizationManager.Get("No RCI active");
 
             this.WindowStartupLocation = WindowStartupLocation.Manual;
 
@@ -80,6 +81,7 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Overlay
             }
 
             Loaded += RadioOverlayWindow_Loaded;
+            SourceInitialized += RadioOverlayWindow_SourceInitialized;
 
             LocationChanged += Location_Changed;
 
@@ -99,6 +101,12 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Overlay
         {
             _suppressSizeHandling = false;
             CalculateScale();
+        }
+
+        private void RadioOverlayWindow_SourceInitialized(object sender, EventArgs e)
+        {
+            _hwndSource = HwndSource.FromHwnd(new WindowInteropHelper(this).Handle);
+            _hwndSource?.AddHook(WndProc);
         }
 
         private void RadioRefresh(object sender, EventArgs eventArgs)
@@ -155,9 +163,6 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Overlay
             RciStatusIndicator.Background = GetRciStatusBrush(status);
             RciStatusLabel.Text = GetRciStatusText(status);
             RciStatusLabel.Foreground = GetRciStatusForeground(status);
-            RciStatusIndicator.ToolTip = GetRciStatusText(status) + "\n\n" +
-                                         ConnectedClientsSingleton.Instance.GetRciDebugSummary(_clientStateSingleton.PlayerGameState.coalition);
-            RciStatusLabel.ToolTip = RciStatusIndicator.ToolTip;
             UpdateRciCallsignLabel(ConnectedClientsSingleton.Instance.GetFriendlyRciCallsign(_clientStateSingleton.PlayerGameState.coalition));
             UpdateOverlayMinimumHeightIfChanged(previousRciVisibility, previousCallsignVisibility);
         }
@@ -171,7 +176,6 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Overlay
         private void UpdateRciCallsignLabel(string callsigns)
         {
             RciCallsignLabel.Text = callsigns ?? string.Empty;
-            RciCallsignLabel.ToolTip = RciCallsignLabel.Text;
             RciCallsignLabel.Visibility = string.IsNullOrWhiteSpace(RciCallsignLabel.Text)
                 ? Visibility.Collapsed
                 : Visibility.Visible;
@@ -315,6 +319,7 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Overlay
             _globalSettings.SetPositionSetting(GlobalSettingsKeys.RadioY, bounds.Top);
             base.OnClosing(e);
 
+            _hwndSource?.RemoveHook(WndProc);
             _updateTimer.Stop();
         }
 
@@ -343,20 +348,6 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Overlay
             Opacity = e.NewValue;
         }
 
-        private void containerPanel_SizeChanged(object sender, SizeChangedEventArgs e)
-        {
-            if (_suppressSizeHandling)
-            {
-                return;
-            }
-
-            //force aspect ratio
-            CalculateScale();
-
-            WindowState = WindowState.Normal;
-        }
-
-
         private void CalculateScale()
         {
             var yScale = ActualHeight / RadioOverlayWin.MinHeight;
@@ -374,25 +365,105 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Overlay
                 return;
             }
 
-            try
+            if (sizeInfo.WidthChanged || sizeInfo.HeightChanged)
             {
-                _suppressSizeHandling = true;
-
-                if (sizeInfo.WidthChanged && !sizeInfo.HeightChanged)
-                {
-                    Height = sizeInfo.NewSize.Width / _aspectRatio;
-                }
-                else if (sizeInfo.HeightChanged && !sizeInfo.WidthChanged)
-                {
-                    Width = sizeInfo.NewSize.Height * _aspectRatio;
-                }
-            }
-            finally
-            {
-                _suppressSizeHandling = false;
+                CalculateScale();
             }
 
             // Console.WriteLine(this.Height +" width:"+ this.Width);
+        }
+
+        private IntPtr WndProc(IntPtr hwnd, int msg, IntPtr wParam, IntPtr lParam, ref bool handled)
+        {
+            const int wmSizing = 0x0214;
+
+            if (msg != wmSizing || lParam == IntPtr.Zero)
+            {
+                return IntPtr.Zero;
+            }
+
+            var rect = (NativeRect)Marshal.PtrToStructure(lParam, typeof(NativeRect));
+            EnforceResizeAspectRatio((ResizeEdge)wParam.ToInt32(), ref rect);
+            Marshal.StructureToPtr(rect, lParam, true);
+            handled = true;
+
+            return IntPtr.Zero;
+        }
+
+        private void EnforceResizeAspectRatio(ResizeEdge edge, ref NativeRect rect)
+        {
+            var width = Math.Max(rect.Right - rect.Left, GetDeviceWidth(MinWidth));
+            var height = Math.Max(rect.Bottom - rect.Top, GetDeviceHeight(MinHeight));
+            var aspectRatio = _aspectRatio <= 0 ? MinWidth / MinHeight : _aspectRatio;
+
+            switch (edge)
+            {
+                case ResizeEdge.Left:
+                    rect.Left = rect.Right - width;
+                    rect.Bottom = rect.Top + (int)Math.Round(width / aspectRatio);
+                    break;
+                case ResizeEdge.Right:
+                    rect.Right = rect.Left + width;
+                    rect.Bottom = rect.Top + (int)Math.Round(width / aspectRatio);
+                    break;
+                case ResizeEdge.Top:
+                    rect.Top = rect.Bottom - height;
+                    rect.Right = rect.Left + (int)Math.Round(height * aspectRatio);
+                    break;
+                case ResizeEdge.Bottom:
+                    rect.Bottom = rect.Top + height;
+                    rect.Right = rect.Left + (int)Math.Round(height * aspectRatio);
+                    break;
+                case ResizeEdge.TopLeft:
+                    rect.Left = rect.Right - width;
+                    rect.Top = rect.Bottom - (int)Math.Round(width / aspectRatio);
+                    break;
+                case ResizeEdge.TopRight:
+                    rect.Right = rect.Left + width;
+                    rect.Top = rect.Bottom - (int)Math.Round(width / aspectRatio);
+                    break;
+                case ResizeEdge.BottomLeft:
+                    rect.Left = rect.Right - width;
+                    rect.Bottom = rect.Top + (int)Math.Round(width / aspectRatio);
+                    break;
+                case ResizeEdge.BottomRight:
+                    rect.Right = rect.Left + width;
+                    rect.Bottom = rect.Top + (int)Math.Round(width / aspectRatio);
+                    break;
+            }
+        }
+
+        private int GetDeviceWidth(double width)
+        {
+            var source = PresentationSource.FromVisual(this);
+            return (int)Math.Ceiling(width * (source?.CompositionTarget?.TransformToDevice.M11 ?? 1.0));
+        }
+
+        private int GetDeviceHeight(double height)
+        {
+            var source = PresentationSource.FromVisual(this);
+            return (int)Math.Ceiling(height * (source?.CompositionTarget?.TransformToDevice.M22 ?? 1.0));
+        }
+
+        private enum ResizeEdge
+        {
+            Left = 1,
+            Right = 2,
+            Top = 3,
+            TopLeft = 4,
+            TopRight = 5,
+            Bottom = 6,
+            BottomLeft = 7,
+            BottomRight = 8
+        }
+
+        [StructLayout(LayoutKind.Sequential)]
+        private struct NativeRect
+        {
+            public int Left;
+            public int Top;
+            public int Right;
+            public int Bottom;
         }
 
         private bool IsOldDefaultOverlaySize(double configuredWidth, double configuredHeight)

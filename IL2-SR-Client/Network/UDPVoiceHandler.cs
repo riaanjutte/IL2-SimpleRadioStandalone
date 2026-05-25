@@ -427,6 +427,12 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.Network
                                         vehicleId = transmittingClient.GameState.vehicleId;
                                     }
 
+                                    SRClient originalTransmittingClient = null;
+                                    if (!string.IsNullOrWhiteSpace(udpVoicePacket.OriginalClientGuid))
+                                    {
+                                        _clients.TryGetValue(udpVoicePacket.OriginalClientGuid, out originalTransmittingClient);
+                                    }
+
                                     var globalFrequencies = _serverSettings.GlobalFrequencies;
 
                                     var frequencyCount = udpVoicePacket.Frequencies.Length;
@@ -523,13 +529,16 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.Network
                                                 
                                             }
 
+                                            var speakerClient = originalTransmittingClient ?? transmittingClient;
+                                            var isIntercomReceive = destinationRadio.ReceivingRadio.modulation == RadioInformation.Modulation.INTERCOM;
                                             var transmitterName = "";
-                                            if (_serverSettings.GetSettingAsBool(ServerSettingsKeys.SHOW_TRANSMITTER_NAME)
-                                                && _globalSettings.GetClientSettingBool(GlobalSettingsKeys.ShowTransmitterName)
-                                                && transmittingClient!=null)
+                                            if ((isIntercomReceive
+                                                 || (_serverSettings.GetSettingAsBool(ServerSettingsKeys.SHOW_TRANSMITTER_NAME)
+                                                     && _globalSettings.GetClientSettingBool(GlobalSettingsKeys.ShowTransmitterName)))
+                                                && speakerClient != null)
 
                                             {
-                                                transmitterName = transmittingClient.Name;
+                                                transmitterName = speakerClient.Name;
                                             }
 
                                             var newRadioReceivingState =  new RadioReceivingState

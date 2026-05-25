@@ -7,12 +7,18 @@
              Name="RadioControlContainer"
              Width="130"
              Height="40">
-    <StackPanel Orientation="Vertical" HorizontalAlignment="Center" Width="130">
+    <StackPanel Orientation="Vertical"
+                HorizontalAlignment="Center"
+                Width="130"
+                Background="{StaticResource OverlayEquipmentPanelBrush}">
 
-        <Grid HorizontalAlignment="Center" Width="122" Height="18" Margin="0,3,0,0">
+        <Grid HorizontalAlignment="Left" Width="122" Height="14" Margin="4,3,0,0">
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="104" />
-                <ColumnDefinition Width="18" />
+                <ColumnDefinition Width="78" />
+                <ColumnDefinition Width="4" />
+                <ColumnDefinition Width="25" />
+                <ColumnDefinition Width="3" />
+                <ColumnDefinition Width="12" />
             </Grid.ColumnDefinitions>
 
             <Label Name="TunedCount" 
@@ -20,44 +26,133 @@
                    HorizontalAlignment="Left"
                    FontFamily="Courier New"
                    Content="👤10" Width="30" Margin="0" Padding="0" 
-                   Foreground="#E7E7E7" FontSize="12" ></Label>
+                   Foreground="#E7E7E7" FontSize="12"
+                   Visibility="Collapsed" ></Label>
 
 
-            <Label x:Name="RadioLabel"
-                       Grid.Column="0"
-                       Margin="0,0,0,0"
-                       HorizontalAlignment="Center"
-                       VerticalAlignment="Top"
-                       FontSize="12"
-                       Foreground="#E7E7E7"
-                       FontFamily="Courier New"
-                       Padding="0,0,0,0"
-                       Style="{x:Null}"
-                       
-                      Content="INTERCOM" />
+            <Border Grid.Column="0"
+                    Width="78"
+                    Height="12"
+                    HorizontalAlignment="Left"
+                    VerticalAlignment="Center"
+                    Background="{StaticResource OverlayDisplayBrush}"
+                    BorderBrush="#242824"
+                    BorderThickness="1">
+                <Grid>
+                    <Border Background="{StaticResource OverlayDisplayGlassBrush}"
+                            Opacity="0.55"
+                            Style="{x:Null}" />
+                    <Border Height="5"
+                            VerticalAlignment="Top"
+                            Background="{StaticResource OverlayDisplayTopReflectionBrush}"
+                            Opacity="0.65"
+                            Style="{x:Null}" />
+                    <Label x:Name="RadioLabel"
+                           HorizontalAlignment="Center"
+                           VerticalAlignment="Center"
+                           Content="INTERCOM"
+                           FontFamily="Courier New"
+                           FontSize="8"
+                           Foreground="#00FF00"
+                           Padding="0"
+                           Style="{x:Null}" />
+                </Grid>
+            </Border>
 
+            <Border Grid.Column="2"
+                    Width="25"
+                    Height="12"
+                    HorizontalAlignment="Left"
+                    VerticalAlignment="Center"
+                    Background="{StaticResource OverlayDisplayBrush}"
+                    BorderBrush="#242824"
+                    BorderThickness="1"
+                    ToolTip="Number of pilots on this channel">
+                <Border.Effect>
+                    <DropShadowEffect BlurRadius="1"
+                                      Direction="315"
+                                      Opacity="0.25"
+                                      ShadowDepth="1"
+                                      Color="#000000" />
+                </Border.Effect>
+                <Grid ClipToBounds="True">
+                    <Border Background="{StaticResource OverlayDisplayGlassBrush}"
+                            Opacity="0.5"
+                            Style="{x:Null}" />
+                    <Border Height="5"
+                            VerticalAlignment="Top"
+                            Background="{StaticResource OverlayDisplayTopReflectionBrush}"
+                            Opacity="0.6"
+                            Style="{x:Null}" />
+                    <Grid Width="25"
+                          Height="12"
+                          HorizontalAlignment="Center"
+                          VerticalAlignment="Center"
+                          Style="{x:Null}">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="*" />
+                        </Grid.RowDefinitions>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="8" />
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Grid.Column="0"
+                                   HorizontalAlignment="Center"
+                                   VerticalAlignment="Center"
+                                   FontSize="4"
+                                   FontWeight="Bold"
+                                   Foreground="#D8D8D8"
+                                   Style="{x:Null}"
+                                   Text="PLTS:"
+                                   TextAlignment="Center" />
+                        <TextBlock x:Name="IntercomUsersCount"
+                                   Grid.Column="1"
+                                   HorizontalAlignment="Center"
+                                   VerticalAlignment="Center"
+                                   FontSize="7"
+                                   Foreground="#00FF00"
+                                   Style="{x:Null}"
+                                   Text="0"
+                                   TextAlignment="Center"
+                                   TextWrapping="NoWrap" />
+                    </Grid>
+                </Grid>
+            </Border>
 
             <Ellipse x:Name="RadioActive"
-                     Grid.Column="1"
-                     Width="12"
-                     Height="12"
-                     Margin="2,0,2,0"
-                     HorizontalAlignment="Center"
-                     VerticalAlignment="Center"
+                      Grid.Column="4"
+                      Width="12"
+                      Height="12"
+                      Margin="0"
+                      HorizontalAlignment="Right"
+                      VerticalAlignment="Center"
                      Fill="#FF9900"
-                     MouseDown="RadioSelectSwitch"
-                     Stroke="Black"
-                     Style="{x:Null}"
-                     ToolTip="Selected Radio" />
+                      MouseDown="RadioSelectSwitch"
+                      Stroke="Black"
+                      StrokeThickness="1.5"
+                      Style="{x:Null}"
+                     ToolTip="Selected Radio">
+                <Ellipse.Effect>
+                    <DropShadowEffect BlurRadius="2"
+                                      Direction="315"
+                                      Opacity="0.55"
+                                      ShadowDepth="1"
+                                      Color="#000000" />
+                </Ellipse.Effect>
+            </Ellipse>
 
         </Grid>
        
         
             <Slider x:Name="RadioVolume"
-                    Width="80"
-                    Height="30"
+                    Width="122"
+                    Height="18"
+                    Margin="4,0,0,0"
+                    HorizontalAlignment="Left"
+                    Style="{StaticResource OverlaySlider}"
                     IsEnabled="True"
                     Maximum="100"
+                    ToolTip="Intercom Volume"
                     Thumb.DragCompleted="RadioVolume_DragCompleted"
                     Thumb.DragStarted="RadioVolume_DragStarted"
                     ValueChanged="RadioVolume_ValueChanged" />

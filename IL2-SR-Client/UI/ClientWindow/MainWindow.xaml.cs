@@ -111,7 +111,6 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI
             InitializeComponent();
             LocalizationManager.LocalizeElement(this);
             RciStatusLabel.Text = LocalizationManager.Get("RCI");
-            RciStatusIndicator.ToolTip = LocalizationManager.Get("No RCI active");
             LocalizationManager.LocalizeFlowDocument(AboutFlowDocument);
             ClientThemeManager.ApplyThemeToWindow(this, _globalSettings.GetClientSetting(GlobalSettingsKeys.Theme).RawValue);
             Loaded += MainWindow_Loaded;
@@ -1162,7 +1161,6 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI
                 RciStatusLabel.Text = LocalizationManager.Get("No RCI active");
                 RciStatusLabel.Foreground = Brushes.White;
                 RciStatusIndicator.Background = GetRciStatusBrush(RciStatus.None);
-                RciStatusIndicator.ToolTip = LocalizationManager.Get("No RCI active");
                 UpdateRciCallsignLabel(string.Empty);
                 return;
             }
@@ -1171,14 +1169,12 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI
             RciStatusLabel.Text = GetRciStatusText(status);
             RciStatusLabel.Foreground = GetRciStatusForeground(status);
             RciStatusIndicator.Background = GetRciStatusBrush(status);
-            RciStatusIndicator.ToolTip = GetRciStatusText(status) + "\n\n" + Clients.GetRciDebugSummary(ClientState.PlayerGameState.coalition);
             UpdateRciCallsignLabel(Clients.GetFriendlyRciCallsign(ClientState.PlayerGameState.coalition));
         }
 
         private void UpdateRciCallsignLabel(string callsigns)
         {
             RciCallsignLabel.Text = callsigns ?? string.Empty;
-            RciCallsignLabel.ToolTip = RciCallsignLabel.Text;
             RciCallsignLabel.Visibility = string.IsNullOrWhiteSpace(RciCallsignLabel.Text)
                 ? Visibility.Collapsed
                 : Visibility.Visible;

@@ -67,8 +67,8 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI.RadioOverlayWindow
                 {
                     Width = 15,
                     Height = 15,
-                    Margin = new Thickness(0, 0, 2, 0),
-                    HorizontalAlignment = HorizontalAlignment.Center,
+                    Margin = new Thickness(0),
+                    HorizontalAlignment = HorizontalAlignment.Right,
                     VerticalAlignment = VerticalAlignment.Center,
                     HorizontalContentAlignment = HorizontalAlignment.Center,
                     VerticalContentAlignment = VerticalAlignment.Center,
@@ -81,7 +81,7 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI.RadioOverlayWindow
                     ToolTip = LocalizationManager.Format("Channel {0}", channel)
                 };
 
-                button.Style = (Style)FindResource("DarkStyle-Button");
+                button.Style = (Style)FindResource("OverlayChannelButton");
                 button.Click += Channel_Click;
 
                 _channelButtons[channel] = button;
@@ -96,6 +96,16 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI.RadioOverlayWindow
             {
                 RadioHelper.SelectRadioChannel(channel, RadioId);
             }
+        }
+
+        private void ChannelUp_Click(object sender, RoutedEventArgs e)
+        {
+            RadioHelper.RadioChannelUp(RadioId);
+        }
+
+        private void ChannelDown_Click(object sender, RoutedEventArgs e)
+        {
+            RadioHelper.RadioChannelDown(RadioId);
         }
 
         private void RadioVolume_DragStarted(object sender, RoutedEventArgs e)
@@ -132,8 +142,9 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI.RadioOverlayWindow
 
             if (IL2PlayerRadioInfo == null || !_clientStateSingleton.IsConnected)
             {
-                RadioActive.Fill = new SolidColorBrush(Colors.Red);
+                RadioActive.Fill = CreateStatusBrush(Colors.Red);
                 RadioFrequency.Text = LocalizationManager.Get("Not Connected");
+                UsersCount.Text = "0";
                 UpdateChannelButtonState(-1);
 
 
@@ -155,35 +166,76 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI.RadioOverlayWindow
 
                     if (transmitting.IsSending && (transmitting.SendingOn == RadioId))
                     {
-                        RadioActive.Fill = new SolidColorBrush((Color) ColorConverter.ConvertFromString("#96FF6D"));
+                        RadioActive.Fill = CreateStatusBrush((Color) ColorConverter.ConvertFromString("#96FF6D"));
                     }
                     else
                     {
-                        RadioActive.Fill = new SolidColorBrush(Colors.Green);
+                        RadioActive.Fill = CreateStatusBrush(Colors.Green);
                     }
                 }
                 else
                 {
-                    RadioActive.Fill = new SolidColorBrush(Colors.Orange);
+                    RadioActive.Fill = CreateStatusBrush(Colors.Orange);
                 }
 
                 RadioFrequency.Text = LocalizationManager.Format("CHN {0}", currentRadio.channel);
                 UpdateChannelButtonState(currentRadio.channel);
 
                 int count = _connectClientsSingleton.ClientsOnFreq(currentRadio.freq, currentRadio.modulation);
-
-                if (count > 0)
-                {
-                    RadioFrequency.Text += " - " + count;
-                }
+                UsersCount.Text = count.ToString(CultureInfo.InvariantCulture);
 
                 if (_dragging == false)
                 {
                     _syncingSliderFromState = true;
-                    RadioVolume.Value = currentRadio.volume * 100.0;
+                    RadioVolume.Value = RadioHelper.GetEffectiveReceiveVolume(RadioId, currentRadio) * 100.0;
                     _syncingSliderFromState = false;
                 }
             }
+        }
+
+        private static Brush CreateStatusBrush(Color color)
+        {
+            return new RadialGradientBrush
+            {
+                GradientOrigin = new Point(0.32, 0.25),
+                Center = new Point(0.5, 0.5),
+                RadiusX = 0.72,
+                RadiusY = 0.72,
+                GradientStops =
+                {
+                    new GradientStop(Lighten(color, 150), 0.0),
+                    new GradientStop(Lighten(color, 40), 0.28),
+                    new GradientStop(color, 0.58),
+                    new GradientStop(Darken(color, 95), 1.0)
+                }
+            };
+        }
+
+        private static Color Lighten(Color color, byte amount)
+        {
+            return Color.FromArgb(color.A,
+                Add(color.R, amount),
+                Add(color.G, amount),
+                Add(color.B, amount));
+        }
+
+        private static Color Darken(Color color, byte amount)
+        {
+            return Color.FromArgb(color.A,
+                Subtract(color.R, amount),
+                Subtract(color.G, amount),
+                Subtract(color.B, amount));
+        }
+
+        private static byte Add(byte value, byte amount)
+        {
+            var result = value + amount;
+            return result > 255 ? (byte)255 : (byte)result;
+        }
+
+        private static byte Subtract(byte value, byte amount)
+        {
+            return value < amount ? (byte)0 : (byte)(value - amount);
         }
 
         private void UpdateChannelButtonState(int selectedChannel)

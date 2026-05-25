@@ -321,6 +321,9 @@
   <data name="Intercom Audio Channel" xml:space="preserve">
     <value>Canal de audio de intercomunicador</value>
   </data>
+  <data name="Intercom Volume" xml:space="preserve">
+    <value>Volumen de intercomunicador</value>
+  </data>
   <data name="First Radio Audio Channel" xml:space="preserve">
     <value>Primer canal de audio de radio</value>
   </data>

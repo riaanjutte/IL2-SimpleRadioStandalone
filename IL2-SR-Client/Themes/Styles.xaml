@@ -60,6 +60,144 @@
     <SolidColorBrush x:Key="DisabledButtonBackground" Color="#A7ADB3" />
     <SolidColorBrush x:Key="DisabledButtonForeground" Color="#1B1B1B" />
 
+    <LinearGradientBrush x:Key="OverlayEquipmentPanelBrush" StartPoint="0,0" EndPoint="1,1">
+        <GradientStop Color="#565955" Offset="0" />
+        <GradientStop Color="#444842" Offset="0.42" />
+        <GradientStop Color="#343833" Offset="1" />
+    </LinearGradientBrush>
+
+    <LinearGradientBrush x:Key="OverlayRaisedControlBrush" StartPoint="0,0" EndPoint="0,1">
+        <GradientStop Color="#6A6D68" Offset="0" />
+        <GradientStop Color="#535650" Offset="0.52" />
+        <GradientStop Color="#3D403B" Offset="1" />
+    </LinearGradientBrush>
+
+    <LinearGradientBrush x:Key="OverlayPressedControlBrush" StartPoint="0,0" EndPoint="0,1">
+        <GradientStop Color="#2F332F" Offset="0" />
+        <GradientStop Color="#494D47" Offset="1" />
+    </LinearGradientBrush>
+
+    <LinearGradientBrush x:Key="OverlayDisplayBrush" StartPoint="0,0" EndPoint="0,1">
+        <GradientStop Color="#020302" Offset="0" />
+        <GradientStop Color="#080B07" Offset="0.45" />
+        <GradientStop Color="#000000" Offset="1" />
+    </LinearGradientBrush>
+
+    <LinearGradientBrush x:Key="OverlayDisplayGlassBrush" StartPoint="0,0" EndPoint="1,1">
+        <GradientStop Color="#55FFFFFF" Offset="0" />
+        <GradientStop Color="#20FFFFFF" Offset="0.24" />
+        <GradientStop Color="#00FFFFFF" Offset="0.46" />
+        <GradientStop Color="#12000000" Offset="0.74" />
+        <GradientStop Color="#30000000" Offset="1" />
+    </LinearGradientBrush>
+
+    <LinearGradientBrush x:Key="OverlayDisplayTopReflectionBrush" StartPoint="0,0" EndPoint="0,1">
+        <GradientStop Color="#38FFFFFF" Offset="0" />
+        <GradientStop Color="#10FFFFFF" Offset="0.38" />
+        <GradientStop Color="#00FFFFFF" Offset="1" />
+    </LinearGradientBrush>
+
+    <SolidColorBrush x:Key="OverlayRaisedBorderBrush" Color="#2B2E2B" />
+    <SolidColorBrush x:Key="OverlayEdgeHighlightBrush" Color="#7B7F78" />
+
+    <DrawingBrush x:Key="OverlayWeatheringTexture"
+                  Opacity="0.22"
+                  TileMode="Tile"
+                  Viewport="0,0,24,24"
+                  ViewportUnits="Absolute">
+        <DrawingBrush.Drawing>
+            <DrawingGroup>
+                <GeometryDrawing Brush="#10FFFFFF"
+                                 Geometry="M 2,5 L 8,5 8,6 2,6 Z" />
+                <GeometryDrawing Brush="#12000000"
+                                 Geometry="M 14,2 L 22,2 22,3 14,3 Z" />
+                <GeometryDrawing Brush="#0FFFFFFF"
+                                 Geometry="M 5,17 L 17,17 17,18 5,18 Z" />
+                <GeometryDrawing Brush="#16000000"
+                                 Geometry="M 1,22 L 7,22 7,23 1,23 Z" />
+            </DrawingGroup>
+        </DrawingBrush.Drawing>
+    </DrawingBrush>
+
+    <DropShadowEffect x:Key="OverlayRaisedShadow"
+                      BlurRadius="2"
+                      Direction="315"
+                      Opacity="0.35"
+                      ShadowDepth="1"
+                      Color="#000000" />
+
+    <Style x:Key="OverlaySliderRepeatButton" TargetType="{x:Type RepeatButton}">
+        <Setter Property="Focusable" Value="False" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type RepeatButton}">
+                    <Border Background="Transparent" />
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <Style x:Key="OverlaySliderThumb" TargetType="{x:Type Thumb}">
+        <Setter Property="Focusable" Value="False" />
+        <Setter Property="Width" Value="8" />
+        <Setter Property="Height" Value="16" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type Thumb}">
+                    <Border Background="{StaticResource OverlayRaisedControlBrush}"
+                            BorderBrush="{StaticResource OverlayRaisedBorderBrush}"
+                            BorderThickness="1"
+                            CornerRadius="2"
+                            Style="{x:Null}">
+                        <Border BorderBrush="{StaticResource OverlayEdgeHighlightBrush}"
+                                BorderThickness="1,1,0,0"
+                                CornerRadius="2"
+                                Opacity="0.45"
+                                Style="{x:Null}" />
+                    </Border>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <Style x:Key="OverlaySlider" TargetType="{x:Type Slider}">
+        <Setter Property="Height" Value="18" />
+        <Setter Property="IsMoveToPointEnabled" Value="True" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type Slider}">
+                    <Grid Height="{TemplateBinding Height}">
+                        <Border Height="4"
+                                VerticalAlignment="Center"
+                                Background="#81909A"
+                                BorderBrush="#4C565C"
+                                BorderThickness="1"
+                                Style="{x:Null}">
+                            <Border BorderBrush="#B8C2C8"
+                                    BorderThickness="0,1,0,0"
+                                    Opacity="0.35"
+                                    Style="{x:Null}" />
+                        </Border>
+                        <Track x:Name="PART_Track"
+                               VerticalAlignment="Center">
+                            <Track.DecreaseRepeatButton>
+                                <RepeatButton Command="Slider.DecreaseLarge"
+                                              Style="{StaticResource OverlaySliderRepeatButton}" />
+                            </Track.DecreaseRepeatButton>
+                            <Track.IncreaseRepeatButton>
+                                <RepeatButton Command="Slider.IncreaseLarge"
+                                              Style="{StaticResource OverlaySliderRepeatButton}" />
+                            </Track.IncreaseRepeatButton>
+                            <Track.Thumb>
+                                <Thumb Style="{StaticResource OverlaySliderThumb}" />
+                            </Track.Thumb>
+                        </Track>
+                    </Grid>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
     <SolidColorBrush x:Key="Expander.Background" Color="{StaticResource LightBackgroundColor}" />
     <SolidColorBrush x:Key="Expander.MouseOver.Arrow.Stroke" Color="{StaticResource ForegroundColor}" />
     <SolidColorBrush x:Key="Expander.Disabled.Arrow.Stroke" Color="{StaticResource LightDisabledBackgroundColor}" />

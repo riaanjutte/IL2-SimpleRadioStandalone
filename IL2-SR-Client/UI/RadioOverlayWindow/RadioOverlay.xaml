@@ -6,11 +6,11 @@
         Name="RadioOverlayWin"
         Title="IL2-SimpleRadio"
         Width="130"
-        Height="156"
+        Height="160"
         MinWidth="130"
-        MinHeight="156"
+        MinHeight="160"
         AllowsTransparency="True"
-        Background="#444"
+        Background="{StaticResource OverlayEquipmentPanelBrush}"
         LocationChanged="RadioOverlayWindow_OnLocationChanged"
         Opacity="1.0"
         ResizeMode="CanResizeWithGrip"
@@ -18,20 +18,21 @@
         Topmost="True"
         WindowStyle="None">
 
+    <Grid Background="{StaticResource OverlayEquipmentPanelBrush}">
     <WrapPanel Name="ContainerPanel"
-               SizeChanged="containerPanel_SizeChanged"
                Style="{x:Null}">
 
-        <WrapPanel.LayoutTransform>
+        <WrapPanel.RenderTransform>
             <ScaleTransform x:Name="ApplicationScaleTransform"
-                            CenterX="0"
-                            CenterY="0"
+                             CenterX="0"
+                             CenterY="0"
                             ScaleX="{Binding ElementName=RadioOverlayWin,
-                                             Path=ScaleValue}"
-                            ScaleY="{Binding ElementName=RadioOverlayWin,
-                                             Path=ScaleValue}" />
-        </WrapPanel.LayoutTransform>
-        <StackPanel Orientation="Vertical">
+                                              Path=ScaleValue}"
+                             ScaleY="{Binding ElementName=RadioOverlayWin,
+                                              Path=ScaleValue}" />
+        </WrapPanel.RenderTransform>
+        <StackPanel Orientation="Vertical"
+                    Background="{StaticResource OverlayEquipmentPanelBrush}">
 
         <StackPanel HorizontalAlignment="Left"  Orientation="Horizontal">
             <TextBlock x:Name="RadioLabel"
@@ -88,16 +89,21 @@
         <Separator Width="130" Margin="0 2" />
 
         <StackPanel x:Name="RciStatusPanel"
-                    Width="118"
-                    Margin="5,0,0,0"
+                    Width="122"
+                    Margin="4,0,0,0"
                     HorizontalAlignment="Left"
                     Visibility="Collapsed">
             <Grid Height="14">
                 <Border x:Name="RciStatusIndicator"
-                        Background="#444"
-                        BorderBrush="#777"
+                        Background="{StaticResource OverlayPressedControlBrush}"
+                        BorderBrush="{StaticResource OverlayRaisedBorderBrush}"
                         BorderThickness="1"
-                        Style="{x:Null}" />
+                        Style="{x:Null}">
+                    <Border BorderBrush="{StaticResource OverlayEdgeHighlightBrush}"
+                            BorderThickness="1,1,0,0"
+                            Opacity="0.35"
+                            Style="{x:Null}" />
+                </Border>
                 <TextBlock x:Name="RciStatusLabel"
                            HorizontalAlignment="Center"
                            VerticalAlignment="Center"
@@ -109,7 +115,7 @@
                            Text="RCI" />
             </Grid>
             <TextBlock x:Name="RciCallsignLabel"
-                       Width="118"
+                       Width="122"
                        Height="9"
                        Margin="0,1,0,0"
                        HorizontalAlignment="Center"
@@ -123,11 +129,12 @@
                        Visibility="Collapsed" />
         </StackPanel>
 
-        <Slider Margin="0,3,0,0" x:Name="WindowOpacitySlider"
-                Width="80"
-                Height="30"
+        <Slider Margin="4,3,0,0" x:Name="WindowOpacitySlider"
+                Width="122"
+                Height="18"
                 VerticalAlignment="Center"
-                HorizontalAlignment="Center"
+                HorizontalAlignment="Left"
+                Style="{StaticResource OverlaySlider}"
                 Maximum="1.0"
                 Minimum="0.05"
                 ToolTip="Window Opacity"
@@ -135,4 +142,7 @@
                 Value="1.0" />
         </StackPanel>
     </WrapPanel>
+        <Border Background="{StaticResource OverlayWeatheringTexture}"
+                IsHitTestVisible="False" />
+    </Grid>
 </Window>
