@@ -93,8 +93,8 @@
                             <RowDefinition Height="*" />
                         </Grid.RowDefinitions>
                         <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="*" />
-                            <ColumnDefinition Width="8" />
+                            <ColumnDefinition Width="14" />
+                            <ColumnDefinition Width="11" />
                         </Grid.ColumnDefinitions>
                         <TextBlock Grid.Column="0"
                                    HorizontalAlignment="Center"

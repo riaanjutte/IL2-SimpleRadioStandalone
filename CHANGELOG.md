@@ -1,5 +1,16 @@
 # Changelog
 
+## IL2-SRS 1.0.4.1 community update
+
+### Fixed
+
+- Fixed overlay pilot counter clipping when a channel or intercom has 10 or more pilots.
+
+### Validation
+
+- Built `IL2-SimpleRadioStandalone.sln` Release/x64 successfully.
+- Ran `IL2-SR-CommonTests`: 12/12 passed.
+
 ## IL2-SRS 1.0.4.0 community update
 
 ### Fixed
