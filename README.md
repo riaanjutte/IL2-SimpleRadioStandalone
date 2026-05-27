@@ -19,7 +19,7 @@ An open source Stand alone Radio for IL2
 
 Please obtain the latest release from the Releases page
 
-Donate if you want to so I can purchase Hardware for testing :) 
+Donate to Ciribob (the original developer of SRS) if you want to so that he can purchase Hardware for testing :) 
 
 [![](https://www.paypalobjects.com/en_US/i/btn/btn_donateCC_LG.gif)](https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=JY35DDAQ938TN)
 
