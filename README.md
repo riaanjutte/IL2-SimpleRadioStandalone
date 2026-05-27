@@ -14,8 +14,6 @@
 
 Client translations live in `IL2-SR-Client/Localization/*.resx`. The current non-English text is machine translated, so community corrections are welcome: keep the English `name` keys unchanged and edit the translated `<value>` text. See `IL2-SR-Client/Localization/README.md` for the full workflow.
 
-## Original README from Ciribob's repository
-
 # IL2-SimpleRadio Standalone
 An open source Stand alone Radio for IL2
 
