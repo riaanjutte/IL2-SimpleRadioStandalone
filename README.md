@@ -6,7 +6,7 @@
 
 1. Localization support for English, German, French, and Spanish, with editable `.resx` translation files.
 2. Improved joystick reconnect handling so PTT can recover after device disconnect/reconnect.
-3. Expanded radio overlay with 12 channel buttons, channel up/down controls, pilot counts, mute support, and RCI status.
+3. Expanded radio overlay with 12 channel buttons, channel up/down controls, pilot counts, mute support, and RCI status on Combat Box.
 4. Community recommended settings prompt for existing users.
 5. Dark mode with Windows theme detection.
 
