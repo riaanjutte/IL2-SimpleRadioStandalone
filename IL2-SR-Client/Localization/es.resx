@@ -372,6 +372,18 @@
   <data name="and make sure to follow the information in #common-issues first before asking for help in #support" xml:space="preserve">
     <value>y asegurate de seguir primero la informacion de #common-issues antes de pedir ayuda en #support</value>
   </data>
+  <data name="Community Edition source code" xml:space="preserve">
+    <value>Codigo fuente de Community Edition</value>
+  </data>
+  <data name="The Community Edition source code and releases are available on " xml:space="preserve">
+    <value>El codigo fuente y las versiones de Community Edition estan disponibles en </value>
+  </data>
+  <data name="The Community Edition source code and releases are available on" xml:space="preserve">
+    <value>El codigo fuente y las versiones de Community Edition estan disponibles en</value>
+  </data>
+  <data name="GitHub" xml:space="preserve">
+    <value>GitHub</value>
+  </data>
   <data name="Input Device not detected?" xml:space="preserve">
     <value>Dispositivo de entrada no detectado?</value>
   </data>

@@ -1475,6 +1475,16 @@
                             <Run Text=" and make sure to follow the information in #common-issues first before asking for help in #support"/>
                         </Paragraph>
                         <Paragraph>
+                            <Run FontWeight="Bold" FontSize="16" Text="Community Edition source code"/>
+                        </Paragraph>
+                        <Paragraph FontSize="14">
+                            <Run Text="The Community Edition source code and releases are available on "/>
+                            <Hyperlink NavigateUri="https://github.com/riaanjutte/IL2-SimpleRadioStandalone">
+                                <Run Text="GitHub"/>
+                            </Hyperlink>
+                            <Run Text="."/>
+                        </Paragraph>
+                        <Paragraph>
                             <Run FontWeight="Bold" FontSize="16" Text="Input Device not detected?"/>
                         </Paragraph>
                         <Paragraph FontSize="14">

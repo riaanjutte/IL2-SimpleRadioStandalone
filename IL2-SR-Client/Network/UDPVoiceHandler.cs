@@ -34,7 +34,8 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.Network
         private readonly ConnectedClientsSingleton _clients = ConnectedClientsSingleton.Instance;
         private readonly AudioInputSingleton _audioInputSingleton = AudioInputSingleton.Instance;
 
-        private readonly BlockingCollection<byte[]> _encodedAudio = new BlockingCollection<byte[]>();
+        private const int MaxPendingEncodedAudioPackets = 50;
+        private readonly BlockingCollection<byte[]> _encodedAudio = new BlockingCollection<byte[]>(MaxPendingEncodedAudioPackets);
         private readonly string _guid;
         private readonly byte[] _guidAsciiBytes;
         private readonly InputDeviceManager _inputManager;
@@ -62,6 +63,7 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.Network
         private volatile bool _ptt;
         private long _lastPTTPress; // to handle dodgy PTT - release time
         private long _lastPttFailsafeLog;
+        private long _lastEncodedAudioDropLog;
 
         private volatile bool _ready;
 
@@ -256,10 +258,7 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.Network
                         else if (bytes?.Length > 22)
                         {
                             _udpLastReceived = DateTime.Now.Ticks;
-                            if (!_stop && !_encodedAudio.IsAddingCompleted)
-                            {
-                                _encodedAudio.Add(bytes);
-                            }
+                            QueueEncodedAudio(bytes);
                         }
                     }
                     catch (Exception e)
@@ -355,6 +354,38 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.Network
             byte[] discarded;
             while (_encodedAudio.TryTake(out discarded))
             {
+            }
+        }
+
+        private void QueueEncodedAudio(byte[] bytes)
+        {
+            if (_stop || _encodedAudio.IsAddingCompleted)
+            {
+                return;
+            }
+
+            if (_encodedAudio.TryAdd(bytes))
+            {
+                return;
+            }
+
+            var droppedPackets = 0;
+            byte[] discarded;
+            while (droppedPackets < MaxPendingEncodedAudioPackets / 2 && _encodedAudio.TryTake(out discarded))
+            {
+                droppedPackets++;
+            }
+
+            if (!_encodedAudio.TryAdd(bytes))
+            {
+                return;
+            }
+
+            var now = DateTime.UtcNow.Ticks;
+            if (new TimeSpan(now - _lastEncodedAudioDropLog).TotalSeconds >= 5)
+            {
+                _lastEncodedAudioDropLog = now;
+                Logger.Warn($"Dropped {droppedPackets} stale queued voice packets to keep overlay speaker state close to live audio.");
             }
         }
 
