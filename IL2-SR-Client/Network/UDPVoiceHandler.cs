@@ -50,7 +50,7 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.Network
         private readonly int UDP_VOIP_TIMEOUT = 42; // seconds for timeout before redoing VoIP
 
         private readonly int JITTER_BUFFER = 50; //in milliseconds
-        private const int PTT_INPUT_WATCHDOG_TIMEOUT_MS = 2000;
+        private const int PTT_INPUT_WATCHDOG_TIMEOUT_MS = 5000;
 
         private ClientStateSingleton _clientStateSingleton = ClientStateSingleton.Instance;
 

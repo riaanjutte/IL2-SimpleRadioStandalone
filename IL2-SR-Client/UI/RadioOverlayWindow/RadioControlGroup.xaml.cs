@@ -1,4 +1,5 @@
-﻿using System.Collections.Concurrent;
+﻿using System;
+using System.Collections.Concurrent;
 using System.Globalization;
 using System.Windows;
 using System.Windows.Controls;
@@ -20,11 +21,23 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI.RadioOverlayWindow
     /// </summary>
     public partial class RadioControlGroup : UserControl
     {
+        private const double LastSpeakerHoldMilliseconds = 3000.0;
+        private const double SpeakerNameScrollPixelsPerSecond = 18.0;
+        private const double SpeakerNameScrollPauseMilliseconds = 700.0;
+
         private bool _dragging;
         private bool _syncingSliderFromState;
         private readonly ConcurrentDictionary<int, Button> _channelButtons = new ConcurrentDictionary<int, Button>();
         private readonly ClientStateSingleton _clientStateSingleton = ClientStateSingleton.Instance;
         private readonly ConnectedClientsSingleton _connectClientsSingleton = ConnectedClientsSingleton.Instance;
+        private string _currentDisplayText = string.Empty;
+        private string _lastSpeakerName = string.Empty;
+        private DateTime _lastSpeakerEndedAt = DateTime.MinValue;
+        private DateTime _speakerNameScrollStartedAt = DateTime.MinValue;
+        private bool _speakerDisplayActive;
+        private bool _currentSpeakerActive;
+        private bool _wasReceivingSpeaker;
+        private int _lastRenderedChannel = -1;
 
         public RadioControlGroup()
         {
@@ -143,7 +156,12 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI.RadioOverlayWindow
             if (IL2PlayerRadioInfo == null || !_clientStateSingleton.IsConnected)
             {
                 RadioActive.Fill = CreateStatusBrush(Colors.Red);
-                RadioFrequency.Text = LocalizationManager.Get("Not Connected");
+                SetDisplayText(LocalizationManager.Get("Not Connected"),
+                    new SolidColorBrush((Color)ColorConverter.ConvertFromString("#00FF00")),
+                    1.0,
+                    false);
+                ClearSpeakerDisplayState();
+                _lastRenderedChannel = -1;
                 UsersCount.Text = "0";
                 UpdateChannelButtonState(-1);
 
@@ -158,6 +176,12 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI.RadioOverlayWindow
                 if (currentRadio == null)
                 {
                     return;
+                }
+
+                if (_lastRenderedChannel != currentRadio.channel)
+                {
+                    _lastRenderedChannel = currentRadio.channel;
+                    ClearSpeakerDisplayState();
                 }
 
                 var transmitting = _clientStateSingleton.RadioSendingState;
@@ -178,7 +202,13 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI.RadioOverlayWindow
                     RadioActive.Fill = CreateStatusBrush(Colors.Orange);
                 }
 
-                RadioFrequency.Text = LocalizationManager.Format("CHN {0}", currentRadio.channel);
+                if (!_speakerDisplayActive)
+                {
+                    SetDisplayText(LocalizationManager.Format("CHN {0}", currentRadio.channel),
+                        new SolidColorBrush((Color)ColorConverter.ConvertFromString("#00FF00")),
+                        1.0,
+                        false);
+                }
                 UpdateChannelButtonState(currentRadio.channel);
 
                 int count = _connectClientsSingleton.ClientsOnFreq(currentRadio.freq, currentRadio.modulation);
@@ -263,6 +293,7 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI.RadioOverlayWindow
             var IL2PlayerRadioInfo = _clientStateSingleton.PlayerGameState;
             if (IL2PlayerRadioInfo == null)
             {
+                ClearSpeakerDisplayState();
                 RadioFrequency.Foreground = new SolidColorBrush((Color) ColorConverter.ConvertFromString("#00FF00"));
             }
             else
@@ -272,25 +303,185 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI.RadioOverlayWindow
 
                 if ((receiveState == null) || !receiveState.IsReceiving)
                 {
-                    RadioFrequency.Foreground =
-                        new SolidColorBrush((Color) ColorConverter.ConvertFromString("#00FF00"));
+                    _currentSpeakerActive = false;
+                    UpdateLastSpeakerHold();
                 }
                 else if ((receiveState != null) && receiveState.IsReceiving)
                 {
-                    RadioFrequency.Foreground =
-                        new SolidColorBrush((Color)Colors.White);
-
-                    if (receiveState.SentBy.Length > 0)
+                    _currentSpeakerActive = true;
+                    if (!string.IsNullOrWhiteSpace(receiveState.SentBy))
                     {
-                        RadioFrequency.Text = receiveState.SentBy;
+                        _wasReceivingSpeaker = true;
+                        _speakerDisplayActive = true;
+                        _lastSpeakerName = receiveState.SentBy;
+                        _lastSpeakerEndedAt = DateTime.MinValue;
+                        SetDisplayText(receiveState.SentBy, new SolidColorBrush(Colors.White), 1.0, true);
+                    }
+                    else
+                    {
+                        ClearHeldSpeakerDisplay();
                     }
                 }
                 else
                 {
-                    RadioFrequency.Foreground =
-                        new SolidColorBrush((Color) ColorConverter.ConvertFromString("#00FF00"));
+                    _currentSpeakerActive = false;
+                    UpdateLastSpeakerHold();
                 }
             }
+        }
+
+        private void UpdateLastSpeakerHold()
+        {
+            if (_currentSpeakerActive)
+            {
+                return;
+            }
+
+            if (_wasReceivingSpeaker)
+            {
+                _lastSpeakerEndedAt = DateTime.UtcNow;
+                _wasReceivingSpeaker = false;
+            }
+
+            if (string.IsNullOrWhiteSpace(_lastSpeakerName) || _lastSpeakerEndedAt == DateTime.MinValue)
+            {
+                _speakerDisplayActive = false;
+                RadioFrequency.Foreground = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#00FF00"));
+                StopSpeakerNameScroll();
+                return;
+            }
+
+            var elapsed = (DateTime.UtcNow - _lastSpeakerEndedAt).TotalMilliseconds;
+            if (elapsed >= LastSpeakerHoldMilliseconds)
+            {
+                ClearSpeakerDisplayState();
+                RadioFrequency.Foreground = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#00FF00"));
+                return;
+            }
+
+            _speakerDisplayActive = true;
+            SetDisplayText(_lastSpeakerName, new SolidColorBrush(Colors.White), 1.0, true);
+        }
+
+        private void SetDisplayText(string text, Brush foreground, double opacity, bool allowScroll)
+        {
+            text = text ?? string.Empty;
+            if (!string.Equals(_currentDisplayText, text, StringComparison.Ordinal))
+            {
+                _currentDisplayText = text;
+                RadioFrequency.Text = text;
+                _speakerNameScrollStartedAt = DateTime.UtcNow;
+            }
+
+            RadioFrequency.Foreground = foreground;
+            RadioFrequency.Opacity = opacity;
+            UpdateSpeakerNameScroll(allowScroll);
+        }
+
+        private void UpdateSpeakerNameScroll(bool allowScroll)
+        {
+            if (!allowScroll)
+            {
+                StopSpeakerNameScroll();
+                return;
+            }
+
+            RadioFrequency.Width = double.NaN;
+            RadioFrequency.Measure(new Size(double.PositiveInfinity, double.PositiveInfinity));
+            var textWidth = RadioFrequency.DesiredSize.Width;
+            var textHeight = RadioFrequency.DesiredSize.Height;
+            var viewportWidth = RadioFrequencyViewport.ActualWidth;
+            var viewportHeight = RadioFrequencyViewport.ActualHeight;
+            if (viewportWidth <= 0)
+            {
+                viewportWidth = 76;
+            }
+
+            if (viewportHeight <= 0)
+            {
+                viewportHeight = 12;
+            }
+
+            Canvas.SetTop(RadioFrequency, Math.Max(0, (viewportHeight - textHeight) / 2.0));
+
+            if (textWidth <= viewportWidth)
+            {
+                StopSpeakerNameScroll();
+                return;
+            }
+
+            RadioFrequency.HorizontalAlignment = HorizontalAlignment.Left;
+            RadioFrequency.TextAlignment = TextAlignment.Left;
+            var scrollMetrics = SpeakerNameScrollLayout.Calculate(textWidth, viewportWidth);
+            var scrollingWidth = scrollMetrics.ScrollingWidth;
+            RadioFrequency.Width = scrollingWidth;
+
+            var travelDistance = scrollMetrics.TravelDistance;
+            var travelMilliseconds = travelDistance / SpeakerNameScrollPixelsPerSecond * 1000.0;
+            var cycleMilliseconds = SpeakerNameScrollPauseMilliseconds + travelMilliseconds + SpeakerNameScrollPauseMilliseconds;
+            var elapsed = (DateTime.UtcNow - _speakerNameScrollStartedAt).TotalMilliseconds % cycleMilliseconds;
+
+            double offset;
+            if (elapsed <= SpeakerNameScrollPauseMilliseconds)
+            {
+                offset = 0;
+            }
+            else if (elapsed <= SpeakerNameScrollPauseMilliseconds + travelMilliseconds)
+            {
+                offset = -travelDistance * ((elapsed - SpeakerNameScrollPauseMilliseconds) / travelMilliseconds);
+            }
+            else
+            {
+                offset = -travelDistance;
+            }
+
+            Canvas.SetLeft(RadioFrequency, offset);
+        }
+
+        private void StopSpeakerNameScroll()
+        {
+            RadioFrequency.Width = double.NaN;
+            RadioFrequency.Measure(new Size(double.PositiveInfinity, double.PositiveInfinity));
+            var textWidth = RadioFrequency.DesiredSize.Width;
+            var textHeight = RadioFrequency.DesiredSize.Height;
+            var viewportWidth = RadioFrequencyViewport.ActualWidth;
+            var viewportHeight = RadioFrequencyViewport.ActualHeight;
+            if (viewportWidth <= 0)
+            {
+                viewportWidth = 76;
+            }
+
+            if (viewportHeight <= 0)
+            {
+                viewportHeight = 12;
+            }
+
+            RadioFrequency.HorizontalAlignment = HorizontalAlignment.Center;
+            RadioFrequency.TextAlignment = TextAlignment.Center;
+            Canvas.SetLeft(RadioFrequency, Math.Max(0, (viewportWidth - textWidth) / 2.0));
+            Canvas.SetTop(RadioFrequency, Math.Max(0, (viewportHeight - textHeight) / 2.0));
+        }
+
+        private void ClearSpeakerDisplayState()
+        {
+            _speakerDisplayActive = false;
+            _currentSpeakerActive = false;
+            _wasReceivingSpeaker = false;
+            _lastSpeakerName = string.Empty;
+            _lastSpeakerEndedAt = DateTime.MinValue;
+            RadioFrequency.Opacity = 1.0;
+            StopSpeakerNameScroll();
+        }
+
+        private void ClearHeldSpeakerDisplay()
+        {
+            _speakerDisplayActive = false;
+            _wasReceivingSpeaker = false;
+            _lastSpeakerName = string.Empty;
+            _lastSpeakerEndedAt = DateTime.MinValue;
+            RadioFrequency.Foreground = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#00FF00"));
+            RadioFrequency.Opacity = 1.0;
+            StopSpeakerNameScroll();
         }
 
     }

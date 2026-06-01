@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Threading;
@@ -59,7 +60,9 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.Settings
         private volatile bool _detectPtt;
         private DateTime _nextDeviceReconnectAttemptUtc = DateTime.MinValue;
         private const int DeviceReconnectRetryMs = 2000;
+        private const int SlowPttInputPollWarningMs = 750;
         private long _lastPttInputPollUtcTicks = DateTime.UtcNow.Ticks;
+        private long _lastSlowPttInputPollLogTicks;
 
         public DateTime LastPttInputPollUtc => new DateTime(Interlocked.Read(ref _lastPttInputPollUtcTicks), DateTimeKind.Utc);
 
@@ -534,6 +537,8 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.Settings
             {
                 while (_detectPtt)
                 {
+                    MarkPttInputPoll();
+                    var pollStopwatch = Stopwatch.StartNew();
                     try
                     {
                     var bindStates = GenerateBindStateList();
@@ -603,6 +608,7 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.Settings
 
                     callback(bindStates);
                     MarkPttInputPoll();
+                    WarnIfPttInputPollIsSlow(pollStopwatch.ElapsedMilliseconds, bindStates.Count);
                     //handle overlay
 
                     foreach (var bindState in bindStates)
@@ -816,6 +822,7 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.Settings
                         {
                             callback(new List<InputBindState>());
                             MarkPttInputPoll();
+                            WarnIfPttInputPollIsSlow(pollStopwatch.ElapsedMilliseconds, 0);
                         }
                         catch (Exception callbackEx)
                         {
@@ -842,6 +849,24 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.Settings
         private void MarkPttInputPoll()
         {
             Interlocked.Exchange(ref _lastPttInputPollUtcTicks, DateTime.UtcNow.Ticks);
+        }
+
+        private void WarnIfPttInputPollIsSlow(long elapsedMilliseconds, int bindingCount)
+        {
+            if (elapsedMilliseconds < SlowPttInputPollWarningMs)
+            {
+                return;
+            }
+
+            var now = DateTime.UtcNow.Ticks;
+            if (new TimeSpan(now - Interlocked.Read(ref _lastSlowPttInputPollLogTicks)).TotalSeconds < 10)
+            {
+                return;
+            }
+
+            Interlocked.Exchange(ref _lastSlowPttInputPollLogTicks, now);
+            Logger.Warn($"PTT input polling took {elapsedMilliseconds}ms across {bindingCount} configured bindings. " +
+                        "Slow DirectInput devices can delay PTT and other keybinds.");
         }
 
         private bool GetButtonState(InputDevice inputDeviceBinding)

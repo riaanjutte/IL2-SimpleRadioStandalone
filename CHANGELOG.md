@@ -1,5 +1,24 @@
 # Changelog
 
+## IL2-SRS 1.0.4.3 community update
+
+### Changed
+
+- Overlay speaker names now remain visible for 3 seconds after transmission ends, without a fade effect.
+- Long speaker names now scroll in the overlay channel display instead of being truncated.
+- Overlay channel displays now refresh immediately after changing channels.
+
+### Fixed
+
+- Fixed held speaker names overriding the current speaker display.
+- Added diagnostics for slow DirectInput/PTT polling to help identify controller polling delays.
+- Increased the PTT input watchdog timeout to reduce false-positive reconnect handling during slow controller polls.
+
+### Validation
+
+- Built `IL2-SimpleRadioStandalone.sln` Release/x64 successfully.
+- Ran `IL2-SR-CommonTests`: 13/13 passed.
+
 ## IL2-SRS 1.0.4.2 community update
 
 ### Fixed

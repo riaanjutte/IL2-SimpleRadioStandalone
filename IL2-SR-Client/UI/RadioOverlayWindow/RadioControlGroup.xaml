@@ -194,7 +194,9 @@
                     BorderBrush="#242824"
                     BorderThickness="1"
                     MouseDown="RadioFrequencyText_Click">
-                <Grid>
+                <Grid x:Name="RadioFrequencyViewport"
+                      ClipToBounds="True"
+                      MouseDown="RadioFrequencyText_Click">
                     <Border Background="{StaticResource OverlayDisplayGlassBrush}"
                             Opacity="0.55"
                             Style="{x:Null}" />
@@ -203,18 +205,22 @@
                             Background="{StaticResource OverlayDisplayTopReflectionBrush}"
                             Opacity="0.65"
                             Style="{x:Null}" />
-                    <TextBlock x:Name="RadioFrequency"
-                               HorizontalAlignment="Stretch"
-                               VerticalAlignment="Center"
-                               FontFamily="Courier New"
-                               FontSize="8"
-                               Background="Transparent"
-                               Foreground="#00FF00"
-                               MouseDown="RadioFrequencyText_Click"
-                               Style="{x:Null}"
-                               Text="CHN 1"
-                               TextAlignment="Center"
-                               TextWrapping="NoWrap" />
+                    <Canvas x:Name="RadioFrequencyCanvas"
+                            ClipToBounds="True"
+                            MouseDown="RadioFrequencyText_Click">
+                        <TextBlock x:Name="RadioFrequency"
+                                   Canvas.Left="0"
+                                   Background="Transparent"
+                                   FontFamily="Courier New"
+                                   FontSize="8"
+                                   Foreground="#00FF00"
+                                   MouseDown="RadioFrequencyText_Click"
+                                   Opacity="1"
+                                   Style="{x:Null}"
+                                   Text="CHN 1"
+                                   TextAlignment="Center"
+                                   TextWrapping="NoWrap" />
+                    </Canvas>
                 </Grid>
             </Border>
 
