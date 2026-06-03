@@ -50,9 +50,9 @@
                     <Label x:Name="RadioLabel"
                            HorizontalAlignment="Center"
                            VerticalAlignment="Center"
-                           Content="INTERCOM"
+                           Content="CREW INTERCOM"
                            FontFamily="Courier New"
-                           FontSize="8"
+                           FontSize="7"
                            Foreground="#00FF00"
                            Padding="0"
                            Style="{x:Null}" />

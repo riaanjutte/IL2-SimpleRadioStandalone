@@ -78,6 +78,37 @@
         </StackPanel>
         <Separator Width="130" Margin="0 2" />
 
+        <Border x:Name="AssignedCallsignPanel"
+                Width="122"
+                Height="14"
+                Margin="4,0,0,2"
+                HorizontalAlignment="Left"
+                Background="{StaticResource OverlayDisplayBrush}"
+                BorderBrush="#242824"
+                BorderThickness="1"
+                Style="{x:Null}"
+                Visibility="Collapsed">
+            <Grid ClipToBounds="True">
+                <Border Background="{StaticResource OverlayDisplayGlassBrush}"
+                        Opacity="0.55"
+                        Style="{x:Null}" />
+                <Border Height="5"
+                        VerticalAlignment="Top"
+                        Background="{StaticResource OverlayDisplayTopReflectionBrush}"
+                        Opacity="0.65"
+                        Style="{x:Null}" />
+                <TextBlock x:Name="AssignedCallsignLabel"
+                           HorizontalAlignment="Center"
+                           VerticalAlignment="Center"
+                           FontFamily="Courier New"
+                           FontSize="8"
+                           Foreground="#00FF00"
+                           Style="{x:Null}"
+                           TextAlignment="Center"
+                           TextTrimming="CharacterEllipsis" />
+            </Grid>
+        </Border>
+
         <radioOverlayWindow:RadioControlGroup x:Name="Radio1" RadioId="1" />
         <Separator Width="130" Margin="0 2" />
         
@@ -92,18 +123,25 @@
                     Width="122"
                     Margin="4,0,0,0"
                     HorizontalAlignment="Left"
+                    MouseLeftButtonDown="RciStatusPanel_MouseLeftButtonDown"
                     Visibility="Collapsed">
-            <Grid Height="14">
-                <Border x:Name="RciStatusIndicator"
-                        Background="{StaticResource OverlayPressedControlBrush}"
-                        BorderBrush="{StaticResource OverlayRaisedBorderBrush}"
-                        BorderThickness="1"
-                        Style="{x:Null}">
-                    <Border BorderBrush="{StaticResource OverlayEdgeHighlightBrush}"
-                            BorderThickness="1,1,0,0"
-                            Opacity="0.35"
+            <Border Height="14"
+                    Background="{StaticResource OverlayDisplayBrush}"
+                    BorderBrush="#242824"
+                    BorderThickness="1"
+                    Style="{x:Null}">
+                <Grid ClipToBounds="True">
+                    <Border Background="{StaticResource OverlayDisplayGlassBrush}"
+                            Opacity="0.55"
                             Style="{x:Null}" />
-                </Border>
+                    <Border Height="5"
+                            VerticalAlignment="Top"
+                            Background="{StaticResource OverlayDisplayTopReflectionBrush}"
+                            Opacity="0.65"
+                            Style="{x:Null}" />
+                <Border x:Name="RciStatusIndicator"
+                            Background="Transparent"
+                            Style="{x:Null}" />
                 <TextBlock x:Name="RciStatusLabel"
                            HorizontalAlignment="Center"
                            VerticalAlignment="Center"
@@ -113,7 +151,8 @@
                            Foreground="#E7E7E7"
                            Style="{x:Null}"
                            Text="RCI" />
-            </Grid>
+                </Grid>
+            </Border>
             <TextBlock x:Name="RciCallsignLabel"
                        Width="122"
                        Height="9"

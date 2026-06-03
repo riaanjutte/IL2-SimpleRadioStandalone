@@ -101,48 +101,122 @@ namespace AutoUpdater
         private async Task<Uri> GetPathToLatestVersion()
         {
             Status.Content = "Finding Latest IL2-SRS Version";
-            var githubClient = new GitHubClient(new ProductHeaderValue(GITHUB_USER_AGENT, "1.0.4.3"));
+            var githubClient = new GitHubClient(new ProductHeaderValue(GITHUB_USER_AGENT, "1.0.4.4"));
 
             var releases = await githubClient.Repository.Release.GetAll(GITHUB_USERNAME, GITHUB_REPOSITORY);
 
             bool allowBeta = AllowBeta();
-            Release latestRelease = null;
-            ReleaseAsset latestAsset = null;
-            Version latestVersion = new Version();
+            ReleaseInfo latestRelease = null;
 
             // GitHub API order is not a version contract, so select the highest valid semver tag explicitly.
             foreach (Release release in releases)
             {
-                if (release.Draft || (release.Prerelease && !allowBeta))
+                ReleaseInfo releaseInfo;
+                if (!TryCreateReleaseInfo(release, allowBeta, out releaseInfo))
                 {
                     continue;
                 }
 
-                if (!Version.TryParse(release.TagName.TrimStart('v', 'V'), out var releaseVersion) ||
-                    releaseVersion <= latestVersion)
-                {
-                    continue;
-                }
-
-                var asset = release.Assets.FirstOrDefault(IsReleaseZipAsset);
-                if (asset == null)
-                {
-                    continue;
-                }
-
-                latestRelease = release;
-                latestAsset = asset;
-                latestVersion = releaseVersion;
+                latestRelease = GetNewerRelease(latestRelease, releaseInfo);
             }
 
-            if (latestRelease == null || latestAsset == null)
+            if (latestRelease == null)
             {
                 return null;
             }
 
-            changelogURL = latestRelease.HtmlUrl;
-            Status.Content = "Downloading Version " + latestVersion;
-            return new Uri(latestAsset.BrowserDownloadUrl);
+            changelogURL = latestRelease.Release.HtmlUrl;
+            Status.Content = (latestRelease.IsPrerelease ? "Downloading Beta Version " : "Downloading Version ") + latestRelease.DisplayVersion;
+            return new Uri(latestRelease.Asset.BrowserDownloadUrl);
+        }
+
+        private static ReleaseInfo GetNewerRelease(ReleaseInfo current, ReleaseInfo candidate)
+        {
+            if (current == null ||
+                candidate.Version > current.Version ||
+                (candidate.Version == current.Version && current.IsPrerelease && !candidate.IsPrerelease) ||
+                (candidate.Version == current.Version &&
+                 candidate.IsPrerelease == current.IsPrerelease &&
+                 string.CompareOrdinal(candidate.Release.TagName, current.Release.TagName) > 0))
+            {
+                return candidate;
+            }
+
+            return current;
+        }
+
+        private static bool TryCreateReleaseInfo(Release release, bool allowBeta, out ReleaseInfo releaseInfo)
+        {
+            releaseInfo = null;
+
+            if (release == null || release.Draft || (release.Prerelease && !allowBeta))
+            {
+                return false;
+            }
+
+            Version releaseVersion;
+            if (!TryParseReleaseVersion(release.TagName, out releaseVersion))
+            {
+                return false;
+            }
+
+            var asset = release.Assets.FirstOrDefault(IsReleaseZipAsset);
+            if (asset == null)
+            {
+                return false;
+            }
+
+            releaseInfo = new ReleaseInfo
+            {
+                Release = release,
+                Asset = asset,
+                Version = releaseVersion,
+                DisplayVersion = GetDisplayVersion(release.TagName, releaseVersion),
+                IsPrerelease = release.Prerelease
+            };
+            return true;
+        }
+
+        private static bool TryParseReleaseVersion(string tagName, out Version version)
+        {
+            version = null;
+            if (string.IsNullOrWhiteSpace(tagName))
+            {
+                return false;
+            }
+
+            var normalized = tagName.Trim().TrimStart('v', 'V');
+            if (Version.TryParse(normalized, out version))
+            {
+                return true;
+            }
+
+            var suffixIndex = normalized.IndexOfAny(new[] {'-', '+'});
+            if (suffixIndex > 0)
+            {
+                normalized = normalized.Substring(0, suffixIndex);
+            }
+
+            return Version.TryParse(normalized, out version);
+        }
+
+        private static string GetDisplayVersion(string tagName, Version version)
+        {
+            if (string.IsNullOrWhiteSpace(tagName))
+            {
+                return version.ToString();
+            }
+
+            return tagName.Trim().TrimStart('v', 'V');
+        }
+
+        private class ReleaseInfo
+        {
+            public Release Release { get; set; }
+            public ReleaseAsset Asset { get; set; }
+            public Version Version { get; set; }
+            public string DisplayVersion { get; set; }
+            public bool IsPrerelease { get; set; }
         }
 
         private static bool IsReleaseZipAsset(ReleaseAsset asset)
@@ -155,7 +229,7 @@ namespace AutoUpdater
         {
             foreach (var arg in Environment.GetCommandLineArgs())
             {
-                if (arg.Trim().Equals("-beta"))
+                if (arg.Trim().Equals("-beta", StringComparison.OrdinalIgnoreCase))
                 {
                     return true;
                 }

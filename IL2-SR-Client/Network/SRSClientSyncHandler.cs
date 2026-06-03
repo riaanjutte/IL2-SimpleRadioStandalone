@@ -254,6 +254,7 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.Network
                                                 srClient.LastUpdate = DateTime.Now.Ticks;
                                                 srClient.Name = updatedSrClient.Name;
                                                 srClient.Coalition = updatedSrClient.Coalition;
+                                                srClient.AssignedCallsign = updatedSrClient.AssignedCallsign;
 
                                                 if (updatedSrClient.GameState != null)
                                                 {

@@ -14,7 +14,7 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Overlay
     /// </summary>
     public partial class IntercomControlGroup : UserControl
     {
-        private const string IntercomLabelText = "INTERCOM";
+        private const string IntercomLabelText = "CREW INTERCOM";
         private const int MaxIntercomSpeakerNameLength = 14;
         private bool _dragging;
         private bool _syncingSliderFromState;
@@ -68,7 +68,7 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Overlay
             {
                 RadioActive.Fill = CreateStatusBrush(Colors.Red);
                 RadioLabel.Content = IntercomLabelText;
-                RadioLabel.FontSize = 8;
+                RadioLabel.FontSize = 7;
                 RadioLabel.ToolTip = null;
 
                 TunedCount.Content = "";
@@ -142,7 +142,7 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Overlay
             }
 
             RadioLabel.Content = IntercomLabelText;
-            RadioLabel.FontSize = 8;
+            RadioLabel.FontSize = 7;
             RadioLabel.ToolTip = null;
         }
 

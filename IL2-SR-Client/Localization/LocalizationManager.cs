@@ -183,7 +183,7 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.Localization
             {"Close", "Close"},
             {"DISABLED", "DISABLED"},
             {"ENABLED", "ENABLED"},
-            {"INTERCOM", "INTERCOM"},
+            {"CREW INTERCOM", "CREW INTERCOM"},
             {"Not Connected", "Not Connected"},
             {"CHN {0}", "CHN {0}"},
             {"CHN 1", "CHN 1"},
@@ -226,6 +226,8 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.Localization
             {"Friendly RCI active", "RCI - Friendly only"},
             {"Enemy RCI active", "RCI - Opposition only"},
             {"Both sides have RCI active", "RCI - Both coallitions"},
+            {"Request callsign CHN 2", "Request callsign CHN 2"},
+            {"Callsign: {0}", "Callsign: {0}"},
             {"RCI active", "RCI active"}
         };
 
@@ -372,7 +374,7 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.Localization
                     {"Close", "Schliessen"},
                     {"DISABLED", "DEAKTIVIERT"},
                     {"ENABLED", "AKTIVIERT"},
-                    {"INTERCOM", "INTERCOM"},
+                    {"CREW INTERCOM", "CREW INTERCOM"},
                     {"Not Connected", "Nicht verbunden"},
                     {"CHN {0}", "KANAL {0}"},
                     {"CHN 1", "KANAL 1"},
@@ -415,6 +417,8 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.Localization
                     {"Friendly RCI active", "RCI - Friendly only"},
                     {"Enemy RCI active", "RCI - Opposition only"},
                     {"Both sides have RCI active", "RCI - Both coallitions"},
+                    {"Request callsign CHN 2", "Request callsign CHN 2"},
+                    {"Callsign: {0}", "Callsign: {0}"},
                     {"RCI active", "RCI aktiv"}
                 }},
                 {"fr", new Dictionary<string, string>
@@ -556,7 +560,7 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.Localization
                     {"Close", "Fermer"},
                     {"DISABLED", "DESACTIVE"},
                     {"ENABLED", "ACTIVE"},
-                    {"INTERCOM", "INTERCOM"},
+                    {"CREW INTERCOM", "CREW INTERCOM"},
                     {"Not Connected", "Non connecte"},
                     {"CHN {0}", "CANAL {0}"},
                     {"CHN 1", "CANAL 1"},
@@ -599,6 +603,8 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.Localization
                     {"Friendly RCI active", "RCI - Friendly only"},
                     {"Enemy RCI active", "RCI - Opposition only"},
                     {"Both sides have RCI active", "RCI - Both coallitions"},
+                    {"Request callsign CHN 2", "Request callsign CHN 2"},
+                    {"Callsign: {0}", "Callsign: {0}"},
                     {"RCI active", "RCI actif"}
                 }},
                 {"es", new Dictionary<string, string>
@@ -740,7 +746,7 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.Localization
                     {"Close", "Cerrar"},
                     {"DISABLED", "DESACTIVADO"},
                     {"ENABLED", "ACTIVADO"},
-                    {"INTERCOM", "INTERCOM"},
+                    {"CREW INTERCOM", "CREW INTERCOM"},
                     {"Not Connected", "No conectado"},
                     {"CHN {0}", "CANAL {0}"},
                     {"CHN 1", "CANAL 1"},
@@ -783,6 +789,8 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.Localization
                     {"Friendly RCI active", "RCI - Friendly only"},
                     {"Enemy RCI active", "RCI - Opposition only"},
                     {"Both sides have RCI active", "RCI - Both coallitions"},
+                    {"Request callsign CHN 2", "Request callsign CHN 2"},
+                    {"Callsign: {0}", "Callsign: {0}"},
                     {"RCI active", "RCI activo"}
                 }}
             };

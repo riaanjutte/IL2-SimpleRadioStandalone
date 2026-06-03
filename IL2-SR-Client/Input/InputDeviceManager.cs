@@ -59,7 +59,9 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.Settings
 
         private volatile bool _detectPtt;
         private DateTime _nextDeviceReconnectAttemptUtc = DateTime.MinValue;
-        private const int DeviceReconnectRetryMs = 2000;
+        private int _currentDeviceReconnectRetryMs = MinDeviceReconnectRetryMs;
+        private const int MinDeviceReconnectRetryMs = 2000;
+        private const int MaxDeviceReconnectRetryMs = 30000;
         private const int SlowPttInputPollWarningMs = 750;
         private long _lastPttInputPollUtcTicks = DateTime.UtcNow.Ticks;
         private long _lastSlowPttInputPollLogTicks;
@@ -98,10 +100,16 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.Settings
 
         public void InitDevices(bool refreshControllerDevices)
         {
+            InitDevicesInternal(refreshControllerDevices);
+        }
+
+        private int InitDevicesInternal(bool refreshControllerDevices)
+        {
             Logger.Info("Starting Device Search. Expand Search: " +
             (_globalSettings.GetClientSettingBool(GlobalSettingsKeys.ExpandControls)));
 
             var deviceInstances = _directInput.GetDevices();
+            var changedDevices = 0;
 
             lock (_inputDevicesLock)
             {
@@ -140,6 +148,7 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.Settings
                                             deviceInstance.ProductName.Trim().Replace("\0", ""));
 
                                 RemoveInputDeviceLocked(deviceInstance.InstanceGuid);
+                                changedDevices++;
                             }
                             else
                             {
@@ -164,6 +173,7 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.Settings
                             device.Acquire();
 
                             _inputDevices.Add(deviceInstance.InstanceGuid, device);
+                            changedDevices++;
                         }
                         else if (deviceInstance.Type == DeviceType.Mouse)
                         {
@@ -176,6 +186,7 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.Settings
                             device.Acquire();
 
                             _inputDevices.Add(deviceInstance.InstanceGuid, device);
+                            changedDevices++;
                         }
                         else if (isControllerDevice)
                         {
@@ -189,6 +200,7 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.Settings
                             device.Acquire();
 
                             _inputDevices.Add(deviceInstance.InstanceGuid, device);
+                            changedDevices++;
                         }
                         else if (isExpandedControllerDevice)
                         {
@@ -202,6 +214,7 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.Settings
                             device.Acquire();
 
                             _inputDevices.Add(deviceInstance.InstanceGuid, device);
+                            changedDevices++;
 
                             Logger.Info("Added (Expanded Device) ID:" + deviceInstance.ProductGuid + " " +
                                         deviceInstance.ProductName.Trim().Replace("\0", ""));
@@ -214,6 +227,8 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.Settings
                     }
                 }
             }
+
+            return changedDevices;
         }
 
         private void LoadWhiteList()
@@ -1157,16 +1172,26 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.Settings
                 return;
             }
 
-            _nextDeviceReconnectAttemptUtc = now.AddMilliseconds(DeviceReconnectRetryMs);
+            _nextDeviceReconnectAttemptUtc = now.AddMilliseconds(_currentDeviceReconnectRetryMs);
 
             try
             {
                 Logger.Info("Attempting automatic input device rediscovery");
-                InitDevices(true);
+                var changedDevices = InitDevicesInternal(false);
+                if (changedDevices > 0)
+                {
+                    _currentDeviceReconnectRetryMs = MinDeviceReconnectRetryMs;
+                    Logger.Info($"Automatic input device rediscovery added {changedDevices} device(s)");
+                }
+                else
+                {
+                    _currentDeviceReconnectRetryMs = Math.Min(_currentDeviceReconnectRetryMs * 2, MaxDeviceReconnectRetryMs);
+                }
             }
             catch (Exception ex)
             {
                 Logger.Error(ex, "Automatic input device rediscovery failed");
+                _currentDeviceReconnectRetryMs = Math.Min(_currentDeviceReconnectRetryMs * 2, MaxDeviceReconnectRetryMs);
             }
         }
 

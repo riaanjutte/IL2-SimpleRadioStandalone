@@ -35,12 +35,14 @@ namespace Installer
     {
         private const string REG_PATH = "HKEY_CURRENT_USER\\SOFTWARE\\IL2-SRS";
         private readonly string _currentDirectory;
+        private readonly bool _autoUpdateMode;
         private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
         private ProgressBarDialog _progressBarDialog = null;
 
         public MainWindow()
         {
             SetupLogging();
+            _autoUpdateMode = HasCommandLineArgument("-autoupdate");
             InitializeComponent();
 
             var assembly = Assembly.GetExecutingAssembly();
@@ -215,12 +217,22 @@ namespace Installer
                 }
                 else if (result == 1)
                 {
-                    _progressBarDialog.UpdateProgress(true, "Installed IL2-SRS Successfully!");
+                    _progressBarDialog.UpdateProgress(true, _autoUpdateMode
+                        ? "Installed IL2-SRS Successfully! Restarting client..."
+                        : "Installed IL2-SRS Successfully!");
 
                     Logger.Info($"Installed IL2-SRS Successfully!");
-                
-                    //open to installation location
-                    Process.Start("explorer.exe", srPath.Text);
+
+                    if (_autoUpdateMode)
+                    {
+                        LaunchClientAfterAutoUpdate(srsPath);
+                    }
+                    else
+                    {
+                        //open to installation location
+                        Process.Start("explorer.exe", srPath.Text);
+                    }
+
                     Environment.Exit(0);
                 }
                 else
@@ -238,6 +250,37 @@ namespace Installer
                 }
             }).Invoke();
 
+        }
+
+        private static bool HasCommandLineArgument(string expectedArgument)
+        {
+            return Environment.GetCommandLineArgs()
+                .Any(arg => string.Equals(arg?.Trim(), expectedArgument, StringComparison.OrdinalIgnoreCase));
+        }
+
+        private static void LaunchClientAfterAutoUpdate(string installPath)
+        {
+            try
+            {
+                string clientPath = Path.Combine(installPath, "IL2-SR-ClientRadio.exe");
+                if (!File.Exists(clientPath))
+                {
+                    Logger.Warn($"Unable to restart IL2-SRS client after auto update. File not found: {clientPath}");
+                    return;
+                }
+
+                Logger.Info($"Restarting IL2-SRS client after auto update: {clientPath}");
+                Process.Start(new ProcessStartInfo
+                {
+                    FileName = clientPath,
+                    WorkingDirectory = installPath,
+                    UseShellExecute = true
+                });
+            }
+            catch (Exception ex)
+            {
+                Logger.Error(ex, "Unable to restart IL2-SRS client after auto update");
+            }
         }
 
         private int InstallRelease(string srPath, string IL2ScriptsPath, bool shortcut)

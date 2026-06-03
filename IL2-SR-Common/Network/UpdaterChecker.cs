@@ -22,7 +22,7 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Common
 
         public static readonly string MINIMUM_PROTOCOL_VERSION = "1.0.0.0";
 
-        public static readonly string VERSION = "1.0.4.3";
+        public static readonly string VERSION = "1.0.4.4";
 
         private static readonly Logger _logger = LogManager.GetCurrentClassLogger();
 
@@ -39,55 +39,56 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Common
             
                 var releases = await githubClient.Repository.Release.GetAll(GITHUB_USERNAME, GITHUB_REPOSITORY);
             
-                Version latestStableVersion = new Version();
-                Release latestStableRelease = null;
-                Version latestBetaVersion = new Version();
-                Release latestBetaRelease = null;
+                ReleaseInfo latestStableRelease = null;
+                ReleaseInfo latestBetaRelease = null;
             
                 // Retrieve last stable and beta branch release as tagged on GitHub
                 foreach (Release release in releases)
                 {
-                    Version releaseVersion;
-            
-                    if (Version.TryParse(release.TagName.Replace("v", ""), out releaseVersion))
+                    if (release.Draft)
                     {
-                        if (release.Prerelease && releaseVersion > latestBetaVersion)
-                        {
-                            latestBetaRelease = release;
-                            latestBetaVersion = releaseVersion;
-                        }
-                        else if (!release.Prerelease && releaseVersion > latestStableVersion)
-                        {
-                            latestStableRelease = release;
-                            latestStableVersion = releaseVersion;
-                        }
+                        continue;
+                    }
+
+                    ReleaseInfo releaseInfo;
+                    if (!TryCreateReleaseInfo(release, out releaseInfo))
+                    {
+                        _logger.Warn($"Failed to parse GitHub release version {release.TagName}");
+                        continue;
+                    }
+
+                    if (releaseInfo.IsPrerelease)
+                    {
+                        latestBetaRelease = GetNewerRelease(latestBetaRelease, releaseInfo);
                     }
                     else
                     {
-                        _logger.Warn($"Failed to parse GitHub release version {release.TagName}");
+                        latestStableRelease = GetNewerRelease(latestStableRelease, releaseInfo);
                     }
                 }
 
                 if(latestStableRelease ==null)
                 {
-                    _logger.Warn($"No releases available");
+                    _logger.Warn($"No stable releases available");
                     return;
                 }
             
                 // Compare latest versions with currently running version depending on user branch choice
-                if (checkForBetaUpdates && latestBetaVersion > currentVersion)
+                if (checkForBetaUpdates &&
+                    latestBetaRelease != null &&
+                    IsNewerThanCurrent(latestBetaRelease, latestStableRelease, currentVersion))
                 {
-                    ShowUpdateAvailableDialog("beta", latestBetaVersion, latestBetaRelease.HtmlUrl, true);
+                    ShowUpdateAvailableDialog("beta", latestBetaRelease.DisplayVersion, latestBetaRelease.Release.HtmlUrl, true);
                 }
-                else if (latestStableVersion > currentVersion)
+                else if (latestStableRelease.Version > currentVersion)
                 {
-                    ShowUpdateAvailableDialog("stable", latestStableVersion, latestStableRelease.HtmlUrl, false);
+                    ShowUpdateAvailableDialog("stable", latestStableRelease.DisplayVersion, latestStableRelease.Release.HtmlUrl, false);
                 }
-                else if (checkForBetaUpdates && latestBetaVersion == currentVersion)
+                else if (checkForBetaUpdates && latestBetaRelease != null && latestBetaRelease.Version == currentVersion)
                 {
                     _logger.Warn($"Running latest beta version: {currentVersion}");
                 }
-                else if (latestStableVersion == currentVersion)
+                else if (latestStableRelease.Version == currentVersion)
                 {
                     _logger.Warn($"Running latest stable version: {currentVersion}");
                 }
@@ -103,7 +104,7 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Common
 #endif
         }
 
-        public static void ShowUpdateAvailableDialog(string branch, Version version, string url, bool beta)
+        public static void ShowUpdateAvailableDialog(string branch, string version, string url, bool beta)
         {
             _logger.Warn($"New {branch} version available on GitHub: {version}");
 
@@ -203,6 +204,90 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Common
             };
 
             return candidates.FirstOrDefault(File.Exists);
+        }
+
+        private static bool IsNewerThanCurrent(ReleaseInfo betaRelease, ReleaseInfo stableRelease, Version currentVersion)
+        {
+            return betaRelease.Version > currentVersion &&
+                   (betaRelease.Version > stableRelease.Version || stableRelease.Version <= currentVersion);
+        }
+
+        private static ReleaseInfo GetNewerRelease(ReleaseInfo current, ReleaseInfo candidate)
+        {
+            if (current == null ||
+                candidate.Version > current.Version ||
+                (candidate.Version == current.Version && string.CompareOrdinal(candidate.Release.TagName, current.Release.TagName) > 0))
+            {
+                return candidate;
+            }
+
+            return current;
+        }
+
+        private static bool TryCreateReleaseInfo(Release release, out ReleaseInfo releaseInfo)
+        {
+            releaseInfo = null;
+
+            if (release == null || release.Draft)
+            {
+                return false;
+            }
+
+            Version version;
+            if (!TryParseReleaseVersion(release.TagName, out version))
+            {
+                return false;
+            }
+
+            releaseInfo = new ReleaseInfo
+            {
+                Release = release,
+                Version = version,
+                DisplayVersion = GetDisplayVersion(release.TagName, version),
+                IsPrerelease = release.Prerelease
+            };
+            return true;
+        }
+
+        private static bool TryParseReleaseVersion(string tagName, out Version version)
+        {
+            version = null;
+            if (string.IsNullOrWhiteSpace(tagName))
+            {
+                return false;
+            }
+
+            var normalized = tagName.Trim().TrimStart('v', 'V');
+            if (Version.TryParse(normalized, out version))
+            {
+                return true;
+            }
+
+            var suffixIndex = normalized.IndexOfAny(new[] {'-', '+'});
+            if (suffixIndex > 0)
+            {
+                normalized = normalized.Substring(0, suffixIndex);
+            }
+
+            return Version.TryParse(normalized, out version);
+        }
+
+        private static string GetDisplayVersion(string tagName, Version version)
+        {
+            if (string.IsNullOrWhiteSpace(tagName))
+            {
+                return version.ToString();
+            }
+
+            return tagName.Trim().TrimStart('v', 'V');
+        }
+
+        private class ReleaseInfo
+        {
+            public Release Release { get; set; }
+            public Version Version { get; set; }
+            public string DisplayVersion { get; set; }
+            public bool IsPrerelease { get; set; }
         }
     }
 }

@@ -26,6 +26,7 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Server.Network
         private readonly IEventAggregator _eventAggregator;
 
         private readonly ServerSettingsStore _serverSettings;
+        private readonly CombatBoxCallsignProvider _callsignProvider;
         private NatHandler _natHandler;
 
 
@@ -37,6 +38,7 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Server.Network
             _eventAggregator = eventAggregator;
             _eventAggregator.Subscribe(this);
             _serverSettings = ServerSettingsStore.Instance;
+            _callsignProvider = new CombatBoxCallsignProvider(_serverSettings);
 
             OptionKeepAlive = true;
 
@@ -213,6 +215,7 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Server.Network
                 }
 
                 srClient.ClientSession = state;
+                srClient.AssignedCallsign = _callsignProvider.GetAssignedCallsign(srClient.Name, srClient.Coalition);
 
                 // add to proper list
                 _clients[srClient.ClientGuid] = srClient;
@@ -265,8 +268,9 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Server.Network
                     client.Name = message.Client.Name;
                     client.Coalition = message.Client.Coalition;
                     client.Seat = message.Client.Seat;
+                    client.AssignedCallsign = _callsignProvider.GetAssignedCallsign(client.Name, client.Coalition);
 
-                    Logger.Debug($"Client metadata update: {message.Client.ClientGuid} ({message.Client.Name}) coalition {message.Client.Coalition}");
+                    Logger.Debug($"Client metadata update: {message.Client.ClientGuid} ({message.Client.Name}) coalition {message.Client.Coalition} callsign {client.AssignedCallsign}");
 
                     //send update to everyone
                     //Remove Client Radio Info
@@ -278,7 +282,8 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Server.Network
                             ClientGuid = client.ClientGuid,
                             Coalition = client.Coalition,
                             Name = client.Name,
-                            Seat = client.Seat
+                            Seat = client.Seat,
+                            AssignedCallsign = client.AssignedCallsign
                         }
                     };
 
@@ -327,6 +332,7 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Server.Network
                     }
                     //update to local ticks
                     message.Client.GameState.LastUpdate = DateTime.Now.Ticks;
+                    var assignedCallsign = _callsignProvider.GetAssignedCallsign(message.Client.Name, message.Client.Coalition);
 
                     var changed = false;
 
@@ -337,7 +343,9 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Server.Network
                     }
                     else
                     {
-                        changed = !client.GameState.Equals(message.Client.GameState) || client.Coalition != message.Client.Coalition;
+                        changed = !client.GameState.Equals(message.Client.GameState) ||
+                                  client.Coalition != message.Client.Coalition ||
+                                  !string.Equals(client.AssignedCallsign, assignedCallsign, StringComparison.Ordinal);
                     }
 
                     client.LastUpdate = DateTime.Now.Ticks;
@@ -346,8 +354,9 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Server.Network
                     client.Seat = message.Client.Seat;
                     client.GameState = message.Client.GameState;
                     client.Seat = message.Client.Seat;
+                    client.AssignedCallsign = assignedCallsign;
 
-                    Logger.Debug($"Client radio update: {message.Client.ClientGuid} ({message.Client.Name}) Coalition {message.Client.Coalition}, Radios {PrettyPrint(message.Client.GameState.radios)}");
+                    Logger.Debug($"Client radio update: {message.Client.ClientGuid} ({message.Client.Name}) Coalition {message.Client.Coalition}, Callsign {client.AssignedCallsign}, Radios {PrettyPrint(message.Client.GameState.radios)}");
 
                     TimeSpan lastSent = new TimeSpan(DateTime.Now.Ticks - client.LastRadioUpdateSent);
 
@@ -368,7 +377,8 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Server.Network
                                     Coalition = client.Coalition,
                                     Name = client.Name,
                                     GameState = client.GameState, //send radio info
-                                    Seat = client.Seat
+                                    Seat = client.Seat,
+                                    AssignedCallsign = client.AssignedCallsign
                                 }
                             };
                             Multicast(replyMessage.Encode());
@@ -390,6 +400,8 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Server.Network
 
         private void HandleRadioClientsSync(SRSClientSession session, NetworkMessage message)
         {
+            RefreshAssignedCallsigns();
+
             //store new client
             var replyMessage = new NetworkMessage
             {
@@ -411,12 +423,28 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Server.Network
                     ClientGuid = message.Client.ClientGuid,
                     Coalition = message.Client.Coalition,
                     GameState = message.Client.GameState,
-                    Name = message.Client.Name
+                    Name = message.Client.Name,
+                    AssignedCallsign = _callsignProvider.GetAssignedCallsign(message.Client.Name, message.Client.Coalition)
                 }
             };
 
             Multicast(update.Encode());
             Logger.Trace($"Client sync: Guid {message.Client.ClientGuid}, name {message.Client.Name}, coalition {message.Client.Coalition}");
+        }
+
+        private void RefreshAssignedCallsigns()
+        {
+            _callsignProvider.RefreshIfNeeded();
+
+            foreach (var client in _clients.Values)
+            {
+                if (client == null)
+                {
+                    continue;
+                }
+
+                client.AssignedCallsign = _callsignProvider.GetAssignedCallsign(client.Name, client.Coalition);
+            }
         }
 
         public void RequestStop()

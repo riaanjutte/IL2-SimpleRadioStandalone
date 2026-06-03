@@ -21,6 +21,7 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Common.Setting
         UPNP_ENABLED,
         SECOND_RADIO_ENABLED,
         CHANNEL_LIMIT,
+        ASSIGNED_CALLSIGNS_JSON_FILE,
         DSERVER_RCON_ADDRESS,
         DSERVER_RCON_USERNAME,
         DSERVER_RCON_PASSWORD
@@ -43,6 +44,7 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Common.Setting
             { ServerSettingsKeys.SHOW_TRANSMITTER_NAME.ToString(), "true" },
             { ServerSettingsKeys.SECOND_RADIO_ENABLED.ToString(), "false" },
             { ServerSettingsKeys.CHANNEL_LIMIT.ToString(), "5" },
+            { ServerSettingsKeys.ASSIGNED_CALLSIGNS_JSON_FILE.ToString(), @"\\tempest.combatbox.net\cb-radio-status\callsign-roster.json" },
         };
     }
 }

@@ -528,8 +528,8 @@
   <data name="ENABLED" xml:space="preserve">
     <value>ACTIVE</value>
   </data>
-  <data name="INTERCOM" xml:space="preserve">
-    <value>INTERCOM</value>
+  <data name="CREW INTERCOM" xml:space="preserve">
+    <value>CREW INTERCOM</value>
   </data>
   <data name="Not Connected" xml:space="preserve">
     <value>Non connecte</value>
@@ -656,6 +656,12 @@
   </data>
   <data name="Both sides have RCI active" xml:space="preserve">
     <value>RCI - Both coallitions</value>
+  </data>
+  <data name="Request callsign CHN 2" xml:space="preserve">
+    <value>Request callsign CHN 2</value>
+  </data>
+  <data name="Callsign: {0}" xml:space="preserve">
+    <value>Callsign: {0}</value>
   </data>
   <data name="RCI active" xml:space="preserve">
     <value>RCI actif</value>

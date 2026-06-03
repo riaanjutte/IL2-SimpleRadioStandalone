@@ -34,6 +34,7 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Overlay
 
         private readonly double _originalMinHeight;
         private HwndSource _hwndSource;
+        private const double AssignedCallsignMinHeightDelta = 16.0;
         private const double Radio2MinHeightDelta = 71.0;
         private const double RciStatusMinHeightDelta = 14.0;
         private const double RciCallsignMinHeightDelta = 10.0;
@@ -43,6 +44,11 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Overlay
         private const double OldDefaultOverlayHeight = 270.0;
         private bool _suppressSizeHandling = true;
         private bool _rciIndicatorEnabled;
+        private bool _overlayTestModeEnabled;
+        private int _overlayTestClickCount;
+        private int _overlayTestStateIndex;
+        private DateTime _lastOverlayTestClickUtc = DateTime.MinValue;
+        private DispatcherTimer _overlayTestTimer;
     
         public RadioOverlayWindow()
         {
@@ -113,6 +119,7 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Overlay
         {
             var IL2PlayerRadioInfo = _clientStateSingleton.PlayerGameState;
 
+            UpdateAssignedCallsignIndicator();
            
             Radio1.RepaintRadioStatus();
             Radio1.RepaintRadioReceive();
@@ -146,8 +153,68 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Overlay
             FocusIL2();
         }
 
+        private void UpdateAssignedCallsignIndicator()
+        {
+            if (_overlayTestModeEnabled)
+            {
+                return;
+            }
+
+            var previousVisibility = AssignedCallsignPanel.Visibility;
+            var assignedCallsign = ConnectedClientsSingleton.Instance.GetOwnAssignedCallsign();
+            var hasAssignedCallsign = !string.IsNullOrWhiteSpace(assignedCallsign);
+            var showRequestPrompt = !hasAssignedCallsign && _rciIndicatorEnabled;
+
+            if (hasAssignedCallsign)
+            {
+                AssignedCallsignLabel.Text = FormatCurrentCallsign(assignedCallsign.Trim());
+                AssignedCallsignLabel.Foreground = Brushes.Lime;
+                AssignedCallsignLabel.FontWeight = FontWeights.Normal;
+            }
+            else if (showRequestPrompt)
+            {
+                AssignedCallsignLabel.Text = LocalizationManager.Get("Request callsign CHN 2");
+                AssignedCallsignLabel.Foreground = Brushes.Red;
+                AssignedCallsignLabel.FontWeight = FontWeights.Bold;
+            }
+            else
+            {
+                AssignedCallsignLabel.Text = string.Empty;
+                AssignedCallsignLabel.Foreground = Brushes.Lime;
+                AssignedCallsignLabel.FontWeight = FontWeights.Normal;
+            }
+
+            AssignedCallsignPanel.Visibility = string.IsNullOrWhiteSpace(AssignedCallsignLabel.Text)
+                ? Visibility.Collapsed
+                : Visibility.Visible;
+
+            if (previousVisibility != AssignedCallsignPanel.Visibility)
+            {
+                UpdateOverlayMinimumHeight();
+            }
+        }
+
+        private string FormatCurrentCallsign(string assignedCallsign)
+        {
+            var format = LocalizationManager.Get("Callsign: {0}");
+
+            try
+            {
+                return string.Format(format, assignedCallsign);
+            }
+            catch (FormatException)
+            {
+                return "Callsign: " + assignedCallsign;
+            }
+        }
+
         public void UpdateRciStatusIndicator()
         {
+            if (_overlayTestModeEnabled)
+            {
+                return;
+            }
+
             var previousRciVisibility = RciStatusPanel.Visibility;
             var previousCallsignVisibility = RciCallsignLabel.Visibility;
 
@@ -160,7 +227,7 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Overlay
             }
 
             var status = ConnectedClientsSingleton.Instance.GetRciStatus(_clientStateSingleton.PlayerGameState.coalition);
-            RciStatusIndicator.Background = GetRciStatusBrush(status);
+            RciStatusIndicator.Background = Brushes.Transparent;
             RciStatusLabel.Text = GetRciStatusText(status);
             RciStatusLabel.Foreground = GetRciStatusForeground(status);
             UpdateRciCallsignLabel(ConnectedClientsSingleton.Instance.GetFriendlyRciCallsign(_clientStateSingleton.PlayerGameState.coalition));
@@ -170,6 +237,7 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Overlay
         public void SetRciIndicatorEnabled(bool enabled)
         {
             _rciIndicatorEnabled = enabled;
+            UpdateAssignedCallsignIndicator();
             UpdateRciStatusIndicator();
         }
 
@@ -179,6 +247,129 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Overlay
             RciCallsignLabel.Visibility = string.IsNullOrWhiteSpace(RciCallsignLabel.Text)
                 ? Visibility.Collapsed
                 : Visibility.Visible;
+        }
+
+        private void RciStatusPanel_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+        {
+            e.Handled = true;
+
+            var now = DateTime.UtcNow;
+            _overlayTestClickCount = now - _lastOverlayTestClickUtc > TimeSpan.FromSeconds(2)
+                ? 1
+                : _overlayTestClickCount + 1;
+            _lastOverlayTestClickUtc = now;
+
+            if (_overlayTestClickCount < 5)
+            {
+                return;
+            }
+
+            _overlayTestClickCount = 0;
+            ToggleOverlayTestMode();
+        }
+
+        private void ToggleOverlayTestMode()
+        {
+            if (_overlayTestModeEnabled)
+            {
+                StopOverlayTestMode();
+                return;
+            }
+
+            StartOverlayTestMode();
+        }
+
+        private void StartOverlayTestMode()
+        {
+            _overlayTestModeEnabled = true;
+            _overlayTestStateIndex = 0;
+            ApplyOverlayTestState();
+
+            if (_overlayTestTimer == null)
+            {
+                _overlayTestTimer = new DispatcherTimer {Interval = TimeSpan.FromSeconds(2)};
+                _overlayTestTimer.Tick += OverlayTestTimer_Tick;
+            }
+
+            _overlayTestTimer.Start();
+            Logger.Info("Radio overlay test mode started");
+        }
+
+        private void StopOverlayTestMode()
+        {
+            _overlayTestTimer?.Stop();
+            _overlayTestModeEnabled = false;
+            UpdateAssignedCallsignIndicator();
+            UpdateRciStatusIndicator();
+            Logger.Info("Radio overlay test mode stopped");
+        }
+
+        private void OverlayTestTimer_Tick(object sender, EventArgs e)
+        {
+            _overlayTestStateIndex++;
+            ApplyOverlayTestState();
+        }
+
+        private void ApplyOverlayTestState()
+        {
+            var states = GetOverlayTestStates();
+            var state = states[_overlayTestStateIndex % states.Length];
+
+            AssignedCallsignLabel.Text = state.AssignedCallsignText;
+            AssignedCallsignLabel.Foreground = state.AssignedCallsignForeground;
+            AssignedCallsignLabel.FontWeight = state.AssignedCallsignFontWeight;
+            AssignedCallsignPanel.Visibility = string.IsNullOrWhiteSpace(state.AssignedCallsignText)
+                ? Visibility.Collapsed
+                : Visibility.Visible;
+
+            RciStatusPanel.Visibility = Visibility.Visible;
+            RciStatusIndicator.Background = Brushes.Transparent;
+            RciStatusLabel.Text = state.RciStatusText;
+            RciStatusLabel.Foreground = state.RciStatusForeground;
+            UpdateRciCallsignLabel(state.RciCallsignText);
+            UpdateOverlayMinimumHeight();
+        }
+
+        private OverlayTestState[] GetOverlayTestStates()
+        {
+            return new[]
+            {
+                new OverlayTestState(
+                    LocalizationManager.Get("Request callsign CHN 2"),
+                    Brushes.Red,
+                    FontWeights.Bold,
+                    LocalizationManager.Get("No RCI active"),
+                    GetRciStatusForeground(RciStatus.None),
+                    string.Empty),
+                new OverlayTestState(
+                    FormatCurrentCallsign("CHECKMATE"),
+                    Brushes.Lime,
+                    FontWeights.Normal,
+                    LocalizationManager.Get("Friendly RCI active"),
+                    GetRciStatusForeground(RciStatus.FriendlyOnly),
+                    "DEFCON"),
+                new OverlayTestState(
+                    FormatCurrentCallsign("CHECKMATE"),
+                    Brushes.Lime,
+                    FontWeights.Normal,
+                    LocalizationManager.Get("Both sides have RCI active"),
+                    GetRciStatusForeground(RciStatus.Both),
+                    "DEFCON"),
+                new OverlayTestState(
+                    FormatCurrentCallsign("CHECKMATE"),
+                    Brushes.Lime,
+                    FontWeights.Normal,
+                    LocalizationManager.Get("Enemy RCI active"),
+                    GetRciStatusForeground(RciStatus.EnemyOnly),
+                    string.Empty),
+                new OverlayTestState(
+                    FormatCurrentCallsign("CHECKMATE"),
+                    Brushes.Lime,
+                    FontWeights.Normal,
+                    LocalizationManager.Get("RCI active"),
+                    GetRciStatusForeground(RciStatus.Neutral),
+                    "RCI TEST")
+            };
         }
 
         private void UpdateOverlayMinimumHeightIfChanged(Visibility previousRciVisibility, Visibility previousCallsignVisibility)
@@ -193,6 +384,11 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Overlay
         private void UpdateOverlayMinimumHeight()
         {
             var minHeight = _originalMinHeight;
+
+            if (AssignedCallsignPanel.Visibility == Visibility.Visible)
+            {
+                minHeight += AssignedCallsignMinHeightDelta;
+            }
 
             if (Radio2.Visibility == Visibility.Visible)
             {
@@ -240,10 +436,15 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Overlay
             switch (status)
             {
                 case RciStatus.FriendlyOnly:
+                    return Brushes.Lime;
                 case RciStatus.Both:
-                    return Brushes.Black;
+                    return new SolidColorBrush((Color)ColorConverter.ConvertFromString("#FFB000"));
+                case RciStatus.EnemyOnly:
+                    return new SolidColorBrush((Color)ColorConverter.ConvertFromString("#FF3030"));
+                case RciStatus.Neutral:
+                    return new SolidColorBrush((Color)ColorConverter.ConvertFromString("#D8D8D8"));
                 default:
-                    return Brushes.White;
+                    return new SolidColorBrush((Color)ColorConverter.ConvertFromString("#D8D8D8"));
             }
         }
 
@@ -321,6 +522,7 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Overlay
 
             _hwndSource?.RemoveHook(WndProc);
             _updateTimer.Stop();
+            _overlayTestTimer?.Stop();
         }
 
         private void Button_Minimise(object sender, RoutedEventArgs e)
@@ -464,6 +666,32 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Overlay
             public int Top;
             public int Right;
             public int Bottom;
+        }
+
+        private class OverlayTestState
+        {
+            public OverlayTestState(
+                string assignedCallsignText,
+                Brush assignedCallsignForeground,
+                FontWeight assignedCallsignFontWeight,
+                string rciStatusText,
+                Brush rciStatusForeground,
+                string rciCallsignText)
+            {
+                AssignedCallsignText = assignedCallsignText;
+                AssignedCallsignForeground = assignedCallsignForeground;
+                AssignedCallsignFontWeight = assignedCallsignFontWeight;
+                RciStatusText = rciStatusText;
+                RciStatusForeground = rciStatusForeground;
+                RciCallsignText = rciCallsignText;
+            }
+
+            public string AssignedCallsignText { get; }
+            public Brush AssignedCallsignForeground { get; }
+            public FontWeight AssignedCallsignFontWeight { get; }
+            public string RciStatusText { get; }
+            public Brush RciStatusForeground { get; }
+            public string RciCallsignText { get; }
         }
 
         private bool IsOldDefaultOverlaySize(double configuredWidth, double configuredHeight)

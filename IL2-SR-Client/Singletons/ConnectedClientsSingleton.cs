@@ -81,6 +81,13 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.Singletons
             }
         }
 
+        public string GetOwnAssignedCallsign()
+        {
+            return _clients.TryGetValue(_guid, out var client) && client != null
+                ? client.AssignedCallsign ?? string.Empty
+                : string.Empty;
+        }
+
         public RciStatus GetRciStatus(int ownCoalition)
         {
             var friendlyRci = false;

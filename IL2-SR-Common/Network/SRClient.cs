@@ -37,6 +37,8 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Common.Network
 
         public int Seat { get; set; }
 
+        public string AssignedCallsign { get; set; }
+
         public int Coalition
         {
             get { return _coalition; }
