@@ -22,13 +22,15 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Common
 
         public static readonly string MINIMUM_PROTOCOL_VERSION = "1.0.0.0";
 
-        public static readonly string VERSION = "1.0.4.4";
+        public static readonly string VERSION = "1.0.4.5";
+        public static readonly string RELEASE_TAG = "1.0.4.5-beta.1";
 
         private static readonly Logger _logger = LogManager.GetCurrentClassLogger();
 
         public static async void CheckForUpdate(bool checkForBetaUpdates)
         {
-            Version currentVersion = Version.Parse(VERSION);
+            ReleaseInfo currentRelease = CreateCurrentReleaseInfo();
+            Version currentVersion = currentRelease.Version;
 
 #if DEBUG
             _logger.Info("Skipping update check due to DEBUG mode");
@@ -76,19 +78,19 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Common
                 // Compare latest versions with currently running version depending on user branch choice
                 if (checkForBetaUpdates &&
                     latestBetaRelease != null &&
-                    IsNewerThanCurrent(latestBetaRelease, latestStableRelease, currentVersion))
+                    IsBetaUpdateAvailable(latestBetaRelease, latestStableRelease, currentRelease))
                 {
                     ShowUpdateAvailableDialog("beta", latestBetaRelease.DisplayVersion, latestBetaRelease.Release.HtmlUrl, true);
                 }
-                else if (latestStableRelease.Version > currentVersion)
+                else if (IsReleaseNewerThanCurrent(latestStableRelease, currentRelease))
                 {
                     ShowUpdateAvailableDialog("stable", latestStableRelease.DisplayVersion, latestStableRelease.Release.HtmlUrl, false);
                 }
-                else if (checkForBetaUpdates && latestBetaRelease != null && latestBetaRelease.Version == currentVersion)
+                else if (checkForBetaUpdates && latestBetaRelease != null && !IsReleaseNewerThanCurrent(latestBetaRelease, currentRelease))
                 {
-                    _logger.Warn($"Running latest beta version: {currentVersion}");
+                    _logger.Warn($"Running latest beta version: {currentRelease.DisplayVersion}");
                 }
-                else if (latestStableRelease.Version == currentVersion)
+                else if (!currentRelease.IsPrerelease && latestStableRelease.Version == currentVersion)
                 {
                     _logger.Warn($"Running latest stable version: {currentVersion}");
                 }
@@ -206,10 +208,35 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Common
             return candidates.FirstOrDefault(File.Exists);
         }
 
-        private static bool IsNewerThanCurrent(ReleaseInfo betaRelease, ReleaseInfo stableRelease, Version currentVersion)
+        private static bool IsBetaUpdateAvailable(ReleaseInfo betaRelease, ReleaseInfo stableRelease, ReleaseInfo currentRelease)
         {
-            return betaRelease.Version > currentVersion &&
-                   (betaRelease.Version > stableRelease.Version || stableRelease.Version <= currentVersion);
+            return IsReleaseNewerThanCurrent(betaRelease, currentRelease) &&
+                   (betaRelease.Version > stableRelease.Version || !IsReleaseNewerThanCurrent(stableRelease, currentRelease));
+        }
+
+        private static bool IsReleaseNewerThanCurrent(ReleaseInfo candidate, ReleaseInfo current)
+        {
+            if (candidate == null || current == null)
+            {
+                return false;
+            }
+
+            if (candidate.Version > current.Version)
+            {
+                return true;
+            }
+
+            if (candidate.Version < current.Version)
+            {
+                return false;
+            }
+
+            if (candidate.IsPrerelease == current.IsPrerelease)
+            {
+                return string.CompareOrdinal(candidate.DisplayVersion, current.DisplayVersion) > 0;
+            }
+
+            return current.IsPrerelease && !candidate.IsPrerelease;
         }
 
         private static ReleaseInfo GetNewerRelease(ReleaseInfo current, ReleaseInfo candidate)
@@ -247,6 +274,22 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Common
                 IsPrerelease = release.Prerelease
             };
             return true;
+        }
+
+        private static ReleaseInfo CreateCurrentReleaseInfo()
+        {
+            Version version;
+            if (!TryParseReleaseVersion(RELEASE_TAG, out version))
+            {
+                version = Version.Parse(VERSION);
+            }
+
+            return new ReleaseInfo
+            {
+                Version = version,
+                DisplayVersion = GetDisplayVersion(RELEASE_TAG, version),
+                IsPrerelease = RELEASE_TAG.IndexOf("-", StringComparison.Ordinal) >= 0
+            };
         }
 
         private static bool TryParseReleaseVersion(string tagName, out Version version)
