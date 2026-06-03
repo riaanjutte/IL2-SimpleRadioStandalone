@@ -23,7 +23,7 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Common
         public static readonly string MINIMUM_PROTOCOL_VERSION = "1.0.0.0";
 
         public static readonly string VERSION = "1.0.4.5";
-        public static readonly string RELEASE_TAG = "1.0.4.5-beta.2";
+        public static readonly string RELEASE_TAG = "1.0.4.5-beta.3";
 
         private static readonly Logger _logger = LogManager.GetCurrentClassLogger();
 
@@ -80,11 +80,11 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Common
                     latestBetaRelease != null &&
                     IsBetaUpdateAvailable(latestBetaRelease, latestStableRelease, currentRelease))
                 {
-                    ShowUpdateAvailableDialog("beta", latestBetaRelease.DisplayVersion, latestBetaRelease.Release.HtmlUrl, true);
+                    ShowUpdateAvailableDialog("beta", latestBetaRelease.DisplayVersion, latestBetaRelease.Release.HtmlUrl, true, latestBetaRelease.Release.TagName);
                 }
                 else if (IsReleaseNewerThanCurrent(latestStableRelease, currentRelease))
                 {
-                    ShowUpdateAvailableDialog("stable", latestStableRelease.DisplayVersion, latestStableRelease.Release.HtmlUrl, false);
+                    ShowUpdateAvailableDialog("stable", latestStableRelease.DisplayVersion, latestStableRelease.Release.HtmlUrl, false, latestStableRelease.Release.TagName);
                 }
                 else if (checkForBetaUpdates && latestBetaRelease != null && !IsReleaseNewerThanCurrent(latestBetaRelease, currentRelease))
                 {
@@ -106,7 +106,7 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Common
 #endif
         }
 
-        public static void ShowUpdateAvailableDialog(string branch, string version, string url, bool beta)
+        public static void ShowUpdateAvailableDialog(string branch, string version, string url, bool beta, string releaseTag)
         {
             _logger.Warn($"New {branch} version available on GitHub: {version}");
 
@@ -117,7 +117,7 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Common
             {
                 try
                 {
-                    LaunchUpdater(beta);
+                    LaunchUpdater(beta, releaseTag);
                 }
                 catch (Exception ex)
                 {
@@ -143,7 +143,7 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Common
             });
         }
 
-        private static void LaunchUpdater(bool beta)
+        private static void LaunchUpdater(bool beta, string releaseTag)
         {
             var updaterPath = ResolveUpdaterPath();
             if (string.IsNullOrEmpty(updaterPath))
@@ -166,10 +166,7 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Common
                     Verb = "runas"
                 };
     
-                if (beta)
-                {
-                    startInfo.Arguments = "-beta";
-                }
+                startInfo.Arguments = BuildUpdaterArguments(beta, releaseTag);
               
                 try
                 {
@@ -189,11 +186,33 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Common
                     UseShellExecute = true,
                     WorkingDirectory = updaterDirectory,
                     FileName = updaterPath,
-                    Arguments = beta ? "-beta" : string.Empty
+                    Arguments = BuildUpdaterArguments(beta, releaseTag)
                 };
 
                 Process.Start(startInfo);
             }
+        }
+
+        private static string BuildUpdaterArguments(bool beta, string releaseTag)
+        {
+            var arguments = beta ? "-beta" : string.Empty;
+
+            if (!string.IsNullOrWhiteSpace(releaseTag))
+            {
+                if (!string.IsNullOrWhiteSpace(arguments))
+                {
+                    arguments += " ";
+                }
+
+                arguments += "-tag " + QuoteArgument(releaseTag);
+            }
+
+            return arguments;
+        }
+
+        private static string QuoteArgument(string argument)
+        {
+            return "\"" + argument.Replace("\"", "\\\"") + "\"";
         }
 
         private static string ResolveUpdaterPath()

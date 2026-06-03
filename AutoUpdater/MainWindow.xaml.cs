@@ -103,9 +103,29 @@ namespace AutoUpdater
             Status.Content = "Finding Latest IL2-SRS Version";
             var githubClient = new GitHubClient(new ProductHeaderValue(GITHUB_USER_AGENT, "1.0.4.5"));
 
-            var releases = await githubClient.Repository.Release.GetAll(GITHUB_USERNAME, GITHUB_REPOSITORY);
-
+            var targetTag = GetTargetReleaseTag();
             bool allowBeta = AllowBeta();
+
+            if (!string.IsNullOrWhiteSpace(targetTag))
+            {
+                try
+                {
+                    var targetRelease = await githubClient.Repository.Release.Get(GITHUB_USERNAME, GITHUB_REPOSITORY, targetTag);
+                    ReleaseInfo targetReleaseInfo;
+                    if (TryCreateReleaseInfo(targetRelease, true, out targetReleaseInfo))
+                    {
+                        changelogURL = targetReleaseInfo.Release.HtmlUrl;
+                        Status.Content = (targetReleaseInfo.IsPrerelease ? "Downloading Beta Version " : "Downloading Version ") + targetReleaseInfo.DisplayVersion;
+                        return new Uri(targetReleaseInfo.Asset.BrowserDownloadUrl);
+                    }
+                }
+                catch (NotFoundException)
+                {
+                    // Fall back to release selection below if a stale client passed an unknown tag.
+                }
+            }
+
+            var releases = await githubClient.Repository.Release.GetAll(GITHUB_USERNAME, GITHUB_REPOSITORY);
             ReleaseInfo latestRelease = null;
 
             // GitHub API order is not a version contract, so select the highest valid semver tag explicitly.
@@ -121,6 +141,12 @@ namespace AutoUpdater
             }
 
             if (latestRelease == null)
+            {
+                return null;
+            }
+
+            var localVersion = GetLocalInstalledVersion();
+            if (!allowBeta && localVersion != null && latestRelease.Version < localVersion)
             {
                 return null;
             }
@@ -238,6 +264,56 @@ namespace AutoUpdater
 
             return false;
 
+        }
+
+        private string GetTargetReleaseTag()
+        {
+            var args = Environment.GetCommandLineArgs();
+            for (var i = 0; i < args.Length; i++)
+            {
+                var arg = args[i].Trim();
+                if (arg.Equals("-tag", StringComparison.OrdinalIgnoreCase) ||
+                    arg.Equals("--tag", StringComparison.OrdinalIgnoreCase) ||
+                    arg.Equals("/tag", StringComparison.OrdinalIgnoreCase))
+                {
+                    return i + 1 < args.Length ? args[i + 1].Trim() : null;
+                }
+
+                const string tagEqualsPrefix = "-tag=";
+                if (arg.StartsWith(tagEqualsPrefix, StringComparison.OrdinalIgnoreCase))
+                {
+                    return arg.Substring(tagEqualsPrefix.Length).Trim();
+                }
+            }
+
+            return null;
+        }
+
+        private static Version GetLocalInstalledVersion()
+        {
+            var baseDirectory = AppDomain.CurrentDomain.BaseDirectory;
+            var candidates = new[]
+            {
+                Path.Combine(baseDirectory, "IL2-SR-ClientRadio.exe"),
+                Path.Combine(baseDirectory, "DCS-SR-Common.dll")
+            };
+
+            foreach (var candidate in candidates)
+            {
+                if (!File.Exists(candidate))
+                {
+                    continue;
+                }
+
+                Version version;
+                var productVersion = FileVersionInfo.GetVersionInfo(candidate).ProductVersion;
+                if (Version.TryParse(productVersion, out version))
+                {
+                    return version;
+                }
+            }
+
+            return null;
         }
 
         public void ShowError()
