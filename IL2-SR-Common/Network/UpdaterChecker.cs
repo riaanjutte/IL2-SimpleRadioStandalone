@@ -23,7 +23,7 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Common
         public static readonly string MINIMUM_PROTOCOL_VERSION = "1.0.0.0";
 
         public static readonly string VERSION = "1.0.4.5";
-        public static readonly string RELEASE_TAG = "1.0.4.5-beta.3";
+        public static readonly string RELEASE_TAG = "1.0.4.5-beta.4";
 
         private static readonly Logger _logger = LogManager.GetCurrentClassLogger();
 

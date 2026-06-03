@@ -35,6 +35,8 @@ namespace AutoUpdater
         public static readonly string GITHUB_REPOSITORY = "IL2-SimpleRadioStandalone";
         // Required for all requests against the GitHub API, as per https://developer.github.com/v3/#user-agent-required
         public static readonly string GITHUB_USER_AGENT = $"{GITHUB_USERNAME}_{GITHUB_REPOSITORY}";
+        private const string CURRENT_VERSION = "1.0.4.5";
+        private const string CURRENT_RELEASE_TAG = "1.0.4.5-beta.4";
         private Uri _uri;
         private string _directory;
         private string _file;
@@ -101,10 +103,11 @@ namespace AutoUpdater
         private async Task<Uri> GetPathToLatestVersion()
         {
             Status.Content = "Finding Latest IL2-SRS Version";
-            var githubClient = new GitHubClient(new ProductHeaderValue(GITHUB_USER_AGENT, "1.0.4.5"));
+            var githubClient = new GitHubClient(new ProductHeaderValue(GITHUB_USER_AGENT, CURRENT_VERSION));
 
             var targetTag = GetTargetReleaseTag();
-            bool allowBeta = AllowBeta();
+            var localRelease = GetLocalInstalledReleaseInfo();
+            bool allowBeta = AllowBeta() || (localRelease != null && localRelease.IsPrerelease);
 
             if (!string.IsNullOrWhiteSpace(targetTag))
             {
@@ -145,8 +148,7 @@ namespace AutoUpdater
                 return null;
             }
 
-            var localVersion = GetLocalInstalledVersion();
-            if (!allowBeta && localVersion != null && latestRelease.Version < localVersion)
+            if (!IsReleaseNewerThanLocal(latestRelease, localRelease))
             {
                 return null;
             }
@@ -203,6 +205,36 @@ namespace AutoUpdater
             return true;
         }
 
+        private static bool IsReleaseNewerThanLocal(ReleaseInfo candidate, LocalReleaseInfo current)
+        {
+            if (candidate == null)
+            {
+                return false;
+            }
+
+            if (current == null)
+            {
+                return true;
+            }
+
+            if (candidate.Version > current.Version)
+            {
+                return true;
+            }
+
+            if (candidate.Version < current.Version)
+            {
+                return false;
+            }
+
+            if (candidate.IsPrerelease == current.IsPrerelease)
+            {
+                return string.CompareOrdinal(candidate.DisplayVersion, current.DisplayVersion) > 0;
+            }
+
+            return current.IsPrerelease && !candidate.IsPrerelease;
+        }
+
         private static bool TryParseReleaseVersion(string tagName, out Version version)
         {
             version = null;
@@ -240,6 +272,13 @@ namespace AutoUpdater
         {
             public Release Release { get; set; }
             public ReleaseAsset Asset { get; set; }
+            public Version Version { get; set; }
+            public string DisplayVersion { get; set; }
+            public bool IsPrerelease { get; set; }
+        }
+
+        private class LocalReleaseInfo
+        {
             public Version Version { get; set; }
             public string DisplayVersion { get; set; }
             public bool IsPrerelease { get; set; }
@@ -289,31 +328,81 @@ namespace AutoUpdater
             return null;
         }
 
-        private static Version GetLocalInstalledVersion()
+        private static LocalReleaseInfo GetLocalInstalledReleaseInfo()
         {
             var baseDirectory = AppDomain.CurrentDomain.BaseDirectory;
-            var candidates = new[]
-            {
-                Path.Combine(baseDirectory, "IL2-SR-ClientRadio.exe"),
-                Path.Combine(baseDirectory, "DCS-SR-Common.dll")
-            };
+            var clientPath = Path.Combine(baseDirectory, "IL2-SR-ClientRadio.exe");
 
-            foreach (var candidate in candidates)
+            Version clientVersion;
+            if (TryGetProductVersion(clientPath, out clientVersion))
             {
-                if (!File.Exists(candidate))
+                Version updaterVersion;
+                if (TryParseReleaseVersion(CURRENT_VERSION, out updaterVersion) && clientVersion == updaterVersion)
                 {
-                    continue;
+                    LocalReleaseInfo updaterReleaseInfo;
+                    if (TryCreateLocalReleaseInfo(CURRENT_RELEASE_TAG, CURRENT_VERSION, out updaterReleaseInfo))
+                    {
+                        return updaterReleaseInfo;
+                    }
                 }
 
-                Version version;
-                var productVersion = FileVersionInfo.GetVersionInfo(candidate).ProductVersion;
-                if (Version.TryParse(productVersion, out version))
+                return new LocalReleaseInfo
                 {
-                    return version;
-                }
+                    Version = clientVersion,
+                    DisplayVersion = clientVersion.ToString(),
+                    IsPrerelease = false
+                };
+            }
+
+            LocalReleaseInfo fallbackReleaseInfo;
+            if (TryCreateLocalReleaseInfo(CURRENT_RELEASE_TAG, CURRENT_VERSION, out fallbackReleaseInfo))
+            {
+                return fallbackReleaseInfo;
             }
 
             return null;
+        }
+
+        private static bool TryGetProductVersion(string filePath, out Version version)
+        {
+            version = null;
+            if (!File.Exists(filePath))
+            {
+                return false;
+            }
+
+            return Version.TryParse(FileVersionInfo.GetVersionInfo(filePath).ProductVersion, out version);
+        }
+
+        private static bool TryCreateLocalReleaseInfo(string releaseTag, string versionValue, out LocalReleaseInfo releaseInfo)
+        {
+            releaseInfo = null;
+
+            Version parsedVersion;
+            if (!TryParseReleaseVersion(releaseTag ?? versionValue, out parsedVersion))
+            {
+                return false;
+            }
+
+            releaseInfo = new LocalReleaseInfo
+            {
+                Version = parsedVersion,
+                DisplayVersion = GetDisplayVersion(releaseTag ?? versionValue, parsedVersion),
+                IsPrerelease = !string.IsNullOrWhiteSpace(releaseTag) &&
+                               releaseTag.IndexOf("-", StringComparison.Ordinal) >= 0
+            };
+
+            return true;
+        }
+
+        public void ShowNoUpdateAvailable()
+        {
+            MessageBox.Show("No newer IL2-SRS update is available.",
+                "SRS Auto Updater",
+                MessageBoxButton.OK,
+                MessageBoxImage.Information);
+
+            Close();
         }
 
         public void ShowError()
@@ -333,7 +422,7 @@ namespace AutoUpdater
                 _uri = await GetPathToLatestVersion();
                 if (_uri == null)
                 {
-                    ShowError();
+                    ShowNoUpdateAvailable();
                     return;
                 }
 
