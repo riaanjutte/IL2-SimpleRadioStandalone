@@ -178,15 +178,15 @@
 
         <Grid Width="122" Height="12" Margin="4,5,0,1" HorizontalAlignment="Left">
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="78" />
-                <ColumnDefinition Width="4" />
+                <ColumnDefinition Width="83" />
+                <ColumnDefinition Width="1" />
                 <ColumnDefinition Width="25" />
-                <ColumnDefinition Width="3" />
+                <ColumnDefinition Width="1" />
                 <ColumnDefinition Width="12" />
             </Grid.ColumnDefinitions>
 
             <Border Grid.Column="0"
-                    Width="78"
+                    Width="83"
                     Height="12"
                     HorizontalAlignment="Left"
                     VerticalAlignment="Center"
@@ -213,6 +213,7 @@
                                    Background="Transparent"
                                    FontFamily="Courier New"
                                    FontSize="8"
+                                   FontWeight="Bold"
                                    Foreground="#00FF00"
                                    MouseDown="RadioFrequencyText_Click"
                                    Opacity="1"
@@ -266,7 +267,6 @@
                                    HorizontalAlignment="Center"
                                    VerticalAlignment="Center"
                                    FontSize="4"
-                                   FontWeight="Bold"
                                    Foreground="#D8D8D8"
                                    Style="{x:Null}"
                                    Text="PLTS:"

@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Net;
 using System.Net.Sockets;
 using System.Text;
+using System.Threading;
 using System.Windows;
 using Caliburn.Micro;
 using Ciribob.IL2.SimpleRadio.Standalone.Common;
@@ -27,6 +28,8 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Server.Network
 
         private readonly ServerSettingsStore _serverSettings;
         private readonly CombatBoxCallsignProvider _callsignProvider;
+        private readonly object _callsignRefreshLock = new object();
+        private Timer _callsignRefreshTimer;
         private NatHandler _natHandler;
 
 
@@ -75,6 +78,7 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Server.Network
             try
             {
                 Start();
+                StartCallsignRefreshTimer();
             }
             catch(Exception ex)
             {
@@ -432,6 +436,16 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Server.Network
             Logger.Trace($"Client sync: Guid {message.Client.ClientGuid}, name {message.Client.Name}, coalition {message.Client.Coalition}");
         }
 
+        private void StartCallsignRefreshTimer()
+        {
+            _callsignRefreshTimer?.Dispose();
+            _callsignRefreshTimer = new Timer(
+                RefreshAssignedCallsignsAndBroadcastChanges,
+                null,
+                TimeSpan.FromSeconds(1),
+                TimeSpan.FromSeconds(1));
+        }
+
         private void RefreshAssignedCallsigns()
         {
             _callsignProvider.RefreshIfNeeded();
@@ -447,10 +461,70 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Server.Network
             }
         }
 
+        private void RefreshAssignedCallsignsAndBroadcastChanges(object state)
+        {
+            try
+            {
+                lock (_callsignRefreshLock)
+                {
+                    _callsignProvider.RefreshIfNeeded();
+                    var changedClients = new List<SRClient>();
+
+                    foreach (var client in _clients.Values)
+                    {
+                        if (client == null)
+                        {
+                            continue;
+                        }
+
+                        var assignedCallsign = _callsignProvider.GetAssignedCallsign(client.Name, client.Coalition);
+                        if (string.Equals(client.AssignedCallsign, assignedCallsign, StringComparison.Ordinal))
+                        {
+                            continue;
+                        }
+
+                        client.AssignedCallsign = assignedCallsign;
+                        changedClients.Add(client);
+                    }
+
+                    foreach (var client in changedClients)
+                    {
+                        var replyMessage = new NetworkMessage
+                        {
+                            MsgType = NetworkMessage.MessageType.UPDATE,
+                            Client = new SRClient
+                            {
+                                ClientGuid = client.ClientGuid,
+                                Coalition = client.Coalition,
+                                Name = client.Name,
+                                Seat = client.Seat,
+                                AssignedCallsign = client.AssignedCallsign
+                            }
+                        };
+
+                        Multicast(replyMessage.Encode());
+                    }
+
+                    if (changedClients.Count > 0)
+                    {
+                        Logger.Info($"Broadcast assigned callsign updates for {changedClients.Count} client(s)");
+                        _eventAggregator.PublishOnUIThread(new ServerStateMessage(true,
+                            new List<SRClient>(_clients.Values)));
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Logger.Warn(ex, "Exception refreshing assigned callsigns");
+            }
+        }
+
         public void RequestStop()
         {
             try
             {
+                _callsignRefreshTimer?.Dispose();
+                _callsignRefreshTimer = null;
                 _natHandler?.CloseNAT();
             }
             catch

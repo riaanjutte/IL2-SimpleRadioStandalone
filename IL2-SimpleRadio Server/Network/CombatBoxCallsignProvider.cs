@@ -11,7 +11,7 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Server.Network
     public class CombatBoxCallsignProvider
     {
         private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
-        private static readonly TimeSpan RefreshInterval = TimeSpan.FromSeconds(5);
+        private static readonly TimeSpan RefreshInterval = TimeSpan.FromSeconds(1);
         private static readonly TimeSpan MissingFileLogInterval = TimeSpan.FromMinutes(5);
         private static readonly TimeSpan ReadErrorLogInterval = TimeSpan.FromMinutes(1);
 
