@@ -663,6 +663,9 @@
   <data name="Callsign: {0}" xml:space="preserve">
     <value>Callsign: {0}</value>
   </data>
+  <data name="RCO On Duty : {0}" xml:space="preserve">
+    <value>RCO On Duty : {0}</value>
+  </data>
   <data name="RCI active" xml:space="preserve">
     <value>RCI aktiv</value>
   </data>

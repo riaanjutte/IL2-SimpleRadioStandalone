@@ -243,10 +243,28 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Overlay
 
         private void UpdateRciCallsignLabel(string callsigns)
         {
-            RciCallsignLabel.Text = callsigns ?? string.Empty;
+            RciCallsignLabel.Text = FormatRcoOnDutyCallsign(callsigns);
             RciCallsignLabel.Visibility = string.IsNullOrWhiteSpace(RciCallsignLabel.Text)
                 ? Visibility.Collapsed
                 : Visibility.Visible;
+        }
+
+        private string FormatRcoOnDutyCallsign(string callsigns)
+        {
+            if (string.IsNullOrWhiteSpace(callsigns))
+            {
+                return string.Empty;
+            }
+
+            var format = LocalizationManager.Get("RCO On Duty : {0}");
+            try
+            {
+                return string.Format(format, callsigns.Trim());
+            }
+            catch (FormatException)
+            {
+                return "RCO On Duty : " + callsigns.Trim();
+            }
         }
 
         private void RciStatusPanel_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)

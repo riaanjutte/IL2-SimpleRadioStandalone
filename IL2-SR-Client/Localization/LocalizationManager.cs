@@ -228,6 +228,7 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.Localization
             {"Both sides have RCI active", "RCI - Both coallitions"},
             {"Request callsign CHN 2", "Request callsign CHN 2"},
             {"Callsign: {0}", "Callsign: {0}"},
+            {"RCO On Duty : {0}", "RCO On Duty : {0}"},
             {"RCI active", "RCI active"}
         };
 
@@ -419,6 +420,7 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.Localization
                     {"Both sides have RCI active", "RCI - Both coallitions"},
                     {"Request callsign CHN 2", "Request callsign CHN 2"},
                     {"Callsign: {0}", "Callsign: {0}"},
+                    {"RCO On Duty : {0}", "RCO On Duty : {0}"},
                     {"RCI active", "RCI aktiv"}
                 }},
                 {"fr", new Dictionary<string, string>
@@ -605,6 +607,7 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.Localization
                     {"Both sides have RCI active", "RCI - Both coallitions"},
                     {"Request callsign CHN 2", "Request callsign CHN 2"},
                     {"Callsign: {0}", "Callsign: {0}"},
+                    {"RCO On Duty : {0}", "RCO On Duty : {0}"},
                     {"RCI active", "RCI actif"}
                 }},
                 {"es", new Dictionary<string, string>
@@ -791,6 +794,7 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.Localization
                     {"Both sides have RCI active", "RCI - Both coallitions"},
                     {"Request callsign CHN 2", "Request callsign CHN 2"},
                     {"Callsign: {0}", "Callsign: {0}"},
+                    {"RCO On Duty : {0}", "RCO On Duty : {0}"},
                     {"RCI active", "RCI activo"}
                 }}
             };
