@@ -12,6 +12,7 @@ using Ciribob.IL2.SimpleRadio.Standalone.Client.Localization;
 using NLog;
 using Ciribob.IL2.SimpleRadio.Standalone.Client.Settings;
 using Ciribob.IL2.SimpleRadio.Standalone.Client.Singletons;
+using Ciribob.IL2.SimpleRadio.Standalone.Client.UI;
 using Ciribob.IL2.SimpleRadio.Standalone.Client.UI.RadioOverlayWindow;
 using Ciribob.IL2.SimpleRadio.Standalone.Common;
 
@@ -167,13 +168,13 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Overlay
 
             if (hasAssignedCallsign)
             {
-                AssignedCallsignLabel.Text = FormatCurrentCallsign(assignedCallsign.Trim());
+                AssignedCallsignLabel.Text = RciDisplayState.FormatAssignedCallsign(assignedCallsign.Trim());
                 AssignedCallsignLabel.Foreground = Brushes.Lime;
                 AssignedCallsignLabel.FontWeight = FontWeights.Normal;
             }
             else if (showRequestPrompt)
             {
-                AssignedCallsignLabel.Text = LocalizationManager.Get("Request callsign CHN 2");
+                AssignedCallsignLabel.Text = RciDisplayState.GetRequestCallsignText();
                 AssignedCallsignLabel.Foreground = Brushes.Red;
                 AssignedCallsignLabel.FontWeight = FontWeights.Bold;
             }
@@ -191,20 +192,6 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Overlay
             if (previousVisibility != AssignedCallsignPanel.Visibility)
             {
                 UpdateOverlayMinimumHeight();
-            }
-        }
-
-        private string FormatCurrentCallsign(string assignedCallsign)
-        {
-            var format = LocalizationManager.Get("Callsign: {0}");
-
-            try
-            {
-                return string.Format(format, assignedCallsign);
-            }
-            catch (FormatException)
-            {
-                return "Callsign: " + assignedCallsign;
             }
         }
 
@@ -227,10 +214,14 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Overlay
             }
 
             var status = ConnectedClientsSingleton.Instance.GetRciStatus(_clientStateSingleton.PlayerGameState.coalition);
+            var displayState = RciDisplayState.Create(
+                status,
+                ConnectedClientsSingleton.Instance.GetFriendlyRciCallsign(_clientStateSingleton.PlayerGameState.coalition));
+
             RciStatusIndicator.Background = Brushes.Transparent;
-            RciStatusLabel.Text = GetRciStatusText(status);
-            RciStatusLabel.Foreground = GetRciStatusForeground(status);
-            UpdateRciCallsignLabel(ConnectedClientsSingleton.Instance.GetFriendlyRciCallsign(_clientStateSingleton.PlayerGameState.coalition));
+            RciStatusLabel.Text = displayState.StatusText;
+            RciStatusLabel.Foreground = displayState.OverlayStatusForeground;
+            UpdateRciCallsignLabel(displayState.RcoOnDutyText);
             UpdateOverlayMinimumHeightIfChanged(previousRciVisibility, previousCallsignVisibility);
         }
 
@@ -243,28 +234,10 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Overlay
 
         private void UpdateRciCallsignLabel(string callsigns)
         {
-            RciCallsignLabel.Text = FormatRcoOnDutyCallsign(callsigns);
+            RciCallsignLabel.Text = callsigns;
             RciCallsignLabel.Visibility = string.IsNullOrWhiteSpace(RciCallsignLabel.Text)
                 ? Visibility.Collapsed
                 : Visibility.Visible;
-        }
-
-        private string FormatRcoOnDutyCallsign(string callsigns)
-        {
-            if (string.IsNullOrWhiteSpace(callsigns))
-            {
-                return string.Empty;
-            }
-
-            var format = LocalizationManager.Get("RCO On Duty : {0}");
-            try
-            {
-                return string.Format(format, callsigns.Trim());
-            }
-            catch (FormatException)
-            {
-                return "RCO On Duty : " + callsigns.Trim();
-            }
         }
 
         private void RciStatusPanel_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
@@ -353,40 +326,30 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Overlay
             return new[]
             {
                 new OverlayTestState(
-                    LocalizationManager.Get("Request callsign CHN 2"),
+                    RciDisplayState.GetRequestCallsignText(),
                     Brushes.Red,
                     FontWeights.Bold,
-                    LocalizationManager.Get("No RCI active"),
-                    GetRciStatusForeground(RciStatus.None),
-                    string.Empty),
+                    RciDisplayState.Create(RciStatus.None, string.Empty)),
                 new OverlayTestState(
-                    FormatCurrentCallsign("CHECKMATE"),
+                    RciDisplayState.FormatAssignedCallsign("CHECKMATE"),
                     Brushes.Lime,
                     FontWeights.Normal,
-                    LocalizationManager.Get("Friendly RCI active"),
-                    GetRciStatusForeground(RciStatus.FriendlyOnly),
-                    "DEFCON"),
+                    RciDisplayState.Create(RciStatus.FriendlyOnly, "DEFCON")),
                 new OverlayTestState(
-                    FormatCurrentCallsign("CHECKMATE"),
+                    RciDisplayState.FormatAssignedCallsign("CHECKMATE"),
                     Brushes.Lime,
                     FontWeights.Normal,
-                    LocalizationManager.Get("Both sides have RCI active"),
-                    GetRciStatusForeground(RciStatus.Both),
-                    "DEFCON"),
+                    RciDisplayState.Create(RciStatus.Both, "DEFCON")),
                 new OverlayTestState(
-                    FormatCurrentCallsign("CHECKMATE"),
+                    RciDisplayState.FormatAssignedCallsign("CHECKMATE"),
                     Brushes.Lime,
                     FontWeights.Normal,
-                    LocalizationManager.Get("Enemy RCI active"),
-                    GetRciStatusForeground(RciStatus.EnemyOnly),
-                    string.Empty),
+                    RciDisplayState.Create(RciStatus.EnemyOnly, string.Empty)),
                 new OverlayTestState(
-                    FormatCurrentCallsign("CHECKMATE"),
+                    RciDisplayState.FormatAssignedCallsign("CHECKMATE"),
                     Brushes.Lime,
                     FontWeights.Normal,
-                    LocalizationManager.Get("RCI active"),
-                    GetRciStatusForeground(RciStatus.Neutral),
-                    "RCI TEST")
+                    RciDisplayState.Create(RciStatus.Neutral, "RCI TEST"))
             };
         }
 
@@ -430,57 +393,6 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Overlay
 
             MinHeight = minHeight;
             Recalculate();
-        }
-
-        private Brush GetRciStatusBrush(RciStatus status)
-        {
-            switch (status)
-            {
-                case RciStatus.FriendlyOnly:
-                    return new SolidColorBrush((Color)ColorConverter.ConvertFromString("#00FF00"));
-                case RciStatus.EnemyOnly:
-                    return new SolidColorBrush((Color)ColorConverter.ConvertFromString("#D60000"));
-                case RciStatus.Both:
-                    return new SolidColorBrush((Color)ColorConverter.ConvertFromString("#FFB000"));
-                case RciStatus.Neutral:
-                    return new SolidColorBrush((Color)ColorConverter.ConvertFromString("#999999"));
-                default:
-                    return new SolidColorBrush((Color)ColorConverter.ConvertFromString("#444444"));
-            }
-        }
-
-        private Brush GetRciStatusForeground(RciStatus status)
-        {
-            switch (status)
-            {
-                case RciStatus.FriendlyOnly:
-                    return Brushes.Lime;
-                case RciStatus.Both:
-                    return new SolidColorBrush((Color)ColorConverter.ConvertFromString("#FFB000"));
-                case RciStatus.EnemyOnly:
-                    return new SolidColorBrush((Color)ColorConverter.ConvertFromString("#FF3030"));
-                case RciStatus.Neutral:
-                    return new SolidColorBrush((Color)ColorConverter.ConvertFromString("#D8D8D8"));
-                default:
-                    return new SolidColorBrush((Color)ColorConverter.ConvertFromString("#D8D8D8"));
-            }
-        }
-
-        private string GetRciStatusText(RciStatus status)
-        {
-            switch (status)
-            {
-                case RciStatus.FriendlyOnly:
-                    return LocalizationManager.Get("Friendly RCI active");
-                case RciStatus.EnemyOnly:
-                    return LocalizationManager.Get("Enemy RCI active");
-                case RciStatus.Both:
-                    return LocalizationManager.Get("Both sides have RCI active");
-                case RciStatus.Neutral:
-                    return LocalizationManager.Get("RCI active");
-                default:
-                    return LocalizationManager.Get("No RCI active");
-            }
         }
 
         private void Recalculate()
@@ -692,16 +604,14 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Overlay
                 string assignedCallsignText,
                 Brush assignedCallsignForeground,
                 FontWeight assignedCallsignFontWeight,
-                string rciStatusText,
-                Brush rciStatusForeground,
-                string rciCallsignText)
+                RciDisplayState rciDisplayState)
             {
                 AssignedCallsignText = assignedCallsignText;
                 AssignedCallsignForeground = assignedCallsignForeground;
                 AssignedCallsignFontWeight = assignedCallsignFontWeight;
-                RciStatusText = rciStatusText;
-                RciStatusForeground = rciStatusForeground;
-                RciCallsignText = rciCallsignText;
+                RciStatusText = rciDisplayState.StatusText;
+                RciStatusForeground = rciDisplayState.OverlayStatusForeground;
+                RciCallsignText = rciDisplayState.RcoOnDutyText;
             }
 
             public string AssignedCallsignText { get; }

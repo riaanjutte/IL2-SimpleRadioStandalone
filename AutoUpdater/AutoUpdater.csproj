@@ -101,6 +101,15 @@
       <DependentUpon>App.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="..\IL2-SR-Common\Network\UpdateReleaseSelector.cs">
+      <Link>Network\UpdateReleaseSelector.cs</Link>
+    </Compile>
+    <Compile Include="..\IL2-SR-Common\Network\ReleaseMetadata.cs">
+      <Link>Network\ReleaseMetadata.cs</Link>
+    </Compile>
+    <Compile Include="..\IL2-SR-Common\Network\UpdaterArguments.cs">
+      <Link>Network\UpdaterArguments.cs</Link>
+    </Compile>
     <Compile Include="MainWindow.xaml.cs">
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>

@@ -135,7 +135,7 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI
             Width = GetClientWindowWidth(_globalSettings.GetPositionSetting(GlobalSettingsKeys.ClientWidth).DoubleValue);
             Height = GetClientWindowHeight(_globalSettings.GetPositionSetting(GlobalSettingsKeys.ClientHeight).DoubleValue);
 
-            Title = Title + " - " + UpdaterChecker.VERSION;
+            Title = Title + " - " + UpdaterChecker.RELEASE_TAG;
 
             CheckWindowVisibility();
 
@@ -1158,96 +1158,31 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI
             RciStatusPanel.Visibility = showRciStatus ? Visibility.Visible : Visibility.Collapsed;
             if (!showRciStatus)
             {
-                RciStatusLabel.Text = LocalizationManager.Get("No RCI active");
-                RciStatusLabel.Foreground = Brushes.White;
-                RciStatusIndicator.Background = GetRciStatusBrush(RciStatus.None);
-                UpdateRciCallsignLabel(string.Empty);
+                ApplyRciDisplayState(RciDisplayState.Create(RciStatus.None, string.Empty));
                 return;
             }
 
             var status = Clients.GetRciStatus(ClientState.PlayerGameState.coalition);
-            RciStatusLabel.Text = GetRciStatusText(status);
-            RciStatusLabel.Foreground = GetRciStatusForeground(status);
-            RciStatusIndicator.Background = GetRciStatusBrush(status);
-            UpdateRciCallsignLabel(Clients.GetFriendlyRciCallsign(ClientState.PlayerGameState.coalition));
+            ApplyRciDisplayState(RciDisplayState.Create(
+                status,
+                Clients.GetFriendlyRciCallsign(ClientState.PlayerGameState.coalition)));
         }
 
-        private void UpdateRciCallsignLabel(string callsigns)
+        private void ApplyRciDisplayState(RciDisplayState displayState)
         {
-            RciCallsignLabel.Text = FormatRcoOnDutyCallsign(callsigns);
-            RciCallsignLabel.Visibility = string.IsNullOrWhiteSpace(RciCallsignLabel.Text)
-                ? Visibility.Collapsed
-                : Visibility.Visible;
-        }
-
-        private string FormatRcoOnDutyCallsign(string callsigns)
-        {
-            if (string.IsNullOrWhiteSpace(callsigns))
-            {
-                return string.Empty;
-            }
-
-            var format = LocalizationManager.Get("RCO On Duty : {0}");
-            try
-            {
-                return string.Format(format, callsigns.Trim());
-            }
-            catch (FormatException)
-            {
-                return "RCO On Duty : " + callsigns.Trim();
-            }
+            RciStatusLabel.Text = displayState.StatusText;
+            RciStatusLabel.Foreground = displayState.MainWindowStatusForeground;
+            RciStatusIndicator.Background = displayState.StatusBackground;
+            RciCallsignLabel.Text = displayState.RcoOnDutyText;
+            RciCallsignLabel.Visibility = displayState.HasRcoOnDuty
+                ? Visibility.Visible
+                : Visibility.Collapsed;
         }
 
         private bool ShouldShowRciStatus()
         {
             return ClientState.IsConnected
                    && string.Equals(GetAddressFromTextBox(), CombatBoxRciServerHost, StringComparison.OrdinalIgnoreCase);
-        }
-
-        private Brush GetRciStatusBrush(RciStatus status)
-        {
-            switch (status)
-            {
-                case RciStatus.FriendlyOnly:
-                    return new SolidColorBrush((Color)ColorConverter.ConvertFromString("#00FF00"));
-                case RciStatus.EnemyOnly:
-                    return new SolidColorBrush((Color)ColorConverter.ConvertFromString("#D60000"));
-                case RciStatus.Both:
-                    return new SolidColorBrush((Color)ColorConverter.ConvertFromString("#FFB000"));
-                case RciStatus.Neutral:
-                    return new SolidColorBrush((Color)ColorConverter.ConvertFromString("#999999"));
-                default:
-                    return new SolidColorBrush((Color)ColorConverter.ConvertFromString("#444444"));
-            }
-        }
-
-        private Brush GetRciStatusForeground(RciStatus status)
-        {
-            switch (status)
-            {
-                case RciStatus.FriendlyOnly:
-                case RciStatus.Both:
-                    return Brushes.Black;
-                default:
-                    return Brushes.White;
-            }
-        }
-
-        private string GetRciStatusText(RciStatus status)
-        {
-            switch (status)
-            {
-                case RciStatus.FriendlyOnly:
-                    return LocalizationManager.Get("Friendly RCI active");
-                case RciStatus.EnemyOnly:
-                    return LocalizationManager.Get("Enemy RCI active");
-                case RciStatus.Both:
-                    return LocalizationManager.Get("Both sides have RCI active");
-                case RciStatus.Neutral:
-                    return LocalizationManager.Get("RCI active");
-                default:
-                    return LocalizationManager.Get("No RCI active");
-            }
         }
 
         private void SpeakerBoost_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)

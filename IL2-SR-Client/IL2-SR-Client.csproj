@@ -266,6 +266,7 @@
       <DependentUpon>FavouriteServersView.xaml</DependentUpon>
     </Compile>
     <Compile Include="UI\ClientWindow\Favourites\FavouriteServersViewModel.cs" />
+    <Compile Include="UI\RciDisplayState.cs" />
     <Compile Include="UI\RadioOverlayWindow\IntercomControlGroup.xaml.cs">
       <DependentUpon>IntercomControlGroup.xaml</DependentUpon>
     </Compile>

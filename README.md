@@ -10,6 +10,10 @@
 4. Community recommended settings prompt for existing users.
 5. Dark mode with Windows theme detection.
 
+## Community thanks
+
+Thanks to Broadway for extensive testing, practical feedback, and suggestions that helped shape the Community Edition improvements.
+
 ## Helping with translations
 
 Client translations live in `IL2-SR-Client/Localization/*.resx`. The current non-English text is machine translated, so community corrections are welcome: keep the English `name` keys unchanged and edit the translated `<value>` text. See `IL2-SR-Client/Localization/README.md` for the full workflow.

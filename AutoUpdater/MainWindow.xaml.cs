@@ -20,6 +20,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 using System.Windows.Threading;
+using Ciribob.IL2.SimpleRadio.Standalone.Common.Network;
 using Octokit;
 using MessageBox = System.Windows.MessageBox;
 using Path = System.IO.Path;
@@ -31,12 +32,6 @@ namespace AutoUpdater
     /// </summary>
     public partial class MainWindow : Window
     {
-        public static readonly string GITHUB_USERNAME = "riaanjutte";
-        public static readonly string GITHUB_REPOSITORY = "IL2-SimpleRadioStandalone";
-        // Required for all requests against the GitHub API, as per https://developer.github.com/v3/#user-agent-required
-        public static readonly string GITHUB_USER_AGENT = $"{GITHUB_USERNAME}_{GITHUB_REPOSITORY}";
-        private const string CURRENT_VERSION = "1.0.4.5";
-        private const string CURRENT_RELEASE_TAG = "1.0.4.5-beta.4";
         private Uri _uri;
         private string _directory;
         private string _file;
@@ -103,232 +98,32 @@ namespace AutoUpdater
         private async Task<Uri> GetPathToLatestVersion()
         {
             Status.Content = "Finding Latest IL2-SRS Version";
-            var githubClient = new GitHubClient(new ProductHeaderValue(GITHUB_USER_AGENT, CURRENT_VERSION));
+            var githubClient = new GitHubClient(new ProductHeaderValue(ReleaseMetadata.GithubUserAgent, ReleaseMetadata.Version));
 
-            var targetTag = GetTargetReleaseTag();
+            var updaterArguments = UpdaterArguments.Parse(Environment.GetCommandLineArgs());
+            var targetTag = updaterArguments.ReleaseTag;
             var localRelease = GetLocalInstalledReleaseInfo();
-            bool allowBeta = AllowBeta() || (localRelease != null && localRelease.IsPrerelease);
+            bool allowBeta = updaterArguments.Beta || (localRelease != null && localRelease.IsPrerelease);
 
-            if (!string.IsNullOrWhiteSpace(targetTag))
-            {
-                try
-                {
-                    var targetRelease = await githubClient.Repository.Release.Get(GITHUB_USERNAME, GITHUB_REPOSITORY, targetTag);
-                    ReleaseInfo targetReleaseInfo;
-                    if (TryCreateReleaseInfo(targetRelease, true, out targetReleaseInfo))
-                    {
-                        changelogURL = targetReleaseInfo.Release.HtmlUrl;
-                        Status.Content = (targetReleaseInfo.IsPrerelease ? "Downloading Beta Version " : "Downloading Version ") + targetReleaseInfo.DisplayVersion;
-                        return new Uri(targetReleaseInfo.Asset.BrowserDownloadUrl);
-                    }
-                }
-                catch (NotFoundException)
-                {
-                    // Fall back to release selection below if a stale client passed an unknown tag.
-                }
-            }
-
-            var releases = await githubClient.Repository.Release.GetAll(GITHUB_USERNAME, GITHUB_REPOSITORY);
-            ReleaseInfo latestRelease = null;
-
-            // GitHub API order is not a version contract, so select the highest valid semver tag explicitly.
-            foreach (Release release in releases)
-            {
-                ReleaseInfo releaseInfo;
-                if (!TryCreateReleaseInfo(release, allowBeta, out releaseInfo))
-                {
-                    continue;
-                }
-
-                latestRelease = GetNewerRelease(latestRelease, releaseInfo);
-            }
+            var releases = await githubClient.Repository.Release.GetAll(ReleaseMetadata.GithubUsername, ReleaseMetadata.GithubRepository);
+            var releaseCandidates = releases.Select(ToUpdateReleaseCandidate).ToList();
+            var latestRelease = UpdateReleaseSelector.SelectAutoUpdaterDownload(
+                releaseCandidates,
+                localRelease,
+                allowBeta,
+                targetTag);
 
             if (latestRelease == null)
             {
                 return null;
             }
-
-            if (!IsReleaseNewerThanLocal(latestRelease, localRelease))
-            {
-                return null;
-            }
-
-            changelogURL = latestRelease.Release.HtmlUrl;
+            
+            changelogURL = latestRelease.HtmlUrl;
             Status.Content = (latestRelease.IsPrerelease ? "Downloading Beta Version " : "Downloading Version ") + latestRelease.DisplayVersion;
-            return new Uri(latestRelease.Asset.BrowserDownloadUrl);
+            return new Uri(latestRelease.AssetDownloadUrl);
         }
 
-        private static ReleaseInfo GetNewerRelease(ReleaseInfo current, ReleaseInfo candidate)
-        {
-            if (current == null ||
-                candidate.Version > current.Version ||
-                (candidate.Version == current.Version && current.IsPrerelease && !candidate.IsPrerelease) ||
-                (candidate.Version == current.Version &&
-                 candidate.IsPrerelease == current.IsPrerelease &&
-                 string.CompareOrdinal(candidate.Release.TagName, current.Release.TagName) > 0))
-            {
-                return candidate;
-            }
-
-            return current;
-        }
-
-        private static bool TryCreateReleaseInfo(Release release, bool allowBeta, out ReleaseInfo releaseInfo)
-        {
-            releaseInfo = null;
-
-            if (release == null || release.Draft || (release.Prerelease && !allowBeta))
-            {
-                return false;
-            }
-
-            Version releaseVersion;
-            if (!TryParseReleaseVersion(release.TagName, out releaseVersion))
-            {
-                return false;
-            }
-
-            var asset = release.Assets.FirstOrDefault(IsReleaseZipAsset);
-            if (asset == null)
-            {
-                return false;
-            }
-
-            releaseInfo = new ReleaseInfo
-            {
-                Release = release,
-                Asset = asset,
-                Version = releaseVersion,
-                DisplayVersion = GetDisplayVersion(release.TagName, releaseVersion),
-                IsPrerelease = release.Prerelease
-            };
-            return true;
-        }
-
-        private static bool IsReleaseNewerThanLocal(ReleaseInfo candidate, LocalReleaseInfo current)
-        {
-            if (candidate == null)
-            {
-                return false;
-            }
-
-            if (current == null)
-            {
-                return true;
-            }
-
-            if (candidate.Version > current.Version)
-            {
-                return true;
-            }
-
-            if (candidate.Version < current.Version)
-            {
-                return false;
-            }
-
-            if (candidate.IsPrerelease == current.IsPrerelease)
-            {
-                return string.CompareOrdinal(candidate.DisplayVersion, current.DisplayVersion) > 0;
-            }
-
-            return current.IsPrerelease && !candidate.IsPrerelease;
-        }
-
-        private static bool TryParseReleaseVersion(string tagName, out Version version)
-        {
-            version = null;
-            if (string.IsNullOrWhiteSpace(tagName))
-            {
-                return false;
-            }
-
-            var normalized = tagName.Trim().TrimStart('v', 'V');
-            if (Version.TryParse(normalized, out version))
-            {
-                return true;
-            }
-
-            var suffixIndex = normalized.IndexOfAny(new[] {'-', '+'});
-            if (suffixIndex > 0)
-            {
-                normalized = normalized.Substring(0, suffixIndex);
-            }
-
-            return Version.TryParse(normalized, out version);
-        }
-
-        private static string GetDisplayVersion(string tagName, Version version)
-        {
-            if (string.IsNullOrWhiteSpace(tagName))
-            {
-                return version.ToString();
-            }
-
-            return tagName.Trim().TrimStart('v', 'V');
-        }
-
-        private class ReleaseInfo
-        {
-            public Release Release { get; set; }
-            public ReleaseAsset Asset { get; set; }
-            public Version Version { get; set; }
-            public string DisplayVersion { get; set; }
-            public bool IsPrerelease { get; set; }
-        }
-
-        private class LocalReleaseInfo
-        {
-            public Version Version { get; set; }
-            public string DisplayVersion { get; set; }
-            public bool IsPrerelease { get; set; }
-        }
-
-        private static bool IsReleaseZipAsset(ReleaseAsset asset)
-        {
-            return asset.Name.StartsWith("IL2-SimpleRadioStandalone", StringComparison.OrdinalIgnoreCase)
-                   && asset.Name.EndsWith(".zip", StringComparison.OrdinalIgnoreCase);
-        }
-
-        private bool AllowBeta()
-        {
-            foreach (var arg in Environment.GetCommandLineArgs())
-            {
-                if (arg.Trim().Equals("-beta", StringComparison.OrdinalIgnoreCase))
-                {
-                    return true;
-                }
-                
-            }
-
-            return false;
-
-        }
-
-        private string GetTargetReleaseTag()
-        {
-            var args = Environment.GetCommandLineArgs();
-            for (var i = 0; i < args.Length; i++)
-            {
-                var arg = args[i].Trim();
-                if (arg.Equals("-tag", StringComparison.OrdinalIgnoreCase) ||
-                    arg.Equals("--tag", StringComparison.OrdinalIgnoreCase) ||
-                    arg.Equals("/tag", StringComparison.OrdinalIgnoreCase))
-                {
-                    return i + 1 < args.Length ? args[i + 1].Trim() : null;
-                }
-
-                const string tagEqualsPrefix = "-tag=";
-                if (arg.StartsWith(tagEqualsPrefix, StringComparison.OrdinalIgnoreCase))
-                {
-                    return arg.Substring(tagEqualsPrefix.Length).Trim();
-                }
-            }
-
-            return null;
-        }
-
-        private static LocalReleaseInfo GetLocalInstalledReleaseInfo()
+        private static UpdateReleaseInfo GetLocalInstalledReleaseInfo()
         {
             var baseDirectory = AppDomain.CurrentDomain.BaseDirectory;
             var clientPath = Path.Combine(baseDirectory, "IL2-SR-ClientRadio.exe");
@@ -337,30 +132,15 @@ namespace AutoUpdater
             if (TryGetProductVersion(clientPath, out clientVersion))
             {
                 Version updaterVersion;
-                if (TryParseReleaseVersion(CURRENT_VERSION, out updaterVersion) && clientVersion == updaterVersion)
+                if (UpdateReleaseSelector.TryParseReleaseVersion(ReleaseMetadata.Version, out updaterVersion) && clientVersion == updaterVersion)
                 {
-                    LocalReleaseInfo updaterReleaseInfo;
-                    if (TryCreateLocalReleaseInfo(CURRENT_RELEASE_TAG, CURRENT_VERSION, out updaterReleaseInfo))
-                    {
-                        return updaterReleaseInfo;
-                    }
+                    return UpdateReleaseSelector.CreateCurrentReleaseInfo(ReleaseMetadata.Version, ReleaseMetadata.ReleaseTag);
                 }
 
-                return new LocalReleaseInfo
-                {
-                    Version = clientVersion,
-                    DisplayVersion = clientVersion.ToString(),
-                    IsPrerelease = false
-                };
+                return UpdateReleaseSelector.CreateCurrentReleaseInfo(clientVersion.ToString(), clientVersion.ToString());
             }
 
-            LocalReleaseInfo fallbackReleaseInfo;
-            if (TryCreateLocalReleaseInfo(CURRENT_RELEASE_TAG, CURRENT_VERSION, out fallbackReleaseInfo))
-            {
-                return fallbackReleaseInfo;
-            }
-
-            return null;
+            return UpdateReleaseSelector.CreateCurrentReleaseInfo(ReleaseMetadata.Version, ReleaseMetadata.ReleaseTag);
         }
 
         private static bool TryGetProductVersion(string filePath, out Version version)
@@ -372,27 +152,6 @@ namespace AutoUpdater
             }
 
             return Version.TryParse(FileVersionInfo.GetVersionInfo(filePath).ProductVersion, out version);
-        }
-
-        private static bool TryCreateLocalReleaseInfo(string releaseTag, string versionValue, out LocalReleaseInfo releaseInfo)
-        {
-            releaseInfo = null;
-
-            Version parsedVersion;
-            if (!TryParseReleaseVersion(releaseTag ?? versionValue, out parsedVersion))
-            {
-                return false;
-            }
-
-            releaseInfo = new LocalReleaseInfo
-            {
-                Version = parsedVersion,
-                DisplayVersion = GetDisplayVersion(releaseTag ?? versionValue, parsedVersion),
-                IsPrerelease = !string.IsNullOrWhiteSpace(releaseTag) &&
-                               releaseTag.IndexOf("-", StringComparison.Ordinal) >= 0
-            };
-
-            return true;
         }
 
         public void ShowNoUpdateAvailable()
@@ -506,6 +265,24 @@ namespace AutoUpdater
         {
             _cancel = true;
             _progressCheckTimer?.Stop();
+        }
+
+        private static UpdateReleaseCandidate ToUpdateReleaseCandidate(Release release)
+        {
+            return new UpdateReleaseCandidate
+            {
+                TagName = release.TagName,
+                HtmlUrl = release.HtmlUrl,
+                IsDraft = release.Draft,
+                IsPrerelease = release.Prerelease,
+                Assets = release.Assets
+                    .Select(asset => new UpdateReleaseAsset
+                    {
+                        Name = asset.Name,
+                        BrowserDownloadUrl = asset.BrowserDownloadUrl
+                    })
+                    .ToList()
+            };
         }
     }
 }

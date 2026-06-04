@@ -75,7 +75,10 @@
     <Compile Include="DCSState\PlayerGameStateTests.cs" />
     <Compile Include="Helpers\ConversionHelpersTests.cs" />
     <Compile Include="Network\CombatBoxCallsignRosterTests.cs" />
+    <Compile Include="Network\UpdaterArgumentsTests.cs" />
+    <Compile Include="Network\UpdateReleaseSelectorTests.cs" />
     <Compile Include="Network\UDPVoicePacketTests.cs" />
+    <Compile Include="UI\RciDisplayStateTests.cs" />
     <Compile Include="UI\RadioOverlaySpeakerNameScrollTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

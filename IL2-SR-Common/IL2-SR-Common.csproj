@@ -132,6 +132,9 @@
     <Compile Include="Timers\ITimer.cs" />
     <Compile Include="Timers\Timer.cs" />
     <Compile Include="Network\UDPVoicePacket.cs" />
+    <Compile Include="Network\ReleaseMetadata.cs" />
+    <Compile Include="Network\UpdaterArguments.cs" />
+    <Compile Include="Network\UpdateReleaseSelector.cs" />
     <Compile Include="Network\UpdaterChecker.cs" />
   </ItemGroup>
   <ItemGroup>
