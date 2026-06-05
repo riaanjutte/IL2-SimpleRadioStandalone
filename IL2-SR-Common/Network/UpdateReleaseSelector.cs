@@ -306,7 +306,8 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Common.Network
         private static bool IsReleaseZipAsset(UpdateReleaseAsset asset)
         {
             return asset != null &&
-                   asset.Name != null &&
+                   !string.IsNullOrWhiteSpace(asset.Name) &&
+                   !string.IsNullOrWhiteSpace(asset.BrowserDownloadUrl) &&
                    asset.Name.StartsWith("IL2-SimpleRadioStandalone", StringComparison.OrdinalIgnoreCase) &&
                    asset.Name.EndsWith(".zip", StringComparison.OrdinalIgnoreCase);
         }

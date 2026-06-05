@@ -15,6 +15,7 @@ using Ciribob.IL2.SimpleRadio.Standalone.Client.DSP;
 using Ciribob.IL2.SimpleRadio.Standalone.Client.Network;
 using Ciribob.IL2.SimpleRadio.Standalone.Client.Settings;
 using Ciribob.IL2.SimpleRadio.Standalone.Client.Singletons;
+using Ciribob.IL2.SimpleRadio.Standalone.Client.UI.ClientWindow;
 using Ciribob.IL2.SimpleRadio.Standalone.Common;
 using Ciribob.IL2.SimpleRadio.Standalone.Common.Helpers;
 using Ciribob.IL2.SimpleRadio.Standalone.Common.Network;
@@ -273,15 +274,10 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.Audio.Managers
             {
                 try
                 {
-                    var device = (MMDevice)_audioInputSingleton.SelectedAudioInput.Value;
-
-                    if (device == null)
-                    {
-                        device = WasapiCapture.GetDefaultCaptureDevice();
-                    }
-
+                    var device = ResolveCaptureDevice();
                     device.AudioEndpointVolume.Mute = false;
 
+                    Logger.Info($"Starting microphone capture on {device.FriendlyName} {device.ID} CHN:{device.AudioClient.MixFormat.Channels} Rate:{device.AudioClient.MixFormat.SampleRate}");
                     _wasapiCapture = new WasapiCapture(device, true);
                     _wasapiCapture.ShareMode = AudioClientShareMode.Shared;
                     _wasapiCapture.DataAvailable += WasapiCaptureOnDataAvailable;
@@ -393,7 +389,7 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.Audio.Managers
 
                             if (ShouldResetMicPipeline(pcmShort))
                             {
-                                ResetMicProcessingPipeline("sustained clipped or saturated microphone frames");
+                                RestartMicCapture("sustained clipped or saturated microphone frames", 250);
                                 return;
                             }
 
@@ -551,7 +547,51 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.Audio.Managers
             }
         }
 
+        private MMDevice ResolveCaptureDevice()
+        {
+            var savedDeviceId = _globalSettings.GetClientSetting(GlobalSettingsKeys.AudioInputDeviceId).RawValue?.Trim();
+            var selectedDevice = _audioInputSingleton.SelectedAudioInput?.Value as MMDevice;
+            var selectedDeviceId = selectedDevice?.ID;
+
+            if (string.IsNullOrWhiteSpace(savedDeviceId) || savedDeviceId.Equals("default", StringComparison.OrdinalIgnoreCase))
+            {
+                if (selectedDevice == null)
+                {
+                    var defaultDevice = WasapiCapture.GetDefaultCaptureDevice();
+                    Logger.Info($"Resolved default microphone capture endpoint {defaultDevice.FriendlyName} {defaultDevice.ID}");
+                    return defaultDevice;
+                }
+
+                savedDeviceId = selectedDeviceId;
+            }
+
+            var deviceEnum = new MMDeviceEnumerator();
+            var activeCaptureDevices = deviceEnum.EnumerateAudioEndPoints(DataFlow.Capture, DeviceState.Active);
+            foreach (var device in activeCaptureDevices)
+            {
+                if (!device.ID.Equals(savedDeviceId, StringComparison.OrdinalIgnoreCase))
+                {
+                    continue;
+                }
+
+                _audioInputSingleton.SelectedAudioInput = new AudioDeviceListItem
+                {
+                    Text = device.FriendlyName,
+                    Value = device
+                };
+                Logger.Info($"Resolved saved microphone capture endpoint {device.FriendlyName} {device.ID}");
+                return device;
+            }
+
+            throw new InvalidOperationException($"Saved microphone capture endpoint is not active: {savedDeviceId}");
+        }
+
         private void RestartMicCaptureAfterUnexpectedStop()
+        {
+            RestartMicCapture("unexpected microphone capture stop", 500);
+        }
+
+        private void RestartMicCapture(string reason, int delayMs)
         {
             if (Interlocked.Exchange(ref _micCaptureRestartInProgress, 1) == 1)
             {
@@ -562,7 +602,7 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.Audio.Managers
             {
                 try
                 {
-                    Thread.Sleep(500);
+                    Thread.Sleep(delayMs);
                     if (_stoppingEncoding || !_audioInputSingleton.MicrophoneAvailable)
                     {
                         return;
@@ -573,16 +613,12 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.Audio.Managers
                         _wasapiCapture?.Dispose();
                         _wasapiCapture = null;
 
-                        ResetMicProcessingPipeline("unexpected microphone capture stop");
+                        ResetMicProcessingPipeline(reason);
 
-                        var device = (MMDevice)_audioInputSingleton.SelectedAudioInput.Value;
-                        if (device == null)
-                        {
-                            device = WasapiCapture.GetDefaultCaptureDevice();
-                        }
-
+                        var device = ResolveCaptureDevice();
                         device.AudioEndpointVolume.Mute = false;
 
+                        Logger.Info($"Restarting microphone capture on {device.FriendlyName} {device.ID} after {reason}");
                         _wasapiCapture = new WasapiCapture(device, true);
                         _wasapiCapture.ShareMode = AudioClientShareMode.Shared;
                         _wasapiCapture.DataAvailable += WasapiCaptureOnDataAvailable;
@@ -590,11 +626,11 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.Audio.Managers
                         _wasapiCapture.StartRecording();
                     }
 
-                    Logger.Info("Restarted microphone capture after unexpected stop");
+                    Logger.Info($"Restarted microphone capture after {reason}");
                 }
                 catch (Exception ex)
                 {
-                    Logger.Error(ex, "Failed to restart microphone capture after unexpected stop");
+                    Logger.Error(ex, $"Failed to restart microphone capture after {reason}");
                 }
                 finally
                 {

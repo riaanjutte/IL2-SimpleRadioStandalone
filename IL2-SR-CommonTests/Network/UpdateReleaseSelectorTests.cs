@@ -200,6 +200,137 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Common.Tests.Network
             Assert.IsNull(selected);
         }
 
+        [TestMethod]
+        public void ReleaseSelectionIgnoresStandaloneAutoUpdaterExeAsset()
+        {
+            var current = Current("1.0.4.2", "1.0.4.2");
+            var release = Stable("v1.0.4.3");
+            release.Assets.Clear();
+            release.Assets.Add(new UpdateReleaseAsset
+            {
+                Name = "IL2-SRS-AutoUpdater.exe",
+                BrowserDownloadUrl = "https://downloads/IL2-SRS-AutoUpdater.exe"
+            });
+            release.Assets.Add(new UpdateReleaseAsset
+            {
+                Name = "IL2-SimpleRadioStandalone-1.0.4.3.zip",
+                BrowserDownloadUrl = "https://downloads/IL2-SimpleRadioStandalone-1.0.4.3.zip"
+            });
+
+            var selected = UpdateReleaseSelector.SelectAutoUpdaterDownload(
+                Releases(release),
+                current,
+                false,
+                null);
+
+            Assert.AreEqual("IL2-SimpleRadioStandalone-1.0.4.3.zip", selected.AssetName);
+            Assert.AreEqual("https://downloads/IL2-SimpleRadioStandalone-1.0.4.3.zip", selected.AssetDownloadUrl);
+        }
+
+        [TestMethod]
+        public void ReleaseSelectionChoosesMainZipWhenMultipleAssetsExist()
+        {
+            var current = Current("1.0.4.2", "1.0.4.2");
+            var release = Stable("v1.0.4.3");
+            release.Assets.Clear();
+            release.Assets.Add(new UpdateReleaseAsset
+            {
+                Name = "IL2-SimpleRadioStandalone-1.0.4.3.txt",
+                BrowserDownloadUrl = "https://downloads/readme.txt"
+            });
+            release.Assets.Add(new UpdateReleaseAsset
+            {
+                Name = "IL2-SRS-AutoUpdater.exe",
+                BrowserDownloadUrl = "https://downloads/IL2-SRS-AutoUpdater.exe"
+            });
+            release.Assets.Add(new UpdateReleaseAsset
+            {
+                Name = "IL2-SimpleRadioStandalone-1.0.4.3.zip",
+                BrowserDownloadUrl = "https://downloads/main.zip"
+            });
+
+            var selected = UpdateReleaseSelector.SelectClientUpdate(
+                Releases(release),
+                current,
+                false);
+
+            Assert.AreEqual("IL2-SimpleRadioStandalone-1.0.4.3.zip", selected.AssetName);
+            Assert.AreEqual("https://downloads/main.zip", selected.AssetDownloadUrl);
+        }
+
+        [TestMethod]
+        public void ReleaseSelectionIgnoresAssetWithMissingDownloadUrl()
+        {
+            var current = Current("1.0.4.2", "1.0.4.2");
+            var release = Stable("v1.0.4.3");
+            release.Assets.Clear();
+            release.Assets.Add(new UpdateReleaseAsset
+            {
+                Name = "IL2-SimpleRadioStandalone-1.0.4.3.zip",
+                BrowserDownloadUrl = null
+            });
+            release.Assets.Add(new UpdateReleaseAsset
+            {
+                Name = "IL2-SRS-AutoUpdater.exe",
+                BrowserDownloadUrl = "https://downloads/IL2-SRS-AutoUpdater.exe"
+            });
+
+            var selected = UpdateReleaseSelector.SelectAutoUpdaterDownload(
+                Releases(release),
+                current,
+                false,
+                null);
+
+            Assert.IsNull(selected);
+        }
+
+        [TestMethod]
+        public void ReleaseSelectionSkipsInvalidAssetAndUsesNextValidMainZip()
+        {
+            var current = Current("1.0.4.2", "1.0.4.2");
+            var release = Stable("v1.0.4.3");
+            release.Assets.Clear();
+            release.Assets.Add(new UpdateReleaseAsset
+            {
+                Name = "IL2-SimpleRadioStandalone-1.0.4.3.zip",
+                BrowserDownloadUrl = " "
+            });
+            release.Assets.Add(new UpdateReleaseAsset
+            {
+                Name = "IL2-SimpleRadioStandalone-1.0.4.3.zip",
+                BrowserDownloadUrl = "https://downloads/valid.zip"
+            });
+
+            var selected = UpdateReleaseSelector.SelectAutoUpdaterDownload(
+                Releases(release),
+                current,
+                false,
+                null);
+
+            Assert.AreEqual("https://downloads/valid.zip", selected.AssetDownloadUrl);
+        }
+
+        [TestMethod]
+        public void ReleaseSelectionMatchesZipAssetNameCaseInsensitively()
+        {
+            var current = Current("1.0.4.2", "1.0.4.2");
+            var release = Stable("v1.0.4.3");
+            release.Assets.Clear();
+            release.Assets.Add(new UpdateReleaseAsset
+            {
+                Name = "il2-simpleradiostandalone-1.0.4.3.ZIP",
+                BrowserDownloadUrl = "https://downloads/case-insensitive.zip"
+            });
+
+            var selected = UpdateReleaseSelector.SelectAutoUpdaterDownload(
+                Releases(release),
+                current,
+                false,
+                null);
+
+            Assert.AreEqual("https://downloads/case-insensitive.zip", selected.AssetDownloadUrl);
+        }
+
         private static UpdateReleaseInfo Current(string version, string tag)
         {
             return UpdateReleaseSelector.CreateCurrentReleaseInfo(version, tag);

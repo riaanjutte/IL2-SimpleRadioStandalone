@@ -52,5 +52,81 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Common.Tests.Network
             Assert.AreEqual(1, callsigns.Count);
             Assert.AreEqual("COWBOY-1", callsigns[new CallsignRosterKey("Valid", 2)]);
         }
+
+        [TestMethod]
+        public void ParseReturnsEmptyDictionaryForEmptyOrMissingPlayersRoster()
+        {
+            Assert.AreEqual(0, CombatBoxCallsignRoster.Parse(null).Count);
+            Assert.AreEqual(0, CombatBoxCallsignRoster.Parse("").Count);
+            Assert.AreEqual(0, CombatBoxCallsignRoster.Parse("{}").Count);
+            Assert.AreEqual(0, CombatBoxCallsignRoster.Parse(@"{ ""players"": null }").Count);
+        }
+
+        [TestMethod]
+        public void ParseTrimsCallsignAndMatchesPlayerNameCaseInsensitively()
+        {
+            const string roster = @"{
+  ""players"": [
+    { ""name"": ""  CAG_SonoftheMorning  "", ""coalitionCode"": 1, ""callsign"": ""  STUD-3  "" }
+  ]
+}";
+
+            var callsigns = CombatBoxCallsignRoster.Parse(roster);
+
+            Assert.AreEqual(1, callsigns.Count);
+            Assert.AreEqual("STUD-3", callsigns[new CallsignRosterKey("cag_sonofthemorning", 1)]);
+            Assert.AreEqual("STUD-3", callsigns[new CallsignRosterKey(" CAG_SonoftheMorning ", 1)]);
+        }
+
+        [TestMethod]
+        public void ParseUsesCoalitionCodeAsPartOfLookupKey()
+        {
+            const string roster = @"{
+  ""players"": [
+    { ""name"": ""Broadway"", ""coalitionCode"": 1, ""callsign"": ""CHECKMATE"" },
+    { ""name"": ""Broadway"", ""coalitionCode"": 2, ""callsign"": ""DARKSTAR"" }
+  ]
+}";
+
+            var callsigns = CombatBoxCallsignRoster.Parse(roster);
+
+            Assert.AreEqual("CHECKMATE", callsigns[new CallsignRosterKey("Broadway", 1)]);
+            Assert.AreEqual("DARKSTAR", callsigns[new CallsignRosterKey("Broadway", 2)]);
+            Assert.IsFalse(callsigns.ContainsKey(new CallsignRosterKey("Broadway", 0)));
+        }
+
+        [TestMethod]
+        public void ParseLastDuplicateEntryWins()
+        {
+            const string roster = @"{
+  ""players"": [
+    { ""name"": ""DEFCON"", ""coalitionCode"": 2, ""callsign"": ""OLD-CALLSIGN"" },
+    { ""name"": ""defcon"", ""coalitionCode"": 2, ""callsign"": ""NEW-CALLSIGN"" }
+  ]
+}";
+
+            var callsigns = CombatBoxCallsignRoster.Parse(roster);
+
+            Assert.AreEqual(1, callsigns.Count);
+            Assert.AreEqual("NEW-CALLSIGN", callsigns[new CallsignRosterKey("DEFCON", 2)]);
+        }
+
+        [TestMethod]
+        public void ParseIgnoresNullPlayersMissingNamesAndWhitespaceNames()
+        {
+            const string roster = @"{
+  ""players"": [
+    null,
+    { ""coalitionCode"": 1, ""callsign"": ""NO-NAME"" },
+    { ""name"": ""   "", ""coalitionCode"": 1, ""callsign"": ""BLANK-NAME"" },
+    { ""name"": ""Valid"", ""coalitionCode"": 1, ""callsign"": ""VALID-CALLSIGN"" }
+  ]
+}";
+
+            var callsigns = CombatBoxCallsignRoster.Parse(roster);
+
+            Assert.AreEqual(1, callsigns.Count);
+            Assert.AreEqual("VALID-CALLSIGN", callsigns[new CallsignRosterKey("Valid", 1)]);
+        }
     }
 }

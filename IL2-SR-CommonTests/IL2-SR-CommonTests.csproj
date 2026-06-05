@@ -78,8 +78,10 @@
     <Compile Include="Network\UpdaterArgumentsTests.cs" />
     <Compile Include="Network\UpdateReleaseSelectorTests.cs" />
     <Compile Include="Network\UDPVoicePacketTests.cs" />
+    <Compile Include="Singletons\ConnectedClientsSingletonTests.cs" />
     <Compile Include="UI\RciDisplayStateTests.cs" />
     <Compile Include="UI\RadioOverlaySpeakerNameScrollTests.cs" />
+    <Compile Include="Utils\RadioHelperMuteTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
