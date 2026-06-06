@@ -277,5 +277,76 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.Singletons
 
             return count;
         }
+
+        public int ClientsOnChannel(int channel)
+        {
+            var channelFrequency = GetChannelFrequency(channel);
+            var currentClientPos = ClientStateSingleton.Instance.PlayerGameState;
+            var ownCoalition = currentClientPos?.coalition ?? 0;
+            var count = currentClientPos != null &&
+                        IsActiveCoalition(ownCoalition) &&
+                        HasRadioTunedToChannel(currentClientPos, channelFrequency)
+                ? 1
+                : 0;
+
+            foreach (var client in _clients)
+            {
+                var srClient = client.Value;
+                if (srClient == null ||
+                    client.Key.Equals(_guid) ||
+                    !IsSameActiveCoalition(srClient.Coalition, ownCoalition) ||
+                    srClient.GameState?.radios == null)
+                {
+                    continue;
+                }
+
+                if (HasRadioTunedToChannel(srClient.GameState, channelFrequency))
+                {
+                    count++;
+                }
+            }
+
+            return count;
+        }
+
+        public bool IsChannelOccupied(int channel)
+        {
+            return ClientsOnChannel(channel) > 0;
+        }
+
+        private static double GetChannelFrequency(int channel)
+        {
+            return PlayerGameState.START_FREQ + PlayerGameState.CHANNEL_OFFSET * channel;
+        }
+
+        private static bool IsActiveCoalition(int coalition)
+        {
+            return coalition > 0;
+        }
+
+        private static bool IsSameActiveCoalition(int clientCoalition, int ownCoalition)
+        {
+            return IsActiveCoalition(ownCoalition) && clientCoalition == ownCoalition;
+        }
+
+        private static bool HasRadioTunedToChannel(PlayerGameState gameState, double channelFrequency)
+        {
+            foreach (var radio in gameState.radios)
+            {
+                if (radio == null ||
+                    radio.modulation == RadioInformation.Modulation.DISABLED ||
+                    radio.modulation == RadioInformation.Modulation.INTERCOM)
+                {
+                    continue;
+                }
+
+                if (PlayerGameState.FreqCloseEnough(radio.freq, channelFrequency))
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
     }
 }

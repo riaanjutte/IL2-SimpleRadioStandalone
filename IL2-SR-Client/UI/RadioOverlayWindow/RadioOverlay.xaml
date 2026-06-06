@@ -97,15 +97,17 @@
                         Background="{StaticResource OverlayDisplayTopReflectionBrush}"
                         Opacity="0.65"
                         Style="{x:Null}" />
-                <TextBlock x:Name="AssignedCallsignLabel"
-                           HorizontalAlignment="Center"
-                           VerticalAlignment="Center"
-                           FontFamily="Courier New"
-                           FontSize="8"
-                           Foreground="#00FF00"
-                           Style="{x:Null}"
-                           TextAlignment="Center"
-                           TextTrimming="CharacterEllipsis" />
+                <Canvas x:Name="AssignedCallsignViewport"
+                        ClipToBounds="True">
+                    <TextBlock x:Name="AssignedCallsignLabel"
+                               Canvas.Left="0"
+                               Background="Transparent"
+                               FontFamily="Courier New"
+                               FontSize="8"
+                               Foreground="#00FF00"
+                               Style="{x:Null}"
+                               TextAlignment="Center" />
+                </Canvas>
             </Grid>
         </Border>
 

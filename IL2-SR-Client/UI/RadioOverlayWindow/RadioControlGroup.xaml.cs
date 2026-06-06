@@ -28,6 +28,7 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI.RadioOverlayWindow
         private bool _dragging;
         private bool _syncingSliderFromState;
         private readonly ConcurrentDictionary<int, Button> _channelButtons = new ConcurrentDictionary<int, Button>();
+        private readonly ConcurrentDictionary<int, bool> _channelOccupancyStates = new ConcurrentDictionary<int, bool>();
         private readonly ClientStateSingleton _clientStateSingleton = ClientStateSingleton.Instance;
         private readonly ConnectedClientsSingleton _connectClientsSingleton = ConnectedClientsSingleton.Instance;
         private string _currentDisplayText = string.Empty;
@@ -38,6 +39,7 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI.RadioOverlayWindow
         private bool _currentSpeakerActive;
         private bool _wasReceivingSpeaker;
         private int _lastRenderedChannel = -1;
+        private DateTime _lastChannelOccupancyRefresh = DateTime.MinValue;
 
         public RadioControlGroup()
         {
@@ -73,6 +75,7 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI.RadioOverlayWindow
         {
             ChannelGrid.Children.Clear();
             _channelButtons.Clear();
+            _channelOccupancyStates.Clear();
 
             for (var channel = 1; channel <= 12; channel++)
             {
@@ -98,6 +101,7 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI.RadioOverlayWindow
                 button.Click += Channel_Click;
 
                 _channelButtons[channel] = button;
+                _channelOccupancyStates[channel] = false;
                 ChannelGrid.Children.Add(button);
             }
         }
@@ -164,6 +168,7 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI.RadioOverlayWindow
                 _lastRenderedChannel = -1;
                 UsersCount.Text = "0";
                 UpdateChannelButtonState(-1);
+                UpdateChannelOccupancyIndicators(true);
 
 
                 //reset dragging just incase
@@ -210,6 +215,7 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI.RadioOverlayWindow
                         false);
                 }
                 UpdateChannelButtonState(currentRadio.channel);
+                RefreshChannelOccupancyIndicatorsIfNeeded();
 
                 int count = _connectClientsSingleton.ClientsOnFreq(currentRadio.freq, currentRadio.modulation);
                 UsersCount.Text = count.ToString(CultureInfo.InvariantCulture);
@@ -221,6 +227,28 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI.RadioOverlayWindow
                     _syncingSliderFromState = false;
                 }
             }
+        }
+
+        private void RefreshChannelOccupancyIndicatorsIfNeeded()
+        {
+            var now = DateTime.UtcNow;
+            if ((now - _lastChannelOccupancyRefresh).TotalSeconds < 5)
+            {
+                return;
+            }
+
+            _lastChannelOccupancyRefresh = now;
+            UpdateChannelOccupancyIndicators(false);
+        }
+
+        private void UpdateChannelOccupancyIndicators(bool clear)
+        {
+            foreach (var pair in _channelButtons)
+            {
+                _channelOccupancyStates[pair.Key] = !clear && pair.Key >= 3 && _connectClientsSingleton.IsChannelOccupied(pair.Key);
+            }
+
+            UpdateChannelButtonState(clear ? -1 : _lastRenderedChannel);
         }
 
         private static Brush CreateStatusBrush(Color color)
@@ -277,6 +305,12 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI.RadioOverlayWindow
                 {
                     button.Foreground = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#00FF00"));
                     button.BorderBrush = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#00FF00"));
+                    button.BorderThickness = new Thickness(1.5);
+                }
+                else if (_channelOccupancyStates.TryGetValue(pair.Key, out var occupied) && occupied)
+                {
+                    button.Foreground = Brushes.White;
+                    button.BorderBrush = new SolidColorBrush(Color.FromArgb(128, 255, 255, 0));
                     button.BorderThickness = new Thickness(1.5);
                 }
                 else

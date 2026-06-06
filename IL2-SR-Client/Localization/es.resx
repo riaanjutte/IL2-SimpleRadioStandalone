@@ -660,6 +660,9 @@
   <data name="Request callsign CHN 2" xml:space="preserve">
     <value>Request callsign CHN 2</value>
   </data>
+  <data name="Active RCO on duty, request a callsign ASAP" xml:space="preserve">
+    <value>Active RCO on duty, request a callsign ASAP</value>
+  </data>
   <data name="Callsign: {0}" xml:space="preserve">
     <value>Callsign: {0}</value>
   </data>

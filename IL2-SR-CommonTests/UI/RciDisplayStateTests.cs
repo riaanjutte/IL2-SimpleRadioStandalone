@@ -32,6 +32,7 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Common.Tests.UI
         {
             Assert.AreEqual("Callsign: CHECKMATE", RciDisplayState.FormatAssignedCallsign("CHECKMATE"));
             Assert.AreEqual("Request callsign CHN 2", RciDisplayState.GetRequestCallsignText());
+            Assert.AreEqual("Active RCO on duty, request a callsign ASAP", RciDisplayState.GetActiveRcoRequestCallsignText());
         }
     }
 }

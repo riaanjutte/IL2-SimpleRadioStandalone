@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Windows;
+using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Interop;
 using System.Windows.Media;
@@ -39,6 +40,9 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Overlay
         private const double Radio2MinHeightDelta = 71.0;
         private const double RciStatusMinHeightDelta = 14.0;
         private const double RciCallsignMinHeightDelta = 10.0;
+        private const double AssignedCallsignScrollPixelsPerSecond = 18.0;
+        private const double AssignedCallsignInitialScrollPauseMilliseconds = 700.0;
+        private const double AssignedCallsignRepeatScrollPauseMilliseconds = 15000.0;
         private const double DefaultOverlayWidth = 260.0;
         private const double DefaultOverlayHeight = 320.0;
         private const double OldDefaultOverlayWidth = 122.0;
@@ -49,6 +53,8 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Overlay
         private int _overlayTestClickCount;
         private int _overlayTestStateIndex;
         private DateTime _lastOverlayTestClickUtc = DateTime.MinValue;
+        private DateTime _assignedCallsignScrollStartedAt = DateTime.MinValue;
+        private string _currentAssignedCallsignText = string.Empty;
         private DispatcherTimer _overlayTestTimer;
     
         public RadioOverlayWindow()
@@ -165,25 +171,45 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Overlay
             var assignedCallsign = ConnectedClientsSingleton.Instance.GetOwnAssignedCallsign();
             var hasAssignedCallsign = !string.IsNullOrWhiteSpace(assignedCallsign);
             var showRequestPrompt = !hasAssignedCallsign && _rciIndicatorEnabled;
+            var friendlyRciCallsigns = showRequestPrompt && _clientStateSingleton.PlayerGameState != null
+                ? ConnectedClientsSingleton.Instance.GetFriendlyRciCallsign(_clientStateSingleton.PlayerGameState.coalition)
+                : string.Empty;
+            var showActiveRcoRequestPrompt = !string.IsNullOrWhiteSpace(friendlyRciCallsigns);
+
+            string displayText;
+            Brush foreground;
+            FontWeight fontWeight;
+            var allowScroll = false;
 
             if (hasAssignedCallsign)
             {
-                AssignedCallsignLabel.Text = RciDisplayState.FormatAssignedCallsign(assignedCallsign.Trim());
-                AssignedCallsignLabel.Foreground = Brushes.Lime;
-                AssignedCallsignLabel.FontWeight = FontWeights.Normal;
+                displayText = RciDisplayState.FormatAssignedCallsign(assignedCallsign.Trim());
+                foreground = Brushes.Lime;
+                fontWeight = FontWeights.Normal;
+            }
+            else if (showActiveRcoRequestPrompt)
+            {
+                displayText = RciDisplayState.GetActiveRcoRequestCallsignText();
+                foreground = Brushes.Red;
+                fontWeight = FontWeights.Bold;
+                allowScroll = true;
             }
             else if (showRequestPrompt)
             {
-                AssignedCallsignLabel.Text = RciDisplayState.GetRequestCallsignText();
-                AssignedCallsignLabel.Foreground = Brushes.Red;
-                AssignedCallsignLabel.FontWeight = FontWeights.Bold;
+                displayText = RciDisplayState.GetRequestCallsignText();
+                foreground = Brushes.Red;
+                fontWeight = FontWeights.Bold;
             }
             else
             {
-                AssignedCallsignLabel.Text = string.Empty;
-                AssignedCallsignLabel.Foreground = Brushes.Lime;
-                AssignedCallsignLabel.FontWeight = FontWeights.Normal;
+                displayText = string.Empty;
+                foreground = Brushes.Lime;
+                fontWeight = FontWeights.Normal;
             }
+
+            AssignedCallsignLabel.Foreground = foreground;
+            AssignedCallsignLabel.FontWeight = fontWeight;
+            SetAssignedCallsignText(displayText, allowScroll);
 
             AssignedCallsignPanel.Visibility = string.IsNullOrWhiteSpace(AssignedCallsignLabel.Text)
                 ? Visibility.Collapsed
@@ -193,6 +219,101 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Overlay
             {
                 UpdateOverlayMinimumHeight();
             }
+        }
+
+        private void SetAssignedCallsignText(string text, bool allowScroll)
+        {
+            text = text ?? string.Empty;
+            if (!string.Equals(_currentAssignedCallsignText, text, StringComparison.Ordinal))
+            {
+                _currentAssignedCallsignText = text;
+                AssignedCallsignLabel.Text = text;
+                _assignedCallsignScrollStartedAt = DateTime.UtcNow;
+            }
+
+            UpdateAssignedCallsignScroll(allowScroll);
+        }
+
+        private void UpdateAssignedCallsignScroll(bool allowScroll)
+        {
+            if (!allowScroll || string.IsNullOrWhiteSpace(AssignedCallsignLabel.Text))
+            {
+                StopAssignedCallsignScroll();
+                return;
+            }
+
+            AssignedCallsignLabel.Width = double.NaN;
+            AssignedCallsignLabel.Measure(new Size(double.PositiveInfinity, double.PositiveInfinity));
+            var textWidth = AssignedCallsignLabel.DesiredSize.Width;
+            var textHeight = AssignedCallsignLabel.DesiredSize.Height;
+            var viewportWidth = AssignedCallsignViewport.ActualWidth;
+            var viewportHeight = AssignedCallsignViewport.ActualHeight;
+
+            if (viewportWidth <= 0)
+            {
+                viewportWidth = AssignedCallsignPanel.Width - 2;
+            }
+
+            if (viewportHeight <= 0)
+            {
+                viewportHeight = AssignedCallsignPanel.Height - 2;
+            }
+
+            Canvas.SetTop(AssignedCallsignLabel, Math.Max(0, (viewportHeight - textHeight) / 2.0));
+
+            if (textWidth <= viewportWidth)
+            {
+                StopAssignedCallsignScroll();
+                return;
+            }
+
+            AssignedCallsignLabel.TextAlignment = TextAlignment.Left;
+            var scrollMetrics = SpeakerNameScrollLayout.Calculate(textWidth, viewportWidth);
+            AssignedCallsignLabel.Width = scrollMetrics.ScrollingWidth;
+
+            var travelMilliseconds = scrollMetrics.TravelDistance / AssignedCallsignScrollPixelsPerSecond * 1000.0;
+            var cycleMilliseconds = AssignedCallsignInitialScrollPauseMilliseconds + travelMilliseconds + AssignedCallsignRepeatScrollPauseMilliseconds;
+            var elapsed = (DateTime.UtcNow - _assignedCallsignScrollStartedAt).TotalMilliseconds % cycleMilliseconds;
+
+            double offset;
+            if (elapsed <= AssignedCallsignInitialScrollPauseMilliseconds)
+            {
+                offset = 0;
+            }
+            else if (elapsed <= AssignedCallsignInitialScrollPauseMilliseconds + travelMilliseconds)
+            {
+                offset = -scrollMetrics.TravelDistance * ((elapsed - AssignedCallsignInitialScrollPauseMilliseconds) / travelMilliseconds);
+            }
+            else
+            {
+                offset = -scrollMetrics.TravelDistance;
+            }
+
+            Canvas.SetLeft(AssignedCallsignLabel, offset);
+        }
+
+        private void StopAssignedCallsignScroll()
+        {
+            AssignedCallsignLabel.Width = double.NaN;
+            AssignedCallsignLabel.Measure(new Size(double.PositiveInfinity, double.PositiveInfinity));
+            var textWidth = AssignedCallsignLabel.DesiredSize.Width;
+            var textHeight = AssignedCallsignLabel.DesiredSize.Height;
+            var viewportWidth = AssignedCallsignViewport.ActualWidth;
+            var viewportHeight = AssignedCallsignViewport.ActualHeight;
+
+            if (viewportWidth <= 0)
+            {
+                viewportWidth = AssignedCallsignPanel.Width - 2;
+            }
+
+            if (viewportHeight <= 0)
+            {
+                viewportHeight = AssignedCallsignPanel.Height - 2;
+            }
+
+            AssignedCallsignLabel.TextAlignment = TextAlignment.Center;
+            Canvas.SetLeft(AssignedCallsignLabel, Math.Max(0, (viewportWidth - textWidth) / 2.0));
+            Canvas.SetTop(AssignedCallsignLabel, Math.Max(0, (viewportHeight - textHeight) / 2.0));
         }
 
         public void UpdateRciStatusIndicator()
@@ -306,7 +427,7 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Overlay
             var states = GetOverlayTestStates();
             var state = states[_overlayTestStateIndex % states.Length];
 
-            AssignedCallsignLabel.Text = state.AssignedCallsignText;
+            SetAssignedCallsignText(state.AssignedCallsignText, state.ScrollAssignedCallsignText);
             AssignedCallsignLabel.Foreground = state.AssignedCallsignForeground;
             AssignedCallsignLabel.FontWeight = state.AssignedCallsignFontWeight;
             AssignedCallsignPanel.Visibility = string.IsNullOrWhiteSpace(state.AssignedCallsignText)
@@ -326,29 +447,34 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Overlay
             return new[]
             {
                 new OverlayTestState(
-                    RciDisplayState.GetRequestCallsignText(),
+                    RciDisplayState.GetActiveRcoRequestCallsignText(),
                     Brushes.Red,
                     FontWeights.Bold,
+                    true,
                     RciDisplayState.Create(RciStatus.None, string.Empty)),
                 new OverlayTestState(
                     RciDisplayState.FormatAssignedCallsign("CHECKMATE"),
                     Brushes.Lime,
                     FontWeights.Normal,
+                    false,
                     RciDisplayState.Create(RciStatus.FriendlyOnly, "DEFCON")),
                 new OverlayTestState(
                     RciDisplayState.FormatAssignedCallsign("CHECKMATE"),
                     Brushes.Lime,
                     FontWeights.Normal,
+                    false,
                     RciDisplayState.Create(RciStatus.Both, "DEFCON")),
                 new OverlayTestState(
                     RciDisplayState.FormatAssignedCallsign("CHECKMATE"),
                     Brushes.Lime,
                     FontWeights.Normal,
+                    false,
                     RciDisplayState.Create(RciStatus.EnemyOnly, string.Empty)),
                 new OverlayTestState(
                     RciDisplayState.FormatAssignedCallsign("CHECKMATE"),
                     Brushes.Lime,
                     FontWeights.Normal,
+                    false,
                     RciDisplayState.Create(RciStatus.Neutral, "RCI TEST"))
             };
         }
@@ -604,11 +730,13 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Overlay
                 string assignedCallsignText,
                 Brush assignedCallsignForeground,
                 FontWeight assignedCallsignFontWeight,
+                bool scrollAssignedCallsignText,
                 RciDisplayState rciDisplayState)
             {
                 AssignedCallsignText = assignedCallsignText;
                 AssignedCallsignForeground = assignedCallsignForeground;
                 AssignedCallsignFontWeight = assignedCallsignFontWeight;
+                ScrollAssignedCallsignText = scrollAssignedCallsignText;
                 RciStatusText = rciDisplayState.StatusText;
                 RciStatusForeground = rciDisplayState.OverlayStatusForeground;
                 RciCallsignText = rciDisplayState.RcoOnDutyText;
@@ -617,6 +745,7 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Overlay
             public string AssignedCallsignText { get; }
             public Brush AssignedCallsignForeground { get; }
             public FontWeight AssignedCallsignFontWeight { get; }
+            public bool ScrollAssignedCallsignText { get; }
             public string RciStatusText { get; }
             public Brush RciStatusForeground { get; }
             public string RciCallsignText { get; }

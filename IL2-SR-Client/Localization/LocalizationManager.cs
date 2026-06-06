@@ -227,6 +227,7 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.Localization
             {"Enemy RCI active", "RCI - Opposition only"},
             {"Both sides have RCI active", "RCI - Both coallitions"},
             {"Request callsign CHN 2", "Request callsign CHN 2"},
+            {"Active RCO on duty, request a callsign ASAP", "Active RCO on duty, request a callsign ASAP"},
             {"Callsign: {0}", "Callsign: {0}"},
             {"RCO On Duty : {0}", "RCO On Duty : {0}"},
             {"RCI active", "RCI active"}
@@ -419,6 +420,7 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.Localization
                     {"Enemy RCI active", "RCI - Opposition only"},
                     {"Both sides have RCI active", "RCI - Both coallitions"},
                     {"Request callsign CHN 2", "Request callsign CHN 2"},
+                    {"Active RCO on duty, request a callsign ASAP", "Active RCO on duty, request a callsign ASAP"},
                     {"Callsign: {0}", "Callsign: {0}"},
                     {"RCO On Duty : {0}", "RCO On Duty : {0}"},
                     {"RCI active", "RCI aktiv"}
@@ -606,6 +608,7 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.Localization
                     {"Enemy RCI active", "RCI - Opposition only"},
                     {"Both sides have RCI active", "RCI - Both coallitions"},
                     {"Request callsign CHN 2", "Request callsign CHN 2"},
+                    {"Active RCO on duty, request a callsign ASAP", "Active RCO on duty, request a callsign ASAP"},
                     {"Callsign: {0}", "Callsign: {0}"},
                     {"RCO On Duty : {0}", "RCO On Duty : {0}"},
                     {"RCI active", "RCI actif"}
@@ -793,6 +796,7 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.Localization
                     {"Enemy RCI active", "RCI - Opposition only"},
                     {"Both sides have RCI active", "RCI - Both coallitions"},
                     {"Request callsign CHN 2", "Request callsign CHN 2"},
+                    {"Active RCO on duty, request a callsign ASAP", "Active RCO on duty, request a callsign ASAP"},
                     {"Callsign: {0}", "Callsign: {0}"},
                     {"RCO On Duty : {0}", "RCO On Duty : {0}"},
                     {"RCI active", "RCI activo"}

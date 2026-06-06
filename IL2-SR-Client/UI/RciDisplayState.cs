@@ -49,6 +49,11 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI
             return LocalizationManager.Get("Request callsign CHN 2");
         }
 
+        public static string GetActiveRcoRequestCallsignText()
+        {
+            return LocalizationManager.Get("Active RCO on duty, request a callsign ASAP");
+        }
+
         public Brush StatusBackground => GetStatusBackground(Status);
         public Brush MainWindowStatusForeground => GetMainWindowStatusForeground(Status);
         public Brush OverlayStatusForeground => GetOverlayStatusForeground(Status);
