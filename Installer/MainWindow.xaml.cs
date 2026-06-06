@@ -14,6 +14,7 @@ using System.Windows.Documents;
 using System.Windows.Forms;
 using System.Windows.Input;
 using Ciribob.IL2.SimpleRadio.Standalone.Client.Utils;
+using Ciribob.IL2.SimpleRadio.Standalone.Common.Network;
 using IWshRuntimeLibrary;
 using MahApps.Metro.Controls;
 using Microsoft.Win32;
@@ -47,7 +48,9 @@ namespace Installer
 
             var assembly = Assembly.GetExecutingAssembly();
             var fvi = FileVersionInfo.GetVersionInfo(assembly.Location);
-            var version = fvi.FileVersion;
+            var version = string.IsNullOrWhiteSpace(ReleaseMetadata.ReleaseTag)
+                ? fvi.FileVersion
+                : ReleaseMetadata.ReleaseTag;
 
             intro.Content = intro.Content + " v" + version;
 
