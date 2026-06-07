@@ -126,7 +126,7 @@
                       Margin="0"
                       HorizontalAlignment="Right"
                       VerticalAlignment="Center"
-                     Fill="#FF9900"
+                     Fill="Green"
                       MouseDown="RadioSelectSwitch"
                       Stroke="Black"
                       StrokeThickness="1.5"

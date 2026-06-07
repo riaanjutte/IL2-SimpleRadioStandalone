@@ -11,6 +11,7 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Common.Tests.Utils
         [TestInitialize]
         public void TestInitialize()
         {
+            RadioHelper.SetMicrophoneMuted(false);
             ConfigureMutableRadios();
             ClearMutedRadios();
             ConfigureMutableRadios();
@@ -19,6 +20,7 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Common.Tests.Utils
         [TestCleanup]
         public void TestCleanup()
         {
+            RadioHelper.SetMicrophoneMuted(false);
             ConfigureMutableRadios();
             ClearMutedRadios();
         }
@@ -116,6 +118,20 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Common.Tests.Utils
 
             Assert.IsFalse(RadioHelper.IsRadioMuted(1));
             Assert.AreEqual(0.8f, RadioHelper.GetEffectiveReceiveVolume(1, state.radios[1]));
+        }
+
+        [TestMethod]
+        public void ToggleMicrophoneMuteTogglesOutboundMicrophoneMuteState()
+        {
+            Assert.IsFalse(RadioHelper.IsMicrophoneMuted());
+
+            RadioHelper.ToggleMicrophoneMute();
+
+            Assert.IsTrue(RadioHelper.IsMicrophoneMuted());
+
+            RadioHelper.ToggleMicrophoneMute();
+
+            Assert.IsFalse(RadioHelper.IsMicrophoneMuted());
         }
 
         private static void ConfigureMutableRadios()

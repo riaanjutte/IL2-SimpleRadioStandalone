@@ -37,6 +37,10 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.Settings
         ClientY,
         ClientWidth,
         ClientHeight,
+        PilotRosterX,
+        PilotRosterY,
+        PilotRosterWidth,
+        PilotRosterHeight,
         AwacsX,
         AwacsY,
         MicAudioOutputDeviceId,
@@ -184,6 +188,9 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.Settings
         ToggleAllRadiosMute = 135,
         ModifierToggleAllRadiosMute = 235,
 
+        ToggleMicrophoneMute = 136,
+        ModifierToggleMicrophoneMute = 236,
+
     }
 
 
@@ -323,6 +330,11 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.Settings
             {GlobalSettingsKeys.ClientY.ToString(), "200"},
             {GlobalSettingsKeys.ClientWidth.ToString(), "700"},
             {GlobalSettingsKeys.ClientHeight.ToString(), "650"},
+
+            {GlobalSettingsKeys.PilotRosterX.ToString(), "360"},
+            {GlobalSettingsKeys.PilotRosterY.ToString(), "260"},
+            {GlobalSettingsKeys.PilotRosterWidth.ToString(), "560"},
+            {GlobalSettingsKeys.PilotRosterHeight.ToString(), "420"},
 
             {GlobalSettingsKeys.AwacsX.ToString(), "300"},
             {GlobalSettingsKeys.AwacsY.ToString(), "300"},

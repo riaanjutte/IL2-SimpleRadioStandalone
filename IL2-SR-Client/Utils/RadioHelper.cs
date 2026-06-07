@@ -23,6 +23,7 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.Utils
         private const float DefaultMutedVolume = 0.25f;
         private static readonly HashSet<int> MutedRadios = new HashSet<int>();
         private static readonly object MutedRadiosLock = new object();
+        private static bool _microphoneMuted;
      
         public static bool SelectRadio(int radioId, bool tts = true)
         {
@@ -261,6 +262,30 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.Utils
             lock (MutedRadiosLock)
             {
                 return MutedRadios.Contains(radioId);
+            }
+        }
+
+        public static bool IsMicrophoneMuted()
+        {
+            lock (MutedRadiosLock)
+            {
+                return _microphoneMuted;
+            }
+        }
+
+        public static void SetMicrophoneMuted(bool muted)
+        {
+            lock (MutedRadiosLock)
+            {
+                _microphoneMuted = muted;
+            }
+        }
+
+        public static void ToggleMicrophoneMute()
+        {
+            lock (MutedRadiosLock)
+            {
+                _microphoneMuted = !_microphoneMuted;
             }
         }
 

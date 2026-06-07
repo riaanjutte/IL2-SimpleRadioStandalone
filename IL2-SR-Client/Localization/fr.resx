@@ -159,6 +159,9 @@
   <data name="Toggle Client List" xml:space="preserve">
     <value>Basculer la liste clients</value>
   </data>
+  <data name="Toggle Pilot Roster" xml:space="preserve">
+    <value>Basculer la liste pilotes</value>
+  </data>
   <data name="Current Profile:" xml:space="preserve">
     <value>Profil actuel :</value>
   </data>
@@ -471,6 +474,18 @@
   <data name="Connected Clients" xml:space="preserve">
     <value>Clients connectes</value>
   </data>
+  <data name="Pilot Roster" xml:space="preserve">
+    <value>Liste des pilotes</value>
+  </data>
+  <data name="PILOT ROSTER" xml:space="preserve">
+    <value>LISTE PILOTES</value>
+  </data>
+  <data name="CALLSIGN" xml:space="preserve">
+    <value>INDICATIF</value>
+  </data>
+  <data name="PILOT" xml:space="preserve">
+    <value>PILOTE</value>
+  </data>
   <data name="Add new configuration" xml:space="preserve">
     <value>Ajouter une configuration</value>
   </data>
@@ -641,6 +656,9 @@
   </data>
   <data name="Mute / Unmute Both Radios" xml:space="preserve">
     <value>Couper / retablir les deux radios</value>
+  </data>
+  <data name="Mute / Unmute Microphone" xml:space="preserve">
+    <value>Couper / retablir le microphone</value>
   </data>
   <data name="RCI" xml:space="preserve">
     <value>RCI</value>

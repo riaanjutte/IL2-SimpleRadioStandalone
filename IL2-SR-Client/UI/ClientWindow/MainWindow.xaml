@@ -205,6 +205,18 @@
                     <StackPanel Margin="0"
                                 HorizontalAlignment="Center"
                                 Orientation="Horizontal">
+                        <Button x:Name="ShowPilotRoster"
+                                Width="220"
+                                Margin="0,15,0,0"
+                                HorizontalAlignment="Center"
+                                Click="ShowPilotRoster_OnClick"
+                                Content="Toggle Pilot Roster"
+                                Style="{DynamicResource SquareButtonStyle}" />
+                    </StackPanel>
+
+                    <StackPanel Margin="0"
+                                HorizontalAlignment="Center"
+                                Orientation="Horizontal">
                         <StackPanel.Resources>
                             <converters:BooleanInverterConverter x:Key="BooleanInverterConverter"/>
                         </StackPanel.Resources>
@@ -327,6 +339,7 @@
                                 <ColumnDefinition Width="75" />
                             </Grid.ColumnDefinitions>
                             <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto" />
                                 <RowDefinition Height="Auto" />
                                 <RowDefinition Height="Auto" />
                                 <RowDefinition Height="Auto" />
@@ -509,6 +522,11 @@
                                                        Grid.ColumnSpan="5"
                                                        ControlInputBinding="{x:Static settings:InputBinding.ToggleAllRadiosMute}"
                                                        InputName="Mute / Unmute Both Radios" />
+                            <local:InputBindingControl x:Name="ToggleMicrophoneMute"
+                                                       Grid.Row="26"
+                                                       Grid.ColumnSpan="5"
+                                                       ControlInputBinding="{x:Static settings:InputBinding.ToggleMicrophoneMute}"
+                                                       InputName="Mute / Unmute Microphone" />
                         </Grid>
                     </StackPanel>
                 </ScrollViewer>

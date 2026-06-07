@@ -737,6 +737,7 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.Network
             if (_ready
                 && _listener != null
                 && _audioInputSingleton.MicrophoneAvailable
+                && !RadioHelper.IsMicrophoneMuted()
                 && (bytes != null)
                 && (transmittingRadios = PTTPressed(out sendingOn)).Count >0 )
                 //can only send if IL2 is connected

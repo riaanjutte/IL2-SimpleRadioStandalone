@@ -36,7 +36,7 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Overlay
 
         private readonly double _originalMinHeight;
         private HwndSource _hwndSource;
-        private const double AssignedCallsignMinHeightDelta = 16.0;
+        private const double AssignedCallsignMinHeightDelta = 20.0;
         private const double Radio2MinHeightDelta = 71.0;
         private const double RciStatusMinHeightDelta = 14.0;
         private const double RciCallsignMinHeightDelta = 10.0;
@@ -44,7 +44,8 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Overlay
         private const double AssignedCallsignInitialScrollPauseMilliseconds = 700.0;
         private const double AssignedCallsignRepeatScrollPauseMilliseconds = 15000.0;
         private const double DefaultOverlayWidth = 260.0;
-        private const double DefaultOverlayHeight = 320.0;
+        private const double DefaultOverlayHeight = 286.0;
+        private const double PreviousFramedDefaultOverlayHeight = 320.0;
         private const double OldDefaultOverlayWidth = 122.0;
         private const double OldDefaultOverlayHeight = 270.0;
         private bool _suppressSizeHandling = true;
@@ -83,11 +84,11 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Overlay
 
             var configuredWidth = _globalSettings.GetPositionSetting(GlobalSettingsKeys.RadioWidth).DoubleValue;
             var configuredHeight = _globalSettings.GetPositionSetting(GlobalSettingsKeys.RadioHeight).DoubleValue;
-            var migratedOldDefaultSize = IsOldDefaultOverlaySize(configuredWidth, configuredHeight);
-            Width = GetOverlayWidth(configuredWidth, migratedOldDefaultSize);
-            Height = GetOverlayHeight(configuredHeight, migratedOldDefaultSize);
+            var useDefaultSize = ShouldUseDefaultOverlaySize(configuredWidth, configuredHeight);
+            Width = GetOverlayWidth(configuredWidth, useDefaultSize);
+            Height = GetOverlayHeight(configuredHeight, useDefaultSize);
 
-            if (migratedOldDefaultSize)
+            if (useDefaultSize)
             {
                 _globalSettings.SetPositionSetting(GlobalSettingsKeys.RadioWidth, Width);
                 _globalSettings.SetPositionSetting(GlobalSettingsKeys.RadioHeight, Height);
@@ -272,22 +273,13 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Overlay
             AssignedCallsignLabel.Width = scrollMetrics.ScrollingWidth;
 
             var travelMilliseconds = scrollMetrics.TravelDistance / AssignedCallsignScrollPixelsPerSecond * 1000.0;
-            var cycleMilliseconds = AssignedCallsignInitialScrollPauseMilliseconds + travelMilliseconds + AssignedCallsignRepeatScrollPauseMilliseconds;
-            var elapsed = (DateTime.UtcNow - _assignedCallsignScrollStartedAt).TotalMilliseconds % cycleMilliseconds;
-
-            double offset;
-            if (elapsed <= AssignedCallsignInitialScrollPauseMilliseconds)
-            {
-                offset = 0;
-            }
-            else if (elapsed <= AssignedCallsignInitialScrollPauseMilliseconds + travelMilliseconds)
-            {
-                offset = -scrollMetrics.TravelDistance * ((elapsed - AssignedCallsignInitialScrollPauseMilliseconds) / travelMilliseconds);
-            }
-            else
-            {
-                offset = -scrollMetrics.TravelDistance;
-            }
+            var elapsed = (DateTime.UtcNow - _assignedCallsignScrollStartedAt).TotalMilliseconds;
+            var offset = SpeakerNameScrollLayout.CalculateResetPauseScrollOffset(
+                elapsed,
+                scrollMetrics.TravelDistance,
+                travelMilliseconds,
+                AssignedCallsignInitialScrollPauseMilliseconds,
+                AssignedCallsignRepeatScrollPauseMilliseconds);
 
             Canvas.SetLeft(AssignedCallsignLabel, offset);
         }
@@ -581,26 +573,6 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Overlay
             _overlayTestTimer?.Stop();
         }
 
-        private void Button_Minimise(object sender, RoutedEventArgs e)
-        {
-            // Minimising a window without a taskbar icon leads to the window's menu bar still showing up in the bottom of screen
-            // Since controls are unusable, but a very small portion of the always-on-top window still showing, we're closing it instead, similar to toggling the overlay
-            if (_globalSettings.GetClientSettingBool(GlobalSettingsKeys.RadioOverlayTaskbarHide))
-            {
-                Close();
-            }
-            else
-            {
-                WindowState = WindowState.Minimized;
-            }
-        }
-
-
-        private void Button_Close(object sender, RoutedEventArgs e)
-        {
-            Close();
-        }
-
         private void windowOpacitySlider_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
         {
             Opacity = e.NewValue;
@@ -751,10 +723,12 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Overlay
             public string RciCallsignText { get; }
         }
 
-        private bool IsOldDefaultOverlaySize(double configuredWidth, double configuredHeight)
+        private bool ShouldUseDefaultOverlaySize(double configuredWidth, double configuredHeight)
         {
-            return Math.Abs(configuredWidth - OldDefaultOverlayWidth) < 0.5 &&
-                   Math.Abs(configuredHeight - OldDefaultOverlayHeight) < 0.5;
+            return (Math.Abs(configuredWidth - OldDefaultOverlayWidth) < 0.5 &&
+                    Math.Abs(configuredHeight - OldDefaultOverlayHeight) < 0.5) ||
+                   (Math.Abs(configuredWidth - DefaultOverlayWidth) < 0.5 &&
+                    Math.Abs(configuredHeight - PreviousFramedDefaultOverlayHeight) < 0.5);
         }
 
         private double GetOverlayWidth(double configuredWidth, bool useDefaultSize)

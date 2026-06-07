@@ -238,12 +238,17 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.Singletons
                 return 0;
             }
             var currentClientPos = ClientStateSingleton.Instance.PlayerGameState;
+            if (currentClientPos == null)
+            {
+                return 0;
+            }
+
             var currentUnitId = currentClientPos.unitId;
             var currentVehicleId = currentClientPos.vehicleId;
             var coalitionSecurity = SyncedServerSettings.Instance.GetSettingAsBool(ServerSettingsKeys.COALITION_AUDIO_SECURITY);
             var globalFrequencies = _serverSettings.GlobalFrequencies;
             var global = globalFrequencies.Contains(freq);
-            int count = 0;
+            int count = LocalClientCanHearFrequency(currentClientPos, freq, modulation, currentUnitId, currentVehicleId) ? 1 : 0;
 
             foreach (var client in _clients)
             {
@@ -276,6 +281,23 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.Singletons
             }
 
             return count;
+        }
+
+        private static bool LocalClientCanHearFrequency(PlayerGameState currentClientPos, double freq,
+            RadioInformation.Modulation modulation, long currentUnitId, long currentVehicleId)
+        {
+            if (!IsActiveCoalition(currentClientPos.coalition))
+            {
+                return false;
+            }
+
+            RadioReceivingState radioReceivingState;
+            return currentClientPos.CanHearTransmission(freq,
+                modulation,
+                currentUnitId,
+                currentVehicleId,
+                new List<int>(),
+                out radioReceivingState) != null;
         }
 
         public int ClientsOnChannel(int channel)

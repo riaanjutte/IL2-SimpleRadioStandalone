@@ -181,6 +181,41 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Common.Tests.Singletons
             Assert.AreEqual(0, ConnectedClientsSingleton.Instance.ClientsOnChannel(11));
         }
 
+        [TestMethod]
+        public void ClientsOnFreqIncludesLocalPlayerRadio()
+        {
+            ClientStateSingleton.Instance.PlayerGameState.radios[1].freq = ChannelFrequency(1);
+            ClientStateSingleton.Instance.PlayerGameState.radios[1].modulation = RadioInformation.Modulation.AM;
+
+            Assert.AreEqual(1, ConnectedClientsSingleton.Instance.ClientsOnFreq(
+                ChannelFrequency(1),
+                RadioInformation.Modulation.AM));
+        }
+
+        [TestMethod]
+        public void ClientsOnFreqIncludesLocalAndRemotePilots()
+        {
+            ClientStateSingleton.Instance.PlayerGameState.radios[1].freq = ChannelFrequency(5);
+            ClientStateSingleton.Instance.PlayerGameState.radios[1].modulation = RadioInformation.Modulation.AM;
+            AddClient("friendly-channel", "Broadway", FriendlyCoalition, 5);
+
+            Assert.AreEqual(2, ConnectedClientsSingleton.Instance.ClientsOnFreq(
+                ChannelFrequency(5),
+                RadioInformation.Modulation.AM));
+        }
+
+        [TestMethod]
+        public void ClientsOnFreqDoesNotIncludeLocalPlayerInNeutralLobby()
+        {
+            ClientStateSingleton.Instance.PlayerGameState.coalition = 0;
+            ClientStateSingleton.Instance.PlayerGameState.radios[1].freq = ChannelFrequency(3);
+            ClientStateSingleton.Instance.PlayerGameState.radios[1].modulation = RadioInformation.Modulation.AM;
+
+            Assert.AreEqual(0, ConnectedClientsSingleton.Instance.ClientsOnFreq(
+                ChannelFrequency(3),
+                RadioInformation.Modulation.AM));
+        }
+
         private static void AddClient(string guid, string name, int coalition)
         {
             ConnectedClientsSingleton.Instance[guid] = new SRClient

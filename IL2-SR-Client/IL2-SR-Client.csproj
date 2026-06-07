@@ -245,6 +245,11 @@
     <Compile Include="UI\ClientWindow\ClientList\ClientListWindow.xaml.cs">
       <DependentUpon>ClientListWindow.xaml</DependentUpon>
     </Compile>
+    <Compile Include="UI\ClientWindow\PilotRoster\PilotRosterBuilder.cs" />
+    <Compile Include="UI\ClientWindow\PilotRoster\PilotRosterEntry.cs" />
+    <Compile Include="UI\ClientWindow\PilotRoster\PilotRosterWindow.xaml.cs">
+      <DependentUpon>PilotRosterWindow.xaml</DependentUpon>
+    </Compile>
     <Compile Include="UI\ClientWindow\InputBindingControl.xaml.cs">
       <DependentUpon>InputBindingControl.xaml</DependentUpon>
     </Compile>
@@ -297,6 +302,10 @@
     <Compile Include="Utils\ValueConverters\MicAvailabilityTooltipConverter.cs" />
     <Compile Include="Utils\WPFElementHelper.cs" />
     <Page Include="UI\ClientWindow\ClientList\ClientListWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UI\ClientWindow\PilotRoster\PilotRosterWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -373,6 +382,8 @@
     <None Include="Localization\README.md">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
+    <None Include="Fonts\JustAnotherHand-LICENSE.txt" />
+    <Resource Include="Fonts\JustAnotherHand-Regular.ttf" />
     <Content Include="NLog.config">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>

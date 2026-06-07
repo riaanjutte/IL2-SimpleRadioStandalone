@@ -32,6 +32,56 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Common.Tests.UI
                 "The final scroll position should include trailing padding so the last letters are not clipped.");
         }
 
+        [TestMethod]
+        public void AssignedCallsignScrollPauseHappensAtResetPosition()
+        {
+            const double travelDistance = 100.0;
+            const double travelMilliseconds = 1000.0;
+            const double initialPauseMilliseconds = 700.0;
+            const double resetPauseMilliseconds = 15000.0;
+
+            Assert.AreEqual(
+                0,
+                SpeakerNameScrollLayout.CalculateResetPauseScrollOffset(
+                    initialPauseMilliseconds / 2,
+                    travelDistance,
+                    travelMilliseconds,
+                    initialPauseMilliseconds,
+                    resetPauseMilliseconds),
+                0.01);
+
+            Assert.AreEqual(
+                -50,
+                SpeakerNameScrollLayout.CalculateResetPauseScrollOffset(
+                    initialPauseMilliseconds + 500.0,
+                    travelDistance,
+                    travelMilliseconds,
+                    initialPauseMilliseconds,
+                    resetPauseMilliseconds),
+                0.01);
+
+            Assert.AreEqual(
+                0,
+                SpeakerNameScrollLayout.CalculateResetPauseScrollOffset(
+                    initialPauseMilliseconds + travelMilliseconds + 1000.0,
+                    travelDistance,
+                    travelMilliseconds,
+                    initialPauseMilliseconds,
+                    resetPauseMilliseconds),
+                0.01,
+                "After the first scroll completes, the text should reset to the start and pause there.");
+
+            Assert.AreEqual(
+                -50,
+                SpeakerNameScrollLayout.CalculateResetPauseScrollOffset(
+                    initialPauseMilliseconds + travelMilliseconds + resetPauseMilliseconds + 500.0,
+                    travelDistance,
+                    travelMilliseconds,
+                    initialPauseMilliseconds,
+                    resetPauseMilliseconds),
+                0.01);
+        }
+
         private static double MeasureOverlayChannelTextWidth(string text)
         {
             var formattedText = new FormattedText(

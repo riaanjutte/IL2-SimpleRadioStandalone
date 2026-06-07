@@ -24,6 +24,7 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI.RadioOverlayWindow
         private const double LastSpeakerHoldMilliseconds = 3000.0;
         private const double SpeakerNameScrollPixelsPerSecond = 18.0;
         private const double SpeakerNameScrollPauseMilliseconds = 700.0;
+        private static readonly Color ActiveGreen = (Color)ColorConverter.ConvertFromString("#96FF6D");
 
         private bool _dragging;
         private bool _syncingSliderFromState;
@@ -190,12 +191,15 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI.RadioOverlayWindow
                 }
 
                 var transmitting = _clientStateSingleton.RadioSendingState;
+                var receiving = _clientStateSingleton.RadioReceivingState[RadioId];
+                var speakingOnThisRadio = transmitting.IsSending && (transmitting.SendingOn == RadioId)
+                                          || receiving != null && receiving.IsReceiving;
                 if (RadioId == IL2PlayerRadioInfo.selected)
                 {
 
-                    if (transmitting.IsSending && (transmitting.SendingOn == RadioId))
+                    if (speakingOnThisRadio)
                     {
-                        RadioActive.Fill = CreateStatusBrush((Color) ColorConverter.ConvertFromString("#96FF6D"));
+                        RadioActive.Fill = CreateStatusBrush(ActiveGreen);
                     }
                     else
                     {
@@ -204,7 +208,7 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI.RadioOverlayWindow
                 }
                 else
                 {
-                    RadioActive.Fill = CreateStatusBrush(Colors.Orange);
+                    RadioActive.Fill = CreateStatusBrush(speakingOnThisRadio ? ActiveGreen : Colors.Green);
                 }
 
                 if (!_speakerDisplayActive)

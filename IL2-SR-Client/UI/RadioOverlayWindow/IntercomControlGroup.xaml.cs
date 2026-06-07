@@ -16,6 +16,7 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Overlay
     {
         private const string IntercomLabelText = "CREW INTERCOM";
         private const int MaxIntercomSpeakerNameLength = 14;
+        private static readonly Color ActiveGreen = (Color)ColorConverter.ConvertFromString("#96FF6D");
         private bool _dragging;
         private bool _syncingSliderFromState;
         private readonly ClientStateSingleton _clientStateSingleton = ClientStateSingleton.Instance;
@@ -82,32 +83,35 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Overlay
                 var currentRadio = IL2PlayerRadioInfo.radios[RadioId];
                 var transmitting = _clientStateSingleton.RadioSendingState;
                 var receiving = _clientStateSingleton.RadioReceivingState[0];
+                var speakingOnThisRadio = transmitting.IsSending && (transmitting.SendingOn == RadioId)
+                                          || receiving != null && receiving.IsReceiving;
                 UpdateIntercomLabel(receiving);
 
-                if (RadioId == IL2PlayerRadioInfo.selected || transmitting.IsSending && (transmitting.SendingOn == RadioId))
+                if (RadioId == IL2PlayerRadioInfo.selected)
                 {
-                    if (transmitting.IsSending && (transmitting.SendingOn == RadioId))
+                    if (speakingOnThisRadio)
                     {
-                        RadioActive.Fill = CreateStatusBrush((Color)ColorConverter.ConvertFromString("#96FF6D"));
+                        RadioActive.Fill = CreateStatusBrush(ActiveGreen);
                     }
                     else
                     {
                         RadioActive.Fill = CreateStatusBrush(Colors.Green);
                     }
-                    if (receiving!=null && receiving.IsReceiving)
-                    {
-                        RadioLabel.Foreground = new SolidColorBrush(Colors.White);
-                        TunedCount.Foreground = RadioLabel.Foreground;
-                    }
-                    else
-                    {
-                        RadioLabel.Foreground = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#00FF00"));
-                        TunedCount.Foreground = RadioLabel.Foreground;
-                    }
                 }
                 else
                 {
-                    RadioActive.Fill = CreateStatusBrush(Colors.Orange);
+                    RadioActive.Fill = CreateStatusBrush(speakingOnThisRadio ? ActiveGreen : Colors.Green);
+                }
+
+                if (receiving != null && receiving.IsReceiving)
+                {
+                    RadioLabel.Foreground = new SolidColorBrush(Colors.White);
+                    TunedCount.Foreground = RadioLabel.Foreground;
+                }
+                else
+                {
+                    RadioLabel.Foreground = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#00FF00"));
+                    TunedCount.Foreground = RadioLabel.Foreground;
                 }
 
                 int count = _connectClientsSingleton.ClientsOnFreq(currentRadio.freq, currentRadio.modulation);

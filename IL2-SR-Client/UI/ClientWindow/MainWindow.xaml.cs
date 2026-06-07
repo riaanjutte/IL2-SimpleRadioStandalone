@@ -31,6 +31,7 @@ using Ciribob.IL2.SimpleRadio.Standalone.Client.Settings;
 using Ciribob.IL2.SimpleRadio.Standalone.Client.Singletons;
 using Ciribob.IL2.SimpleRadio.Standalone.Client.UI.ClientWindow.ClientList;
 using Ciribob.IL2.SimpleRadio.Standalone.Client.UI.ClientWindow.Favourites;
+using Ciribob.IL2.SimpleRadio.Standalone.Client.UI.ClientWindow.PilotRoster;
 using Ciribob.IL2.SimpleRadio.Standalone.Client.Utils;
 using Ciribob.IL2.SimpleRadio.Standalone.Common;
 using Ciribob.IL2.SimpleRadio.Standalone.Common.Helpers;
@@ -70,6 +71,7 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI
         private ServerSettingsWindow _serverSettingsWindow;
 
         private ClientListWindow _clientListWindow;
+        private PilotRosterWindow _pilotRosterWindow;
 
         //used to debounce toggle
         private long _toggleShowHide;
@@ -111,6 +113,7 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI
             InitializeComponent();
             LocalizationManager.LocalizeElement(this);
             RciStatusLabel.Text = LocalizationManager.Get("RCI");
+            UpdateCombatBoxFeatureVisibility(false);
             LocalizationManager.LocalizeFlowDocument(AboutFlowDocument);
             ClientThemeManager.ApplyThemeToWindow(this, _globalSettings.GetClientSetting(GlobalSettingsKeys.Theme).RawValue);
             Loaded += MainWindow_Loaded;
@@ -548,6 +551,10 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI
             ToggleAllRadiosMute.InputName = LocalizationManager.Get("Mute / Unmute Both Radios");
             ToggleAllRadiosMute.ControlInputBinding = InputBinding.ToggleAllRadiosMute;
             ToggleAllRadiosMute.InputDeviceManager = InputManager;
+
+            ToggleMicrophoneMute.InputName = LocalizationManager.Get("Mute / Unmute Microphone");
+            ToggleMicrophoneMute.ControlInputBinding = InputBinding.ToggleMicrophoneMute;
+            ToggleMicrophoneMute.InputDeviceManager = InputManager;
         }
 
         private void OnProfileDropDownChanged(object sender, SelectionChangedEventArgs e)
@@ -583,6 +590,7 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI
             ToggleSelectedRadioMute.LoadInputSettings();
             ToggleOtherRadioMute.LoadInputSettings();
             ToggleAllRadiosMute.LoadInputSettings();
+            ToggleMicrophoneMute.LoadInputSettings();
         }
 
         private void ReloadRadioAudioChannelSettings()
@@ -909,6 +917,7 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI
             ClientState.IsConnected = false;
             ToggleServerSettings.IsEnabled = false;
             UpdateRciStatusIndicator();
+            UpdateCombatBoxFeatureVisibility(false);
             _radioOverlayWindow?.SetRciIndicatorEnabled(false);
 
             try
@@ -985,6 +994,7 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI
 
                         ClientState.IsConnected = true;
                         ClientState.IsVoipConnected = false;
+                        UpdateCombatBoxFeatureVisibility();
 
                         if (_globalSettings.GetClientSettingBool(GlobalSettingsKeys.PlayConnectionSounds))
                         {
@@ -1145,7 +1155,28 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI
 
             var showRciStatus = ShouldShowRciStatus();
             UpdateRciStatusIndicator(showRciStatus);
+            UpdateCombatBoxFeatureVisibility(showRciStatus);
             _radioOverlayWindow?.SetRciIndicatorEnabled(showRciStatus);
+        }
+
+        private void UpdateCombatBoxFeatureVisibility()
+        {
+            UpdateCombatBoxFeatureVisibility(ShouldShowRciStatus());
+        }
+
+        private void UpdateCombatBoxFeatureVisibility(bool showCombatBoxFeatures)
+        {
+            ShowPilotRoster.Visibility = Visibility.Visible;
+
+            if (!showCombatBoxFeatures && (_pilotRosterWindow?.IsUnavailableMode == false))
+            {
+                _pilotRosterWindow?.Close();
+                _pilotRosterWindow = null;
+            }
+            else if (showCombatBoxFeatures && (_pilotRosterWindow?.IsUnavailableMode == true))
+            {
+                ShowPilotRosterWindow(showUnavailableMessage: false);
+            }
         }
 
         private void UpdateRciStatusIndicator()
@@ -1670,6 +1701,36 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI
             {
                 _clientListWindow?.Close();
                 _clientListWindow = null;
+            }
+        }
+
+        private void ShowPilotRoster_OnClick(object sender, RoutedEventArgs e)
+        {
+            if (!ShouldShowRciStatus())
+            {
+                ShowPilotRosterWindow(showUnavailableMessage: true);
+                return;
+            }
+
+            ShowPilotRosterWindow(showUnavailableMessage: false);
+        }
+
+        private void ShowPilotRosterWindow(bool showUnavailableMessage)
+        {
+            if ((_pilotRosterWindow == null) || !_pilotRosterWindow.IsVisible ||
+                (_pilotRosterWindow.WindowState == WindowState.Minimized) ||
+                (_pilotRosterWindow.IsUnavailableMode != showUnavailableMessage))
+            {
+                _pilotRosterWindow?.Close();
+
+                _pilotRosterWindow = new PilotRosterWindow(showUnavailableMessage);
+                _pilotRosterWindow.WindowStartupLocation = WindowStartupLocation.Manual;
+                _pilotRosterWindow.Show();
+            }
+            else
+            {
+                _pilotRosterWindow?.Close();
+                _pilotRosterWindow = null;
             }
         }
 
