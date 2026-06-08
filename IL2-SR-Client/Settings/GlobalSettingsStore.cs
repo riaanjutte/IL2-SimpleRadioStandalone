@@ -21,6 +21,7 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.Settings
         AutoConnectPrompt, //message about auto connect
         RadioOverlayTaskbarHide,
         AutoStartRadioOverlay,
+        AutoStartPilotRoster,
 
         AudioInputDeviceId,
         AudioOutputDeviceId,
@@ -302,6 +303,7 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.Settings
             {GlobalSettingsKeys.AutoConnectMismatchPrompt.ToString(), "true"},
             {GlobalSettingsKeys.RadioOverlayTaskbarHide.ToString(), "false"},
             {GlobalSettingsKeys.AutoStartRadioOverlay.ToString(), "true"},
+            {GlobalSettingsKeys.AutoStartPilotRoster.ToString(), "false"},
             {GlobalSettingsKeys.RefocusIL2.ToString(), "false"},
             {GlobalSettingsKeys.ExpandControls.ToString(), "false"},
 

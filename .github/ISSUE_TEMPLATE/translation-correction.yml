@@ -1,0 +1,48 @@
+name: Translation correction
+description: Suggest a correction for client UI translation text.
+title: "[Translation]: "
+labels:
+  - localization
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Use this form if you want to suggest a translation fix without editing `.resx` files directly.
+  - type: dropdown
+    id: language
+    attributes:
+      label: Language
+      options:
+        - German
+        - French
+        - Spanish
+        - Italian
+        - Russian
+        - Other
+    validations:
+      required: true
+  - type: input
+    id: key
+    attributes:
+      label: Resource key
+      description: The English `name` key from the `.resx` file, if you know it.
+      placeholder: Connect
+  - type: textarea
+    id: current
+    attributes:
+      label: Current text
+      description: Paste the current translation or describe where it appears in the app.
+    validations:
+      required: true
+  - type: textarea
+    id: suggested
+    attributes:
+      label: Suggested text
+      description: Keep placeholders such as `{0}` unchanged.
+    validations:
+      required: true
+  - type: textarea
+    id: context
+    attributes:
+      label: Context
+      description: Optional screenshot, menu/tab name, or reason for the correction.

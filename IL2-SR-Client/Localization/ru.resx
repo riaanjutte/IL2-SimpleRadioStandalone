@@ -118,358 +118,358 @@
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <data name="General" xml:space="preserve">
-    <value>General</value>
+    <value>Общие</value>
   </data>
   <data name="Setup" xml:space="preserve">
-    <value>Configuracion</value>
+    <value>Настройка</value>
   </data>
   <data name="Microphone" xml:space="preserve">
-    <value>Microfono</value>
+    <value>Микрофон</value>
   </data>
   <data name="Audio Preview" xml:space="preserve">
-    <value>Vista previa de audio</value>
+    <value>Прослушать звук</value>
   </data>
   <data name="Stop Preview" xml:space="preserve">
-    <value>Detener vista previa</value>
+    <value>Остановить прослушивание</value>
   </data>
   <data name="Speakers &amp; Optional Mic Output" xml:space="preserve">
-    <value>Altavoces y salida opcional de microfono</value>
+    <value>Динамики и доп. выход микрофона</value>
   </data>
   <data name="Speaker Boost:" xml:space="preserve">
-    <value>Refuerzo de altavoz:</value>
+    <value>Усиление динамиков:</value>
   </data>
   <data name="Server" xml:space="preserve">
-    <value>Servidor</value>
+    <value>Сервер</value>
   </data>
   <data name="Connect" xml:space="preserve">
-    <value>Conectar</value>
+    <value>Подключиться</value>
   </data>
   <data name="Connecting..." xml:space="preserve">
-    <value>Conectando...</value>
+    <value>Подключение...</value>
   </data>
   <data name="Disconnect" xml:space="preserve">
-    <value>Desconectar</value>
+    <value>Отключиться</value>
   </data>
   <data name="Show Server Settings" xml:space="preserve">
-    <value>Mostrar ajustes del servidor</value>
+    <value>Показать настройки сервера</value>
   </data>
   <data name="Toggle Radio Overlay" xml:space="preserve">
-    <value>Alternar superposicion de radio</value>
+    <value>Показать/скрыть радио-оверлей</value>
   </data>
   <data name="Toggle Client List" xml:space="preserve">
-    <value>Alternar lista de clientes</value>
+    <value>Показать/скрыть список клиентов</value>
   </data>
   <data name="Toggle Pilot Roster" xml:space="preserve">
-    <value>Alternar lista de pilotos</value>
+    <value>Показать/скрыть список пилотов</value>
   </data>
   <data name="Current Profile:" xml:space="preserve">
-    <value>Perfil actual:</value>
+    <value>Текущий профиль:</value>
   </data>
   <data name="Connected Clients:" xml:space="preserve">
-    <value>Clientes conectados:</value>
+    <value>Подключенные клиенты:</value>
   </data>
   <data name="Patreon - Support SRS" xml:space="preserve">
-    <value>Patreon - apoyar SRS</value>
+    <value>Patreon - поддержать SRS</value>
   </data>
   <data name="Controls" xml:space="preserve">
-    <value>Controles</value>
+    <value>Управление</value>
   </data>
   <data name="Rescan Input Devices" xml:space="preserve">
-    <value>Volver a buscar dispositivos de entrada</value>
+    <value>Повторно найти устройства ввода</value>
   </data>
   <data name="Device" xml:space="preserve">
-    <value>Dispositivo</value>
+    <value>Устройство</value>
   </data>
   <data name="Button" xml:space="preserve">
-    <value>Boton</value>
+    <value>Кнопка</value>
   </data>
   <data name="Favourites" xml:space="preserve">
-    <value>Favoritos</value>
+    <value>Избранное</value>
   </data>
   <data name="Settings" xml:space="preserve">
-    <value>Ajustes</value>
+    <value>Настройки</value>
   </data>
   <data name="Global Settings" xml:space="preserve">
-    <value>Ajustes globales</value>
+    <value>Глобальные настройки</value>
   </data>
   <data name="Language" xml:space="preserve">
-    <value>Idioma</value>
+    <value>Язык</value>
   </data>
   <data name="Theme" xml:space="preserve">
-    <value>Tema</value>
+    <value>Тема</value>
   </data>
   <data name="Light" xml:space="preserve">
-    <value>Claro</value>
+    <value>Светлая</value>
   </data>
   <data name="Dark" xml:space="preserve">
-    <value>Oscuro</value>
+    <value>Темная</value>
   </data>
   <data name="Use Windows setting" xml:space="preserve">
-    <value>Usar configuracion de Windows</value>
+    <value>Использовать настройку Windows</value>
   </data>
   <data name="Auto Connect Prompt" xml:space="preserve">
-    <value>Aviso de conexion automatica</value>
+    <value>Запрос автоподключения</value>
   </data>
   <data name="Auto Connect Mismatch Prompt" xml:space="preserve">
-    <value>Aviso si la conexion automatica no coincide</value>
+    <value>Запрос при несовпадении автоподключения</value>
   </data>
   <data name="Reset Radio Overlay" xml:space="preserve">
-    <value>Restablecer superposicion de radio</value>
+    <value>Сбросить радио-оверлей</value>
   </data>
   <data name="Reset" xml:space="preserve">
-    <value>Restablecer</value>
+    <value>Сбросить</value>
   </data>
   <data name="Hide Overlay Taskbar Item" xml:space="preserve">
-    <value>Ocultar superposicion en la barra de tareas</value>
+    <value>Скрыть оверлей на панели задач</value>
   </data>
   <data name="Auto Start Radio Overlay" xml:space="preserve">
-    <value>Iniciar superposicion de radio automaticamente</value>
+    <value>Автозапуск радио-оверлея</value>
   </data>
   <data name="Autostart Roster Overlay" xml:space="preserve">
-    <value>Iniciar lista de pilotos automaticamente</value>
+    <value>Автозапуск списка пилотов</value>
   </data>
   <data name="Auto Refocus IL2" xml:space="preserve">
-    <value>Reenfocar IL2 automaticamente</value>
+    <value>Автофокус IL-2</value>
   </data>
   <data name="Allow More Input Devices" xml:space="preserve">
-    <value>Permitir mas dispositivos de entrada</value>
+    <value>Разрешить больше устройств ввода</value>
   </data>
   <data name="Microphone Automatic Gain Control" xml:space="preserve">
-    <value>Control automatico de ganancia del microfono</value>
+    <value>Автоматическая регулировка усиления микрофона</value>
   </data>
   <data name="Microphone Noise Suppression" xml:space="preserve">
-    <value>Supresion de ruido del microfono</value>
+    <value>Подавление шума микрофона</value>
   </data>
   <data name="Minimise to tray" xml:space="preserve">
-    <value>Minimizar a la bandeja</value>
+    <value>Свернуть в трей</value>
   </data>
   <data name="Start minimised" xml:space="preserve">
-    <value>Iniciar minimizado</value>
+    <value>Запускать свернутым</value>
   </data>
   <data name="Check for beta updates" xml:space="preserve">
-    <value>Buscar actualizaciones beta</value>
+    <value>Проверять beta-обновления</value>
   </data>
   <data name="Play connection sounds" xml:space="preserve">
-    <value>Reproducir sonidos de conexion</value>
+    <value>Воспроизводить звуки подключения</value>
   </data>
   <data name="Require Admin" xml:space="preserve">
-    <value>Requerir administrador</value>
+    <value>Требовать права администратора</value>
   </data>
   <data name="Show Transmitter Name (Requires Server ON too)" xml:space="preserve">
-    <value>Mostrar nombre del transmisor (tambien requiere servidor ON)</value>
+    <value>Показывать имя передающего (также требует ON на сервере)</value>
   </data>
   <data name="Profile" xml:space="preserve">
-    <value>Perfil</value>
+    <value>Профиль</value>
   </data>
   <data name="Create Profile" xml:space="preserve">
-    <value>Crear perfil</value>
+    <value>Создать профиль</value>
   </data>
   <data name="Create" xml:space="preserve">
-    <value>Crear</value>
+    <value>Создать</value>
   </data>
   <data name="Cancel" xml:space="preserve">
-    <value>Cancelar</value>
+    <value>Отмена</value>
   </data>
   <data name="Rename" xml:space="preserve">
-    <value>Renombrar</value>
+    <value>Переименовать</value>
   </data>
   <data name="Please Enter a Profile Name" xml:space="preserve">
-    <value>Introduce un nombre de perfil</value>
+    <value>Введите имя профиля</value>
   </data>
   <data name="Copy Profile" xml:space="preserve">
-    <value>Copiar perfil</value>
+    <value>Копировать профиль</value>
   </data>
   <data name="Rename Profile" xml:space="preserve">
-    <value>Renombrar perfil</value>
+    <value>Переименовать профиль</value>
   </data>
   <data name="Delete Profile" xml:space="preserve">
-    <value>Eliminar perfil</value>
+    <value>Удалить профиль</value>
   </data>
   <data name="Profile Settings" xml:space="preserve">
-    <value>Ajustes de perfil</value>
+    <value>Настройки профиля</value>
   </data>
   <data name="Radio Rx Effects" xml:space="preserve">
-    <value>Efectos Rx de radio</value>
+    <value>Эффекты приема радио</value>
   </data>
   <data name="Radio Tx Effects" xml:space="preserve">
-    <value>Efectos Tx de radio</value>
+    <value>Эффекты передачи радио</value>
   </data>
   <data name="Start" xml:space="preserve">
-    <value>Inicio</value>
+    <value>Начало</value>
   </data>
   <data name="End" xml:space="preserve">
-    <value>Fin</value>
+    <value>Конец</value>
   </data>
   <data name="Radio Switch works as Push To Talk (PTT)" xml:space="preserve">
-    <value>El selector de radio funciona como Push To Talk (PTT)</value>
+    <value>Переключатель радио работает как Push To Talk (PTT)</value>
   </data>
   <data name="Enable Radio Voice Effect" xml:space="preserve">
-    <value>Activar efecto de voz de radio</value>
+    <value>Включить эффект радиоголоса</value>
   </data>
   <data name="Enable Clipping Effect (Requires Radio effects on!)" xml:space="preserve">
-    <value>Activar efecto de recorte (requiere efectos de radio!)</value>
+    <value>Включить эффект клиппинга (требуются радиоэффекты!)</value>
   </data>
   <data name="Enable Text to Speech (beta)" xml:space="preserve">
-    <value>Activar texto a voz (beta)</value>
+    <value>Включить синтез речи (beta)</value>
   </data>
   <data name="Text To Speech Volume" xml:space="preserve">
-    <value>Volumen de texto a voz</value>
+    <value>Громкость синтеза речи</value>
   </data>
   <data name="Selected Radio Muted Volume" xml:space="preserve">
-    <value>Volumen silenciado de radio seleccionada</value>
+    <value>Громкость приглушенной выбранной радиостанции</value>
   </data>
   <data name="Wrap Next Radio" xml:space="preserve">
-    <value>Volver al inicio al avanzar radio</value>
+    <value>Циклически выбирать следующую радиостанцию</value>
   </data>
   <data name="Push to Talk Release Delay (ms)" xml:space="preserve">
-    <value>Retardo al soltar Push to Talk (ms)</value>
+    <value>Задержка отпускания Push to Talk (мс)</value>
   </data>
   <data name="Intercom Audio Channel" xml:space="preserve">
-    <value>Canal de audio de intercomunicador</value>
+    <value>Аудиоканал интеркома</value>
   </data>
   <data name="Intercom Volume" xml:space="preserve">
-    <value>Volumen de intercomunicador</value>
+    <value>Громкость интеркома</value>
   </data>
   <data name="First Radio Audio Channel" xml:space="preserve">
-    <value>Primer canal de audio de radio</value>
+    <value>Аудиоканал первой радиостанции</value>
   </data>
   <data name="Second Radio Audio Channel" xml:space="preserve">
-    <value>Segundo canal de audio de radio</value>
+    <value>Аудиоканал второй радиостанции</value>
   </data>
   <data name="Help" xml:space="preserve">
-    <value>Ayuda</value>
+    <value>Справка</value>
   </data>
   <data name="Help &amp; About" xml:space="preserve">
-    <value>Ayuda y acerca de</value>
+    <value>Справка и сведения</value>
   </data>
   <data name="Speaker" xml:space="preserve">
-    <value>Altavoz</value>
+    <value>Динамик</value>
   </data>
   <data name="Boost" xml:space="preserve">
-    <value>Refuerzo</value>
+    <value>Усиление</value>
   </data>
   <data name="Please preview your audio first" xml:space="preserve">
-    <value>Primero prueba la vista previa de audio</value>
+    <value>Сначала проверьте звук</value>
   </data>
   <data name=" using the preview option to make sure that your microphone and speakers are configured correctly." xml:space="preserve">
-    <value> usando la vista previa para asegurarte de que el microfono y los altavoces estan bien configurados.</value>
+    <value> с помощью прослушивания, чтобы убедиться, что микрофон и динамики настроены правильно.</value>
   </data>
   <data name="using the preview option to make sure that your microphone and speakers are configured correctly." xml:space="preserve">
-    <value>usando la vista previa para asegurarte de que el microfono y los altavoces estan bien configurados.</value>
+    <value>с помощью прослушивания, чтобы убедиться, что микрофон и динамики настроены правильно.</value>
   </data>
   <data name="Speaker boost can be set higher to counteract the volume reduction caused by clipping and the radio effects. If speaker boost is too high - you may have issues where other windows sounds are too loud. Reduce the boost to fix this." xml:space="preserve">
-    <value>El refuerzo del altavoz puede aumentarse para compensar la reduccion de volumen causada por el recorte y los efectos de radio. Si es demasiado alto, otros sonidos de Windows pueden sonar demasiado fuertes. Reduce el refuerzo para corregirlo.</value>
+    <value>Усиление динамиков можно увеличить, чтобы компенсировать снижение громкости из-за клиппинга и радиоэффектов. Если усиление слишком высокое, другие звуки Windows могут быть слишком громкими. Уменьшите усиление, чтобы исправить это.</value>
   </data>
   <data name="Troubleshooting" xml:space="preserve">
-    <value>Solucion de problemas</value>
+    <value>Устранение неполадок</value>
   </data>
   <data name="If you have any issues with the SRS please get help on the dedicated Discord channel " xml:space="preserve">
-    <value>Si tienes problemas con SRS, pide ayuda en el canal dedicado de Discord </value>
+    <value>Если у вас есть проблемы с SRS, обратитесь за помощью на выделенный канал Discord </value>
   </data>
   <data name="If you have any issues with the SRS please get help on the dedicated Discord channel" xml:space="preserve">
-    <value>Si tienes problemas con SRS, pide ayuda en el canal dedicado de Discord</value>
+    <value>Если у вас есть проблемы с SRS, обратитесь за помощью на выделенный канал Discord</value>
   </data>
   <data name="here" xml:space="preserve">
-    <value>aqui</value>
+    <value>здесь</value>
   </data>
   <data name=" and make sure to follow the information in #common-issues first before asking for help in #support" xml:space="preserve">
-    <value> y asegurate de seguir primero la informacion de #common-issues antes de pedir ayuda en #support</value>
+    <value> и сначала выполните рекомендации в #common-issues, прежде чем просить помощь в #support</value>
   </data>
   <data name="and make sure to follow the information in #common-issues first before asking for help in #support" xml:space="preserve">
-    <value>y asegurate de seguir primero la informacion de #common-issues antes de pedir ayuda en #support</value>
+    <value>и сначала выполните рекомендации в #common-issues, прежде чем просить помощь в #support</value>
   </data>
   <data name="Community Edition source code" xml:space="preserve">
-    <value>Codigo fuente de Community Edition</value>
+    <value>Исходный код Community Edition</value>
   </data>
   <data name="The Community Edition source code and releases are available on " xml:space="preserve">
-    <value>El codigo fuente y las versiones de Community Edition estan disponibles en </value>
+    <value>Исходный код и релизы Community Edition доступны на </value>
   </data>
   <data name="The Community Edition source code and releases are available on" xml:space="preserve">
-    <value>El codigo fuente y las versiones de Community Edition estan disponibles en</value>
+    <value>Исходный код и релизы Community Edition доступны на</value>
   </data>
   <data name="GitHub" xml:space="preserve">
     <value>GitHub</value>
   </data>
   <data name="Input Device not detected?" xml:space="preserve">
-    <value>Dispositivo de entrada no detectado?</value>
+    <value>Устройство ввода не обнаружено?</value>
   </data>
   <data name="If your input device isn't detected - try enabling &quot;Allow more input devices&quot; and restart the client." xml:space="preserve">
-    <value>Si no se detecta tu dispositivo de entrada, activa "Permitir mas dispositivos de entrada" y reinicia el cliente.</value>
+    <value>Если устройство ввода не обнаружено, включите "Разрешить больше устройств ввода" и перезапустите клиент.</value>
   </data>
   <data name="If ALL devices then stop working - turn the setting off and please post you clientlog.txt on the dedicated SRS " xml:space="preserve">
-    <value>Si TODOS los dispositivos dejan de funcionar, desactiva esta opcion y publica tu clientlog.txt en el SRS dedicado </value>
+    <value>Если после этого ВСЕ устройства перестанут работать, отключите настройку и опубликуйте clientlog.txt на выделенном канале SRS </value>
   </data>
   <data name="If ALL devices then stop working - turn the setting off and please post you clientlog.txt on the dedicated SRS" xml:space="preserve">
-    <value>Si TODOS los dispositivos dejan de funcionar, desactiva esta opcion y publica tu clientlog.txt en el SRS dedicado</value>
+    <value>Если после этого ВСЕ устройства перестанут работать, отключите настройку и опубликуйте clientlog.txt на выделенном канале SRS</value>
   </data>
   <data name="Discord Channel" xml:space="preserve">
-    <value>Canal de Discord</value>
+    <value>Канал Discord</value>
   </data>
   <data name=" in order for me to help you add the device to the whitelist." xml:space="preserve">
-    <value> para que pueda ayudarte a anadir el dispositivo a la lista blanca.</value>
+    <value> чтобы я мог помочь добавить устройство в белый список.</value>
   </data>
   <data name="in order for me to help you add the device to the whitelist." xml:space="preserve">
-    <value>para que pueda ayudarte a anadir el dispositivo a la lista blanca.</value>
+    <value>чтобы я мог помочь добавить устройство в белый список.</value>
   </data>
   <data name="Control" xml:space="preserve">
-    <value>Control</value>
+    <value>Команда</value>
   </data>
   <data name="None" xml:space="preserve">
-    <value>Ninguno</value>
+    <value>Нет</value>
   </data>
   <data name="Set" xml:space="preserve">
-    <value>Asignar</value>
+    <value>Назначить</value>
   </data>
   <data name="Clear" xml:space="preserve">
-    <value>Borrar</value>
+    <value>Очистить</value>
   </data>
   <data name="Left" xml:space="preserve">
-    <value>Izquierda</value>
+    <value>Лево</value>
   </data>
   <data name="Equal" xml:space="preserve">
-    <value>Centro</value>
+    <value>Центр</value>
   </data>
   <data name="Right" xml:space="preserve">
-    <value>Derecha</value>
+    <value>Право</value>
   </data>
   <data name="Modifier" xml:space="preserve">
-    <value>Modificador</value>
+    <value>Модификатор</value>
   </data>
   <data name="ON" xml:space="preserve">
-    <value>ON</value>
+    <value>ВКЛ</value>
   </data>
   <data name="OFF" xml:space="preserve">
-    <value>OFF</value>
+    <value>ВЫКЛ</value>
   </data>
   <data name="Show" xml:space="preserve">
-    <value>Mostrar</value>
+    <value>Показать</value>
   </data>
   <data name="Quit" xml:space="preserve">
-    <value>Salir</value>
+    <value>Выход</value>
   </data>
   <data name="Restart Required" xml:space="preserve">
-    <value>Reinicio requerido</value>
+    <value>Требуется перезапуск</value>
   </data>
   <data name="Please restart SRS for the language change to take effect." xml:space="preserve">
-    <value>Reinicia SRS para aplicar el cambio de idioma.</value>
+    <value>Перезапустите SRS, чтобы смена языка вступила в силу.</value>
   </data>
   <data name="Restart SRS now to apply the language change?" xml:space="preserve">
-    <value>Reiniciar SRS ahora para aplicar el cambio de idioma?</value>
+    <value>Перезапустить SRS сейчас, чтобы применить смену языка?</value>
   </data>
   <data name="Input Devices Rescanned" xml:space="preserve">
-    <value>Dispositivos de entrada actualizados</value>
+    <value>Устройства ввода просканированы снова</value>
   </data>
   <data name="New input devices can now be used." xml:space="preserve">
-    <value>Ahora se pueden usar los nuevos dispositivos de entrada.</value>
+    <value>Теперь можно использовать новые устройства ввода.</value>
   </data>
   <data name="Invalid IP or Host Name!" xml:space="preserve">
-    <value>IP o nombre de host no valido!</value>
+    <value>Недопустимый IP или имя хоста!</value>
   </data>
   <data name="Host Name Error" xml:space="preserve">
-    <value>Error de nombre de host</value>
+    <value>Ошибка имени хоста</value>
   </data>
   <data name="IL2-SRS Client" xml:space="preserve">
-    <value>Cliente IL2-SRS</value>
+    <value>Клиент IL2-SRS</value>
   </data>
   <data name="IL2-SimpleRadio" xml:space="preserve">
     <value>IL2-SimpleRadio</value>
@@ -478,234 +478,234 @@
     <value>Il-2</value>
   </data>
   <data name="Connected Clients" xml:space="preserve">
-    <value>Clientes conectados</value>
+    <value>Подключенные клиенты</value>
   </data>
   <data name="Pilot Roster" xml:space="preserve">
-    <value>Lista de pilotos</value>
+    <value>Список пилотов</value>
   </data>
   <data name="PILOT ROSTER" xml:space="preserve">
-    <value>LISTA PILOTOS</value>
+    <value>СПИСОК ПИЛОТОВ</value>
   </data>
   <data name="CALLSIGN" xml:space="preserve">
-    <value>INDICATIVO</value>
+    <value>ПОЗЫВНОЙ</value>
   </data>
   <data name="PILOT" xml:space="preserve">
-    <value>PILOTO</value>
+    <value>ПИЛОТ</value>
   </data>
   <data name="Add new configuration" xml:space="preserve">
-    <value>Agregar nueva configuracion</value>
+    <value>Добавить новую конфигурацию</value>
   </data>
   <data name="Name" xml:space="preserve">
-    <value>Nombre</value>
+    <value>Имя</value>
   </data>
   <data name="ServerAddress" xml:space="preserve">
-    <value>Direccion del servidor</value>
+    <value>АдресСервера</value>
   </data>
   <data name="Remove Selected" xml:space="preserve">
-    <value>Quitar seleccionado</value>
+    <value>Удалить выбранное</value>
   </data>
   <data name="ServerAddress/port" xml:space="preserve">
-    <value>Direccion/puerto del servidor</value>
+    <value>АдресСервера/порт</value>
   </data>
   <data name="Is Default" xml:space="preserve">
-    <value>Predeterminado</value>
+    <value>По умолчанию</value>
   </data>
   <data name="Server Settings" xml:space="preserve">
-    <value>Ajustes del servidor</value>
+    <value>Настройки сервера</value>
   </data>
   <data name="Coalition Security" xml:space="preserve">
-    <value>Seguridad de coalicion</value>
+    <value>Безопасность коалиции</value>
   </data>
   <data name="Unknown" xml:space="preserve">
-    <value>Desconocido</value>
+    <value>Неизвестно</value>
   </data>
   <data name="Spectator Audio" xml:space="preserve">
-    <value>Audio de espectador</value>
+    <value>Аудио наблюдателя</value>
   </data>
   <data name="IRL Radio Tx Behaviour" xml:space="preserve">
-    <value>Comportamiento Tx de radio real</value>
+    <value>Реалистичное поведение передачи радио</value>
   </data>
   <data name="Show Tuned Client Count" xml:space="preserve">
-    <value>Mostrar cantidad de clientes sintonizados</value>
+    <value>Показывать число клиентов на канале</value>
   </data>
   <data name="Show Transmitter Name" xml:space="preserve">
-    <value>Mostrar nombre del transmisor</value>
+    <value>Показывать имя передающего</value>
   </data>
   <data name="Server Version" xml:space="preserve">
-    <value>Version del servidor</value>
+    <value>Версия сервера</value>
   </data>
   <data name="Channel Limit" xml:space="preserve">
-    <value>Limite de canal</value>
+    <value>Лимит каналов</value>
   </data>
   <data name="Second Radio Enabled" xml:space="preserve">
-    <value>Segunda radio activada</value>
+    <value>Вторая радиостанция включена</value>
   </data>
   <data name="Close" xml:space="preserve">
-    <value>Cerrar</value>
+    <value>Закрыть</value>
   </data>
   <data name="DISABLED" xml:space="preserve">
-    <value>DESACTIVADO</value>
+    <value>ОТКЛЮЧЕНО</value>
   </data>
   <data name="ENABLED" xml:space="preserve">
-    <value>ACTIVADO</value>
+    <value>ВКЛЮЧЕНО</value>
   </data>
   <data name="CREW INTERCOM" xml:space="preserve">
-    <value>CREW INTERCOM</value>
+    <value>ЭКИПАЖНЫЙ ИНТЕРКОМ</value>
   </data>
   <data name="Not Connected" xml:space="preserve">
-    <value>No conectado</value>
+    <value>Нет подключения</value>
   </data>
   <data name="CHN {0}" xml:space="preserve">
-    <value>CANAL {0}</value>
+    <value>КАН {0}</value>
   </data>
   <data name="CHN 1" xml:space="preserve">
-    <value>CANAL 1</value>
+    <value>КАН 1</value>
   </data>
   <data name="Go to saved address tab" xml:space="preserve">
-    <value>Ir a la pestana de direcciones guardadas</value>
+    <value>Перейти на вкладку сохраненных адресов</value>
   </data>
   <data name="VOIP" xml:space="preserve">
     <value>VOIP</value>
   </data>
   <data name="Selected Radio" xml:space="preserve">
-    <value>Radio seleccionada</value>
+    <value>Выбранная радиостанция</value>
   </data>
   <data name="Channel 1" xml:space="preserve">
-    <value>Canal 1</value>
+    <value>Канал 1</value>
   </data>
   <data name="Channel 2" xml:space="preserve">
-    <value>Canal 2</value>
+    <value>Канал 2</value>
   </data>
   <data name="Channel 3" xml:space="preserve">
-    <value>Canal 3</value>
+    <value>Канал 3</value>
   </data>
   <data name="Channel 4" xml:space="preserve">
-    <value>Canal 4</value>
+    <value>Канал 4</value>
   </data>
   <data name="Channel 5" xml:space="preserve">
-    <value>Canal 5</value>
+    <value>Канал 5</value>
   </data>
   <data name="Window Opacity" xml:space="preserve">
-    <value>Opacidad de ventana</value>
+    <value>Прозрачность окна</value>
   </data>
   <data name="Select First Radio" xml:space="preserve">
-    <value>Seleccionar primera radio</value>
+    <value>Выбрать первую радиостанцию</value>
   </data>
   <data name="Select Second Radio" xml:space="preserve">
-    <value>Seleccionar segunda radio</value>
+    <value>Выбрать вторую радиостанцию</value>
   </data>
   <data name="Push To Talk - PTT" xml:space="preserve">
     <value>Push To Talk - PTT</value>
   </data>
   <data name="Select Intercom" xml:space="preserve">
-    <value>Seleccionar intercomunicador</value>
+    <value>Выбрать интерком</value>
   </data>
   <data name="Overlay Toggle" xml:space="preserve">
-    <value>Alternar superposicion</value>
+    <value>Переключить оверлей</value>
   </data>
   <data name="Radio Channel Up" xml:space="preserve">
-    <value>Subir canal de radio</value>
+    <value>Канал радио вверх</value>
   </data>
   <data name="Radio Channel Down" xml:space="preserve">
-    <value>Bajar canal de radio</value>
+    <value>Канал радио вниз</value>
   </data>
   <data name="Radio Channel 1" xml:space="preserve">
-    <value>Canal de radio 1</value>
+    <value>Канал радио 1</value>
   </data>
   <data name="Radio Channel 2" xml:space="preserve">
-    <value>Canal de radio 2</value>
+    <value>Канал радио 2</value>
   </data>
   <data name="Radio Channel 3" xml:space="preserve">
-    <value>Canal de radio 3</value>
+    <value>Канал радио 3</value>
   </data>
   <data name="Radio Channel 4" xml:space="preserve">
-    <value>Canal de radio 4</value>
+    <value>Канал радио 4</value>
   </data>
   <data name="Radio Channel 5" xml:space="preserve">
-    <value>Canal de radio 5</value>
+    <value>Канал радио 5</value>
   </data>
   <data name="Radio Channel 6" xml:space="preserve">
-    <value>Canal de radio 6</value>
+    <value>Канал радио 6</value>
   </data>
   <data name="Radio Channel 7" xml:space="preserve">
-    <value>Canal de radio 7</value>
+    <value>Канал радио 7</value>
   </data>
   <data name="Radio Channel 8" xml:space="preserve">
-    <value>Canal de radio 8</value>
+    <value>Канал радио 8</value>
   </data>
   <data name="Radio Channel 9" xml:space="preserve">
-    <value>Canal de radio 9</value>
+    <value>Канал радио 9</value>
   </data>
   <data name="Radio Channel 10" xml:space="preserve">
-    <value>Canal de radio 10</value>
+    <value>Канал радио 10</value>
   </data>
   <data name="Radio Channel 11" xml:space="preserve">
-    <value>Canal de radio 11</value>
+    <value>Канал радио 11</value>
   </data>
   <data name="Radio Channel 12" xml:space="preserve">
-    <value>Canal de radio 12</value>
+    <value>Канал радио 12</value>
   </data>
   <data name="Select Next Radio / Intercom" xml:space="preserve">
-    <value>Seleccionar radio siguiente / intercomunicador</value>
+    <value>Выбрать следующее радио / интерком</value>
   </data>
   <data name="Select Previous Radio / Intercom" xml:space="preserve">
-    <value>Seleccionar radio anterior / intercomunicador</value>
+    <value>Выбрать предыдущее радио / интерком</value>
   </data>
   <data name="Read Status (TTS on required)" xml:space="preserve">
-    <value>Leer estado (requiere TTS)</value>
+    <value>Прочитать статус (требуется TTS)</value>
   </data>
   <data name="Mute / Unmute Selected Radio" xml:space="preserve">
-    <value>Silenciar / reactivar radio seleccionada</value>
+    <value>Приглушить / вернуть выбранное радио</value>
   </data>
   <data name="Mute / Unmute Other Radio" xml:space="preserve">
-    <value>Silenciar / reactivar otra radio</value>
+    <value>Приглушить / вернуть другое радио</value>
   </data>
   <data name="Mute / Unmute Both Radios" xml:space="preserve">
-    <value>Silenciar / reactivar ambas radios</value>
+    <value>Приглушить / вернуть оба радио</value>
   </data>
   <data name="Mute / Unmute Microphone" xml:space="preserve">
-    <value>Silenciar / reactivar microfono</value>
+    <value>Выключить / включить микрофон</value>
   </data>
   <data name="RCI" xml:space="preserve">
     <value>RCI</value>
   </data>
   <data name="No RCI active" xml:space="preserve">
-    <value>RCI no activo</value>
+    <value>RCI не активен</value>
   </data>
   <data name="Friendly RCI active" xml:space="preserve">
-    <value>RCI - Friendly only</value>
+    <value>RCI - только союзный</value>
   </data>
   <data name="Enemy RCI active" xml:space="preserve">
-    <value>RCI - Opposition only</value>
+    <value>RCI - только противник</value>
   </data>
   <data name="Both sides have RCI active" xml:space="preserve">
-    <value>RCI - Both coallitions</value>
+    <value>RCI - обе коалиции</value>
   </data>
   <data name="Request callsign CHN 2" xml:space="preserve">
-    <value>Request callsign CHN 2</value>
+    <value>Запросите позывной КАН 2</value>
   </data>
   <data name="Active RCO on duty, request a callsign ASAP" xml:space="preserve">
-    <value>Active RCO on duty, request a callsign ASAP</value>
+    <value>Активный RCO на дежурстве, срочно запросите позывной</value>
   </data>
   <data name="Callsign: {0}" xml:space="preserve">
-    <value>Callsign: {0}</value>
+    <value>Позывной: {0}</value>
   </data>
   <data name="RCO On Duty : {0}" xml:space="preserve">
-    <value>RCO On Duty : {0}</value>
+    <value>RCO на дежурстве: {0}</value>
   </data>
   <data name="RCI active" xml:space="preserve">
-    <value>RCI activo</value>
+    <value>RCI активен</value>
   </data>
   <data name="Community Recommended Profile Settings" xml:space="preserve">
-    <value>Ajustes de perfil recomendados por la comunidad</value>
+    <value>Рекомендуемые сообществом настройки профиля</value>
   </data>
   <data name="Would you like to apply the community recommended profile settings to the current profile?" xml:space="preserve">
-    <value>Desea aplicar los ajustes de perfil recomendados por la comunidad al perfil actual?</value>
+    <value>Применить рекомендуемые сообществом настройки к текущему профилю?</value>
   </data>
   <data name="This will set:" xml:space="preserve">
-    <value>Esto configurara:</value>
+    <value>Будут установлены:</value>
   </data>
   <data name="Select Yes to apply these settings. Select No to keep your current settings. You will not be asked again." xml:space="preserve">
-    <value>Seleccione Si para aplicar estos ajustes. Seleccione No para mantener los ajustes actuales. No se le volvera a preguntar.</value>
+    <value>Выберите Да, чтобы применить эти настройки. Выберите Нет, чтобы оставить текущие настройки. Этот вопрос больше не появится.</value>
   </data>
 </root>

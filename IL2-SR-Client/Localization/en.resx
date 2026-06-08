@@ -225,6 +225,9 @@
   <data name="Auto Start Radio Overlay" xml:space="preserve">
     <value>Auto Start Radio Overlay</value>
   </data>
+  <data name="Autostart Roster Overlay" xml:space="preserve">
+    <value>Autostart Roster Overlay</value>
+  </data>
   <data name="Auto Refocus IL2" xml:space="preserve">
     <value>Auto Refocus IL2</value>
   </data>
@@ -449,6 +452,9 @@
   </data>
   <data name="Please restart SRS for the language change to take effect." xml:space="preserve">
     <value>Please restart SRS for the language change to take effect.</value>
+  </data>
+  <data name="Restart SRS now to apply the language change?" xml:space="preserve">
+    <value>Restart SRS now to apply the language change?</value>
   </data>
   <data name="Input Devices Rescanned" xml:space="preserve">
     <value>Input Devices Rescanned</value>

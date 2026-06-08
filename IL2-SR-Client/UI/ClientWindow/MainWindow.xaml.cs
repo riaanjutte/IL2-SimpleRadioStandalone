@@ -75,6 +75,7 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI
 
         //used to debounce toggle
         private long _toggleShowHide;
+        private bool _pilotRosterAutoStartedForCurrentConnection;
 
         private readonly DispatcherTimer _updateTimer;
         private ServerAddress _serverAddress;
@@ -663,6 +664,8 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI
                 _globalSettings.GetClientSettingBool(GlobalSettingsKeys.RadioOverlayTaskbarHide);
             AutoStartRadioOverlayToggle.IsChecked =
                 _globalSettings.GetClientSettingBool(GlobalSettingsKeys.AutoStartRadioOverlay);
+            AutoStartPilotRosterToggle.IsChecked =
+                _globalSettings.GetClientSettingBool(GlobalSettingsKeys.AutoStartPilotRoster);
             RefocusIL2.IsChecked = _globalSettings.GetClientSettingBool(GlobalSettingsKeys.RefocusIL2);
             ExpandInputDevices.IsChecked = _globalSettings.GetClientSettingBool(GlobalSettingsKeys.ExpandControls);
 
@@ -766,6 +769,7 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI
             yield return AutoConnectMismatchPromptToggle;
             yield return RadioOverlayTaskbarItem;
             yield return AutoStartRadioOverlayToggle;
+            yield return AutoStartPilotRosterToggle;
             yield return RefocusIL2;
             yield return ExpandInputDevices;
             yield return MinimiseToTray;
@@ -1170,12 +1174,21 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI
 
             if (!showCombatBoxFeatures && (_pilotRosterWindow?.IsUnavailableMode == false))
             {
+                _pilotRosterAutoStartedForCurrentConnection = false;
                 _pilotRosterWindow?.Close();
                 _pilotRosterWindow = null;
             }
+            else if (!showCombatBoxFeatures)
+            {
+                _pilotRosterAutoStartedForCurrentConnection = false;
+            }
             else if (showCombatBoxFeatures && (_pilotRosterWindow?.IsUnavailableMode == true))
             {
-                ShowPilotRosterWindow(showUnavailableMessage: false);
+                EnsurePilotRosterWindow(showUnavailableMessage: false);
+            }
+            else if (showCombatBoxFeatures)
+            {
+                AutoStartPilotRoster();
             }
         }
 
@@ -1276,6 +1289,19 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI
             }
 
             Dispatcher.BeginInvoke(new Action(ShowRadioOverlay), DispatcherPriority.ContextIdle);
+        }
+
+        private void AutoStartPilotRoster()
+        {
+            if (_pilotRosterAutoStartedForCurrentConnection ||
+                !_globalSettings.GetClientSettingBool(GlobalSettingsKeys.AutoStartPilotRoster))
+            {
+                return;
+            }
+
+            _pilotRosterAutoStartedForCurrentConnection = true;
+            Dispatcher.BeginInvoke(new Action(() => EnsurePilotRosterWindow(showUnavailableMessage: false)),
+                DispatcherPriority.ContextIdle);
         }
 
         private void ShowRadioOverlay()
@@ -1437,6 +1463,11 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI
             _globalSettings.SetClientSetting(GlobalSettingsKeys.AutoStartRadioOverlay, (bool) AutoStartRadioOverlayToggle.IsChecked);
         }
 
+        private void AutoStartPilotRosterToggle_Click(object sender, RoutedEventArgs e)
+        {
+            _globalSettings.SetClientSetting(GlobalSettingsKeys.AutoStartPilotRoster, (bool)AutoStartPilotRosterToggle.IsChecked);
+        }
+
         private void IL2Refocus_OnClick_Click(object sender, RoutedEventArgs e)
         {
             _globalSettings.SetClientSetting(GlobalSettingsKeys.RefocusIL2, (bool) RefocusIL2.IsChecked);
@@ -1547,11 +1578,97 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI
             }
 
             _globalSettings.SetClientSetting(GlobalSettingsKeys.Language, selectedLanguage.Code);
-            MessageBox.Show(this,
-                LocalizationManager.Get("Please restart SRS for the language change to take effect."),
+            var restartResult = MessageBox.Show(this,
+                LocalizationManager.Get("Please restart SRS for the language change to take effect.") + "\n\n" +
+                LocalizationManager.Get("Restart SRS now to apply the language change?"),
                 LocalizationManager.Get("Restart Required"),
-                MessageBoxButton.OK,
-                MessageBoxImage.Information);
+                MessageBoxButton.YesNo,
+                MessageBoxImage.Question);
+
+            if (restartResult == MessageBoxResult.Yes)
+            {
+                RestartClient();
+            }
+        }
+
+        private void RestartClient()
+        {
+            try
+            {
+                var executablePath = Process.GetCurrentProcess().MainModule.FileName;
+                Process.Start(new ProcessStartInfo
+                {
+                    FileName = executablePath,
+                    WorkingDirectory = AppDomain.CurrentDomain.BaseDirectory,
+                    Arguments = BuildRestartArguments(),
+                    UseShellExecute = true
+                });
+
+                Application.Current.Shutdown();
+            }
+            catch (Exception ex)
+            {
+                Logger.Error(ex, "Unable to restart SRS after language change");
+                MessageBox.Show(this,
+                    LocalizationManager.Get("Please restart SRS for the language change to take effect."),
+                    LocalizationManager.Get("Restart Required"),
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Information);
+            }
+        }
+
+        private static string BuildRestartArguments()
+        {
+            var args = Environment.GetCommandLineArgs()
+                .Skip(1)
+                .Where(arg => !string.Equals(arg, "-allowMultiple", StringComparison.OrdinalIgnoreCase))
+                .Select(QuoteCommandLineArgument)
+                .ToList();
+
+            args.Add("-allowMultiple");
+            return string.Join(" ", args);
+        }
+
+        private static string QuoteCommandLineArgument(string argument)
+        {
+            if (argument == null)
+            {
+                return "\"\"";
+            }
+
+            if (argument.Length > 0 && argument.IndexOfAny(new[] {' ', '\t', '\n', '\v', '"'}) < 0)
+            {
+                return argument;
+            }
+
+            var quoted = new System.Text.StringBuilder();
+            quoted.Append('"');
+
+            var backslashes = 0;
+            foreach (var character in argument)
+            {
+                if (character == '\\')
+                {
+                    backslashes++;
+                    continue;
+                }
+
+                if (character == '"')
+                {
+                    quoted.Append('\\', (backslashes * 2) + 1);
+                    quoted.Append('"');
+                    backslashes = 0;
+                    continue;
+                }
+
+                quoted.Append('\\', backslashes);
+                backslashes = 0;
+                quoted.Append(character);
+            }
+
+            quoted.Append('\\', backslashes * 2);
+            quoted.Append('"');
+            return quoted.ToString();
         }
 
         private void ThemeRadioButton_Checked(object sender, RoutedEventArgs e)
@@ -1721,17 +1838,29 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI
                 (_pilotRosterWindow.WindowState == WindowState.Minimized) ||
                 (_pilotRosterWindow.IsUnavailableMode != showUnavailableMessage))
             {
-                _pilotRosterWindow?.Close();
-
-                _pilotRosterWindow = new PilotRosterWindow(showUnavailableMessage);
-                _pilotRosterWindow.WindowStartupLocation = WindowStartupLocation.Manual;
-                _pilotRosterWindow.Show();
+                EnsurePilotRosterWindow(showUnavailableMessage);
             }
             else
             {
                 _pilotRosterWindow?.Close();
                 _pilotRosterWindow = null;
             }
+        }
+
+        private void EnsurePilotRosterWindow(bool showUnavailableMessage)
+        {
+            if (_pilotRosterWindow != null && _pilotRosterWindow.IsVisible &&
+                _pilotRosterWindow.WindowState != WindowState.Minimized &&
+                _pilotRosterWindow.IsUnavailableMode == showUnavailableMessage)
+            {
+                return;
+            }
+
+            _pilotRosterWindow?.Close();
+
+            _pilotRosterWindow = new PilotRosterWindow(showUnavailableMessage);
+            _pilotRosterWindow.WindowStartupLocation = WindowStartupLocation.Manual;
+            _pilotRosterWindow.Show();
         }
 
         private void ShowTransmitterName_OnClick_OnClick(object sender, RoutedEventArgs e)

@@ -4,7 +4,7 @@
 
 ## Community Edition highlights
 
-1. Localization support for English, German, French, and Spanish, with editable `.resx` translation files.
+1. Localization support for English, German, French, Spanish, Italian, and Russian, with editable `.resx` translation files.
 2. Improved joystick reconnect handling so PTT can recover after device disconnect/reconnect.
 3. Expanded radio overlay with 12 channel buttons, channel up/down controls, pilot counts, mute support, and RCI status on Combat Box.
 4. Community recommended settings prompt for existing users.
@@ -16,7 +16,14 @@ Thanks to Broadway for extensive testing, practical feedback, and suggestions th
 
 ## Helping with translations
 
-Client translations live in `IL2-SR-Client/Localization/*.resx`. The current non-English text is machine translated, so community corrections are welcome: keep the English `name` keys unchanged and edit the translated `<value>` text. See `IL2-SR-Client/Localization/README.md` for the full workflow.
+Client translations live in `IL2-SR-Client/Localization/*.resx`. The current non-English text is machine translated, so community corrections are welcome.
+
+You can help in two ways:
+
+1. Open a GitHub issue using the `Translation correction` template.
+2. Edit the relevant `.resx` file and open a pull request.
+
+See `TRANSLATING.md` for the full workflow. Translation pull requests are automatically checked for missing keys, duplicate keys, invalid XML, blank values, and broken placeholders such as `{0}`.
 
 # IL2-SimpleRadio Standalone
 An open source Stand alone Radio for IL2

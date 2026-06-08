@@ -2,6 +2,10 @@
 
 The client loads translations from the `.resx` files in this folder. These files are intended to be easy for the community to edit without changing C# code or rebuilding the app.
 
+For the full contributor workflow, see `../../TRANSLATING.md`.
+
+If you do not want to edit files directly, open a GitHub issue using the `Translation correction` template.
+
 ## Updating a translation
 
 1. Open the language file, for example `es.resx`.
@@ -27,3 +31,17 @@ Example:
 The language picker uses the file name as the language code. For built-in languages, the existing display names are preserved. For new languages, the client uses the culture's native display name when Windows recognizes the code.
 
 If a translation is missing or invalid, the client falls back to English for that text.
+
+## Validation
+
+Translation pull requests are checked automatically. You can run the same validation locally from the repository root:
+
+```powershell
+pwsh ./scripts/Validate-ResxTranslations.ps1
+```
+
+On Windows PowerShell:
+
+```powershell
+powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\Validate-ResxTranslations.ps1
+```

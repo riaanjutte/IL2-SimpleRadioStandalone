@@ -720,14 +720,14 @@
                                Grid.Column="0"
                                HorizontalContentAlignment="Center"
                                VerticalContentAlignment="Center"
-                               Content="Auto Refocus IL2" />
+                               Content="Autostart Roster Overlay" />
 
-                            <ToggleButton Name="RefocusIL2"
+                            <ToggleButton Name="AutoStartPilotRosterToggle"
                                       Grid.Row="5"
                                       Grid.Column="1"
                                       HorizontalContentAlignment="Center"
                                       VerticalContentAlignment="Center"
-                                      Click="IL2Refocus_OnClick_Click">
+                                      Click="AutoStartPilotRosterToggle_Click">
                                 <ToggleButton.Style>
                                     <Style TargetType="{x:Type ToggleButton}">
                                         <Setter Property="Content" Value="ON" />
@@ -748,14 +748,14 @@
                                Grid.Column="0"
                                HorizontalContentAlignment="Center"
                                VerticalContentAlignment="Center"
-                               Content="Allow More Input Devices" />
+                               Content="Auto Refocus IL2" />
 
-                            <ToggleButton Name="ExpandInputDevices"
+                            <ToggleButton Name="RefocusIL2"
                                       Grid.Row="6"
                                       Grid.Column="1"
                                       HorizontalContentAlignment="Center"
                                       VerticalContentAlignment="Center"
-                                      Click="ExpandInputDevices_OnClick_Click">
+                                      Click="IL2Refocus_OnClick_Click">
                                 <ToggleButton.Style>
                                     <Style TargetType="{x:Type ToggleButton}">
                                         <Setter Property="Content" Value="ON" />
@@ -776,14 +776,14 @@
                                Grid.Column="0"
                                HorizontalContentAlignment="Center"
                                VerticalContentAlignment="Center"
-                               Content="Microphone Automatic Gain Control" />
+                               Content="Allow More Input Devices" />
 
-                            <ToggleButton Name="MicAGC"
+                            <ToggleButton Name="ExpandInputDevices"
                                       Grid.Row="7"
                                       Grid.Column="1"
                                       HorizontalContentAlignment="Center"
                                       VerticalContentAlignment="Center"
-                                      Click="MicAGC_OnClick">
+                                      Click="ExpandInputDevices_OnClick_Click">
                                 <ToggleButton.Style>
                                     <Style TargetType="{x:Type ToggleButton}">
                                         <Setter Property="Content" Value="ON" />
@@ -804,10 +804,38 @@
                                Grid.Column="0"
                                HorizontalContentAlignment="Center"
                                VerticalContentAlignment="Center"
+                               Content="Microphone Automatic Gain Control" />
+
+                            <ToggleButton Name="MicAGC"
+                                      Grid.Row="8"
+                                      Grid.Column="1"
+                                      HorizontalContentAlignment="Center"
+                                      VerticalContentAlignment="Center"
+                                      Click="MicAGC_OnClick">
+                                <ToggleButton.Style>
+                                    <Style TargetType="{x:Type ToggleButton}">
+                                        <Setter Property="Content" Value="ON" />
+                                        <Style.Triggers>
+                                            <Trigger Property="IsChecked" Value="True">
+                                                <Setter Property="Content" Value="ON" />
+                                            </Trigger>
+                                            <Trigger Property="IsChecked" Value="False">
+                                                <Setter Property="Content" Value="OFF" />
+                                            </Trigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </ToggleButton.Style>
+                            </ToggleButton>
+
+
+                            <Label Grid.Row="9"
+                               Grid.Column="0"
+                               HorizontalContentAlignment="Center"
+                               VerticalContentAlignment="Center"
                                Content="Microphone Noise Suppression" />
 
                             <ToggleButton Name="MicDenoise"
-                                      Grid.Row="8"
+                                      Grid.Row="9"
                                       Grid.Column="1"
                                       HorizontalContentAlignment="Center"
                                       VerticalContentAlignment="Center"
@@ -827,14 +855,14 @@
                                 </ToggleButton.Style>
                             </ToggleButton>
 
-                            <Label Grid.Row="9"
+                            <Label Grid.Row="10"
                                Grid.Column="0"
                                HorizontalContentAlignment="Center"
                                VerticalContentAlignment="Center"
                                Content="Minimise to tray" />
 
                             <ToggleButton Name="MinimiseToTray"
-                                      Grid.Row="9"
+                                      Grid.Row="10"
                                       Grid.Column="1"
                                       HorizontalContentAlignment="Center"
                                       VerticalContentAlignment="Center"
@@ -854,14 +882,14 @@
                                 </ToggleButton.Style>
                             </ToggleButton>
 
-                            <Label Grid.Row="10"
+                            <Label Grid.Row="11"
                                Grid.Column="0"
                                HorizontalContentAlignment="Center"
                                VerticalContentAlignment="Center"
                                Content="Start minimised" />
 
                             <ToggleButton Name="StartMinimised"
-                                      Grid.Row="10"
+                                      Grid.Row="11"
                                       Grid.Column="1"
                                       HorizontalContentAlignment="Center"
                                       VerticalContentAlignment="Center"
@@ -881,14 +909,14 @@
                                 </ToggleButton.Style>
                             </ToggleButton>
 
-                            <Label Grid.Row="11"
+                            <Label Grid.Row="12"
                                Grid.Column="0"
                                HorizontalContentAlignment="Center"
                                VerticalContentAlignment="Center"
                                Content="Check for beta updates" />
 
                             <ToggleButton Name="CheckForBetaUpdates"
-                                      Grid.Row="11"
+                                      Grid.Row="12"
                                       Grid.Column="1"
                                       HorizontalContentAlignment="Center"
                                       VerticalContentAlignment="Center"
@@ -908,14 +936,14 @@
                                 </ToggleButton.Style>
                             </ToggleButton>
 
-                            <Label Grid.Row="12"
+                            <Label Grid.Row="13"
                                Grid.Column="0"
                                HorizontalContentAlignment="Center"
                                VerticalContentAlignment="Center"
                                Content="Play connection sounds" />
 
                             <ToggleButton Name="PlayConnectionSounds"
-                                      Grid.Row="12"
+                                      Grid.Row="13"
                                       Grid.Column="1"
                                       HorizontalContentAlignment="Center"
                                       VerticalContentAlignment="Center"
