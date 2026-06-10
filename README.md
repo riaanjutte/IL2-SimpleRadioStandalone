@@ -2,6 +2,10 @@
   <img src="SRSforIL2-CE.png" alt="IL2-SRS Community Edition" />
 </p>
 
+## Download
+
+Download the latest stable Community Edition updater: [IL2-SRS-AutoUpdater.exe](https://github.com/riaanjutte/IL2-SimpleRadioStandalone/releases/latest/download/IL2-SRS-AutoUpdater.exe).
+
 ## Community Edition highlights
 
 1. Localization support for English, German, French, Spanish, Italian, and Russian, with editable `.resx` translation files.
