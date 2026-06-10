@@ -11,8 +11,9 @@ Download the latest stable Community Edition updater: [IL2-SRS-AutoUpdater.exe](
 1. Localization support for English, German, French, Spanish, Italian, and Russian, with editable `.resx` translation files.
 2. Improved joystick reconnect handling so PTT can recover after device disconnect/reconnect.
 3. Expanded radio overlay with 12 channel buttons, channel up/down controls, pilot counts, mute support, and RCI status on Combat Box.
-4. Community recommended settings prompt for existing users.
-5. Dark mode with Windows theme detection.
+4. Pilot Roster window for Combat Box showing friendly pilots, callsigns, and tuned radio channels.
+5. Community recommended settings prompt for existing users.
+6. Dark mode with Windows theme detection.
 
 ## Community thanks
 
