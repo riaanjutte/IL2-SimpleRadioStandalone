@@ -28,7 +28,7 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI.ClientWindow.Favourites
             }
 
             NewAddressCommand = new DelegateCommand(OnNewAddress);
-            RemoveSelectedCommand = new DelegateCommand(OnRemoveSelected);
+            RemoveServerCommand = new DelegateCommand(OnRemoveServer);
             OnDefaultChangedCommand = new DelegateCommand(OnDefaultChanged);
         }
 
@@ -43,7 +43,7 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI.ClientWindow.Favourites
 
         public ICommand SaveCommand { get; set; }
 
-        public ICommand RemoveSelectedCommand { get; set; }
+        public ICommand RemoveServerCommand { get; set; }
 
         public ICommand OnDefaultChangedCommand { get; set; }
 
@@ -70,14 +70,15 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI.ClientWindow.Favourites
             Save();
         }
 
-        private void OnRemoveSelected()
+        private void OnRemoveServer(object obj)
         {
-            if (SelectedItem == null)
+            var address = obj as ServerAddress;
+            if (address == null)
             {
                 return;
             }
 
-            _addresses.Remove(SelectedItem);
+            _addresses.Remove(address);
 
             if (_addresses.Count == 0 && !string.IsNullOrEmpty(_globalSettings.GetClientSetting(GlobalSettingsKeys.LastServer).StringValue))
             {
