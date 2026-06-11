@@ -293,6 +293,7 @@
     <Compile Include="UI\Sounds.cs" />
     <Compile Include="UI\ToolTips.cs" />
     <Compile Include="Utils\DelegateCommand.cs" />
+    <Compile Include="Utils\PanelWeathering.cs" />
     <Compile Include="Utils\RadioHelper.cs" />
     <Compile Include="Utils\ScrewSlotRandomizer.cs" />
     <Compile Include="Utils\StartupConfigTelemetry.cs" />

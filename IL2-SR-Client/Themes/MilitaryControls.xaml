@@ -422,6 +422,11 @@
                                 BorderThickness="1,1,0,0"
                                 CornerRadius="5">
                             <Grid>
+                                <!-- procedural wear: scratches, scuffs, edge grime -->
+                                <Rectangle RadiusX="5"
+                                           RadiusY="5"
+                                           utils:PanelWeathering.Enabled="True" />
+
                                 <!-- corner screws -->
                                 <Control Template="{StaticResource MilPanelScrew}"
                                          HorizontalAlignment="Left" VerticalAlignment="Top" Margin="5,5,0,0" />
