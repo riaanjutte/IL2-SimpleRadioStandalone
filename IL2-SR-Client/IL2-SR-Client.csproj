@@ -384,6 +384,10 @@
     </None>
     <None Include="Fonts\JustAnotherHand-LICENSE.txt" />
     <Resource Include="Fonts\JustAnotherHand-Regular.ttf" />
+    <None Include="Fonts\AllertaStencil-LICENSE.txt" />
+    <Resource Include="Fonts\AllertaStencil-Regular.ttf" />
+    <None Include="Fonts\ShareTechMono-LICENSE.txt" />
+    <Resource Include="Fonts\ShareTechMono-Regular.ttf" />
     <Content Include="NLog.config">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
