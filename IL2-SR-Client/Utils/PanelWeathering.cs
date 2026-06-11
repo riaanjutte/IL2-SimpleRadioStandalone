@@ -62,6 +62,7 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.Utils
             using (var dc = visual.RenderOpen())
             {
                 DrawGrime(dc, w, h);
+                DrawWornPaint(dc, w, h);
                 DrawScratches(dc, w, h);
                 DrawScuffs(dc, w, h);
             }
@@ -125,10 +126,93 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.Utils
             }
         }
 
+        private static void DrawWornPaint(DrawingContext dc, int w, int h)
+        {
+            // paint rubbed through to bare metal where hands and gear touch:
+            // corner chips around the screws, flecks and rub patches along edges
+            var metal = new[]
+            {
+                Color.FromRgb(0x9C, 0x8C, 0x6A),
+                Color.FromRgb(0xA9, 0x9B, 0x7C),
+                Color.FromRgb(0xB5, 0xA3, 0x7F)
+            };
+
+            // corner chip clusters
+            var corners = new[]
+            {
+                new Point(0, 0), new Point(w, 0), new Point(0, h), new Point(w, h)
+            };
+            foreach (var corner in corners)
+            {
+                var chips = 6 + Rng.Next(10);
+                for (var i = 0; i < chips; i++)
+                {
+                    var dx = Rng.NextDouble() * Rng.NextDouble() * 26;
+                    var dy = Rng.NextDouble() * Rng.NextDouble() * 26;
+                    var x = corner.X == 0 ? dx : corner.X - dx;
+                    var y = corner.Y == 0 ? dy : corner.Y - dy;
+                    var alpha = (byte)(14 + Rng.Next(30));
+                    var brush = new SolidColorBrush(
+                        Color.FromArgb(alpha, metal[Rng.Next(metal.Length)].R, metal[Rng.Next(metal.Length)].G, metal[Rng.Next(metal.Length)].B));
+                    brush.Freeze();
+                    var r = 0.5 + Rng.NextDouble() * 1.6;
+                    dc.DrawEllipse(brush, null, new Point(x, y), r, r * (0.6 + Rng.NextDouble() * 0.4));
+                }
+            }
+
+            // edge rub patches: runs of short strokes parallel to the nearest edge
+            var patches = 3 + Rng.Next(4) + (w + h) / 400;
+            for (var i = 0; i < patches; i++)
+            {
+                var edge = Rng.Next(4); // 0=top 1=bottom 2=left 3=right
+                var along = Rng.NextDouble();
+                var inset = Rng.NextDouble() * Rng.NextDouble() * 8;
+                double cx, cy, angle;
+                switch (edge)
+                {
+                    case 0: cx = along * w; cy = inset; angle = 0; break;
+                    case 1: cx = along * w; cy = h - inset; angle = 0; break;
+                    case 2: cx = inset; cy = along * h; angle = Math.PI / 2; break;
+                    default: cx = w - inset; cy = along * h; angle = Math.PI / 2; break;
+                }
+
+                var strokes = 4 + Rng.Next(6);
+                var tone = metal[Rng.Next(metal.Length)];
+                for (var s = 0; s < strokes; s++)
+                {
+                    var offset = (s - strokes / 2.0) * (0.9 + Rng.NextDouble() * 0.6);
+                    var ox = cx + Math.Cos(angle + Math.PI / 2) * offset + (Rng.NextDouble() - 0.5) * 4;
+                    var oy = cy + Math.Sin(angle + Math.PI / 2) * offset + (Rng.NextDouble() - 0.5) * 2;
+                    var len = 5 + Rng.NextDouble() * 16;
+                    var alpha = (byte)(8 + Rng.Next(14));
+                    var pen = new Pen(new SolidColorBrush(Color.FromArgb(alpha, tone.R, tone.G, tone.B)),
+                        0.6 + Rng.NextDouble() * 0.6);
+                    pen.Freeze();
+                    dc.DrawLine(pen,
+                        new Point(ox - Math.Cos(angle) * len / 2, oy - Math.Sin(angle) * len / 2),
+                        new Point(ox + Math.Cos(angle) * len / 2, oy + Math.Sin(angle) * len / 2));
+                }
+            }
+
+            // stray chips scattered across the face
+            var flecks = 8 + (w * h) / 30000;
+            for (var i = 0; i < flecks; i++)
+            {
+                var x = Rng.NextDouble() * w;
+                var y = Rng.NextDouble() * h;
+                var alpha = (byte)(10 + Rng.Next(22));
+                var tone = metal[Rng.Next(metal.Length)];
+                var brush = new SolidColorBrush(Color.FromArgb(alpha, tone.R, tone.G, tone.B));
+                brush.Freeze();
+                var r = 0.4 + Rng.NextDouble() * 1.1;
+                dc.DrawEllipse(brush, null, new Point(x, y), r, r * (0.5 + Rng.NextDouble() * 0.5));
+            }
+        }
+
         private static void DrawGrime(DrawingContext dc, int w, int h)
         {
             // dirt collects along edges and in corners: dense speckle, no gradients
-            var count = 60 + (w * h) / 1200;
+            var count = 120 + (w * h) / 600;
             for (var i = 0; i < count; i++)
             {
                 // bias positions towards the plate border
@@ -140,8 +224,8 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.Utils
                     ? Rng.NextDouble() * h
                     : (Rng.NextDouble() < 0.5 ? Rng.NextDouble() * Rng.NextDouble() * h * 0.25 : h - Rng.NextDouble() * Rng.NextDouble() * h * 0.25);
 
-                var radius = 0.4 + Rng.NextDouble() * 0.9;
-                var alpha = (byte)(8 + Rng.Next(18));
+                var radius = 0.4 + Rng.NextDouble() * 1.1;
+                var alpha = (byte)(12 + Rng.Next(26));
                 var brush = new SolidColorBrush(Color.FromArgb(alpha, 0x0A, 0x07, 0x03));
                 brush.Freeze();
                 dc.DrawEllipse(brush, null, new Point(x, y), radius, radius);
