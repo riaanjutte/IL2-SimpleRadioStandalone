@@ -32,7 +32,6 @@
             </ResourceDictionary.MergedDictionaries>
             <converters:MicAvailabilityTooltipConverter x:Key="MicAvailabilityTooltipConverter" />
             <converters:BooleanToLedBrushConverter x:Key="LedBrushConverter" />
-            <converters:StringToUpperConverter x:Key="StringToUpperConverter" />
         </ResourceDictionary>
     </controls:MetroWindow.Resources>
 
@@ -48,14 +47,6 @@
     </controls:MetroWindow.TitleTemplate>
 
     <TabControl x:Name="TabControl">
-        <TabControl.ItemTemplate>
-            <DataTemplate>
-                <TextBlock FontFamily="{StaticResource MilFontMono}"
-                           FontSize="13"
-                           Text="{Binding Converter={StaticResource StringToUpperConverter}}"
-                           TextWrapping="NoWrap" />
-            </DataTemplate>
-        </TabControl.ItemTemplate>
         <TabItem Header="General">
             <GroupBox x:Name="GroupBox"
                       Margin="5"
