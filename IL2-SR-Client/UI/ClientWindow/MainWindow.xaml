@@ -35,7 +35,56 @@
         </ResourceDictionary>
     </controls:MetroWindow.Resources>
 
-    <TabControl x:Name="TabControl">
+    <DockPanel>
+        <Border DockPanel.Dock="Bottom"
+                Background="{StaticResource MilWellBrush}"
+                BorderBrush="{StaticResource MilBorderBrush}"
+                BorderThickness="0,1,0,0">
+            <DockPanel Margin="10,3" LastChildFill="False">
+                <StackPanel DockPanel.Dock="Left" Orientation="Horizontal">
+                    <Ellipse Width="9" Height="9" VerticalAlignment="Center"
+                             Fill="{Binding AudioInput.MicrophoneAvailable, Converter={StaticResource LedBrushConverter}}" />
+                    <Label Content="Mic" Margin="1,0,10,0" Padding="2,0"
+                           FontFamily="{StaticResource MilFontMono}" FontSize="11"
+                           Foreground="{StaticResource MilTextSecondaryBrush}" />
+                    <Ellipse Width="9" Height="9" VerticalAlignment="Center"
+                             Fill="{Binding ClientState.IsConnected, Converter={StaticResource LedBrushConverter}}" />
+                    <Label Content="Server" Margin="1,0,10,0" Padding="2,0"
+                           FontFamily="{StaticResource MilFontMono}" FontSize="11"
+                           Foreground="{StaticResource MilTextSecondaryBrush}" />
+                    <Ellipse Width="9" Height="9" VerticalAlignment="Center"
+                             Fill="{Binding ClientState.IsVoipConnected, Converter={StaticResource LedBrushConverter}}" />
+                    <Label Content="VOIP" Margin="1,0,10,0" Padding="2,0"
+                           FontFamily="{StaticResource MilFontMono}" FontSize="11"
+                           Foreground="{StaticResource MilTextSecondaryBrush}" />
+                    <Ellipse Width="9" Height="9" VerticalAlignment="Center"
+                             Fill="{Binding ClientState.IsGameConnected, Converter={StaticResource LedBrushConverter}}" />
+                    <Label Content="Il-2" Margin="1,0,0,0" Padding="2,0"
+                           FontFamily="{StaticResource MilFontMono}" FontSize="11"
+                           Foreground="{StaticResource MilTextSecondaryBrush}" />
+                </StackPanel>
+                <StackPanel DockPanel.Dock="Right" Orientation="Horizontal">
+                    <Label Content="Connected Clients:" Padding="2,0"
+                           FontFamily="{StaticResource MilFontMono}" FontSize="11"
+                           Foreground="{StaticResource MilTextSecondaryBrush}" />
+                    <TextBlock Text="{Binding Clients.Total}" VerticalAlignment="Center"
+                               FontFamily="{StaticResource MilFontMono}" FontSize="11"
+                               Foreground="{StaticResource MilTextPrimaryBrush}" />
+                    <TextBlock Text="  |  " VerticalAlignment="Center" FontSize="11"
+                               Foreground="{StaticResource MilBorderBrush}" />
+                    <Label Name="CurrentProfile" Content="None" Padding="2,0"
+                           FontFamily="{StaticResource MilFontMono}" FontSize="11"
+                           Foreground="{StaticResource MilTextPrimaryBrush}" />
+                    <TextBlock Text="  |  " VerticalAlignment="Center" FontSize="11"
+                               Foreground="{StaticResource MilBorderBrush}" />
+                    <TextBlock x:Name="StatusVersionLabel" VerticalAlignment="Center"
+                               FontFamily="{StaticResource MilFontMono}" FontSize="11"
+                               Foreground="{StaticResource MilTextSecondaryBrush}" />
+                </StackPanel>
+            </DockPanel>
+        </Border>
+
+        <TabControl x:Name="TabControl">
         <TabItem Header="General">
             <GroupBox x:Name="GroupBox"
                       Margin="5"
@@ -238,53 +287,6 @@
                     <StackPanel Margin="0"
                                 HorizontalAlignment="Center"
                                 Orientation="Horizontal"/>
-                    <StackPanel HorizontalAlignment="Center" Orientation="Horizontal" Margin="0,0,0,5">
-                        <Label Content="Current Profile:"></Label>
-                        <Label Name="CurrentProfile" Content="None"></Label>
-                    </StackPanel>
-                    <StackPanel Margin="0"
-                                HorizontalAlignment="Center"
-                                Orientation="Horizontal">
-                        <Label HorizontalAlignment="Center" Content="Connected Clients:" />
-                        <Label x:Name="ClientCount"
-                               HorizontalAlignment="Center">
-                            <Label.Content>
-                                <TextBlock> <!-- https://stackoverflow.com/questions/4399178/stringformat-and-multibinding-with-label -->
-                                    <TextBlock.Text>
-                                        <MultiBinding StringFormat=" {0}">
-                                            <Binding Path="Clients.Total" />
-                                        </MultiBinding>
-                                    </TextBlock.Text>
-                                </TextBlock>
-                            </Label.Content>
-                        </Label>
-                    </StackPanel>
-
-                    <StackPanel Margin="0"
-                                HorizontalAlignment="Center"
-                                Orientation="Horizontal">
-                        <StackPanel.Resources>
-                            <converters:ConnectionStatusImageConverter x:Key="ConnectionStatusImageConverter"/>
-                        </StackPanel.Resources>
-                        <Label HorizontalAlignment="Center" HorizontalContentAlignment="Center" Content="Server" />
-                        <Image x:Name="ServerConnectionStatus"
-                               Source="{Binding Path=ClientState.IsConnected, Converter={StaticResource ConnectionStatusImageConverter}}"
-                               HorizontalAlignment="Center"
-                               Height="26"
-                               Margin="5,0,5,0" />
-                        <Label HorizontalAlignment="Center" HorizontalContentAlignment="Center" Content="VOIP" />
-                        <Image x:Name="VOIPConnectionStatus"
-                               Source="{Binding Path=ClientState.IsVoipConnected, Converter={StaticResource ConnectionStatusImageConverter}}"
-                               Height="26"
-                               HorizontalAlignment="Center"
-                               Margin="5,0,5,0" />
-                        <Label HorizontalAlignment="Center" HorizontalContentAlignment="Center" Content="Il-2" />
-                        <Image x:Name="GameConnectionStatus"
-                               Source="{Binding Path=ClientState.IsGameConnected, Converter={StaticResource ConnectionStatusImageConverter}}"
-                               Height="26"
-                               HorizontalAlignment="Center" 
-                               Margin="5,0,5,0" />
-                    </StackPanel>
                     <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
                         <Button Content="Patreon - Support SRS"
                                 Width="190"
@@ -1536,4 +1538,5 @@
         </TabItem>
 
     </TabControl>
+    </DockPanel>
 </controls:MetroWindow>
