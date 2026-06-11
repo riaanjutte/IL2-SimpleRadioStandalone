@@ -52,23 +52,39 @@
                 BorderThickness="0,1,0,0">
             <DockPanel Margin="10,3" LastChildFill="False">
                 <StackPanel DockPanel.Dock="Left" Orientation="Horizontal">
-                    <Ellipse Width="9" Height="9" VerticalAlignment="Center"
-                             Fill="{Binding AudioInput.MicrophoneAvailable, Converter={StaticResource LedBrushConverter}}" />
+                    <Grid Width="13" Height="13" VerticalAlignment="Center">
+                        <Ellipse Fill="{StaticResource MilLampBezelBrush}" />
+                        <Ellipse Margin="2"
+                                 Fill="{Binding AudioInput.MicrophoneAvailable, Converter={StaticResource LedBrushConverter}}" />
+                        <Ellipse Margin="2" Fill="{StaticResource MilLampGlassBrush}" />
+                    </Grid>
                     <Label Content="Mic" Margin="1,0,10,0" Padding="2,0"
                            FontFamily="{StaticResource MilFontMono}" FontSize="11"
                            Foreground="{StaticResource MilTextSecondaryBrush}" />
-                    <Ellipse Width="9" Height="9" VerticalAlignment="Center"
-                             Fill="{Binding ClientState.IsConnected, Converter={StaticResource LedBrushConverter}}" />
+                    <Grid Width="13" Height="13" VerticalAlignment="Center">
+                        <Ellipse Fill="{StaticResource MilLampBezelBrush}" />
+                        <Ellipse Margin="2"
+                                 Fill="{Binding ClientState.IsConnected, Converter={StaticResource LedBrushConverter}}" />
+                        <Ellipse Margin="2" Fill="{StaticResource MilLampGlassBrush}" />
+                    </Grid>
                     <Label Content="Server" Margin="1,0,10,0" Padding="2,0"
                            FontFamily="{StaticResource MilFontMono}" FontSize="11"
                            Foreground="{StaticResource MilTextSecondaryBrush}" />
-                    <Ellipse Width="9" Height="9" VerticalAlignment="Center"
-                             Fill="{Binding ClientState.IsVoipConnected, Converter={StaticResource LedBrushConverter}}" />
+                    <Grid Width="13" Height="13" VerticalAlignment="Center">
+                        <Ellipse Fill="{StaticResource MilLampBezelBrush}" />
+                        <Ellipse Margin="2"
+                                 Fill="{Binding ClientState.IsVoipConnected, Converter={StaticResource LedBrushConverter}}" />
+                        <Ellipse Margin="2" Fill="{StaticResource MilLampGlassBrush}" />
+                    </Grid>
                     <Label Content="VOIP" Margin="1,0,10,0" Padding="2,0"
                            FontFamily="{StaticResource MilFontMono}" FontSize="11"
                            Foreground="{StaticResource MilTextSecondaryBrush}" />
-                    <Ellipse Width="9" Height="9" VerticalAlignment="Center"
-                             Fill="{Binding ClientState.IsGameConnected, Converter={StaticResource LedBrushConverter}}" />
+                    <Grid Width="13" Height="13" VerticalAlignment="Center">
+                        <Ellipse Fill="{StaticResource MilLampBezelBrush}" />
+                        <Ellipse Margin="2"
+                                 Fill="{Binding ClientState.IsGameConnected, Converter={StaticResource LedBrushConverter}}" />
+                        <Ellipse Margin="2" Fill="{StaticResource MilLampGlassBrush}" />
+                    </Grid>
                     <Label Content="Il-2" Margin="1,0,0,0" Padding="2,0"
                            FontFamily="{StaticResource MilFontMono}" FontSize="11"
                            Foreground="{StaticResource MilTextSecondaryBrush}" />

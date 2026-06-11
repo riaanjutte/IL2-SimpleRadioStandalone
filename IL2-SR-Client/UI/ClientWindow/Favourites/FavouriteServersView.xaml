@@ -70,7 +70,7 @@
                 </Style>
             </DataGrid.Resources>
             <DataGrid.Columns>
-                <DataGridTemplateColumn Header="Name"                                        Width="192">
+                <DataGridTemplateColumn Header="Name"                                        Width="165">
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
                             <TextBlock Style="{StaticResource FavouriteServerTextCellStyle}"
@@ -78,7 +78,7 @@
                         </DataTemplate>
                     </DataGridTemplateColumn.CellTemplate>
                 </DataGridTemplateColumn>
-                <DataGridTemplateColumn Header="ServerAddress/port"                                        Width="252">
+                <DataGridTemplateColumn Header="ServerAddress/port"                                        Width="225">
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
                             <TextBlock Style="{StaticResource FavouriteServerTextCellStyle}"
@@ -86,7 +86,7 @@
                         </DataTemplate>
                     </DataGridTemplateColumn.CellTemplate>
                 </DataGridTemplateColumn>
-                <DataGridTemplateColumn Header="Is Default"                                        Width="132">
+                <DataGridTemplateColumn Header="Is Default"                                        Width="120">
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate DataType="ui:ServerAddress">
 

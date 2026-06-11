@@ -16,12 +16,10 @@
         <Setter Property="VerticalContentAlignment" Value="Center" />
     </Style>
 
-    <!-- ============ Buttons ============ -->
+    <!-- ============ Buttons: physical pushbuttons (dark rim, bevelled gradient face) ============ -->
     <Style x:Key="MilButtonBase" TargetType="{x:Type ButtonBase}">
         <Setter Property="Foreground" Value="{StaticResource MilTextPrimaryBrush}" />
-        <Setter Property="Background" Value="{StaticResource MilChromeBrush}" />
-        <Setter Property="BorderBrush" Value="{StaticResource MilBorderBrush}" />
-        <Setter Property="BorderThickness" Value="1" />
+        <Setter Property="Background" Value="{StaticResource MilBtnDarkFaceBrush}" />
         <Setter Property="Padding" Value="10,4" />
         <Setter Property="FontSize" Value="12" />
         <Setter Property="HorizontalContentAlignment" Value="Center" />
@@ -30,32 +28,45 @@
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="{x:Type ButtonBase}">
-                    <Border x:Name="Bd"
-                            Background="{TemplateBinding Background}"
-                            BorderBrush="{TemplateBinding BorderBrush}"
-                            BorderThickness="{TemplateBinding BorderThickness}"
-                            CornerRadius="2"
-                            Padding="{TemplateBinding Padding}">
-                        <ContentPresenter HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
-                                          VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
-                                          RecognizesAccessKey="True" />
+                    <Border x:Name="Rim"
+                            Background="#15100A"
+                            CornerRadius="4"
+                            Padding="1">
+                        <Border x:Name="Face"
+                                Background="{TemplateBinding Background}"
+                                BorderBrush="#38FFF6DC"
+                                BorderThickness="1,1,1,0"
+                                CornerRadius="3"
+                                Padding="{TemplateBinding Padding}">
+                            <ContentPresenter x:Name="Content"
+                                              HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+                                              VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
+                                              RecognizesAccessKey="True" />
+                        </Border>
                     </Border>
                     <ControlTemplate.Triggers>
-                        <Trigger Property="IsMouseOver" Value="True">
-                            <Setter TargetName="Bd" Property="Background" Value="{StaticResource MilBorderBrush}" />
-                        </Trigger>
                         <Trigger Property="IsPressed" Value="True">
-                            <Setter TargetName="Bd" Property="Background" Value="{StaticResource MilWellBrush}" />
+                            <Setter TargetName="Face" Property="BorderThickness" Value="1,0,1,1" />
+                            <Setter TargetName="Face" Property="BorderBrush" Value="#22FFF6DC" />
+                            <Setter TargetName="Content" Property="Margin" Value="0,1,0,-1" />
                         </Trigger>
                         <Trigger Property="IsEnabled" Value="False">
                             <Setter Property="Foreground" Value="{StaticResource MilTextSecondaryBrush}" />
-                            <Setter TargetName="Bd" Property="Background" Value="{StaticResource MilWellBrush}" />
-                            <Setter TargetName="Bd" Property="BorderBrush" Value="{StaticResource MilChromeBrush}" />
+                            <Setter TargetName="Face" Property="Background" Value="{StaticResource MilWellBrush}" />
+                            <Setter TargetName="Face" Property="BorderBrush" Value="#15FFF6DC" />
                         </Trigger>
                     </ControlTemplate.Triggers>
                 </ControlTemplate>
             </Setter.Value>
         </Setter>
+        <Style.Triggers>
+            <Trigger Property="IsMouseOver" Value="True">
+                <Setter Property="Background" Value="{StaticResource MilBtnDarkHoverBrush}" />
+            </Trigger>
+            <Trigger Property="IsPressed" Value="True">
+                <Setter Property="Background" Value="{StaticResource MilBtnDarkPressedBrush}" />
+            </Trigger>
+        </Style.Triggers>
     </Style>
 
     <Style TargetType="{x:Type Button}" BasedOn="{StaticResource MilButtonBase}" />
@@ -64,39 +75,71 @@
          via DynamicResource; defining the same key here makes those buttons pick up the
          military action look with zero per-button XAML edits. -->
     <Style x:Key="SquareButtonStyle" TargetType="{x:Type Button}" BasedOn="{StaticResource MilButtonBase}">
-        <Setter Property="Background" Value="{StaticResource MilActionBrush}" />
-        <Setter Property="BorderBrush" Value="{StaticResource MilActionBorderBrush}" />
+        <Setter Property="Background" Value="{StaticResource MilBtnBrassFaceBrush}" />
         <Setter Property="FontFamily" Value="{StaticResource MilFontMono}" />
         <Style.Triggers>
             <Trigger Property="IsMouseOver" Value="True">
-                <Setter Property="Background" Value="{StaticResource MilActionHoverBrush}" />
+                <Setter Property="Background" Value="{StaticResource MilBtnBrassHoverBrush}" />
+            </Trigger>
+            <Trigger Property="IsPressed" Value="True">
+                <Setter Property="Background" Value="{StaticResource MilBtnBrassPressedBrush}" />
             </Trigger>
         </Style.Triggers>
     </Style>
 
-    <!-- ============ ToggleButton (ON/OFF settings switches) ============ -->
+    <!-- ============ ToggleButton (ON/OFF settings switches): lit brass when engaged ============ -->
     <Style TargetType="{x:Type ToggleButton}" BasedOn="{StaticResource MilButtonBase}">
         <Setter Property="MinWidth" Value="56" />
         <Setter Property="FontFamily" Value="{StaticResource MilFontMono}" />
         <Style.Triggers>
+            <Trigger Property="IsMouseOver" Value="True">
+                <Setter Property="Background" Value="{StaticResource MilBtnDarkHoverBrush}" />
+            </Trigger>
             <Trigger Property="IsChecked" Value="True">
-                <Setter Property="Background" Value="{StaticResource MilActionBrush}" />
-                <Setter Property="BorderBrush" Value="{StaticResource MilActionBorderBrush}" />
+                <Setter Property="Background" Value="{StaticResource MilBtnBrassFaceBrush}" />
+            </Trigger>
+            <Trigger Property="IsPressed" Value="True">
+                <Setter Property="Background" Value="{StaticResource MilBtnDarkPressedBrush}" />
             </Trigger>
         </Style.Triggers>
     </Style>
 
-    <!-- ============ TextBox ============ -->
+    <!-- ============ TextBox: inset well with inner top shadow ============ -->
     <Style TargetType="{x:Type TextBox}">
         <Setter Property="Foreground" Value="{StaticResource MilTextPrimaryBrush}" />
         <Setter Property="Background" Value="{StaticResource MilWellBrush}" />
-        <Setter Property="BorderBrush" Value="{StaticResource MilBorderBrush}" />
+        <Setter Property="BorderBrush" Value="#120D07" />
         <Setter Property="BorderThickness" Value="1" />
         <Setter Property="Padding" Value="4,2" />
         <Setter Property="FontSize" Value="12" />
         <Setter Property="CaretBrush" Value="{StaticResource MilTextPrimaryBrush}" />
         <Setter Property="SelectionBrush" Value="{StaticResource MilAccentBrush}" />
         <Setter Property="VerticalContentAlignment" Value="Center" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type TextBox}">
+                    <Border Background="{TemplateBinding Background}"
+                            BorderBrush="{TemplateBinding BorderBrush}"
+                            BorderThickness="{TemplateBinding BorderThickness}"
+                            CornerRadius="2">
+                        <Grid>
+                            <Border Height="2"
+                                    Margin="1,1,1,0"
+                                    VerticalAlignment="Top"
+                                    Background="#40000000"
+                                    CornerRadius="1" />
+                            <Border Height="1"
+                                    Margin="1,0,1,1"
+                                    VerticalAlignment="Bottom"
+                                    Background="#14FFF6DC" />
+                            <ScrollViewer x:Name="PART_ContentHost"
+                                          Margin="{TemplateBinding Padding}"
+                                          VerticalAlignment="Center" />
+                        </Grid>
+                    </Border>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
         <Style.Triggers>
             <Trigger Property="IsKeyboardFocused" Value="True">
                 <Setter Property="BorderBrush" Value="{StaticResource MilAccentBrush}" />
@@ -350,34 +393,73 @@
         </Setter>
     </Style>
 
-    <!-- ============ GroupBox: olive section header + rule, no box ============ -->
+    <!-- ============ GroupBox: riveted equipment plate with corner screws ============ -->
+    <ControlTemplate x:Key="MilPanelScrew" TargetType="{x:Type Control}">
+        <Grid Width="9" Height="9">
+            <Ellipse Fill="{StaticResource MilScrewBrush}"
+                     Stroke="#15100A"
+                     StrokeThickness="0.8" />
+            <Rectangle Width="6.5"
+                       Height="1.2"
+                       Fill="#241F14"
+                       RenderTransformOrigin="0.5,0.5">
+                <Rectangle.RenderTransform>
+                    <RotateTransform Angle="40" />
+                </Rectangle.RenderTransform>
+            </Rectangle>
+        </Grid>
+    </ControlTemplate>
+
     <Style TargetType="{x:Type GroupBox}">
         <Setter Property="Foreground" Value="{StaticResource MilTextPrimaryBrush}" />
-        <Setter Property="Margin" Value="0,4,0,4" />
+        <Setter Property="Margin" Value="0,5,0,5" />
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="{x:Type GroupBox}">
-                    <DockPanel>
-                        <DockPanel DockPanel.Dock="Top" Margin="0,6,0,4" LastChildFill="True">
-                            <TextBlock DockPanel.Dock="Left"
-                                       Text="&#x25B8;"
-                                       Foreground="{StaticResource MilAccentBrush}"
-                                       FontSize="11"
-                                       Margin="0,0,5,0"
-                                       VerticalAlignment="Center" />
-                            <ContentPresenter DockPanel.Dock="Left"
-                                              ContentSource="Header"
-                                              VerticalAlignment="Center"
-                                              TextElement.Foreground="{StaticResource MilAccentBrush}"
-                                              TextElement.FontFamily="{StaticResource MilFontStencil}"
-                                              TextElement.FontSize="11" />
-                            <Border Height="1"
-                                    Margin="8,1,0,0"
-                                    VerticalAlignment="Center"
-                                    Background="{StaticResource MilBorderBrush}" />
-                        </DockPanel>
-                        <ContentPresenter Margin="2,0,2,4" />
-                    </DockPanel>
+                    <Border Background="{StaticResource MilPanelFaceBrush}"
+                            BorderBrush="#15100A"
+                            BorderThickness="1"
+                            CornerRadius="6">
+                        <Border BorderBrush="#2BFFF6DC"
+                                BorderThickness="1,1,0,0"
+                                CornerRadius="5">
+                            <Grid>
+                                <!-- corner screws -->
+                                <Control Template="{StaticResource MilPanelScrew}"
+                                         HorizontalAlignment="Left" VerticalAlignment="Top" Margin="5,5,0,0" />
+                                <Control Template="{StaticResource MilPanelScrew}"
+                                         HorizontalAlignment="Right" VerticalAlignment="Top" Margin="0,5,5,0" />
+                                <Control Template="{StaticResource MilPanelScrew}"
+                                         HorizontalAlignment="Left" VerticalAlignment="Bottom" Margin="5,0,0,5" />
+                                <Control Template="{StaticResource MilPanelScrew}"
+                                         HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="0,0,5,5" />
+
+                                <DockPanel Margin="20,6,20,10">
+                                    <DockPanel DockPanel.Dock="Top" Margin="0,2,0,6" LastChildFill="True">
+                                        <ContentPresenter DockPanel.Dock="Left"
+                                                          ContentSource="Header"
+                                                          VerticalAlignment="Center"
+                                                          TextElement.Foreground="{StaticResource MilAccentBrush}"
+                                                          TextElement.FontFamily="{StaticResource MilFontStencil}"
+                                                          TextElement.FontSize="12">
+                                            <ContentPresenter.Effect>
+                                                <DropShadowEffect BlurRadius="0"
+                                                                  Direction="270"
+                                                                  Opacity="0.65"
+                                                                  ShadowDepth="1"
+                                                                  Color="#000000" />
+                                            </ContentPresenter.Effect>
+                                        </ContentPresenter>
+                                        <StackPanel Margin="10,2,0,0" VerticalAlignment="Center">
+                                            <Border Height="1" Background="#15100A" />
+                                            <Border Height="1" Background="#2BFFF6DC" />
+                                        </StackPanel>
+                                    </DockPanel>
+                                    <ContentPresenter Margin="2,0,2,2" />
+                                </DockPanel>
+                            </Grid>
+                        </Border>
+                    </Border>
                 </ControlTemplate>
             </Setter.Value>
         </Setter>
@@ -405,19 +487,44 @@
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="{x:Type TabItem}">
-                    <Border x:Name="Bd"
-                            Background="{StaticResource MilChromeBrush}"
-                            BorderBrush="{StaticResource MilChromeBrush}"
-                            BorderThickness="0,2,0,0"
-                            Padding="14,5">
-                        <ContentPresenter ContentSource="Header"
-                                          HorizontalAlignment="Center"
-                                          VerticalAlignment="Center" />
+                    <Border x:Name="Rim"
+                            Background="#15100A"
+                            CornerRadius="4,4,0,0"
+                            Margin="0,3,3,0"
+                            Padding="1,1,1,0">
+                        <Border x:Name="Face"
+                                Background="{StaticResource MilBtnDarkFaceBrush}"
+                                BorderBrush="#30FFF6DC"
+                                BorderThickness="1,1,1,0"
+                                CornerRadius="3,3,0,0"
+                                Padding="12,5">
+                            <StackPanel Orientation="Horizontal">
+                                <Grid Width="9"
+                                      Height="9"
+                                      Margin="0,0,7,0"
+                                      VerticalAlignment="Center">
+                                    <Ellipse Fill="{StaticResource MilLampBezelBrush}" />
+                                    <Ellipse x:Name="Lamp"
+                                             Margin="1.5"
+                                             Fill="{StaticResource MilLedOffBrush}" />
+                                    <Ellipse Margin="1.5" Fill="{StaticResource MilLampGlassBrush}" />
+                                </Grid>
+                                <ContentPresenter ContentSource="Header" VerticalAlignment="Center" />
+                            </StackPanel>
+                        </Border>
                     </Border>
                     <ControlTemplate.Triggers>
                         <Trigger Property="IsSelected" Value="True">
-                            <Setter TargetName="Bd" Property="Background" Value="{StaticResource MilWindowBackgroundBrush}" />
-                            <Setter TargetName="Bd" Property="BorderBrush" Value="{StaticResource MilAccentBrush}" />
+                            <Setter TargetName="Rim" Property="Margin" Value="0,0,3,0" />
+                            <Setter TargetName="Face" Property="Background" Value="{StaticResource MilPanelFaceBrush}" />
+                            <Setter TargetName="Lamp" Property="Fill" Value="{StaticResource MilLedOnBrush}" />
+                            <Setter TargetName="Lamp" Property="Effect">
+                                <Setter.Value>
+                                    <DropShadowEffect BlurRadius="7"
+                                                      ShadowDepth="0"
+                                                      Color="#DCA53C" />
+                                </Setter.Value>
+                            </Setter>
                             <Setter Property="Foreground" Value="{StaticResource MilTextPrimaryBrush}" />
                         </Trigger>
                         <MultiTrigger>
@@ -426,6 +533,7 @@
                                 <Condition Property="IsSelected" Value="False" />
                             </MultiTrigger.Conditions>
                             <Setter Property="Foreground" Value="{StaticResource MilTextPrimaryBrush}" />
+                            <Setter TargetName="Face" Property="Background" Value="{StaticResource MilBtnDarkHoverBrush}" />
                         </MultiTrigger>
                     </ControlTemplate.Triggers>
                 </ControlTemplate>

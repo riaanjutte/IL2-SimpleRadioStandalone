@@ -37,4 +37,59 @@
     <FontFamily x:Key="MilFontStencil">pack://application:,,,/IL2-SR-ClientRadio;component/Fonts/#Allerta Stencil</FontFamily>
     <FontFamily x:Key="MilFontMono">pack://application:,,,/IL2-SR-ClientRadio;component/Fonts/#Share Tech Mono</FontFamily>
 
+    <!-- ===== Skeuomorphic surfaces: equipment plates, pushbuttons, screws, lamps ===== -->
+
+    <!-- Raised equipment plate face -->
+    <LinearGradientBrush x:Key="MilPanelFaceBrush" StartPoint="0,0" EndPoint="0,1">
+        <GradientStop Offset="0" Color="#3D3426" />
+        <GradientStop Offset="1" Color="#2E2719" />
+    </LinearGradientBrush>
+
+    <!-- Dark bakelite pushbutton (default buttons) -->
+    <LinearGradientBrush x:Key="MilBtnDarkFaceBrush" StartPoint="0,0" EndPoint="0,1">
+        <GradientStop Offset="0" Color="#473B28" />
+        <GradientStop Offset="1" Color="#2C2415" />
+    </LinearGradientBrush>
+    <LinearGradientBrush x:Key="MilBtnDarkHoverBrush" StartPoint="0,0" EndPoint="0,1">
+        <GradientStop Offset="0" Color="#54462F" />
+        <GradientStop Offset="1" Color="#352B19" />
+    </LinearGradientBrush>
+    <LinearGradientBrush x:Key="MilBtnDarkPressedBrush" StartPoint="0,0" EndPoint="0,1">
+        <GradientStop Offset="0" Color="#241D10" />
+        <GradientStop Offset="1" Color="#3A3020" />
+    </LinearGradientBrush>
+
+    <!-- Brass pushbutton (primary actions / lit toggles) -->
+    <LinearGradientBrush x:Key="MilBtnBrassFaceBrush" StartPoint="0,0" EndPoint="0,1">
+        <GradientStop Offset="0" Color="#7C6534" />
+        <GradientStop Offset="1" Color="#55431D" />
+    </LinearGradientBrush>
+    <LinearGradientBrush x:Key="MilBtnBrassHoverBrush" StartPoint="0,0" EndPoint="0,1">
+        <GradientStop Offset="0" Color="#8A7139" />
+        <GradientStop Offset="1" Color="#5F4B21" />
+    </LinearGradientBrush>
+    <LinearGradientBrush x:Key="MilBtnBrassPressedBrush" StartPoint="0,0" EndPoint="0,1">
+        <GradientStop Offset="0" Color="#4A3A17" />
+        <GradientStop Offset="1" Color="#6B5527" />
+    </LinearGradientBrush>
+
+    <!-- Slotted panel screw -->
+    <RadialGradientBrush x:Key="MilScrewBrush" GradientOrigin="0.35,0.3">
+        <GradientStop Offset="0" Color="#B0A584" />
+        <GradientStop Offset="0.6" Color="#57503C" />
+        <GradientStop Offset="1" Color="#2A251A" />
+    </RadialGradientBrush>
+
+    <!-- Indicator lamp bezel ring and glass specular highlight -->
+    <RadialGradientBrush x:Key="MilLampBezelBrush" GradientOrigin="0.3,0.25">
+        <GradientStop Offset="0" Color="#7A7060" />
+        <GradientStop Offset="0.7" Color="#3C342A" />
+        <GradientStop Offset="1" Color="#16110B" />
+    </RadialGradientBrush>
+    <RadialGradientBrush x:Key="MilLampGlassBrush" GradientOrigin="0.3,0.25" Center="0.3,0.25" RadiusX="0.7" RadiusY="0.7">
+        <GradientStop Offset="0" Color="#90FFF6DC" />
+        <GradientStop Offset="0.45" Color="#20FFF6DC" />
+        <GradientStop Offset="1" Color="#00FFF6DC" />
+    </RadialGradientBrush>
+
 </ResourceDictionary>

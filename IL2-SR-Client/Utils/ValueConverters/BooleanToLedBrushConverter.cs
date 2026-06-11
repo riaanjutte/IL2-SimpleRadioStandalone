@@ -1,5 +1,6 @@
 using System;
 using System.Globalization;
+using System.Windows;
 using System.Windows.Data;
 using System.Windows.Media;
 
@@ -19,7 +20,11 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.Utils.ValueConverters
 
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            return value is bool isOn && isOn ? OnBrush : OffBrush;
+            var isOn = value is bool b && b;
+            // Prefer the theme palette so lamp colours follow the active theme;
+            // frozen fallbacks keep the converter usable without app resources (e.g. tests).
+            var themed = Application.Current?.TryFindResource(isOn ? "MilLedOnBrush" : "MilLedOffBrush") as Brush;
+            return themed ?? (isOn ? (Brush)OnBrush : OffBrush);
         }
 
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
