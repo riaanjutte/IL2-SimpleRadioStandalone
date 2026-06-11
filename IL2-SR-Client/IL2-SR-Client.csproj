@@ -294,6 +294,7 @@
     <Compile Include="UI\ToolTips.cs" />
     <Compile Include="Utils\DelegateCommand.cs" />
     <Compile Include="Utils\RadioHelper.cs" />
+    <Compile Include="Utils\ScrewSlotRandomizer.cs" />
     <Compile Include="Utils\StartupConfigTelemetry.cs" />
     <Compile Include="Utils\TransponderHelper.cs" />
     <Compile Include="Utils\ValueConverters\BooleanInverterConverter.cs" />
