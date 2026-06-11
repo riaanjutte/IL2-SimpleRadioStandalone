@@ -26,6 +26,7 @@
                     Source="pack://application:,,,/MahApps.Metro;component/Styles/Accents/BaseLight.xaml" />
 
                 <ResourceDictionary Source="Themes\Styles.xaml" />
+                <ResourceDictionary Source="Themes\MilitaryPalette.xaml" />
 
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
