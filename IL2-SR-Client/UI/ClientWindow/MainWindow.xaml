@@ -10,24 +10,52 @@
                       xmlns:converters="clr-namespace:Ciribob.IL2.SimpleRadio.Standalone.Client.Utils.ValueConverters"
                       Title="IL2-SRS Client"
                       Width="700"
-                      MinWidth="700"
+                      MinWidth="640"
                       Height="650"
-                      MinHeight="650"
+                      MinHeight="560"
+                      Background="{StaticResource MilWindowBackgroundBrush}"
+                      Foreground="{StaticResource MilTextPrimaryBrush}"
+                      FontSize="12"
+                      WindowTitleBrush="{StaticResource MilChromeBrush}"
+                      NonActiveWindowTitleBrush="{StaticResource MilChromeBrush}"
+                      GlowBrush="{StaticResource MilBorderBrush}"
+                      NonActiveGlowBrush="{StaticResource MilChromeBrush}"
+                      TitleCaps="False"
                       d:DataContext="{d:DesignInstance local:MainWindow}"
                       ResizeMode="CanResizeWithGrip"
                       mc:Ignorable="d">
 
+    <controls:MetroWindow.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="pack://application:,,,/IL2-SR-ClientRadio;component/Themes/MilitaryControls.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+            <converters:MicAvailabilityTooltipConverter x:Key="MicAvailabilityTooltipConverter" />
+            <converters:BooleanToLedBrushConverter x:Key="LedBrushConverter" />
+            <converters:StringToUpperConverter x:Key="StringToUpperConverter" />
+        </ResourceDictionary>
+    </controls:MetroWindow.Resources>
+
+    <controls:MetroWindow.TitleTemplate>
+        <DataTemplate>
+            <TextBlock Margin="8,0,0,0"
+                       VerticalAlignment="Center"
+                       FontFamily="{StaticResource MilFontStencil}"
+                       FontSize="14"
+                       Foreground="{StaticResource MilTextPrimaryBrush}"
+                       Text="{Binding}" />
+        </DataTemplate>
+    </controls:MetroWindow.TitleTemplate>
+
     <TabControl x:Name="TabControl">
         <TabControl.ItemTemplate>
             <DataTemplate>
-                <TextBlock FontSize="22"
-                           Text="{Binding}"
+                <TextBlock FontFamily="{StaticResource MilFontMono}"
+                           FontSize="13"
+                           Text="{Binding Converter={StaticResource StringToUpperConverter}}"
                            TextWrapping="NoWrap" />
             </DataTemplate>
         </TabControl.ItemTemplate>
-        <TabControl.Resources>
-            <converters:MicAvailabilityTooltipConverter x:Key="MicAvailabilityTooltipConverter"/>
-        </TabControl.Resources>
         <TabItem Header="General">
             <GroupBox x:Name="GroupBox"
                       Margin="5"
