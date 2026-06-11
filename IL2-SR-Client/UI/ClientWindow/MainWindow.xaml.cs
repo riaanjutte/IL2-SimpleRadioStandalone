@@ -1569,11 +1569,6 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI
             _globalSettings.SetClientSetting(GlobalSettingsKeys.ExpandControls, (bool) ExpandInputDevices.IsChecked);
         }
 
-        private void LaunchAddressTab(object sender, RoutedEventArgs e)
-        {
-            TabControl.SelectedItem = FavouritesSeversTab;
-        }
-
         private void MicAGC_OnClick(object sender, RoutedEventArgs e)
         {
             _globalSettings.SetClientSetting(GlobalSettingsKeys.AGC, (bool) MicAGC.IsChecked);
