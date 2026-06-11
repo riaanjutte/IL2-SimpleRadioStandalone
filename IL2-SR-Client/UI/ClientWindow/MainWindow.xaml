@@ -1420,44 +1420,54 @@
             <GroupBox Header="Help &amp; About">
                 <FlowDocumentScrollViewer>
                     <FlowDocument x:Name="AboutFlowDocument"
-                                  FontFamily="{StaticResource MilFontMono}">
+                                  FontFamily="{StaticResource MilFontMono}"
+                                  FontSize="12"
+                                  Foreground="{StaticResource MilTextPrimaryBrush}">
+                        <FlowDocument.Resources>
+                            <Style TargetType="Hyperlink">
+                                <Setter Property="Foreground" Value="{StaticResource MilAccentBrush}" />
+                            </Style>
+                            <Style x:Key="HelpHeading" TargetType="Paragraph">
+                                <Setter Property="FontSize" Value="13" />
+                                <Setter Property="FontWeight" Value="Bold" />
+                                <Setter Property="Foreground" Value="{StaticResource MilAccentBrush}" />
+                            </Style>
+                        </FlowDocument.Resources>
 
-                        <Paragraph>
-                            <Run FontWeight="Bold" FontSize="16" Text="Speaker"/>
-                            <Run FontWeight="Bold" FontSize="16" Text=" "/>
-                            <Run FontWeight="Bold" FontSize="16" Text="Boost"/>
+                        <Paragraph Style="{StaticResource HelpHeading}">
+                            <Run Text="Speaker Boost"/>
                         </Paragraph>
-                        <Paragraph FontSize="14">
-                            <Run FontWeight="Bold" FontSize="14" Text="Please preview your audio first"/>
+                        <Paragraph>
+                            <Run FontWeight="Bold" Text="Please preview your audio first"/>
                             <Run Text=" using the preview option to make sure that your microphone and speakers are configured correctly."/>
                         </Paragraph>
-                        <Paragraph FontSize="14">
+                        <Paragraph>
                             <Run Text="Speaker boost can be set higher to counteract the volume reduction caused by clipping and the radio effects. If speaker boost is too high - you may have issues where other windows sounds are too loud. Reduce the boost to fix this."/>
                         </Paragraph>
-                        <Paragraph>
-                            <Run FontWeight="Bold" FontSize="16" Text="Troubleshooting"/>
+                        <Paragraph Style="{StaticResource HelpHeading}">
+                            <Run Text="Troubleshooting"/>
                         </Paragraph>
-                        <Paragraph FontSize="14">
+                        <Paragraph>
                             <Run Text="If you have any issues with the SRS please get help on the dedicated Discord channel "/>
                             <Hyperlink NavigateUri="https://discord.gg/baw7g3t">
                                 <Run Text="here"/>
                             </Hyperlink>
                             <Run Text=" and make sure to follow the information in #common-issues first before asking for help in #support"/>
                         </Paragraph>
-                        <Paragraph>
-                            <Run FontWeight="Bold" FontSize="16" Text="Community Edition source code"/>
+                        <Paragraph Style="{StaticResource HelpHeading}">
+                            <Run Text="Community Edition source code"/>
                         </Paragraph>
-                        <Paragraph FontSize="14">
+                        <Paragraph>
                             <Run Text="The Community Edition source code and releases are available on "/>
                             <Hyperlink NavigateUri="https://github.com/riaanjutte/IL2-SimpleRadioStandalone">
                                 <Run Text="GitHub"/>
                             </Hyperlink>
                             <Run Text="."/>
                         </Paragraph>
-                        <Paragraph>
-                            <Run FontWeight="Bold" FontSize="16" Text="Input Device not detected?"/>
+                        <Paragraph Style="{StaticResource HelpHeading}">
+                            <Run Text="Input Device not detected?"/>
                         </Paragraph>
-                        <Paragraph FontSize="14">
+                        <Paragraph>
                             <Run Text="If your input device isn't detected - try enabling &quot;Allow more input devices&quot; and restart the client."/>
                             <LineBreak/>
                             <LineBreak/>
@@ -1466,12 +1476,6 @@
                                 <Run Text="Discord Channel"/>
                             </Hyperlink>
                             <Run Text=" in order for me to help you add the device to the whitelist."/>
-                        </Paragraph>
-                        <Paragraph>
-                            <Run FontWeight="Bold" FontSize="16" Text=""/>
-                        </Paragraph>
-                        <Paragraph>
-                            <Run FontWeight="Bold" FontSize="16" Text=""/>
                         </Paragraph>
 
                     </FlowDocument>
