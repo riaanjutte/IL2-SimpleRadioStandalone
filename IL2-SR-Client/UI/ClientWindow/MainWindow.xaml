@@ -1419,7 +1419,8 @@
         <TabItem Header="Help">
             <GroupBox Header="Help &amp; About">
                 <FlowDocumentScrollViewer>
-                    <FlowDocument x:Name="AboutFlowDocument">
+                    <FlowDocument x:Name="AboutFlowDocument"
+                                  FontFamily="{StaticResource MilFontMono}">
 
                         <Paragraph>
                             <Run FontWeight="Bold" FontSize="16" Text="Speaker"/>
