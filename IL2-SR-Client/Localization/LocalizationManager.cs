@@ -8,6 +8,7 @@ using System.Resources;
 using System.Threading;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Data;
 using System.Windows.Documents;
 using System.Windows.Media;
 using Ciribob.IL2.SimpleRadio.Standalone.Client.Settings;
@@ -999,7 +1000,8 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.Localization
             }
 
             var textBlock = item as TextBlock;
-            if (textBlock != null)
+            if (textBlock != null &&
+                BindingOperations.GetBindingExpressionBase(textBlock, TextBlock.TextProperty) == null)
             {
                 textBlock.Text = Get(textBlock.Text);
             }
