@@ -264,3 +264,7 @@ sign.bat
 
 .leu
 Roadmap.md
+
+# Client runtime config written when launching from repo
+default.cfg
+global.cfg
