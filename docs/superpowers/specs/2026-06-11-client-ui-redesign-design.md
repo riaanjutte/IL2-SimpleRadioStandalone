@@ -111,7 +111,7 @@ localization keys.
 | `IL2-SR-Client/Themes/MilitaryPalette.xaml` | **New.** All colors, brushes, and font-family resources as named keys. |
 | `IL2-SR-Client/Themes/MilitaryControls.xaml` | **New.** Implicit styles for Button, ToggleButton, TextBox, ComboBox, CheckBox, RadioButton, Slider, GroupBox, TabControl, TabItem, ScrollBar, ScrollViewer, DataGrid, Label, ProgressBar, ToolTip, StatusBar. |
 | `IL2-SR-Client/Fonts/` | **New.** AllertaStencil-Regular.ttf, ShareTechMono-Regular.ttf + OFL license files, build action Resource. |
-| `IL2-SR-Client/App.xaml` | Merge the two new dictionaries **after** the MahApps dictionaries so the new implicit styles win. MahApps merges stay (popups depend on them). |
+| `IL2-SR-Client/App.xaml` | Merge `MilitaryPalette.xaml` (brushes/fonts only) after the MahApps dictionaries. **Amended during implementation:** `MilitaryControls.xaml` merges into `MainWindow.Resources` instead of App.xaml, because the radio overlay contains bare controls that would otherwise pick up the implicit styles. MahApps merges stay (popups depend on them). |
 | `IL2-SR-Client/UI/ClientWindow/MainWindow.xaml` | Restructure to 5 tabs + status bar. MetroWindow title-bar brushes/properties for dark chrome. |
 | `IL2-SR-Client/UI/ClientWindow/MainWindow.xaml.cs` | Remove theme-switch wiring (theme radio button handlers, ClientThemeManager calls). Update any references to moved panels if names change (they should not). |
 | `IL2-SR-Client/Utils/ClientThemeManager.cs` | **Deleted.** Replaced by declarative XAML styling. |
@@ -122,9 +122,19 @@ localization keys.
 
 ## 4. Risks and edge cases
 
-- **Popups inherit new implicit styles** app-wide (client list, pilot roster,
-  server settings, favourites editor, input prompt). Mostly a consistency bonus;
-  each popup gets a smoke test, and visual breakage gets targeted fixes only.
+- **Popups** (client list, pilot roster, server settings, input prompt) keep
+  their MahApps styling since the implicit military styles are scoped to the
+  main window (see amended App.xaml row). Verified by smoke test; restyling
+  them is follow-up work outside this scope.
+- **Window title font (amended):** the bundled MahApps 1.5.0.23 build exposes
+  `TitleTemplate` but its window template never consumes it, so the planned
+  stencil-font title silently did nothing. Implemented as
+  `TitleCharacterCasing="Upper"` instead — uppercase default font, matching
+  the mono tab strip.
+- **Localization vs bindings (discovered):** `LocalizationManager.LocalizeElement`
+  assigned a local value to every `TextBlock.Text`, destroying binding
+  expressions (it runs before DataContext is set). Fixed with a guard that
+  skips data-bound TextBlocks.
 - **Localization:** all strings keep their `.resx` bindings. The new "Audio" tab
   header needs one new key added to all six language files (en, de, fr, es, it,
   ru) — machine translation for non-English matches the existing convention.
