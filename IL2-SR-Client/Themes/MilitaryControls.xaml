@@ -369,7 +369,7 @@
                                               ContentSource="Header"
                                               VerticalAlignment="Center"
                                               TextElement.Foreground="{StaticResource MilAccentBrush}"
-                                              TextElement.FontFamily="{StaticResource MilFontMono}"
+                                              TextElement.FontFamily="{StaticResource MilFontStencil}"
                                               TextElement.FontSize="11" />
                             <Border Height="1"
                                     Margin="8,1,0,0"
@@ -395,7 +395,7 @@
         <Setter Property="HeaderTemplate">
             <Setter.Value>
                 <DataTemplate>
-                    <TextBlock FontFamily="{StaticResource MilFontMono}"
+                    <TextBlock FontFamily="{StaticResource MilFontStencil}"
                                FontSize="13"
                                Text="{Binding Converter={StaticResource MilUpperConverter}}"
                                TextWrapping="NoWrap" />

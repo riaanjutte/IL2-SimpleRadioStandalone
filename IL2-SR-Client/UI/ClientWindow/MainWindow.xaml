@@ -35,6 +35,16 @@
         </ResourceDictionary>
     </controls:MetroWindow.Resources>
 
+    <controls:MetroWindow.TitleTemplate>
+        <DataTemplate>
+            <TextBlock Margin="8,0,8,0"
+                       VerticalAlignment="Center"
+                       FontFamily="{StaticResource MilFontStencil}"
+                       FontSize="14"
+                       Text="{Binding Converter={StaticResource MilUpperConverter}}" />
+        </DataTemplate>
+    </controls:MetroWindow.TitleTemplate>
+
     <DockPanel>
         <Border DockPanel.Dock="Bottom"
                 Background="{StaticResource MilWellBrush}"
