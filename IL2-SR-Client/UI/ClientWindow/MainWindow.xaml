@@ -596,7 +596,6 @@
                                 <RowDefinition />
                                 <RowDefinition />
                                 <RowDefinition />
-                                <RowDefinition />
                             </Grid.RowDefinitions>
 
                             <Label Grid.Row="0"
@@ -1039,32 +1038,6 @@
                                       DisplayMemberPath="DisplayName"
                                       SelectionChanged="LanguagePicker_SelectionChanged" />
 
-                            <Label Grid.Row="19"
-                                   Grid.Column="0"
-                                   HorizontalContentAlignment="Center"
-                                   VerticalContentAlignment="Center"
-                                   Content="Theme" />
-
-                            <WrapPanel Grid.Row="19"
-                                       Grid.Column="1"
-                                       HorizontalAlignment="Stretch"
-                                       VerticalAlignment="Center">
-                                <RadioButton Name="LightThemeRadioButton"
-                                             Margin="5,2"
-                                             Content="Light"
-                                             GroupName="ClientTheme"
-                                             Checked="ThemeRadioButton_Checked" />
-                                <RadioButton Name="DarkThemeRadioButton"
-                                             Margin="5,2"
-                                             Content="Dark"
-                                             GroupName="ClientTheme"
-                                             Checked="ThemeRadioButton_Checked" />
-                                <RadioButton Name="SystemThemeRadioButton"
-                                             Margin="5,2"
-                                             Content="Use Windows setting"
-                                             GroupName="ClientTheme"
-                                             Checked="ThemeRadioButton_Checked" />
-                            </WrapPanel>
                         </Grid>
 
                     </GroupBox>

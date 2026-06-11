@@ -81,7 +81,6 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI
         private ServerAddress _serverAddress;
         private readonly DelegateCommand _connectCommand;
         private bool _initialisingLanguagePicker;
-        private bool _initialisingThemePicker;
 
         private readonly GlobalSettingsStore _globalSettings = GlobalSettingsStore.Instance;
         private const string CommunitySettingsAccepted = "Accepted";
@@ -128,9 +127,7 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI
             RciStatusLabel.Text = LocalizationManager.Get("RCI");
             UpdateCombatBoxFeatureVisibility(false);
             LocalizationManager.LocalizeFlowDocument(AboutFlowDocument);
-            ClientThemeManager.ApplyThemeToWindow(this, _globalSettings.GetClientSetting(GlobalSettingsKeys.Theme).RawValue);
             Loaded += MainWindow_Loaded;
-            TabControl.SelectionChanged += MainTabControl_SelectionChanged;
 
             // Initialize ToolTip controls
             ToolTips.Init();
@@ -213,23 +210,7 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI
 
         private void MainWindow_Loaded(object sender, RoutedEventArgs e)
         {
-            ApplyCurrentTheme();
             AutoStartRadioOverlay();
-        }
-
-        private void MainTabControl_SelectionChanged(object sender, SelectionChangedEventArgs e)
-        {
-            if (sender == TabControl)
-            {
-                ApplyCurrentTheme();
-            }
-        }
-
-        private void ApplyCurrentTheme()
-        {
-            Dispatcher.BeginInvoke(new Action(() =>
-                ClientThemeManager.ApplyThemeToWindow(this, _globalSettings.GetClientSetting(GlobalSettingsKeys.Theme).RawValue)),
-                DispatcherPriority.ContextIdle);
         }
 
         private void PromptForCommunityRecommendedSettingsOnce()
@@ -777,7 +758,6 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI
         private void InitSettingsScreen()
         {
             InitLanguagePicker();
-            InitThemePicker();
 
             AutoConnectPromptToggle.IsChecked = _globalSettings.GetClientSettingBool(GlobalSettingsKeys.AutoConnectPrompt);
             AutoConnectMismatchPromptToggle.IsChecked = _globalSettings.GetClientSettingBool(GlobalSettingsKeys.AutoConnectMismatchPrompt);
@@ -804,22 +784,6 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI
             ShowTransmitterName.IsChecked = _globalSettings.GetClientSettingBool(GlobalSettingsKeys.ShowTransmitterName);
 
             RefreshOnOffToggleContent();
-        }
-
-        private void InitThemePicker()
-        {
-            _initialisingThemePicker = true;
-            var theme = _globalSettings.GetClientSetting(GlobalSettingsKeys.Theme).RawValue;
-            var normalizedTheme = ClientThemeManager.NormalizeTheme(theme);
-            if (!string.Equals(theme, normalizedTheme, StringComparison.Ordinal))
-            {
-                _globalSettings.SetClientSetting(GlobalSettingsKeys.Theme, normalizedTheme);
-            }
-
-            SystemThemeRadioButton.IsChecked = ClientThemeManager.IsSystemTheme(normalizedTheme);
-            DarkThemeRadioButton.IsChecked = string.Equals(normalizedTheme, ClientThemeManager.DarkTheme, StringComparison.OrdinalIgnoreCase);
-            LightThemeRadioButton.IsChecked = string.Equals(normalizedTheme, ClientThemeManager.LightTheme, StringComparison.OrdinalIgnoreCase);
-            _initialisingThemePicker = false;
         }
 
         private void InitLanguagePicker()
@@ -1790,23 +1754,6 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI
             quoted.Append('\\', backslashes * 2);
             quoted.Append('"');
             return quoted.ToString();
-        }
-
-        private void ThemeRadioButton_Checked(object sender, RoutedEventArgs e)
-        {
-            if (_initialisingThemePicker)
-            {
-                return;
-            }
-
-            var theme = SystemThemeRadioButton.IsChecked == true
-                ? ClientThemeManager.SystemTheme
-                : DarkThemeRadioButton.IsChecked == true
-                ? ClientThemeManager.DarkTheme
-                : ClientThemeManager.LightTheme;
-
-            _globalSettings.SetClientSetting(GlobalSettingsKeys.Theme, theme);
-            ClientThemeManager.ApplyTheme(theme);
         }
 
         private void SetSRSPath_Click(object sender, RoutedEventArgs e)

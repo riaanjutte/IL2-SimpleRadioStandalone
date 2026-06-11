@@ -64,15 +64,6 @@ namespace IL2_SR_Client
 
             ListArgs();
             LocalizationManager.Initialize(GlobalSettingsStore.Instance);
-            var theme = GlobalSettingsStore.Instance.GetClientSetting(GlobalSettingsKeys.Theme).RawValue;
-            var normalizedTheme = ClientThemeManager.NormalizeTheme(theme);
-            if (!string.Equals(theme, normalizedTheme, StringComparison.Ordinal))
-            {
-                GlobalSettingsStore.Instance.SetClientSetting(GlobalSettingsKeys.Theme, normalizedTheme);
-            }
-
-            ClientThemeManager.ApplyTheme(normalizedTheme);
-            SystemEvents.UserPreferenceChanged += SystemEvents_UserPreferenceChanged;
 
 #if !DEBUG
             if (IsClientRunning())
@@ -374,27 +365,9 @@ namespace IL2_SR_Client
 
         protected override void OnExit(ExitEventArgs e)
         {
-            SystemEvents.UserPreferenceChanged -= SystemEvents_UserPreferenceChanged;
             if(_notifyIcon !=null)
                 _notifyIcon.Visible = false;
             base.OnExit(e);
-        }
-
-        private void SystemEvents_UserPreferenceChanged(object sender, UserPreferenceChangedEventArgs e)
-        {
-            if (e.Category != UserPreferenceCategory.General &&
-                e.Category != UserPreferenceCategory.VisualStyle)
-            {
-                return;
-            }
-
-            var theme = GlobalSettingsStore.Instance.GetClientSetting(GlobalSettingsKeys.Theme).RawValue;
-            if (!ClientThemeManager.IsSystemTheme(theme))
-            {
-                return;
-            }
-
-            Dispatcher.BeginInvoke(new Action(() => ClientThemeManager.ApplyTheme(ClientThemeManager.SystemTheme)));
         }
 
         private void UnhandledExceptionHandler(object sender, UnhandledExceptionEventArgs e)
