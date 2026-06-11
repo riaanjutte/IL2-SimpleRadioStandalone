@@ -20,7 +20,7 @@
                       NonActiveWindowTitleBrush="{StaticResource MilChromeBrush}"
                       GlowBrush="{StaticResource MilBorderBrush}"
                       NonActiveGlowBrush="{StaticResource MilChromeBrush}"
-                      TitleCaps="False"
+                      TitleCharacterCasing="Upper"
                       d:DataContext="{d:DesignInstance local:MainWindow}"
                       ResizeMode="CanResizeWithGrip"
                       mc:Ignorable="d">
@@ -34,17 +34,6 @@
             <converters:BooleanToLedBrushConverter x:Key="LedBrushConverter" />
         </ResourceDictionary>
     </controls:MetroWindow.Resources>
-
-    <controls:MetroWindow.TitleTemplate>
-        <DataTemplate>
-            <TextBlock Margin="8,0,0,0"
-                       VerticalAlignment="Center"
-                       FontFamily="{StaticResource MilFontStencil}"
-                       FontSize="14"
-                       Foreground="{StaticResource MilTextPrimaryBrush}"
-                       Text="{Binding}" />
-        </DataTemplate>
-    </controls:MetroWindow.TitleTemplate>
 
     <TabControl x:Name="TabControl">
         <TabItem Header="General">
