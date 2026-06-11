@@ -711,4 +711,16 @@
   <data name="PLTS:" xml:space="preserve">
     <value>ПИЛ:</value>
   </data>
+  <data name="Audio" xml:space="preserve">
+    <value>Аудио</value>
+  </data>
+  <data name="Audio Options" xml:space="preserve">
+    <value>Параметры аудио</value>
+  </data>
+  <data name="Overlays" xml:space="preserve">
+    <value>Оверлеи</value>
+  </data>
+  <data name="Mic" xml:space="preserve">
+    <value>Микр</value>
+  </data>
 </root>
