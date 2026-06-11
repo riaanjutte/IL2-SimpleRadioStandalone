@@ -527,7 +527,7 @@
                                           VerticalContentAlignment="Center"
                                           Click="ExpandInputDevices_OnClick_Click">
                                 <ToggleButton.Style>
-                                    <Style TargetType="{x:Type ToggleButton}">
+                                    <Style TargetType="{x:Type ToggleButton}" BasedOn="{StaticResource {x:Type ToggleButton}}">
                                         <Setter Property="Content" Value="ON" />
                                         <Style.Triggers>
                                             <Trigger Property="IsChecked" Value="True">
@@ -553,7 +553,7 @@
                                           VerticalContentAlignment="Center"
                                           Click="MicAGC_OnClick">
                                 <ToggleButton.Style>
-                                    <Style TargetType="{x:Type ToggleButton}">
+                                    <Style TargetType="{x:Type ToggleButton}" BasedOn="{StaticResource {x:Type ToggleButton}}">
                                         <Setter Property="Content" Value="ON" />
                                         <Style.Triggers>
                                             <Trigger Property="IsChecked" Value="True">
@@ -579,7 +579,7 @@
                                           VerticalContentAlignment="Center"
                                           Click="MicDenoise_OnClick">
                                 <ToggleButton.Style>
-                                    <Style TargetType="{x:Type ToggleButton}">
+                                    <Style TargetType="{x:Type ToggleButton}" BasedOn="{StaticResource {x:Type ToggleButton}}">
                                         <Setter Property="Content" Value="ON" />
                                         <Style.Triggers>
                                             <Trigger Property="IsChecked" Value="True">
@@ -605,7 +605,7 @@
                                           VerticalContentAlignment="Center"
                                           Click="PlayConnectionSounds_OnClick">
                                 <ToggleButton.Style>
-                                    <Style TargetType="{x:Type ToggleButton}">
+                                    <Style TargetType="{x:Type ToggleButton}" BasedOn="{StaticResource {x:Type ToggleButton}}">
                                         <Setter Property="Content" Value="ON" />
                                         <Style.Triggers>
                                             <Trigger Property="IsChecked" Value="True">
@@ -664,7 +664,7 @@
                                       VerticalContentAlignment="Center"
                                       Click="AutoConnectPromptToggle_Click">
                                 <ToggleButton.Style>
-                                    <Style TargetType="{x:Type ToggleButton}">
+                                    <Style TargetType="{x:Type ToggleButton}" BasedOn="{StaticResource {x:Type ToggleButton}}">
                                         <Setter Property="Content" Value="ON" />
                                         <Style.Triggers>
                                             <Trigger Property="IsChecked" Value="True">
@@ -692,7 +692,7 @@
                                       VerticalContentAlignment="Center"
                                       Click="AutoConnectMismatchPromptToggle_Click">
                                 <ToggleButton.Style>
-                                    <Style TargetType="{x:Type ToggleButton}">
+                                    <Style TargetType="{x:Type ToggleButton}" BasedOn="{StaticResource {x:Type ToggleButton}}">
                                         <Setter Property="Content" Value="ON" />
                                         <Style.Triggers>
                                             <Trigger Property="IsChecked" Value="True">
@@ -733,7 +733,7 @@
                                       VerticalContentAlignment="Center"
                                       Click="RadioOverlayTaskbarItem_Click">
                                 <ToggleButton.Style>
-                                    <Style TargetType="{x:Type ToggleButton}">
+                                    <Style TargetType="{x:Type ToggleButton}" BasedOn="{StaticResource {x:Type ToggleButton}}">
                                         <Setter Property="Content" Value="ON" />
                                         <Style.Triggers>
                                             <Trigger Property="IsChecked" Value="True">
@@ -761,7 +761,7 @@
                                       VerticalContentAlignment="Center"
                                       Click="AutoStartRadioOverlayToggle_Click">
                                 <ToggleButton.Style>
-                                    <Style TargetType="{x:Type ToggleButton}">
+                                    <Style TargetType="{x:Type ToggleButton}" BasedOn="{StaticResource {x:Type ToggleButton}}">
                                         <Setter Property="Content" Value="ON" />
                                         <Style.Triggers>
                                             <Trigger Property="IsChecked" Value="True">
@@ -789,7 +789,7 @@
                                       VerticalContentAlignment="Center"
                                       Click="AutoStartPilotRosterToggle_Click">
                                 <ToggleButton.Style>
-                                    <Style TargetType="{x:Type ToggleButton}">
+                                    <Style TargetType="{x:Type ToggleButton}" BasedOn="{StaticResource {x:Type ToggleButton}}">
                                         <Setter Property="Content" Value="ON" />
                                         <Style.Triggers>
                                             <Trigger Property="IsChecked" Value="True">
@@ -817,7 +817,7 @@
                                       VerticalContentAlignment="Center"
                                       Click="IL2Refocus_OnClick_Click">
                                 <ToggleButton.Style>
-                                    <Style TargetType="{x:Type ToggleButton}">
+                                    <Style TargetType="{x:Type ToggleButton}" BasedOn="{StaticResource {x:Type ToggleButton}}">
                                         <Setter Property="Content" Value="ON" />
                                         <Style.Triggers>
                                             <Trigger Property="IsChecked" Value="True">
@@ -845,7 +845,7 @@
                                       VerticalContentAlignment="Center"
                                       Click="MinimiseToTray_OnClick">
                                 <ToggleButton.Style>
-                                    <Style TargetType="{x:Type ToggleButton}">
+                                    <Style TargetType="{x:Type ToggleButton}" BasedOn="{StaticResource {x:Type ToggleButton}}">
                                         <Setter Property="Content" Value="ON" />
                                         <Style.Triggers>
                                             <Trigger Property="IsChecked" Value="True">
@@ -872,7 +872,7 @@
                                       VerticalContentAlignment="Center"
                                       Click="StartMinimised_OnClick">
                                 <ToggleButton.Style>
-                                    <Style TargetType="{x:Type ToggleButton}">
+                                    <Style TargetType="{x:Type ToggleButton}" BasedOn="{StaticResource {x:Type ToggleButton}}">
                                         <Setter Property="Content" Value="ON" />
                                         <Style.Triggers>
                                             <Trigger Property="IsChecked" Value="True">
@@ -899,7 +899,7 @@
                                       VerticalContentAlignment="Center"
                                       Click="CheckForBetaUpdates_OnClick">
                                 <ToggleButton.Style>
-                                    <Style TargetType="{x:Type ToggleButton}">
+                                    <Style TargetType="{x:Type ToggleButton}" BasedOn="{StaticResource {x:Type ToggleButton}}">
                                         <Setter Property="Content" Value="ON" />
                                         <Style.Triggers>
                                             <Trigger Property="IsChecked" Value="True">
@@ -926,7 +926,7 @@
                                       VerticalContentAlignment="Center"
                                       Click="RequireAdminToggle_OnClick">
                                 <ToggleButton.Style>
-                                    <Style TargetType="{x:Type ToggleButton}">
+                                    <Style TargetType="{x:Type ToggleButton}" BasedOn="{StaticResource {x:Type ToggleButton}}">
                                         <Setter Property="Content" Value="ON" />
                                         <Style.Triggers>
                                             <Trigger Property="IsChecked" Value="True">
@@ -953,7 +953,7 @@
                                           VerticalContentAlignment="Center"
                                           Click="ShowTransmitterName_OnClick_OnClick">
                                 <ToggleButton.Style>
-                                    <Style TargetType="{x:Type ToggleButton}">
+                                    <Style TargetType="{x:Type ToggleButton}" BasedOn="{StaticResource {x:Type ToggleButton}}">
                                         <Setter Property="Content" Value="ON" />
                                         <Style.Triggers>
                                             <Trigger Property="IsChecked" Value="True">
@@ -1056,7 +1056,7 @@
                                           VerticalContentAlignment="Center"
                                           Click="RadioRxStart_Click">
                                     <ToggleButton.Style>
-                                        <Style TargetType="{x:Type ToggleButton}">
+                                        <Style TargetType="{x:Type ToggleButton}" BasedOn="{StaticResource {x:Type ToggleButton}}">
                                             <Setter Property="Content" Value="ON" />
                                             <Style.Triggers>
                                                 <Trigger Property="IsChecked" Value="True">
@@ -1075,7 +1075,7 @@
                                           VerticalContentAlignment="Center"
                                           Click="RadioRxEnd_Click">
                                     <ToggleButton.Style>
-                                        <Style TargetType="{x:Type ToggleButton}">
+                                        <Style TargetType="{x:Type ToggleButton}" BasedOn="{StaticResource {x:Type ToggleButton}}">
                                             <Setter Property="Content" Value="ON" />
                                             <Style.Triggers>
                                                 <Trigger Property="IsChecked" Value="True">
@@ -1110,7 +1110,7 @@
                                           VerticalContentAlignment="Center"
                                           Click="RadioTxStart_Click">
                                         <ToggleButton.Style>
-                                            <Style TargetType="{x:Type ToggleButton}">
+                                            <Style TargetType="{x:Type ToggleButton}" BasedOn="{StaticResource {x:Type ToggleButton}}">
                                                 <Setter Property="Content" Value="ON" />
                                                 <Style.Triggers>
                                                     <Trigger Property="IsChecked" Value="True">
@@ -1129,7 +1129,7 @@
                                           VerticalContentAlignment="Center"
                                           Click="RadioTxEnd_Click">
                                         <ToggleButton.Style>
-                                            <Style TargetType="{x:Type ToggleButton}">
+                                            <Style TargetType="{x:Type ToggleButton}" BasedOn="{StaticResource {x:Type ToggleButton}}">
                                                 <Setter Property="Content" Value="ON" />
                                                 <Style.Triggers>
                                                     <Trigger Property="IsChecked" Value="True">
@@ -1160,7 +1160,7 @@
                                       VerticalContentAlignment="Center"
                                       Click="RadioSwitchPTT_Click">
                                 <ToggleButton.Style>
-                                    <Style TargetType="{x:Type ToggleButton}">
+                                    <Style TargetType="{x:Type ToggleButton}" BasedOn="{StaticResource {x:Type ToggleButton}}">
                                         <Setter Property="Content" Value="ON" />
                                         <Style.Triggers>
                                             <Trigger Property="IsChecked" Value="True">
@@ -1189,7 +1189,7 @@
                                       VerticalContentAlignment="Center"
                                       Click="RadioSoundEffects_OnClick">
                                 <ToggleButton.Style>
-                                    <Style TargetType="{x:Type ToggleButton}">
+                                    <Style TargetType="{x:Type ToggleButton}" BasedOn="{StaticResource {x:Type ToggleButton}}">
                                         <Setter Property="Content" Value="ON" />
                                         <Style.Triggers>
                                             <Trigger Property="IsChecked" Value="True">
@@ -1217,7 +1217,7 @@
                                       VerticalContentAlignment="Center"
                                       Click="RadioSoundEffectsClipping_OnClick">
                                 <ToggleButton.Style>
-                                    <Style TargetType="{x:Type ToggleButton}">
+                                    <Style TargetType="{x:Type ToggleButton}" BasedOn="{StaticResource {x:Type ToggleButton}}">
                                         <Setter Property="Content" Value="ON" />
                                         <Style.Triggers>
                                             <Trigger Property="IsChecked" Value="True">
@@ -1244,7 +1244,7 @@
                                           VerticalContentAlignment="Center"
                                           Click="EnableTextToSpeech_OnClick">
                                 <ToggleButton.Style>
-                                    <Style TargetType="{x:Type ToggleButton}">
+                                    <Style TargetType="{x:Type ToggleButton}" BasedOn="{StaticResource {x:Type ToggleButton}}">
                                         <Setter Property="Content" Value="ON" />
                                         <Style.Triggers>
                                             <Trigger Property="IsChecked" Value="True">
@@ -1326,7 +1326,7 @@
                                           VerticalContentAlignment="Center"
                                           Click="EnableRadioWrap_OnClick">
                                 <ToggleButton.Style>
-                                    <Style TargetType="{x:Type ToggleButton}">
+                                    <Style TargetType="{x:Type ToggleButton}" BasedOn="{StaticResource {x:Type ToggleButton}}">
                                         <Setter Property="Content" Value="ON" />
                                         <Style.Triggers>
                                             <Trigger Property="IsChecked" Value="True">

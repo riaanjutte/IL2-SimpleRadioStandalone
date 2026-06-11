@@ -87,15 +87,9 @@
                     <Setter Property="Margin" Value="10,0,6,0" />
                     <Setter Property="VerticalAlignment" Value="Center" />
                 </Style>
-                <Style x:Key="FavouriteServerHeaderStyle" TargetType="{x:Type DataGridColumnHeader}">
-                    <Setter Property="Padding" Value="10,2,6,2" />
-                    <Setter Property="HorizontalContentAlignment" Value="Left" />
-                </Style>
             </DataGrid.Resources>
             <DataGrid.Columns>
-                <DataGridTemplateColumn Header="Name"
-                                        HeaderStyle="{StaticResource FavouriteServerHeaderStyle}"
-                                        Width="192">
+                <DataGridTemplateColumn Header="Name"                                        Width="192">
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
                             <TextBlock Style="{StaticResource FavouriteServerTextCellStyle}"
@@ -103,9 +97,7 @@
                         </DataTemplate>
                     </DataGridTemplateColumn.CellTemplate>
                 </DataGridTemplateColumn>
-                <DataGridTemplateColumn Header="ServerAddress/port"
-                                        HeaderStyle="{StaticResource FavouriteServerHeaderStyle}"
-                                        Width="252">
+                <DataGridTemplateColumn Header="ServerAddress/port"                                        Width="252">
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
                             <TextBlock Style="{StaticResource FavouriteServerTextCellStyle}"
@@ -113,9 +105,7 @@
                         </DataTemplate>
                     </DataGridTemplateColumn.CellTemplate>
                 </DataGridTemplateColumn>
-                <DataGridTemplateColumn Header="Is Default"
-                                        HeaderStyle="{StaticResource FavouriteServerHeaderStyle}"
-                                        Width="132">
+                <DataGridTemplateColumn Header="Is Default"                                        Width="132">
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate DataType="ui:ServerAddress">
 
@@ -133,7 +123,7 @@
                                             <Setter.Value>
                                                 <Path Height="15"
                                                       Data="F1 M 5.33334,3.05176e-005C 8.27869,3.05176e-005 10.6667,2.38669 10.6667,5.33334L 10.6667,128C 10.6667,130.947 8.27869,133.333 5.33334,133.333C 2.38669,133.333 0,130.947 0,128L 0,5.33334C 0,2.38669 2.38669,3.05176e-005 5.33334,3.05176e-005 Z M 58.4986,3.84378C 65.2643,6.4642 70.6588,8.52805 80,4.45712L 80,44.6909C 70.2527,48.5827 64.0612,46.1921 57.5364,43.664C 52.8828,41.8627 48.0729,40 41.3333,40C 27.6667,40 17.9681,48.1263 16,49.9122L 16,9.08273C 20.028,5.89725 29.1282,3.05176e-005 41.3333,3.05176e-005C 48.5703,3.05176e-005 53.845,2.04163 58.4986,3.84378 Z "
-                                                      Fill="Black"
+                                                      Fill="#E4E6DD"
                                                       Stretch="Uniform" />
                                             </Setter.Value>
                                         </Setter>
