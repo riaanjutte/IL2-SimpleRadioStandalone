@@ -708,4 +708,7 @@
   <data name="Select Yes to apply these settings. Select No to keep your current settings. You will not be asked again." xml:space="preserve">
     <value>Seleziona Si per applicare queste impostazioni. Seleziona No per mantenere le impostazioni correnti. Non ti verra richiesto di nuovo.</value>
   </data>
+  <data name="PLTS:" xml:space="preserve">
+    <value>PIL:</value>
+  </data>
 </root>

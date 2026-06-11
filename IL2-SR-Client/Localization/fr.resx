@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <root>
   <!-- 
     Microsoft ResX Schema 
@@ -154,13 +154,13 @@
     <value>Afficher les parametres serveur</value>
   </data>
   <data name="Toggle Radio Overlay" xml:space="preserve">
-    <value>Basculer l'overlay radio</value>
+    <value>Ouvrir l'overlay radio</value>
   </data>
   <data name="Toggle Client List" xml:space="preserve">
-    <value>Basculer la liste clients</value>
+    <value>Ouvrir la liste clients</value>
   </data>
   <data name="Toggle Pilot Roster" xml:space="preserve">
-    <value>Basculer la liste pilotes</value>
+    <value>Ouvrir la liste pilotes</value>
   </data>
   <data name="Current Profile:" xml:space="preserve">
     <value>Profil actuel :</value>
@@ -550,7 +550,7 @@
     <value>ACTIVE</value>
   </data>
   <data name="CREW INTERCOM" xml:space="preserve">
-    <value>CREW INTERCOM</value>
+    <value>I/C EQUIPAGE</value>
   </data>
   <data name="Not Connected" xml:space="preserve">
     <value>Non connecte</value>
@@ -601,7 +601,7 @@
     <value>Selectionner l'intercom</value>
   </data>
   <data name="Overlay Toggle" xml:space="preserve">
-    <value>Basculer l'overlay</value>
+    <value>Ouvrir l'overlay</value>
   </data>
   <data name="Radio Channel Up" xml:space="preserve">
     <value>Canal radio suivant</value>
@@ -655,16 +655,16 @@
     <value>Lire l'etat (TTS requis)</value>
   </data>
   <data name="Mute / Unmute Selected Radio" xml:space="preserve">
-    <value>Couper / retablir la radio selectionnee</value>
+    <value>Éteindre / rallumer la radio sélectionnée</value>
   </data>
   <data name="Mute / Unmute Other Radio" xml:space="preserve">
-    <value>Couper / retablir l'autre radio</value>
+    <value>Éteindre / rallumer l'autre radio</value>
   </data>
   <data name="Mute / Unmute Both Radios" xml:space="preserve">
-    <value>Couper / retablir les deux radios</value>
+    <value>Éteindre / rallumer les deux radios</value>
   </data>
   <data name="Mute / Unmute Microphone" xml:space="preserve">
-    <value>Couper / retablir le microphone</value>
+    <value>Éteindre / rallumer le microphone</value>
   </data>
   <data name="RCI" xml:space="preserve">
     <value>RCI</value>
@@ -707,5 +707,8 @@
   </data>
   <data name="Select Yes to apply these settings. Select No to keep your current settings. You will not be asked again." xml:space="preserve">
     <value>Selectionnez Oui pour appliquer ces parametres. Selectionnez Non pour conserver vos parametres actuels. Cette question ne sera plus posee.</value>
+  </data>
+  <data name="PLTS:" xml:space="preserve">
+    <value>PIL:</value>
   </data>
 </root>

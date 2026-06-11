@@ -82,10 +82,40 @@
                   AutoGenerateColumns="False"
                   ItemsSource="{Binding Path=Addresses}"
                   SelectedItem="{Binding Path=SelectedItem}">
+            <DataGrid.Resources>
+                <Style x:Key="FavouriteServerTextCellStyle" TargetType="{x:Type TextBlock}">
+                    <Setter Property="Margin" Value="10,0,6,0" />
+                    <Setter Property="VerticalAlignment" Value="Center" />
+                </Style>
+                <Style x:Key="FavouriteServerHeaderStyle" TargetType="{x:Type DataGridColumnHeader}">
+                    <Setter Property="Padding" Value="10,2,6,2" />
+                    <Setter Property="HorizontalContentAlignment" Value="Left" />
+                </Style>
+            </DataGrid.Resources>
             <DataGrid.Columns>
-                <DataGridTextColumn Binding="{Binding Path=Name}" Header="Name" />
-                <DataGridTextColumn Binding="{Binding Path=Address}" Header="ServerAddress/port" />
-                <DataGridTemplateColumn Header="Is Default">
+                <DataGridTemplateColumn Header="Name"
+                                        HeaderStyle="{StaticResource FavouriteServerHeaderStyle}"
+                                        Width="192">
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <TextBlock Style="{StaticResource FavouriteServerTextCellStyle}"
+                                       Text="{Binding Path=Name}" />
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
+                <DataGridTemplateColumn Header="ServerAddress/port"
+                                        HeaderStyle="{StaticResource FavouriteServerHeaderStyle}"
+                                        Width="252">
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <TextBlock Style="{StaticResource FavouriteServerTextCellStyle}"
+                                       Text="{Binding Path=Address}" />
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
+                <DataGridTemplateColumn Header="Is Default"
+                                        HeaderStyle="{StaticResource FavouriteServerHeaderStyle}"
+                                        Width="132">
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate DataType="ui:ServerAddress">
 
@@ -93,6 +123,7 @@
                                     Command="{Binding ElementName=FavouritesGrid,
                                                       Path=DataContext.OnDefaultChangedCommand}"
                                     CommandParameter="{Binding}"
+                                    Margin="10,1,6,1"
                                     Padding="0" />
 
                             <DataTemplate.Triggers>

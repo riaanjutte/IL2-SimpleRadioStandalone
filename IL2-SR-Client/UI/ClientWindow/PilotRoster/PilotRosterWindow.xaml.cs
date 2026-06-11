@@ -24,6 +24,10 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI.ClientWindow.PilotRoster
         private const double RosterHeaderHeight = 30.0;
         private const double RosterWindowVerticalChrome = 30.0;
         private const double RosterMaximumScreenMargin = 80.0;
+        private const double DefaultRosterX = 360.0;
+        private const double DefaultRosterY = 260.0;
+        private const double DefaultRosterWidth = 560.0;
+        private const double DefaultRosterHeight = 420.0;
         private readonly GlobalSettingsStore _globalSettings = GlobalSettingsStore.Instance;
         private readonly ObservableCollection<PilotRosterEntry> _pilotRoster = new ObservableCollection<PilotRosterEntry>();
         private readonly DispatcherTimer _updateTimer;
@@ -80,13 +84,16 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI.ClientWindow.PilotRoster
 
         private void RestoreWindowBounds()
         {
-            var configuredWidth = Math.Max(MinWidth, _globalSettings.GetPositionSetting(GlobalSettingsKeys.PilotRosterWidth).DoubleValue);
-            var configuredHeight = Math.Max(MinHeight, _globalSettings.GetPositionSetting(GlobalSettingsKeys.PilotRosterHeight).DoubleValue);
+            var workArea = SystemParameters.WorkArea;
+            var configuredWidth = Math.Max(MinWidth, _globalSettings.GetFinitePositionSetting(GlobalSettingsKeys.PilotRosterWidth, DefaultRosterWidth));
+            var configuredHeight = Math.Max(MinHeight, _globalSettings.GetFinitePositionSetting(GlobalSettingsKeys.PilotRosterHeight, DefaultRosterHeight));
 
-            Width = configuredWidth;
-            Height = configuredHeight;
-            Left = _globalSettings.GetPositionSetting(GlobalSettingsKeys.PilotRosterX).DoubleValue;
-            Top = _globalSettings.GetPositionSetting(GlobalSettingsKeys.PilotRosterY).DoubleValue;
+            Width = Math.Min(configuredWidth, Math.Max(MinWidth, workArea.Width));
+            Height = Math.Min(configuredHeight, Math.Max(MinHeight, workArea.Height));
+            Left = _globalSettings.GetFinitePositionSetting(GlobalSettingsKeys.PilotRosterX, DefaultRosterX);
+            Top = _globalSettings.GetFinitePositionSetting(GlobalSettingsKeys.PilotRosterY, DefaultRosterY);
+            EnsureWindowIsOnScreen();
+            SaveWindowBounds();
         }
 
         private void WindowBoundsChanged(object sender, EventArgs e)
@@ -121,6 +128,7 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI.ClientWindow.PilotRoster
 
             Width = Math.Max(MinWidth, 500);
             Height = Math.Max(MinHeight, 190);
+            EnsureWindowIsOnScreen();
         }
 
         private void RosterFrame_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
@@ -172,6 +180,51 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI.ClientWindow.PilotRoster
             }
 
             Height = fittedHeight;
+            EnsureWindowIsOnScreen();
+        }
+
+        private void EnsureWindowIsOnScreen()
+        {
+            var workArea = SystemParameters.WorkArea;
+            const double margin = 10.0;
+
+            if (double.IsNaN(Left) || double.IsInfinity(Left))
+            {
+                Left = workArea.Left + margin;
+            }
+
+            if (double.IsNaN(Top) || double.IsInfinity(Top))
+            {
+                Top = workArea.Top + margin;
+            }
+
+            if (Width > workArea.Width)
+            {
+                Width = Math.Max(MinWidth, workArea.Width - margin * 2);
+            }
+
+            if (Height > workArea.Height)
+            {
+                Height = Math.Max(MinHeight, workArea.Height - margin * 2);
+            }
+
+            if (Left < workArea.Left + margin)
+            {
+                Left = workArea.Left + margin;
+            }
+            else if (Left + Width > workArea.Right - margin)
+            {
+                Left = Math.Max(workArea.Left + margin, workArea.Right - Width - margin);
+            }
+
+            if (Top < workArea.Top + margin)
+            {
+                Top = workArea.Top + margin;
+            }
+            else if (Top + Height > workArea.Bottom - margin)
+            {
+                Top = Math.Max(workArea.Top + margin, workArea.Bottom - Height - margin);
+            }
         }
 
         protected override void OnClosing(CancelEventArgs e)

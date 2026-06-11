@@ -386,6 +386,44 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.Settings
             return GetSetting("Position Settings", key.ToString());
         }
 
+        public double GetFinitePositionSetting(GlobalSettingsKeys key, double fallbackValue)
+        {
+            double value;
+
+            try
+            {
+                value = GetPositionSetting(key).DoubleValue;
+            }
+            catch (Exception ex)
+            {
+                Logger.Warn(ex, $"Invalid numeric value for position setting {key}; resetting to {fallbackValue.ToString(CultureInfo.InvariantCulture)}");
+                SetPositionSetting(key, fallbackValue);
+                return fallbackValue;
+            }
+
+            if (!double.IsNaN(value) && !double.IsInfinity(value))
+            {
+                return value;
+            }
+
+            Logger.Warn($"Invalid finite value for position setting {key}: {value.ToString(CultureInfo.InvariantCulture)}; resetting to {fallbackValue.ToString(CultureInfo.InvariantCulture)}");
+            SetPositionSetting(key, fallbackValue);
+            return fallbackValue;
+        }
+
+        public double GetBoundedPositionSetting(GlobalSettingsKeys key, double fallbackValue, double minimumValue, double maximumValue)
+        {
+            var value = GetFinitePositionSetting(key, fallbackValue);
+            if (value >= minimumValue && value <= maximumValue)
+            {
+                return value;
+            }
+
+            Logger.Warn($"Out-of-range value for position setting {key}: {value.ToString(CultureInfo.InvariantCulture)}; resetting to {fallbackValue.ToString(CultureInfo.InvariantCulture)}");
+            SetPositionSetting(key, fallbackValue);
+            return fallbackValue;
+        }
+
         public void SetPositionSetting(GlobalSettingsKeys key, double value)
         {
             SetSetting("Position Settings", key.ToString(), value.ToString(CultureInfo.InvariantCulture));

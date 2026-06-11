@@ -42,7 +42,10 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Overlay
         private const double RciCallsignMinHeightDelta = 10.0;
         private const double AssignedCallsignScrollPixelsPerSecond = 18.0;
         private const double AssignedCallsignInitialScrollPauseMilliseconds = 700.0;
-        private const double AssignedCallsignRepeatScrollPauseMilliseconds = 15000.0;
+        private const double AssignedCallsignRepeatScrollPauseMilliseconds = 2000.0;
+        private const double DefaultOverlayX = 300.0;
+        private const double DefaultOverlayY = 300.0;
+        private const double DefaultOverlayOpacity = 1.0;
         private const double DefaultOverlayWidth = 260.0;
         private const double DefaultOverlayHeight = 286.0;
         private const double PreviousFramedDefaultOverlayHeight = 320.0;
@@ -73,17 +76,17 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Overlay
             _originalMinHeight = MinHeight;
 
             AllowsTransparency = true;
-            Opacity = _globalSettings.GetPositionSetting(GlobalSettingsKeys.RadioOpacity).DoubleValue;
+            Opacity = _globalSettings.GetBoundedPositionSetting(GlobalSettingsKeys.RadioOpacity, DefaultOverlayOpacity, 0.0, 1.0);
             WindowOpacitySlider.Value = Opacity;
 
             //allows click and drag anywhere on the window
             ContainerPanel.MouseLeftButtonDown += WrapPanel_MouseLeftButtonDown;
 
-            Left = _globalSettings.GetPositionSetting(GlobalSettingsKeys.RadioX).DoubleValue;
-            Top = _globalSettings.GetPositionSetting(GlobalSettingsKeys.RadioY).DoubleValue;
+            Left = _globalSettings.GetFinitePositionSetting(GlobalSettingsKeys.RadioX, DefaultOverlayX);
+            Top = _globalSettings.GetFinitePositionSetting(GlobalSettingsKeys.RadioY, DefaultOverlayY);
 
-            var configuredWidth = _globalSettings.GetPositionSetting(GlobalSettingsKeys.RadioWidth).DoubleValue;
-            var configuredHeight = _globalSettings.GetPositionSetting(GlobalSettingsKeys.RadioHeight).DoubleValue;
+            var configuredWidth = _globalSettings.GetFinitePositionSetting(GlobalSettingsKeys.RadioWidth, DefaultOverlayWidth);
+            var configuredHeight = _globalSettings.GetFinitePositionSetting(GlobalSettingsKeys.RadioHeight, DefaultOverlayHeight);
             var useDefaultSize = ShouldUseDefaultOverlaySize(configuredWidth, configuredHeight);
             Width = GetOverlayWidth(configuredWidth, useDefaultSize);
             Height = GetOverlayHeight(configuredHeight, useDefaultSize);
@@ -180,7 +183,6 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Overlay
             string displayText;
             Brush foreground;
             FontWeight fontWeight;
-            var allowScroll = false;
 
             if (hasAssignedCallsign)
             {
@@ -193,7 +195,6 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Overlay
                 displayText = RciDisplayState.GetActiveRcoRequestCallsignText();
                 foreground = Brushes.Red;
                 fontWeight = FontWeights.Bold;
-                allowScroll = true;
             }
             else if (showRequestPrompt)
             {
@@ -210,7 +211,7 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Overlay
 
             AssignedCallsignLabel.Foreground = foreground;
             AssignedCallsignLabel.FontWeight = fontWeight;
-            SetAssignedCallsignText(displayText, allowScroll);
+            SetAssignedCallsignText(displayText);
 
             AssignedCallsignPanel.Visibility = string.IsNullOrWhiteSpace(AssignedCallsignLabel.Text)
                 ? Visibility.Collapsed
@@ -222,7 +223,7 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Overlay
             }
         }
 
-        private void SetAssignedCallsignText(string text, bool allowScroll)
+        private void SetAssignedCallsignText(string text, bool allowScroll = true)
         {
             text = text ?? string.Empty;
             if (!string.Equals(_currentAssignedCallsignText, text, StringComparison.Ordinal))
@@ -232,7 +233,7 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Overlay
                 _assignedCallsignScrollStartedAt = DateTime.UtcNow;
             }
 
-            UpdateAssignedCallsignScroll(allowScroll);
+            UpdateAssignedCallsignScroll(!string.IsNullOrWhiteSpace(text) && allowScroll);
         }
 
         private void UpdateAssignedCallsignScroll(bool allowScroll)
@@ -725,6 +726,12 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Overlay
 
         private bool ShouldUseDefaultOverlaySize(double configuredWidth, double configuredHeight)
         {
+            if (double.IsNaN(configuredWidth) || double.IsInfinity(configuredWidth) ||
+                double.IsNaN(configuredHeight) || double.IsInfinity(configuredHeight))
+            {
+                return true;
+            }
+
             return (Math.Abs(configuredWidth - OldDefaultOverlayWidth) < 0.5 &&
                     Math.Abs(configuredHeight - OldDefaultOverlayHeight) < 0.5) ||
                    (Math.Abs(configuredWidth - DefaultOverlayWidth) < 0.5 &&
@@ -733,7 +740,7 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Overlay
 
         private double GetOverlayWidth(double configuredWidth, bool useDefaultSize)
         {
-            if (useDefaultSize || double.IsNaN(configuredWidth) || configuredWidth <= 0)
+            if (useDefaultSize || double.IsNaN(configuredWidth) || double.IsInfinity(configuredWidth) || configuredWidth <= 0)
             {
                 return DefaultOverlayWidth;
             }
@@ -748,7 +755,7 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Overlay
 
         private double GetOverlayHeight(double configuredHeight, bool useDefaultSize)
         {
-            if (useDefaultSize || double.IsNaN(configuredHeight) || configuredHeight <= 0)
+            if (useDefaultSize || double.IsNaN(configuredHeight) || double.IsInfinity(configuredHeight) || configuredHeight <= 0)
             {
                 return DefaultOverlayHeight;
             }

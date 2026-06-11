@@ -33,12 +33,12 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Common.Tests.UI
         }
 
         [TestMethod]
-        public void AssignedCallsignScrollPauseHappensAtResetPosition()
+        public void AssignedCallsignScrollPauseHappensBeforeReset()
         {
             const double travelDistance = 100.0;
             const double travelMilliseconds = 1000.0;
             const double initialPauseMilliseconds = 700.0;
-            const double resetPauseMilliseconds = 15000.0;
+            const double resetPauseMilliseconds = 2000.0;
 
             Assert.AreEqual(
                 0,
@@ -61,7 +61,7 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Common.Tests.UI
                 0.01);
 
             Assert.AreEqual(
-                0,
+                -100,
                 SpeakerNameScrollLayout.CalculateResetPauseScrollOffset(
                     initialPauseMilliseconds + travelMilliseconds + 1000.0,
                     travelDistance,
@@ -69,17 +69,40 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Common.Tests.UI
                     initialPauseMilliseconds,
                     resetPauseMilliseconds),
                 0.01,
-                "After the first scroll completes, the text should reset to the start and pause there.");
+                "After the first scroll completes, the text should pause at the end before resetting.");
 
             Assert.AreEqual(
-                -50,
+                0,
                 SpeakerNameScrollLayout.CalculateResetPauseScrollOffset(
-                    initialPauseMilliseconds + travelMilliseconds + resetPauseMilliseconds + 500.0,
+                    initialPauseMilliseconds + travelMilliseconds + resetPauseMilliseconds,
                     travelDistance,
                     travelMilliseconds,
                     initialPauseMilliseconds,
                     resetPauseMilliseconds),
-                0.01);
+                0.01,
+                "After the end pause completes, the text should reset to the start.");
+
+            Assert.AreEqual(
+                0,
+                SpeakerNameScrollLayout.CalculateResetPauseScrollOffset(
+                    initialPauseMilliseconds + travelMilliseconds + resetPauseMilliseconds + 1000.0,
+                    travelDistance,
+                    travelMilliseconds,
+                    initialPauseMilliseconds,
+                    resetPauseMilliseconds),
+                0.01,
+                "After reset, the text should pause at the start before scrolling again.");
+
+            Assert.AreEqual(
+                -50,
+                SpeakerNameScrollLayout.CalculateResetPauseScrollOffset(
+                    initialPauseMilliseconds + travelMilliseconds + resetPauseMilliseconds + resetPauseMilliseconds + 500.0,
+                    travelDistance,
+                    travelMilliseconds,
+                    initialPauseMilliseconds,
+                    resetPauseMilliseconds),
+                0.01,
+                "After reset, the text should keep cycling instead of stopping after one pass.");
         }
 
         private static double MeasureOverlayChannelTextWidth(string text)

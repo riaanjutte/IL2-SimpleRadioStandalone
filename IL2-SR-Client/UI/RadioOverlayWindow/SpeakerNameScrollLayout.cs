@@ -65,19 +65,18 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI.RadioOverlayWindow
             }
 
             var elapsedAfterInitialPause = elapsedMilliseconds - initialPauseMilliseconds;
-            if (elapsedAfterInitialPause <= travelMilliseconds)
+            var cycleElapsed = elapsedAfterInitialPause % (travelMilliseconds + resetPauseMilliseconds + resetPauseMilliseconds);
+            if (cycleElapsed <= travelMilliseconds)
             {
-                return -travelDistance * (elapsedAfterInitialPause / travelMilliseconds);
+                return -travelDistance * (cycleElapsed / travelMilliseconds);
             }
 
-            var repeatElapsed = (elapsedAfterInitialPause - travelMilliseconds) %
-                                (resetPauseMilliseconds + travelMilliseconds);
-            if (repeatElapsed <= resetPauseMilliseconds)
+            if (cycleElapsed < travelMilliseconds + resetPauseMilliseconds)
             {
-                return 0;
+                return -travelDistance;
             }
 
-            return -travelDistance * ((repeatElapsed - resetPauseMilliseconds) / travelMilliseconds);
+            return 0;
         }
     }
 

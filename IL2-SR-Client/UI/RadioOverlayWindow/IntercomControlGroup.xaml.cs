@@ -21,6 +21,7 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Overlay
         private bool _syncingSliderFromState;
         private readonly ClientStateSingleton _clientStateSingleton = ClientStateSingleton.Instance;
         private readonly ConnectedClientsSingleton _connectClientsSingleton = ConnectedClientsSingleton.Instance;
+        private static string LocalizedIntercomLabelText => LocalizationManager.Get(IntercomLabelText);
 
         public IntercomControlGroup()
         {
@@ -68,7 +69,7 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Overlay
             if ((IL2PlayerRadioInfo == null) || !_clientStateSingleton.IsConnected)
             {
                 RadioActive.Fill = CreateStatusBrush(Colors.Red);
-                RadioLabel.Content = IntercomLabelText;
+                RadioLabel.Content = LocalizedIntercomLabelText;
                 RadioLabel.FontSize = 7;
                 RadioLabel.ToolTip = null;
 
@@ -145,7 +146,7 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Overlay
                 return;
             }
 
-            RadioLabel.Content = IntercomLabelText;
+            RadioLabel.Content = LocalizedIntercomLabelText;
             RadioLabel.FontSize = 7;
             RadioLabel.ToolTip = null;
         }

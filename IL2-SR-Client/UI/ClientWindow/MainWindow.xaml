@@ -542,8 +542,8 @@
         </TabItem>
 
         <TabItem Header="Settings">
-            <ScrollViewer HorizontalScrollBarVisibility="Hidden" VerticalScrollBarVisibility="Visible">
-                <StackPanel>
+            <ScrollViewer HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Visible">
+                <StackPanel Margin="10,0,10,0">
                     <GroupBox Header="Global Settings">
 
                         <Grid>
@@ -1037,27 +1037,26 @@
                                    VerticalContentAlignment="Center"
                                    Content="Theme" />
 
-                            <StackPanel Grid.Row="19"
-                                        Grid.Column="1"
-                                        HorizontalAlignment="Center"
-                                        VerticalAlignment="Center"
-                                        Orientation="Horizontal">
+                            <WrapPanel Grid.Row="19"
+                                       Grid.Column="1"
+                                       HorizontalAlignment="Stretch"
+                                       VerticalAlignment="Center">
                                 <RadioButton Name="LightThemeRadioButton"
-                                             Margin="5,0"
+                                             Margin="5,2"
                                              Content="Light"
                                              GroupName="ClientTheme"
                                              Checked="ThemeRadioButton_Checked" />
                                 <RadioButton Name="DarkThemeRadioButton"
-                                             Margin="5,0"
+                                             Margin="5,2"
                                              Content="Dark"
                                              GroupName="ClientTheme"
                                              Checked="ThemeRadioButton_Checked" />
                                 <RadioButton Name="SystemThemeRadioButton"
-                                             Margin="5,0"
+                                             Margin="5,2"
                                              Content="Use Windows setting"
                                              GroupName="ClientTheme"
                                              Checked="ThemeRadioButton_Checked" />
-                            </StackPanel>
+                            </WrapPanel>
                         </Grid>
 
                     </GroupBox>

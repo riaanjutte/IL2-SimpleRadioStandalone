@@ -149,7 +149,15 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.Utils
 
             if (element is TextBlock textBlock)
             {
-                textBlock.Foreground = currentToggleButton?.IsChecked == true ? palette.ToggleOnForeground : palette.Foreground;
+                var parentTabItem = FindAncestor<TabItem>(textBlock);
+                if (parentTabItem?.IsSelected == true)
+                {
+                    textBlock.Foreground = palette.SelectedTabForeground;
+                }
+                else
+                {
+                    textBlock.Foreground = currentToggleButton?.IsChecked == true ? palette.ToggleOnForeground : palette.Foreground;
+                }
             }
 
             if (element is Label label)
@@ -210,8 +218,8 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.Utils
 
             if (element is TabItem tabItem)
             {
-                tabItem.Background = palette.TabBackground;
-                tabItem.Foreground = palette.Foreground;
+                tabItem.Background = tabItem.IsSelected ? palette.SelectedTabBackground : palette.TabBackground;
+                tabItem.Foreground = tabItem.IsSelected ? palette.SelectedTabForeground : palette.Foreground;
                 tabItem.BorderBrush = palette.Border;
             }
 
@@ -450,6 +458,21 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.Utils
             toggleButton.Background = toggleButton.IsChecked == true ? palette.ToggleOnBackground : palette.ToggleOffBackground;
         }
 
+        private static T FindAncestor<T>(DependencyObject element) where T : DependencyObject
+        {
+            var current = element;
+            while (current != null)
+            {
+                current = VisualTreeHelper.GetParent(current);
+                if (current is T match)
+                {
+                    return match;
+                }
+            }
+
+            return null;
+        }
+
         private sealed class ThemePalette
         {
             public static readonly ThemePalette Light = new ThemePalette(
@@ -467,7 +490,9 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.Utils
                 new SolidColorBrush(Color.FromRgb(170, 170, 170)),
                 new SolidColorBrush(Color.FromRgb(27, 27, 27)),
                 new SolidColorBrush(Color.FromRgb(167, 173, 179)),
-                new SolidColorBrush(Color.FromRgb(150, 150, 150)));
+                new SolidColorBrush(Color.FromRgb(150, 150, 150)),
+                Brushes.White,
+                Brushes.Black);
 
             public static readonly ThemePalette Dark = new ThemePalette(
                 new SolidColorBrush(Color.FromRgb(37, 41, 45)),
@@ -484,7 +509,9 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.Utils
                 new SolidColorBrush(Color.FromRgb(170, 170, 170)),
                 new SolidColorBrush(Color.FromRgb(27, 27, 27)),
                 new SolidColorBrush(Color.FromRgb(167, 173, 179)),
-                new SolidColorBrush(Color.FromRgb(150, 158, 166)));
+                new SolidColorBrush(Color.FromRgb(150, 158, 166)),
+                Brushes.White,
+                Brushes.Black);
 
             private ThemePalette(
                 Brush windowBackground,
@@ -501,7 +528,9 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.Utils
                 Brush buttonHoverBackground,
                 Brush disabledButtonForeground,
                 Brush disabledButtonBackground,
-                Brush disabledButtonBorder)
+                Brush disabledButtonBorder,
+                Brush selectedTabBackground,
+                Brush selectedTabForeground)
             {
                 WindowBackground = windowBackground;
                 PanelBackground = panelBackground;
@@ -518,6 +547,8 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.Utils
                 DisabledButtonForeground = disabledButtonForeground;
                 DisabledButtonBackground = disabledButtonBackground;
                 DisabledButtonBorder = disabledButtonBorder;
+                SelectedTabBackground = selectedTabBackground;
+                SelectedTabForeground = selectedTabForeground;
             }
 
             public Brush WindowBackground { get; }
@@ -535,6 +566,8 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.Utils
             public Brush DisabledButtonForeground { get; }
             public Brush DisabledButtonBackground { get; }
             public Brush DisabledButtonBorder { get; }
+            public Brush SelectedTabBackground { get; }
+            public Brush SelectedTabForeground { get; }
         }
     }
 }

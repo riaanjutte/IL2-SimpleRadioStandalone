@@ -91,6 +91,18 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI
         private const string RecommendedRadio1AudioChannel = "-0.75";
         private const string RecommendedRadio2AudioChannel = "0.75";
         private const string CombatBoxRciServerHost = "srs.combatbox.net";
+        private const double DefaultClientX = 200;
+        private const double DefaultClientY = 200;
+        private const double DefaultClientWidth = 700;
+        private const double DefaultClientHeight = 650;
+        private const double DefaultRadioX = 300;
+        private const double DefaultRadioY = 300;
+        private const double DefaultAwacsX = 300;
+        private const double DefaultAwacsY = 300;
+        private const double DefaultPilotRosterX = 360;
+        private const double DefaultPilotRosterY = 260;
+        private const double DefaultPilotRosterWidth = 560;
+        private const double DefaultPilotRosterHeight = 420;
 
         /// <remarks>Used in the XAML for DataBinding many things</remarks>
         public ClientStateSingleton ClientState { get; } = ClientStateSingleton.Instance;
@@ -134,10 +146,10 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI
             var client = ClientStateSingleton.Instance;
 
             WindowStartupLocation = WindowStartupLocation.Manual;
-            Left = _globalSettings.GetPositionSetting(GlobalSettingsKeys.ClientX).DoubleValue;
-            Top = _globalSettings.GetPositionSetting(GlobalSettingsKeys.ClientY).DoubleValue;
-            Width = GetClientWindowWidth(_globalSettings.GetPositionSetting(GlobalSettingsKeys.ClientWidth).DoubleValue);
-            Height = GetClientWindowHeight(_globalSettings.GetPositionSetting(GlobalSettingsKeys.ClientHeight).DoubleValue);
+            Left = _globalSettings.GetFinitePositionSetting(GlobalSettingsKeys.ClientX, DefaultClientX);
+            Top = _globalSettings.GetFinitePositionSetting(GlobalSettingsKeys.ClientY, DefaultClientY);
+            Width = GetClientWindowWidth(_globalSettings.GetFinitePositionSetting(GlobalSettingsKeys.ClientWidth, DefaultClientWidth));
+            Height = GetClientWindowHeight(_globalSettings.GetFinitePositionSetting(GlobalSettingsKeys.ClientHeight, DefaultClientHeight));
 
             Title = Title + " - " + UpdaterChecker.RELEASE_TAG;
 
@@ -302,16 +314,21 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI
             bool radioWindowVisible = false;
             bool awacsWindowVisible = false;
 
-            int mainWindowX = (int)_globalSettings.GetPositionSetting(GlobalSettingsKeys.ClientX).DoubleValue;
-            int mainWindowY = (int)_globalSettings.GetPositionSetting(GlobalSettingsKeys.ClientY).DoubleValue;
-            int radioWindowX = (int)_globalSettings.GetPositionSetting(GlobalSettingsKeys.RadioX).DoubleValue;
-            int radioWindowY = (int)_globalSettings.GetPositionSetting(GlobalSettingsKeys.RadioY).DoubleValue;
-            int awacsWindowX = (int)_globalSettings.GetPositionSetting(GlobalSettingsKeys.AwacsX).DoubleValue;
-            int awacsWindowY = (int)_globalSettings.GetPositionSetting(GlobalSettingsKeys.AwacsY).DoubleValue;
+            int mainWindowX = ToScreenCoordinate(_globalSettings.GetFinitePositionSetting(GlobalSettingsKeys.ClientX, DefaultClientX));
+            int mainWindowY = ToScreenCoordinate(_globalSettings.GetFinitePositionSetting(GlobalSettingsKeys.ClientY, DefaultClientY));
+            int radioWindowX = ToScreenCoordinate(_globalSettings.GetFinitePositionSetting(GlobalSettingsKeys.RadioX, DefaultRadioX));
+            int radioWindowY = ToScreenCoordinate(_globalSettings.GetFinitePositionSetting(GlobalSettingsKeys.RadioY, DefaultRadioY));
+            int awacsWindowX = ToScreenCoordinate(_globalSettings.GetFinitePositionSetting(GlobalSettingsKeys.AwacsX, DefaultAwacsX));
+            int awacsWindowY = ToScreenCoordinate(_globalSettings.GetFinitePositionSetting(GlobalSettingsKeys.AwacsY, DefaultAwacsY));
+            double pilotRosterWidth = _globalSettings.GetFinitePositionSetting(GlobalSettingsKeys.PilotRosterWidth, DefaultPilotRosterWidth);
+            double pilotRosterHeight = _globalSettings.GetFinitePositionSetting(GlobalSettingsKeys.PilotRosterHeight, DefaultPilotRosterHeight);
+            double pilotRosterX = _globalSettings.GetFinitePositionSetting(GlobalSettingsKeys.PilotRosterX, DefaultPilotRosterX);
+            double pilotRosterY = _globalSettings.GetFinitePositionSetting(GlobalSettingsKeys.PilotRosterY, DefaultPilotRosterY);
 
             Logger.Info($"Checking window visibility for main client window {{X={mainWindowX},Y={mainWindowY}}}");
             Logger.Info($"Checking window visibility for radio overlay {{X={radioWindowX},Y={radioWindowY}}}");
             Logger.Info($"Checking window visibility for AWACS overlay {{X={awacsWindowX},Y={awacsWindowY}}}");
+            Logger.Info($"Checking window visibility for pilot roster {{X={pilotRosterX},Y={pilotRosterY},Width={pilotRosterWidth},Height={pilotRosterHeight}}}");
 
             foreach (System.Windows.Forms.Screen screen in System.Windows.Forms.Screen.AllScreens)
             {
@@ -334,6 +351,12 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI
                 }
             }
 
+            bool pilotRosterVisible = IsWindowRectVisibleOnAnyScreen(
+                pilotRosterX,
+                pilotRosterY,
+                pilotRosterWidth,
+                pilotRosterHeight);
+
             if (!mainWindowVisible)
             {
                 MessageBox.Show(this,
@@ -344,15 +367,15 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI
 
                 Logger.Warn($"Main client window outside visible area of monitors, resetting position ({mainWindowX},{mainWindowY}) to defaults");
 
-                _globalSettings.SetPositionSetting(GlobalSettingsKeys.ClientX, 200);
-                _globalSettings.SetPositionSetting(GlobalSettingsKeys.ClientY, 200);
-                _globalSettings.SetPositionSetting(GlobalSettingsKeys.ClientWidth, 700);
-                _globalSettings.SetPositionSetting(GlobalSettingsKeys.ClientHeight, 650);
+                _globalSettings.SetPositionSetting(GlobalSettingsKeys.ClientX, DefaultClientX);
+                _globalSettings.SetPositionSetting(GlobalSettingsKeys.ClientY, DefaultClientY);
+                _globalSettings.SetPositionSetting(GlobalSettingsKeys.ClientWidth, DefaultClientWidth);
+                _globalSettings.SetPositionSetting(GlobalSettingsKeys.ClientHeight, DefaultClientHeight);
 
-                Left = 200;
-                Top = 200;
-                Width = 700;
-                Height = 650;
+                Left = DefaultClientX;
+                Top = DefaultClientY;
+                Width = DefaultClientWidth;
+                Height = DefaultClientHeight;
             }
 
             if (!radioWindowVisible)
@@ -365,13 +388,13 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI
 
                 Logger.Warn($"Radio overlay window outside visible area of monitors, resetting position ({radioWindowX},{radioWindowY}) to defaults");
 
-                _globalSettings.SetPositionSetting(GlobalSettingsKeys.RadioX, 300);
-                _globalSettings.SetPositionSetting(GlobalSettingsKeys.RadioY, 300);
+                _globalSettings.SetPositionSetting(GlobalSettingsKeys.RadioX, DefaultRadioX);
+                _globalSettings.SetPositionSetting(GlobalSettingsKeys.RadioY, DefaultRadioY);
 
                 if (_radioOverlayWindow != null)
                 {
-                    _radioOverlayWindow.Left = 300;
-                    _radioOverlayWindow.Top = 300;
+                    _radioOverlayWindow.Left = DefaultRadioX;
+                    _radioOverlayWindow.Top = DefaultRadioY;
                 }
             }
 
@@ -385,9 +408,107 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI
 
                 Logger.Warn($"AWACS overlay window outside visible area of monitors, resetting position ({awacsWindowX},{awacsWindowY}) to defaults");
 
-                _globalSettings.SetPositionSetting(GlobalSettingsKeys.AwacsX, 300);
-                _globalSettings.SetPositionSetting(GlobalSettingsKeys.AwacsY, 300);
+                _globalSettings.SetPositionSetting(GlobalSettingsKeys.AwacsX, DefaultAwacsX);
+                _globalSettings.SetPositionSetting(GlobalSettingsKeys.AwacsY, DefaultAwacsY);
             }
+
+            if (!pilotRosterVisible)
+            {
+                var result = MessageBox.Show(this,
+                    "The SRS pilot roster window appears to be saved off-screen, likely due to a monitor, VR, or OpenKneeboard layout change.\n\nDo you want to move it back onto the active desktop?",
+                    "Pilot roster position reset",
+                    MessageBoxButton.YesNo,
+                    MessageBoxImage.Warning);
+
+                if (result == MessageBoxResult.Yes)
+                {
+                    ResetPilotRosterPositionToActiveDesktop(pilotRosterX, pilotRosterY, pilotRosterWidth, pilotRosterHeight);
+                }
+            }
+        }
+
+        private static bool IsWindowRectVisibleOnAnyScreen(double x, double y, double width, double height)
+        {
+            if (double.IsNaN(x) || double.IsInfinity(x) ||
+                double.IsNaN(y) || double.IsInfinity(y) ||
+                double.IsNaN(width) || double.IsInfinity(width) ||
+                double.IsNaN(height) || double.IsInfinity(height) ||
+                width <= 0 || height <= 0)
+            {
+                return false;
+            }
+
+            var windowRect = new System.Drawing.Rectangle(
+                ToScreenCoordinate(x),
+                ToScreenCoordinate(y),
+                ToScreenLength(width),
+                ToScreenLength(height));
+
+            return System.Windows.Forms.Screen.AllScreens.Any(screen => screen.WorkingArea.IntersectsWith(windowRect));
+        }
+
+        private static int ToScreenCoordinate(double value)
+        {
+            if (value > int.MaxValue)
+            {
+                return int.MaxValue;
+            }
+
+            if (value < int.MinValue)
+            {
+                return int.MinValue;
+            }
+
+            return (int)Math.Round(value);
+        }
+
+        private static int ToScreenLength(double value)
+        {
+            if (value > int.MaxValue)
+            {
+                return int.MaxValue;
+            }
+
+            if (value < 1)
+            {
+                return 1;
+            }
+
+            return Math.Max(1, (int)Math.Round(value));
+        }
+
+        private void ResetPilotRosterPositionToActiveDesktop(double oldX, double oldY, double oldWidth, double oldHeight)
+        {
+            var activeScreen = GetActiveDesktopScreen();
+            var width = Math.Min(Math.Max(DefaultPilotRosterWidth, oldWidth), activeScreen.WorkingArea.Width);
+            var height = Math.Min(Math.Max(DefaultPilotRosterHeight, oldHeight), activeScreen.WorkingArea.Height);
+            var x = activeScreen.WorkingArea.Left + (activeScreen.WorkingArea.Width - width) / 2.0;
+            var y = activeScreen.WorkingArea.Top + (activeScreen.WorkingArea.Height - height) / 2.0;
+
+            Logger.Warn($"Pilot roster window outside visible area of monitors, resetting position ({oldX},{oldY},{oldWidth},{oldHeight}) to active desktop {activeScreen.DeviceName}");
+
+            _globalSettings.SetPositionSetting(GlobalSettingsKeys.PilotRosterX, x);
+            _globalSettings.SetPositionSetting(GlobalSettingsKeys.PilotRosterY, y);
+            _globalSettings.SetPositionSetting(GlobalSettingsKeys.PilotRosterWidth, width);
+            _globalSettings.SetPositionSetting(GlobalSettingsKeys.PilotRosterHeight, height);
+
+            if (_pilotRosterWindow != null)
+            {
+                _pilotRosterWindow.Left = x;
+                _pilotRosterWindow.Top = y;
+                _pilotRosterWindow.Width = width;
+                _pilotRosterWindow.Height = height;
+            }
+        }
+
+        private System.Windows.Forms.Screen GetActiveDesktopScreen()
+        {
+            var mainWindowPoint = new System.Drawing.Point(
+                (int)Math.Round(Left + Math.Max(0, ActualWidth) / 2.0),
+                (int)Math.Round(Top + Math.Max(0, ActualHeight) / 2.0));
+
+            return System.Windows.Forms.Screen.AllScreens.FirstOrDefault(screen => screen.WorkingArea.Contains(mainWindowPoint))
+                   ?? System.Windows.Forms.Screen.PrimaryScreen;
         }
 
         private void InitFlowDocument()
@@ -1082,9 +1203,9 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI
 
         private double GetClientWindowWidth(double configuredWidth)
         {
-            if (double.IsNaN(configuredWidth) || configuredWidth <= 0)
+            if (double.IsNaN(configuredWidth) || double.IsInfinity(configuredWidth) || configuredWidth <= 0)
             {
-                return 700;
+                return DefaultClientWidth;
             }
 
             return Math.Max(MinWidth, configuredWidth);
@@ -1092,9 +1213,9 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI
 
         private double GetClientWindowHeight(double configuredHeight)
         {
-            if (double.IsNaN(configuredHeight) || configuredHeight <= 0)
+            if (double.IsNaN(configuredHeight) || double.IsInfinity(configuredHeight) || configuredHeight <= 0)
             {
-                return 650;
+                return DefaultClientHeight;
             }
 
             return Math.Max(MinHeight, configuredHeight);
