@@ -117,6 +117,7 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Overlay
         private void RadioOverlayWindow_Loaded(object sender, RoutedEventArgs e)
         {
             _suppressSizeHandling = false;
+            UpdateOverlayMinimumHeight();
             CalculateScale();
         }
 
@@ -481,34 +482,23 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Overlay
 
         private void UpdateOverlayMinimumHeight()
         {
-            var minHeight = _originalMinHeight;
-
-            if (AssignedCallsignPanel.Visibility == Visibility.Visible)
+            // Measure the real stacked-plate height so MinHeight matches the content
+            // exactly. The window is locked to a MinWidth/MinHeight aspect ratio during
+            // resize, so any over-estimate here letterboxes empty chassis below the last
+            // plate (and that margin grows as the window is dragged larger).
+            SectionsPanel.UpdateLayout();
+            var contentHeight = SectionsPanel.ActualHeight;
+            if (contentHeight < 10)
             {
-                minHeight += AssignedCallsignMinHeightDelta;
+                return; // not laid out yet; keep current minimum
             }
 
-            if (Radio2.Visibility == Visibility.Visible)
-            {
-                minHeight += Radio2MinHeightDelta;
-            }
-
-            if (RciStatusPanel.Visibility == Visibility.Visible)
-            {
-                minHeight += RciStatusMinHeightDelta;
-
-                if (RciCallsignLabel.Visibility == Visibility.Visible)
-                {
-                    minHeight += RciCallsignMinHeightDelta;
-                }
-            }
-
-            if (Math.Abs(MinHeight - minHeight) < 0.1)
+            if (Math.Abs(MinHeight - contentHeight) < 0.5)
             {
                 return;
             }
 
-            MinHeight = minHeight;
+            MinHeight = contentHeight;
             Recalculate();
         }
 
@@ -583,17 +573,6 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Overlay
             var xScale = ActualWidth / RadioOverlayWin.MinWidth;
             var value = Math.Min(xScale, yScale);
             ScaleValue = (double) OnCoerceScaleValue(RadioOverlayWin, value);
-
-            // The content scales to the width (xScale) but the window can be a taller
-            // aspect than the plates, which would leave empty chassis below the last
-            // plate. Snap the window height to the scaled content so it always hugs it.
-            var targetHeight = RadioOverlayWin.MinHeight * ScaleValue;
-            if (Math.Abs(ActualHeight - targetHeight) > 1.0)
-            {
-                _suppressSizeHandling = true;
-                Height = targetHeight;
-                _suppressSizeHandling = false;
-            }
         }
 
         protected override void OnRenderSizeChanged(SizeChangedInfo sizeInfo)

@@ -31,7 +31,8 @@
                              ScaleY="{Binding ElementName=RadioOverlayWin,
                                               Path=ScaleValue}" />
         </WrapPanel.RenderTransform>
-        <StackPanel Orientation="Vertical"
+        <StackPanel x:Name="SectionsPanel"
+                    Orientation="Vertical"
                     Background="Transparent">
 
         <!-- Plate 1: assigned callsign + Radio 1 -->
