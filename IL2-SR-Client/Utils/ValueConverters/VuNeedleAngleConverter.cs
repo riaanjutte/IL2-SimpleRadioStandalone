@@ -6,12 +6,12 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.Utils.ValueConverters
 {
     /// <summary>
     /// Maps a ProgressBar's (Value, Minimum, Maximum) to a VU dial needle angle.
-    /// The dial scale spans -48..+48 degrees around vertical.
+    /// The dial scale spans -55..+55 degrees around vertical.
     /// </summary>
     public class VuNeedleAngleConverter : IMultiValueConverter
     {
-        private const double MinAngle = -48.0;
-        private const double MaxAngle = 48.0;
+        private const double MinAngle = -55.0;
+        private const double MaxAngle = 55.0;
 
         public object Convert(object[] values, Type targetType, object parameter, CultureInfo culture)
         {

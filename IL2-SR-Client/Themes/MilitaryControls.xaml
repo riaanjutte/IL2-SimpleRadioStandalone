@@ -405,44 +405,64 @@
                                     CornerRadius="4" />
                             <Canvas>
                                 <!-- scale arc -->
-                                <Path Data="M 37.8,36.5 A 50,50 0 0 1 112.2,36.5"
+                                <Path Data="M 32.4,42.2 A 52,52 0 0 1 117.6,42.2"
                                       Stroke="#2A251C"
                                       StrokeThickness="2" />
-                                <!-- overload zone -->
-                                <Path Data="M 90.4,22.5 A 50,50 0 0 1 112.2,36.5"
+                                <!-- overload zone (0 dB onward) -->
+                                <Path Data="M 94.5,23.8 A 52,52 0 0 1 117.6,42.2"
                                       Stroke="{StaticResource MilLedErrorBrush}"
                                       StrokeThickness="3" />
-                                <!-- ticks -->
-                                <Line X1="37.8" Y1="36.5" X2="42.3" Y2="40.6" Stroke="#2A251C" StrokeThickness="1.5" />
-                                <Line X1="54.7" Y1="24.3" X2="57.1" Y2="29.8" Stroke="#2A251C" StrokeThickness="1.2" />
-                                <Line X1="75" Y1="20" X2="75" Y2="26" Stroke="#2A251C" StrokeThickness="1.5" />
-                                <Line X1="95.3" Y1="24.3" X2="92.9" Y2="29.8" Stroke="#2A251C" StrokeThickness="1.2" />
-                                <Line X1="112.2" Y1="36.5" X2="107.7" Y2="40.6" Stroke="#2A251C" StrokeThickness="1.5" />
-                                <!-- scale end labels -->
-                                <TextBlock Canvas.Left="28" Canvas.Top="40"
+                                <!-- major ticks -->
+                                <Line X1="32.4" Y1="42.2" X2="37.3" Y2="45.6" Stroke="#2A251C" StrokeThickness="1.5" />
+                                <Line X1="46.7" Y1="28.4" X2="49.9" Y2="33.4" Stroke="#2A251C" StrokeThickness="1.5" />
+                                <Line X1="61.5" Y1="21.8" X2="63.1" Y2="27.6" Stroke="#2A251C" StrokeThickness="1.5" />
+                                <Line X1="94.5" Y1="23.8" X2="92.2" Y2="29.4" Stroke="#2A251C" StrokeThickness="1.5" />
+                                <Line X1="117.6" Y1="42.2" X2="112.7" Y2="45.6" Stroke="#2A251C" StrokeThickness="1.5" />
+                                <!-- minor ticks -->
+                                <Line X1="38.9" Y1="34.6" X2="41.3" Y2="37.1" Stroke="#2A251C" StrokeThickness="1" />
+                                <Line X1="53.8" Y1="24.5" X2="55.2" Y2="27.7" Stroke="#2A251C" StrokeThickness="1" />
+                                <Line X1="78.2" Y1="20.1" X2="78.0" Y2="23.6" Stroke="#2A251C" StrokeThickness="1" />
+                                <Line X1="107.3" Y1="31.3" X2="105.2" Y2="34.0" Stroke="#2A251C" StrokeThickness="1" />
+                                <!-- dB figures -->
+                                <TextBlock Canvas.Left="17" Canvas.Top="31"
                                            FontFamily="{StaticResource MilFontMono}"
-                                           FontSize="10"
+                                           FontSize="8"
                                            Foreground="#2A251C"
-                                           Text="-" />
-                                <TextBlock Canvas.Left="114" Canvas.Top="40"
+                                           Text="-20" />
+                                <TextBlock Canvas.Left="35" Canvas.Top="14"
                                            FontFamily="{StaticResource MilFontMono}"
-                                           FontSize="10"
+                                           FontSize="8"
                                            Foreground="#2A251C"
-                                           Text="+" />
-                                <TextBlock Canvas.Left="66" Canvas.Top="42"
+                                           Text="-10" />
+                                <TextBlock Canvas.Left="55" Canvas.Top="7"
+                                           FontFamily="{StaticResource MilFontMono}"
+                                           FontSize="8"
+                                           Foreground="#2A251C"
+                                           Text="-5" />
+                                <TextBlock Canvas.Left="95" Canvas.Top="9"
+                                           FontFamily="{StaticResource MilFontMono}"
+                                           FontSize="8"
+                                           Foreground="#2A251C"
+                                           Text="0" />
+                                <TextBlock Canvas.Left="119" Canvas.Top="31"
+                                           FontFamily="{StaticResource MilFontMono}"
+                                           FontSize="8"
+                                           Foreground="{StaticResource MilLedErrorBrush}"
+                                           Text="+3" />
+                                <TextBlock Canvas.Left="66" Canvas.Top="44"
                                            FontFamily="{StaticResource MilFontMono}"
                                            FontSize="13"
                                            FontWeight="Bold"
                                            Foreground="#2A251C"
                                            Text="VU" />
                                 <!-- needle -->
-                                <Line X1="75" Y1="70" X2="75" Y2="21"
+                                <Line X1="75" Y1="72" X2="75" Y2="23"
                                       Stroke="#1A150D"
                                       StrokeEndLineCap="Round"
                                       StrokeStartLineCap="Round"
                                       StrokeThickness="2">
                                     <Line.RenderTransform>
-                                        <RotateTransform CenterX="75" CenterY="70">
+                                        <RotateTransform CenterX="75" CenterY="72">
                                             <RotateTransform.Angle>
                                                 <MultiBinding Converter="{StaticResource MilVuNeedleConverter}">
                                                     <Binding Path="Value" RelativeSource="{RelativeSource TemplatedParent}" />
@@ -454,7 +474,7 @@
                                     </Line.RenderTransform>
                                 </Line>
                                 <!-- needle hub -->
-                                <Ellipse Canvas.Left="70" Canvas.Top="65"
+                                <Ellipse Canvas.Left="70" Canvas.Top="67"
                                          Width="10" Height="10"
                                          Fill="#1A150D" />
                             </Canvas>
