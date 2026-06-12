@@ -458,7 +458,7 @@
                                       Width="320"
                                       Margin="0,0,24,0"
                                       HorizontalAlignment="Left"
-                                      VerticalAlignment="Center"
+                                      VerticalAlignment="Top"
                                       ItemsSource="{Binding Path=AudioInput.InputAudioDevices}"
                                       SelectedItem="{Binding Path=AudioInput.SelectedAudioInput, Mode=TwoWay}"
                                       ToolTip="{Binding Path=AudioInput.MicrophoneAvailable, Converter={StaticResource MicAvailabilityTooltipConverter}}" />
@@ -491,7 +491,7 @@
                             <StackPanel Grid.Column="0"
                                         Margin="0,0,24,0"
                                         HorizontalAlignment="Left"
-                                        VerticalAlignment="Center">
+                                        VerticalAlignment="Top">
                                 <ComboBox x:Name="Speakers"
                                           Width="320"
                                           Margin="0,0,0,10"
