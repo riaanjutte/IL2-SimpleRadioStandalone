@@ -12,7 +12,7 @@
                       ResizeMode="CanResizeWithGrip"
                       Background="{StaticResource MilWindowBackgroundBrush}"
                       Foreground="{StaticResource MilTextPrimaryBrush}"
-                      FontSize="12"
+                      FontSize="14"
                       WindowTitleBrush="{StaticResource MilChromeBrush}"
                       NonActiveWindowTitleBrush="{StaticResource MilChromeBrush}"
                       GlowBrush="{StaticResource MilBorderBrush}"
@@ -33,7 +33,7 @@
             <TextBlock Margin="8,0,8,0"
                        VerticalAlignment="Center"
                        FontFamily="{StaticResource MilFontStencil}"
-                       FontSize="14"
+                       FontSize="17"
                        Text="{Binding Converter={StaticResource MilUpperConverter}}" />
         </DataTemplate>
     </controls:MetroWindow.TitleTemplate>

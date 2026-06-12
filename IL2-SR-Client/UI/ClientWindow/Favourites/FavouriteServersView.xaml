@@ -45,7 +45,7 @@
                        Text="ServerAddress" />
             <TextBox Grid.Column="3" Text="{Binding Path=NewAddress}" />
             <Button Grid.Column="4"
-                    Height="23"
+                    Height="28"
                     Margin="5,0,0,0"
                     Command="{Binding Path=NewAddressCommand}">
                 <Path
@@ -67,6 +67,7 @@
                 <Style x:Key="FavouriteServerTextCellStyle" TargetType="{x:Type TextBlock}">
                     <Setter Property="Margin" Value="10,0,6,0" />
                     <Setter Property="VerticalAlignment" Value="Center" />
+                    <Setter Property="TextTrimming" Value="CharacterEllipsis" />
                 </Style>
             </DataGrid.Resources>
             <DataGrid.Columns>

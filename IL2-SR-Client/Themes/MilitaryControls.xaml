@@ -13,7 +13,7 @@
     <!-- ============ Labels & text ============ -->
     <Style TargetType="{x:Type Label}">
         <Setter Property="Foreground" Value="{StaticResource MilTextPrimaryBrush}" />
-        <Setter Property="FontSize" Value="12" />
+        <Setter Property="FontSize" Value="14" />
         <Setter Property="Padding" Value="4,2" />
         <Setter Property="VerticalContentAlignment" Value="Center" />
     </Style>
@@ -23,7 +23,7 @@
         <Setter Property="Foreground" Value="{StaticResource MilTextPrimaryBrush}" />
         <Setter Property="Background" Value="{StaticResource MilBtnDarkFaceBrush}" />
         <Setter Property="Padding" Value="10,4" />
-        <Setter Property="FontSize" Value="12" />
+        <Setter Property="FontSize" Value="14" />
         <Setter Property="HorizontalContentAlignment" Value="Center" />
         <Setter Property="VerticalContentAlignment" Value="Center" />
         <Setter Property="SnapsToDevicePixels" Value="True" />
@@ -113,7 +113,7 @@
         <Setter Property="BorderBrush" Value="#120D07" />
         <Setter Property="BorderThickness" Value="1" />
         <Setter Property="Padding" Value="4,2" />
-        <Setter Property="FontSize" Value="12" />
+        <Setter Property="FontSize" Value="14" />
         <Setter Property="CaretBrush" Value="{StaticResource MilTextPrimaryBrush}" />
         <Setter Property="SelectionBrush" Value="{StaticResource MilAccentBrush}" />
         <Setter Property="VerticalContentAlignment" Value="Center" />
@@ -182,7 +182,7 @@
         <Setter Property="Foreground" Value="{StaticResource MilTextPrimaryBrush}" />
         <Setter Property="Background" Value="{StaticResource MilWellBrush}" />
         <Setter Property="MinHeight" Value="24" />
-        <Setter Property="FontSize" Value="12" />
+        <Setter Property="FontSize" Value="14" />
         <Setter Property="SnapsToDevicePixels" Value="True" />
         <Setter Property="Template">
             <Setter.Value>
@@ -252,7 +252,7 @@
     <!-- ============ CheckBox ============ -->
     <Style TargetType="{x:Type CheckBox}">
         <Setter Property="Foreground" Value="{StaticResource MilTextPrimaryBrush}" />
-        <Setter Property="FontSize" Value="12" />
+        <Setter Property="FontSize" Value="14" />
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="{x:Type CheckBox}">
@@ -287,7 +287,7 @@
     <!-- ============ RadioButton ============ -->
     <Style TargetType="{x:Type RadioButton}">
         <Setter Property="Foreground" Value="{StaticResource MilTextPrimaryBrush}" />
-        <Setter Property="FontSize" Value="12" />
+        <Setter Property="FontSize" Value="14" />
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="{x:Type RadioButton}">
@@ -445,7 +445,7 @@
                                                           VerticalAlignment="Center"
                                                           TextElement.Foreground="{StaticResource MilAccentBrush}"
                                                           TextElement.FontFamily="{StaticResource MilFontStencil}"
-                                                          TextElement.FontSize="12">
+                                                          TextElement.FontSize="14">
                                             <ContentPresenter.Effect>
                                                 <DropShadowEffect BlurRadius="0"
                                                                   Direction="270"
@@ -482,7 +482,7 @@
             <Setter.Value>
                 <DataTemplate>
                     <TextBlock FontFamily="{StaticResource MilFontStencil}"
-                               FontSize="13"
+                               FontSize="16"
                                Text="{Binding Converter={StaticResource MilUpperConverter}}"
                                TextWrapping="NoWrap" />
                 </DataTemplate>
@@ -616,7 +616,7 @@
         <Setter Property="BorderBrush" Value="{StaticResource MilBorderBrush}" />
         <Setter Property="BorderThickness" Value="1" />
         <Setter Property="Padding" Value="8,4" />
-        <Setter Property="FontSize" Value="12" />
+        <Setter Property="FontSize" Value="14" />
     </Style>
 
     <!-- ============ DataGrid (FavouriteServersView renders inside MainWindow) ============ -->
@@ -629,7 +629,7 @@
         <Setter Property="AlternatingRowBackground" Value="{StaticResource MilRowAltBrush}" />
         <Setter Property="HorizontalGridLinesBrush" Value="{StaticResource MilChromeBrush}" />
         <Setter Property="VerticalGridLinesBrush" Value="{StaticResource MilChromeBrush}" />
-        <Setter Property="FontSize" Value="12" />
+        <Setter Property="FontSize" Value="14" />
     </Style>
 
     <Style TargetType="{x:Type DataGridColumnHeader}">
@@ -639,7 +639,7 @@
         <Setter Property="BorderThickness" Value="0,0,1,1" />
         <Setter Property="Padding" Value="6,4" />
         <Setter Property="FontFamily" Value="{StaticResource MilFontMono}" />
-        <Setter Property="FontSize" Value="11" />
+        <Setter Property="FontSize" Value="13" />
     </Style>
 
     <Style TargetType="{x:Type DataGridCell}">

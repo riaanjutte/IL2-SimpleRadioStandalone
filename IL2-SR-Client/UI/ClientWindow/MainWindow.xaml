@@ -15,7 +15,7 @@
                       MinHeight="560"
                       Background="{StaticResource MilWindowBackgroundBrush}"
                       Foreground="{StaticResource MilTextPrimaryBrush}"
-                      FontSize="12"
+                      FontSize="14"
                       WindowTitleBrush="{StaticResource MilChromeBrush}"
                       NonActiveWindowTitleBrush="{StaticResource MilChromeBrush}"
                       GlowBrush="{StaticResource MilBorderBrush}"
@@ -40,7 +40,7 @@
             <TextBlock Margin="8,0,8,0"
                        VerticalAlignment="Center"
                        FontFamily="{StaticResource MilFontStencil}"
-                       FontSize="14"
+                       FontSize="17"
                        Text="{Binding Converter={StaticResource MilUpperConverter}}" />
         </DataTemplate>
     </controls:MetroWindow.TitleTemplate>
@@ -59,7 +59,7 @@
                         <Ellipse Margin="2" Fill="{StaticResource MilLampGlassBrush}" />
                     </Grid>
                     <Label Content="Mic" Margin="1,0,10,0" Padding="2,0"
-                           FontFamily="{StaticResource MilFontMono}" FontSize="11"
+                           FontFamily="{StaticResource MilFontMono}" FontSize="13"
                            Foreground="{StaticResource MilTextSecondaryBrush}" />
                     <Grid Width="13" Height="13" VerticalAlignment="Center">
                         <Ellipse Fill="{StaticResource MilLampBezelBrush}" />
@@ -68,7 +68,7 @@
                         <Ellipse Margin="2" Fill="{StaticResource MilLampGlassBrush}" />
                     </Grid>
                     <Label Content="Server" Margin="1,0,10,0" Padding="2,0"
-                           FontFamily="{StaticResource MilFontMono}" FontSize="11"
+                           FontFamily="{StaticResource MilFontMono}" FontSize="13"
                            Foreground="{StaticResource MilTextSecondaryBrush}" />
                     <Grid Width="13" Height="13" VerticalAlignment="Center">
                         <Ellipse Fill="{StaticResource MilLampBezelBrush}" />
@@ -77,7 +77,7 @@
                         <Ellipse Margin="2" Fill="{StaticResource MilLampGlassBrush}" />
                     </Grid>
                     <Label Content="VOIP" Margin="1,0,10,0" Padding="2,0"
-                           FontFamily="{StaticResource MilFontMono}" FontSize="11"
+                           FontFamily="{StaticResource MilFontMono}" FontSize="13"
                            Foreground="{StaticResource MilTextSecondaryBrush}" />
                     <Grid Width="13" Height="13" VerticalAlignment="Center">
                         <Ellipse Fill="{StaticResource MilLampBezelBrush}" />
@@ -86,25 +86,25 @@
                         <Ellipse Margin="2" Fill="{StaticResource MilLampGlassBrush}" />
                     </Grid>
                     <Label Content="Il-2" Margin="1,0,0,0" Padding="2,0"
-                           FontFamily="{StaticResource MilFontMono}" FontSize="11"
+                           FontFamily="{StaticResource MilFontMono}" FontSize="13"
                            Foreground="{StaticResource MilTextSecondaryBrush}" />
                 </StackPanel>
                 <StackPanel DockPanel.Dock="Right" Orientation="Horizontal">
                     <Label Content="Connected Clients:" Padding="2,0"
-                           FontFamily="{StaticResource MilFontMono}" FontSize="11"
+                           FontFamily="{StaticResource MilFontMono}" FontSize="13"
                            Foreground="{StaticResource MilTextSecondaryBrush}" />
                     <TextBlock Text="{Binding Clients.Total}" VerticalAlignment="Center"
-                               FontFamily="{StaticResource MilFontMono}" FontSize="11"
+                               FontFamily="{StaticResource MilFontMono}" FontSize="13"
                                Foreground="{StaticResource MilTextPrimaryBrush}" />
-                    <TextBlock Text="  |  " VerticalAlignment="Center" FontSize="11"
+                    <TextBlock Text="  |  " VerticalAlignment="Center" FontSize="13"
                                Foreground="{StaticResource MilBorderBrush}" />
                     <Label Name="CurrentProfile" Content="None" Padding="2,0"
-                           FontFamily="{StaticResource MilFontMono}" FontSize="11"
+                           FontFamily="{StaticResource MilFontMono}" FontSize="13"
                            Foreground="{StaticResource MilTextPrimaryBrush}" />
-                    <TextBlock Text="  |  " VerticalAlignment="Center" FontSize="11"
+                    <TextBlock Text="  |  " VerticalAlignment="Center" FontSize="13"
                                Foreground="{StaticResource MilBorderBrush}" />
                     <TextBlock x:Name="StatusVersionLabel" VerticalAlignment="Center"
-                               FontFamily="{StaticResource MilFontMono}" FontSize="11"
+                               FontFamily="{StaticResource MilFontMono}" FontSize="13"
                                Foreground="{StaticResource MilTextSecondaryBrush}" />
                 </StackPanel>
             </DockPanel>
@@ -120,15 +120,15 @@
                                         HorizontalAlignment="Center"
                                         Orientation="Horizontal">
                                 <TextBox x:Name="ServerIp"
-                                         Width="185"
-                                         Height="23"
+                                         Width="200"
+                                         Height="28"
                                          Margin="0,0,5,0"
                                          MaxLines="1"
                                          Text="127.0.0.1:6002"
                                          TextWrapping="Wrap" />
                                 <ComboBox x:Name="ServerAddressPicker"
-                                          Width="185"
-                                          Height="23"
+                                          Width="200"
+                                          Height="28"
                                           DisplayMemberPath="Name"
                                           ItemsSource="{Binding Path=FavouriteServersViewModel.Addresses}"
                                           SelectedItem="{Binding Path=ServerAddress}" />
@@ -208,7 +208,7 @@
                                                HorizontalAlignment="Center"
                                                VerticalAlignment="Center"
                                                FontFamily="Courier New"
-                                               FontSize="10"
+                                               FontSize="12"
                                                FontWeight="Bold"
                                                Foreground="#E7E7E7"
                                                Text="RCI" />
@@ -218,7 +218,7 @@
                                            Margin="0,2,0,0"
                                            HorizontalAlignment="Center"
                                            FontFamily="Courier New"
-                                           FontSize="10"
+                                           FontSize="12"
                                            FontWeight="Bold"
                                            Foreground="{StaticResource ForegroundBrush}"
                                            TextAlignment="Center"
@@ -1348,9 +1348,9 @@
                                         <ColumnDefinition Width="*" />
                                         <ColumnDefinition Width="*" />
                                     </Grid.ColumnDefinitions>
-                                    <Label Grid.Column="0" FontSize="10" Content="5%" HorizontalAlignment="Left" />
-                                    <Label Grid.Column="1" FontSize="10" Content="25%" HorizontalAlignment="Center" />
-                                    <Label Grid.Column="2" FontSize="10" Content="50%" HorizontalAlignment="Right" />
+                                    <Label Grid.Column="0" FontSize="12" Content="5%" HorizontalAlignment="Left" />
+                                    <Label Grid.Column="1" FontSize="12" Content="25%" HorizontalAlignment="Center" />
+                                    <Label Grid.Column="2" FontSize="12" Content="50%" HorizontalAlignment="Right" />
                                 </Grid>
                             </StackPanel>
 
@@ -1408,9 +1408,9 @@
                                         <ColumnDefinition Width="*" />
                                         <ColumnDefinition Width="*" />
                                     </Grid.ColumnDefinitions>
-                                    <Label Grid.Column="0" FontSize="10" Content="0" HorizontalAlignment="Left" ></Label>
-                                    <Label Grid.Column="1" FontSize="10" Content="250" HorizontalAlignment="Center" ></Label>
-                                    <Label Grid.Column="2" FontSize="10" Content="500" HorizontalAlignment="Right" ></Label>
+                                    <Label Grid.Column="0" FontSize="12" Content="0" HorizontalAlignment="Left" ></Label>
+                                    <Label Grid.Column="1" FontSize="12" Content="250" HorizontalAlignment="Center" ></Label>
+                                    <Label Grid.Column="2" FontSize="12" Content="500" HorizontalAlignment="Right" ></Label>
                                 </Grid>
 
                             </StackPanel>
@@ -1461,14 +1461,14 @@
                 <FlowDocumentScrollViewer>
                     <FlowDocument x:Name="AboutFlowDocument"
                                   FontFamily="{StaticResource MilFontMono}"
-                                  FontSize="12"
+                                  FontSize="14"
                                   Foreground="{StaticResource MilTextPrimaryBrush}">
                         <FlowDocument.Resources>
                             <Style TargetType="Hyperlink">
                                 <Setter Property="Foreground" Value="{StaticResource MilAccentBrush}" />
                             </Style>
                             <Style x:Key="HelpHeading" TargetType="Paragraph">
-                                <Setter Property="FontSize" Value="13" />
+                                <Setter Property="FontSize" Value="16" />
                                 <Setter Property="FontWeight" Value="Bold" />
                                 <Setter Property="Foreground" Value="{StaticResource MilAccentBrush}" />
                             </Style>
