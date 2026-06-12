@@ -303,6 +303,7 @@
     <Compile Include="Utils\ValueConverters\ConnectionStatusImageConverter.cs" />
     <Compile Include="Utils\ValueConverters\MicAvailabilityTooltipConverter.cs" />
     <Compile Include="Utils\ValueConverters\StringToUpperConverter.cs" />
+    <Compile Include="Utils\ValueConverters\VuNeedleAngleConverter.cs" />
     <Compile Include="Utils\WPFElementHelper.cs" />
     <Page Include="UI\ClientWindow\ClientList\ClientListWindow.xaml">
       <SubType>Designer</SubType>

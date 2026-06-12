@@ -461,7 +461,7 @@
                                         Orientation="Horizontal">
                                 <ProgressBar Name="Mic_VU"
                                              Width="150"
-                                             Height="20"
+                                             Height="80"
                                              Margin="10,10,0,0"
                                              Value="-100"
                                              Maximum="18"
@@ -512,7 +512,7 @@
                                         ValueChanged="SpeakerBoost_ValueChanged" />
                                 <ProgressBar Name="Speaker_VU"
                                              Width="150"
-                                             Height="20"
+                                             Height="80"
                                              Margin="10,10,0,0"
                                              Value="-100"
                                              Maximum="18"

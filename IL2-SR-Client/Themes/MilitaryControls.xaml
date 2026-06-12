@@ -374,22 +374,88 @@
         </Setter>
     </Style>
 
-    <!-- ============ ProgressBar (VU meters) ============ -->
+    <!-- ============ ProgressBar: analog VU dial (needle meter) ============ -->
+    <converters:VuNeedleAngleConverter x:Key="MilVuNeedleConverter" />
+
     <Style TargetType="{x:Type ProgressBar}">
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="{x:Type ProgressBar}">
-                    <Border Background="{StaticResource MilWellBrush}"
-                            BorderBrush="{StaticResource MilBorderBrush}"
-                            BorderThickness="1"
-                            CornerRadius="1">
-                        <Grid>
-                            <Rectangle x:Name="PART_Track" />
-                            <Decorator x:Name="PART_Indicator" HorizontalAlignment="Left">
-                                <Rectangle Fill="{StaticResource MilLedOnBrush}" Margin="1" />
-                            </Decorator>
+                    <Viewbox Stretch="Uniform">
+                        <Grid Width="150" Height="80">
+                            <!-- bezel -->
+                            <Border Background="#15100A" CornerRadius="6" />
+                            <!-- ivory face -->
+                            <Border Margin="3"
+                                    Background="{StaticResource MilTextPrimaryBrush}"
+                                    CornerRadius="4" />
+                            <Canvas>
+                                <!-- scale arc -->
+                                <Path Data="M 37.8,36.5 A 50,50 0 0 1 112.2,36.5"
+                                      Stroke="#2A251C"
+                                      StrokeThickness="2" />
+                                <!-- overload zone -->
+                                <Path Data="M 90.4,22.5 A 50,50 0 0 1 112.2,36.5"
+                                      Stroke="{StaticResource MilLedErrorBrush}"
+                                      StrokeThickness="3" />
+                                <!-- ticks -->
+                                <Line X1="37.8" Y1="36.5" X2="42.3" Y2="40.6" Stroke="#2A251C" StrokeThickness="1.5" />
+                                <Line X1="54.7" Y1="24.3" X2="57.1" Y2="29.8" Stroke="#2A251C" StrokeThickness="1.2" />
+                                <Line X1="75" Y1="20" X2="75" Y2="26" Stroke="#2A251C" StrokeThickness="1.5" />
+                                <Line X1="95.3" Y1="24.3" X2="92.9" Y2="29.8" Stroke="#2A251C" StrokeThickness="1.2" />
+                                <Line X1="112.2" Y1="36.5" X2="107.7" Y2="40.6" Stroke="#2A251C" StrokeThickness="1.5" />
+                                <!-- scale end labels -->
+                                <TextBlock Canvas.Left="28" Canvas.Top="40"
+                                           FontFamily="{StaticResource MilFontMono}"
+                                           FontSize="10"
+                                           Foreground="#2A251C"
+                                           Text="-" />
+                                <TextBlock Canvas.Left="114" Canvas.Top="40"
+                                           FontFamily="{StaticResource MilFontMono}"
+                                           FontSize="10"
+                                           Foreground="#2A251C"
+                                           Text="+" />
+                                <TextBlock Canvas.Left="66" Canvas.Top="42"
+                                           FontFamily="{StaticResource MilFontMono}"
+                                           FontSize="13"
+                                           FontWeight="Bold"
+                                           Foreground="#2A251C"
+                                           Text="VU" />
+                                <!-- needle -->
+                                <Line X1="75" Y1="70" X2="75" Y2="21"
+                                      Stroke="#1A150D"
+                                      StrokeEndLineCap="Round"
+                                      StrokeStartLineCap="Round"
+                                      StrokeThickness="2">
+                                    <Line.RenderTransform>
+                                        <RotateTransform CenterX="75" CenterY="70">
+                                            <RotateTransform.Angle>
+                                                <MultiBinding Converter="{StaticResource MilVuNeedleConverter}">
+                                                    <Binding Path="Value" RelativeSource="{RelativeSource TemplatedParent}" />
+                                                    <Binding Path="Minimum" RelativeSource="{RelativeSource TemplatedParent}" />
+                                                    <Binding Path="Maximum" RelativeSource="{RelativeSource TemplatedParent}" />
+                                                </MultiBinding>
+                                            </RotateTransform.Angle>
+                                        </RotateTransform>
+                                    </Line.RenderTransform>
+                                </Line>
+                                <!-- needle hub -->
+                                <Ellipse Canvas.Left="70" Canvas.Top="65"
+                                         Width="10" Height="10"
+                                         Fill="#1A150D" />
+                            </Canvas>
+                            <!-- glass -->
+                            <Border Margin="3" CornerRadius="4">
+                                <Border.Background>
+                                    <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
+                                        <GradientStop Offset="0" Color="#28FFFFFF" />
+                                        <GradientStop Offset="0.45" Color="#08FFFFFF" />
+                                        <GradientStop Offset="1" Color="#00FFFFFF" />
+                                    </LinearGradientBrush>
+                                </Border.Background>
+                            </Border>
                         </Grid>
-                    </Border>
+                    </Viewbox>
                 </ControlTemplate>
             </Setter.Value>
         </Setter>
