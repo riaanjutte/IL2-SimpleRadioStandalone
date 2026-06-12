@@ -122,20 +122,20 @@
 
                         <GroupBox Grid.Column="0" Header="Server">
                             <StackPanel HorizontalAlignment="Center">
-                                <TextBox x:Name="ServerIp"
-                                         Width="220"
-                                         Height="28"
-                                         Margin="0,8,0,8"
-                                         MaxLines="1"
-                                         Text="127.0.0.1:6002"
-                                         TextWrapping="Wrap" />
                                 <ComboBox x:Name="ServerAddressPicker"
                                           Width="220"
                                           Height="28"
-                                          Margin="0,0,0,8"
+                                          Margin="0,8,0,8"
                                           DisplayMemberPath="Name"
                                           ItemsSource="{Binding Path=FavouriteServersViewModel.Addresses}"
                                           SelectedItem="{Binding Path=ServerAddress}" />
+                                <TextBox x:Name="ServerIp"
+                                         Width="220"
+                                         Height="28"
+                                         Margin="0,0,0,8"
+                                         MaxLines="1"
+                                         Text="127.0.0.1:6002"
+                                         TextWrapping="Wrap" />
                                 <Button x:Name="StartStop"
                                         Width="220"
                                         Margin="0,0,0,8"
