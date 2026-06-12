@@ -769,4 +769,20 @@
         </Style.Triggers>
     </Style>
 
+    <!-- Row-header gutter: dark instead of the default light strip -->
+    <Style TargetType="{x:Type DataGridRowHeader}">
+        <Setter Property="Background" Value="{StaticResource MilChromeBrush}" />
+        <Setter Property="BorderBrush" Value="{StaticResource MilBorderBrush}" />
+        <Setter Property="BorderThickness" Value="0,0,1,0" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type DataGridRowHeader}">
+                    <Border Background="{TemplateBinding Background}"
+                            BorderBrush="{TemplateBinding BorderBrush}"
+                            BorderThickness="{TemplateBinding BorderThickness}" />
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
 </ResourceDictionary>
