@@ -482,52 +482,45 @@
                         </Grid>
                     </GroupBox>
                     <GroupBox Header="Speakers &amp; Optional Mic Output">
-                        <StackPanel HorizontalAlignment="Center">
-                            <StackPanel Margin="0"
-                                        HorizontalAlignment="Center"
-                                        Orientation="Horizontal">
+                        <Grid HorizontalAlignment="Center">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+                            <StackPanel Grid.Column="0"
+                                        Margin="0,0,24,0"
+                                        VerticalAlignment="Center">
                                 <ComboBox x:Name="Speakers"
-                                          Width="250"
-                                          HorizontalAlignment="Center"
-                                          VerticalAlignment="Top" Margin="0,0,5,0"
+                                          Width="280"
+                                          Margin="0,0,0,10"
                                           ItemsSource="{Binding Path=AudioOutput.OutputAudioDevices}"
                                           SelectedItem="{Binding Path=AudioOutput.SelectedAudioOutput, Mode=TwoWay}" />
                                 <ComboBox x:Name="MicOutput"
-                                          Width="250"
-                                          HorizontalAlignment="Center"
-                                          VerticalAlignment="Top" Margin="5,0,0,0"
+                                          Width="280"
                                           ItemsSource="{Binding Path=AudioOutput.MicOutputAudioDevices}"
                                           SelectedItem="{Binding Path=AudioOutput.SelectedMicAudioOutput, Mode=TwoWay}" />
                             </StackPanel>
-                            <StackPanel Margin="0"
-                                        HorizontalAlignment="Center"
-                                        Orientation="Horizontal">
+                            <StackPanel Grid.Column="1" HorizontalAlignment="Center">
+                                <ProgressBar Name="Speaker_VU"
+                                             Width="150"
+                                             Height="80"
+                                             Value="-100"
+                                             Maximum="18"
+                                             Minimum="-100" />
                                 <Slider x:Name="SpeakerBoost"
                                         Width="150"
-                                        Margin="0,10,0,0"
-                                        VerticalAlignment="Center"
-                                        VerticalContentAlignment="Center"
+                                        Margin="0,8,0,0"
+                                        HorizontalAlignment="Center"
                                         Maximum="1.0"
                                         Minimum="0.0"
                                         IsMoveToPointEnabled="true"
                                         ValueChanged="SpeakerBoost_ValueChanged" />
-                                <ProgressBar Name="Speaker_VU"
-                                             Width="150"
-                                             Height="80"
-                                             Margin="10,10,0,0"
-                                             Value="-100"
-                                             Maximum="18"
-                                             Minimum="-100" />
+                                <StackPanel HorizontalAlignment="Center" Orientation="Horizontal">
+                                    <Label Content="Speaker Boost:" />
+                                    <Label x:Name="SpeakerBoostLabel" Content="+/- %" />
+                                </StackPanel>
                             </StackPanel>
-                            <StackPanel Margin="0"
-                                        HorizontalAlignment="Center"
-                                        Orientation="Horizontal">
-                                <Label HorizontalAlignment="Center" Content="Speaker Boost:" />
-                                <Label x:Name="SpeakerBoostLabel"
-                                       HorizontalAlignment="Center"
-                                       Content="+/- %" />
-                            </StackPanel>
-                        </StackPanel>
+                        </Grid>
                     </GroupBox>
                     <GroupBox Header="Audio Options">
                         <Grid HorizontalAlignment="Center">
