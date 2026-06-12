@@ -31,6 +31,48 @@ namespace IL2_SR_Client
         private bool loggingReady = false;
         private static Logger Logger = LogManager.GetCurrentClassLogger();
 
+        protected override void OnStartup(StartupEventArgs e)
+        {
+            base.OnStartup(e);
+            ApplyUiTheme();
+        }
+
+        /// <summary>
+        /// Swaps the default bakelite palette for the selected variant before any
+        /// window is created. All windows resolve Mil* resources via StaticResource,
+        /// so the palette must be final before XAML loads; theme changes apply on
+        /// the next client start.
+        /// </summary>
+        private void ApplyUiTheme()
+        {
+            try
+            {
+                var theme = GlobalSettingsStore.Instance.GetClientSetting(GlobalSettingsKeys.Theme).RawValue;
+                if (!string.Equals(theme, "Grey", StringComparison.OrdinalIgnoreCase))
+                {
+                    return; // bakelite is the default, already merged via App.xaml
+                }
+
+                var dictionaries = Resources.MergedDictionaries;
+                for (var i = 0; i < dictionaries.Count; i++)
+                {
+                    var source = dictionaries[i].Source?.OriginalString;
+                    if (source != null && source.EndsWith("MilitaryPalette.xaml", StringComparison.OrdinalIgnoreCase))
+                    {
+                        dictionaries[i] = new ResourceDictionary
+                        {
+                            Source = new Uri("Themes/MilitaryPaletteGrey.xaml", UriKind.Relative)
+                        };
+                        return;
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Logger.Error(ex, "Failed to apply UI theme, falling back to default");
+            }
+        }
+
         public App()
         {
             SentrySdk.Init("https://602501536e994652b8c7a3d3a399ffd2@o414743.ingest.sentry.io/5315044");

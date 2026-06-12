@@ -81,6 +81,9 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI
         private ServerAddress _serverAddress;
         private readonly DelegateCommand _connectCommand;
         private bool _initialisingLanguagePicker;
+        private bool _initialisingThemePicker;
+        private const string ThemeBakelite = "Bakelite";
+        private const string ThemeGrey = "Grey";
 
         private readonly GlobalSettingsStore _globalSettings = GlobalSettingsStore.Instance;
         private const string CommunitySettingsAccepted = "Accepted";
@@ -759,6 +762,7 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI
         private void InitSettingsScreen()
         {
             InitLanguagePicker();
+            InitThemePicker();
 
             AutoConnectPromptToggle.IsChecked = _globalSettings.GetClientSettingBool(GlobalSettingsKeys.AutoConnectPrompt);
             AutoConnectMismatchPromptToggle.IsChecked = _globalSettings.GetClientSettingBool(GlobalSettingsKeys.AutoConnectMismatchPrompt);
@@ -794,6 +798,42 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI
             LanguagePicker.SelectedItem =
                 LocalizationManager.GetLanguageOption(_globalSettings.GetClientSetting(GlobalSettingsKeys.Language).RawValue);
             _initialisingLanguagePicker = false;
+        }
+
+        private void InitThemePicker()
+        {
+            _initialisingThemePicker = true;
+            ThemePicker.ItemsSource = new[] { ThemeBakelite, ThemeGrey };
+            ThemePicker.SelectedItem = CurrentTheme();
+            _initialisingThemePicker = false;
+        }
+
+        private string CurrentTheme()
+        {
+            var theme = _globalSettings.GetClientSetting(GlobalSettingsKeys.Theme).RawValue;
+            return string.Equals(theme, ThemeGrey, StringComparison.OrdinalIgnoreCase) ? ThemeGrey : ThemeBakelite;
+        }
+
+        private void ThemePicker_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            var selectedTheme = ThemePicker.SelectedItem as string;
+            if (_initialisingThemePicker || selectedTheme == null || selectedTheme == CurrentTheme())
+            {
+                return;
+            }
+
+            _globalSettings.SetClientSetting(GlobalSettingsKeys.Theme, selectedTheme);
+            var restartResult = MessageBox.Show(this,
+                LocalizationManager.Get("Please restart SRS for the theme change to take effect.") + "\n\n" +
+                LocalizationManager.Get("Restart SRS now to apply the theme change?"),
+                LocalizationManager.Get("Restart Required"),
+                MessageBoxButton.YesNo,
+                MessageBoxImage.Question);
+
+            if (restartResult == MessageBoxResult.Yes)
+            {
+                RestartClient();
+            }
         }
 
         private void ReloadProfileSettings()

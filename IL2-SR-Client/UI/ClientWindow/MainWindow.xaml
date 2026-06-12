@@ -675,6 +675,7 @@
                                 <RowDefinition />
                                 <RowDefinition />
                                 <RowDefinition />
+                                <RowDefinition />
                             </Grid.RowDefinitions>
 
                             <Label Grid.Row="0"
@@ -1006,6 +1007,19 @@
                                       VerticalContentAlignment="Center"
                                       DisplayMemberPath="DisplayName"
                                       SelectionChanged="LanguagePicker_SelectionChanged" />
+
+                            <Label Grid.Row="13"
+                               Grid.Column="0"
+                               HorizontalContentAlignment="Center"
+                               VerticalContentAlignment="Center"
+                               Content="Theme" />
+
+                            <ComboBox Name="ThemePicker"
+                                      Grid.Row="13"
+                                      Grid.Column="1"
+                                      HorizontalContentAlignment="Center"
+                                      VerticalContentAlignment="Center"
+                                      SelectionChanged="ThemePicker_SelectionChanged" />
 
                         </Grid>
 

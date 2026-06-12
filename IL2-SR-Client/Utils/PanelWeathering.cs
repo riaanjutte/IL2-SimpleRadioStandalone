@@ -73,6 +73,11 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.Utils
             return bitmap;
         }
 
+        private static Color ThemeColour(string key, Color fallback)
+        {
+            return Application.Current?.TryFindResource(key) is Color themed ? themed : fallback;
+        }
+
         private static void DrawScratches(DrawingContext dc, int w, int h)
         {
             var count = 6 + (w * h) / 11000;
@@ -132,9 +137,9 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.Utils
             // corner chips around the screws, flecks and rub patches along edges
             var metal = new[]
             {
-                Color.FromRgb(0x9C, 0x8C, 0x6A),
-                Color.FromRgb(0xA9, 0x9B, 0x7C),
-                Color.FromRgb(0xB5, 0xA3, 0x7F)
+                ThemeColour("MilWornMetal1Color", Color.FromRgb(0x9C, 0x8C, 0x6A)),
+                ThemeColour("MilWornMetal2Color", Color.FromRgb(0xA9, 0x9B, 0x7C)),
+                ThemeColour("MilWornMetal3Color", Color.FromRgb(0xB5, 0xA3, 0x7F))
             };
 
             // corner chip clusters

@@ -365,6 +365,10 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
+    <Page Include="Themes\MilitaryPaletteGrey.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
     <Page Include="Themes\MilitaryControls.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>

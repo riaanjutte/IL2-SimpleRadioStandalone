@@ -3,9 +3,10 @@
                     xmlns:converters="clr-namespace:Ciribob.IL2.SimpleRadio.Standalone.Client.Utils.ValueConverters"
                     xmlns:utils="clr-namespace:Ciribob.IL2.SimpleRadio.Standalone.Client.Utils">
 
-    <ResourceDictionary.MergedDictionaries>
-        <ResourceDictionary Source="pack://application:,,,/IL2-SR-ClientRadio;component/Themes/MilitaryPalette.xaml" />
-    </ResourceDictionary.MergedDictionaries>
+    <!-- The Mil* palette is intentionally NOT merged here. The active palette
+         (MilitaryPalette.xaml or MilitaryPaletteGrey.xaml, per the Theme setting)
+         is merged into Application.Resources at startup, and StaticResource
+         lookups in this dictionary fall through to application resources. -->
 
     <converters:StringToUpperConverter x:Key="MilUpperConverter" />
 
