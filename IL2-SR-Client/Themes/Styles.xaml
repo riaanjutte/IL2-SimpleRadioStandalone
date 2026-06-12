@@ -2,6 +2,7 @@
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
                     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+                    xmlns:utils="clr-namespace:Ciribob.IL2.SimpleRadio.Standalone.Client.Utils"
                     mc:Ignorable="d">
 
 
@@ -129,11 +130,8 @@
                        Height="0.9"
                        Fill="#1B1E18"
                        RenderTransformOrigin="0.5,0.5"
-                       Style="{x:Null}">
-                <Rectangle.RenderTransform>
-                    <RotateTransform Angle="35" />
-                </Rectangle.RenderTransform>
-            </Rectangle>
+                       Style="{x:Null}"
+                       utils:ScrewSlotRandomizer.RandomAngle="True" />
         </Grid>
     </ControlTemplate>
 
@@ -159,6 +157,10 @@
                                 CornerRadius="3"
                                 IsHitTestVisible="False"
                                 Style="{x:Null}" />
+                        <Rectangle RadiusX="3"
+                                   RadiusY="3"
+                                   IsHitTestVisible="False"
+                                   utils:PanelWeathering.Enabled="True" />
                         <ContentPresenter Margin="9,5,9,5" />
                         <Control Template="{StaticResource OverlayScrew}"
                                  HorizontalAlignment="Left" VerticalAlignment="Top" Margin="2.5" />
