@@ -526,7 +526,7 @@
                                 <Setter.Value>
                                     <DropShadowEffect BlurRadius="7"
                                                       ShadowDepth="0"
-                                                      Color="#DCA53C" />
+                                                      Color="#4FE34F" />
                                 </Setter.Value>
                             </Setter>
                             <Setter Property="Foreground" Value="{StaticResource MilTextPrimaryBrush}" />

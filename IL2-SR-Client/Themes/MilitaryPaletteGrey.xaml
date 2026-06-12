@@ -15,7 +15,7 @@
     <Color x:Key="MilActionColor">#4D5357</Color>
     <Color x:Key="MilActionBorderColor">#6C7378</Color>
     <Color x:Key="MilActionHoverColor">#5A6165</Color>
-    <Color x:Key="MilLedOnColor">#DCA53C</Color>
+    <Color x:Key="MilLedOnColor">#4FE34F</Color>
     <Color x:Key="MilLedOffColor">#43474A</Color>
     <Color x:Key="MilLedErrorColor">#C25B4E</Color>
     <Color x:Key="MilRowAltColor">#313538</Color>
