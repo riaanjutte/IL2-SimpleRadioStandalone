@@ -24,9 +24,9 @@
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="Auto" />
                 <ColumnDefinition Width="Auto" />
-                <ColumnDefinition Width="Auto" />
             </Grid.ColumnDefinitions>
             <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
                 <RowDefinition Height="Auto" />
                 <RowDefinition Height="Auto" />
                 <RowDefinition Height="Auto" />
@@ -34,7 +34,7 @@
 
             <TextBlock Grid.Row="0"
                        Grid.Column="0"
-                       Grid.ColumnSpan="3"
+                       Grid.ColumnSpan="2"
                        Margin="0,0,0,8"
                        HorizontalAlignment="Left"
                        FontWeight="Bold"
@@ -64,12 +64,13 @@
                      Height="28"
                      VerticalContentAlignment="Center"
                      Text="{Binding Path=NewAddress}" />
-            <Button Grid.Row="2"
-                    Grid.Column="2"
+            <Button Grid.Row="3"
+                    Grid.Column="1"
                     Width="22"
                     Height="20"
-                    Margin="8,0,0,0"
+                    Margin="0,6,0,0"
                     Padding="0"
+                    HorizontalAlignment="Right"
                     Command="{Binding Path=NewAddressCommand}"
                     ToolTip="Add this server">
                 <Path Width="9"
