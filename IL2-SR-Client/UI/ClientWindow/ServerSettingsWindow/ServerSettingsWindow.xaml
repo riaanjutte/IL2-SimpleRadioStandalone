@@ -168,8 +168,10 @@
             <Button Grid.Row="8"
                     Grid.Column="0"
                     Grid.ColumnSpan="2"
-                    Width="80"
-                    Margin="5,4,5,2"
+                    Width="90"
+                    Height="30"
+                    Margin="5,4,5,4"
+                    VerticalAlignment="Center"
                     Click="CloseButton_OnClick"
                     Content="Close" />
 
