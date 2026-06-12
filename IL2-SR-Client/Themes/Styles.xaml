@@ -60,22 +60,10 @@
     <SolidColorBrush x:Key="DisabledButtonBackground" Color="#A7ADB3" />
     <SolidColorBrush x:Key="DisabledButtonForeground" Color="#1B1B1B" />
 
-    <LinearGradientBrush x:Key="OverlayEquipmentPanelBrush" StartPoint="0,0" EndPoint="1,1">
-        <GradientStop Color="#565955" Offset="0" />
-        <GradientStop Color="#444842" Offset="0.42" />
-        <GradientStop Color="#343833" Offset="1" />
-    </LinearGradientBrush>
-
-    <LinearGradientBrush x:Key="OverlayRaisedControlBrush" StartPoint="0,0" EndPoint="0,1">
-        <GradientStop Color="#6A6D68" Offset="0" />
-        <GradientStop Color="#535650" Offset="0.52" />
-        <GradientStop Color="#3D403B" Offset="1" />
-    </LinearGradientBrush>
-
-    <LinearGradientBrush x:Key="OverlayPressedControlBrush" StartPoint="0,0" EndPoint="0,1">
-        <GradientStop Color="#2F332F" Offset="0" />
-        <GradientStop Color="#494D47" Offset="1" />
-    </LinearGradientBrush>
+    <!-- OverlayEquipmentPanelBrush / OverlayRaisedControlBrush / OverlayPressedControlBrush /
+         OverlayRaisedBorderBrush / OverlayEdgeHighlightBrush are theme-dependent and now
+         live in MilitaryPalette.xaml and MilitaryPaletteGrey.xaml so the overlay follows
+         the selected theme. They are consumed below via DynamicResource. -->
 
     <LinearGradientBrush x:Key="OverlayDisplayBrush" StartPoint="0,0" EndPoint="0,1">
         <GradientStop Color="#020302" Offset="0" />
@@ -96,9 +84,6 @@
         <GradientStop Color="#10FFFFFF" Offset="0.38" />
         <GradientStop Color="#00FFFFFF" Offset="1" />
     </LinearGradientBrush>
-
-    <SolidColorBrush x:Key="OverlayRaisedBorderBrush" Color="#2B2E2B" />
-    <SolidColorBrush x:Key="OverlayEdgeHighlightBrush" Color="#7B7F78" />
 
     <DrawingBrush x:Key="OverlayWeatheringTexture"
                   Opacity="0.22"
@@ -159,12 +144,12 @@
             <Setter.Value>
                 <ControlTemplate TargetType="{x:Type ContentControl}">
                     <Grid Margin="3,2,3,2">
-                        <Border Background="{StaticResource OverlayEquipmentPanelBrush}"
+                        <Border Background="{DynamicResource OverlayEquipmentPanelBrush}"
                                 BorderBrush="#15170F"
                                 BorderThickness="1"
                                 CornerRadius="3"
                                 Style="{x:Null}" />
-                        <Border BorderBrush="{StaticResource OverlayEdgeHighlightBrush}"
+                        <Border BorderBrush="{DynamicResource OverlayEdgeHighlightBrush}"
                                 BorderThickness="1,1,0,0"
                                 CornerRadius="3"
                                 Margin="1"
@@ -207,12 +192,12 @@
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="{x:Type Thumb}">
-                    <Border Background="{StaticResource OverlayRaisedControlBrush}"
-                            BorderBrush="{StaticResource OverlayRaisedBorderBrush}"
+                    <Border Background="{DynamicResource OverlayRaisedControlBrush}"
+                            BorderBrush="{DynamicResource OverlayRaisedBorderBrush}"
                             BorderThickness="1"
                             CornerRadius="2"
                             Style="{x:Null}">
-                        <Border BorderBrush="{StaticResource OverlayEdgeHighlightBrush}"
+                        <Border BorderBrush="{DynamicResource OverlayEdgeHighlightBrush}"
                                 BorderThickness="1,1,0,0"
                                 CornerRadius="2"
                                 Opacity="0.45"

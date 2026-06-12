@@ -98,4 +98,23 @@
         <GradientStop Offset="1" Color="#00FFFFFF" />
     </RadialGradientBrush>
 
+    <!-- ===== Radio overlay equipment surfaces (grey). Mirrored in
+         MilitaryPalette.xaml so the overlay follows the selected theme. ===== -->
+    <LinearGradientBrush x:Key="OverlayEquipmentPanelBrush" StartPoint="0,0" EndPoint="0,1">
+        <GradientStop Color="#494D50" Offset="0" />
+        <GradientStop Color="#3C4043" Offset="0.45" />
+        <GradientStop Color="#303437" Offset="1" />
+    </LinearGradientBrush>
+    <LinearGradientBrush x:Key="OverlayRaisedControlBrush" StartPoint="0,0" EndPoint="0,1">
+        <GradientStop Color="#5E6367" Offset="0" />
+        <GradientStop Color="#4B5054" Offset="0.52" />
+        <GradientStop Color="#3A3E41" Offset="1" />
+    </LinearGradientBrush>
+    <LinearGradientBrush x:Key="OverlayPressedControlBrush" StartPoint="0,0" EndPoint="0,1">
+        <GradientStop Color="#282C2E" Offset="0" />
+        <GradientStop Color="#3E4346" Offset="1" />
+    </LinearGradientBrush>
+    <SolidColorBrush x:Key="OverlayRaisedBorderBrush" Color="#17191B" />
+    <SolidColorBrush x:Key="OverlayEdgeHighlightBrush" Color="#828A8F" />
+
 </ResourceDictionary>
