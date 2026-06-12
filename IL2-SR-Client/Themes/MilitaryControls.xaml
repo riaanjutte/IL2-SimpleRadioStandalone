@@ -458,7 +458,9 @@
                                          Width="10" Height="10"
                                          Fill="#1A150D" />
                             </Canvas>
-                            <!-- glossy glass cover: curved specular sweep over the face -->
+                            <!-- glossy glass cover: bright curved band on top, curvature
+                                 shadow below; white alone vanishes on the ivory face, so
+                                 the read comes from the band edge and the dark shading -->
                             <Grid Margin="3">
                                 <Grid.Clip>
                                     <RectangleGeometry RadiusX="4"
@@ -468,19 +470,23 @@
                                 <Border>
                                     <Border.Background>
                                         <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
-                                            <GradientStop Offset="0" Color="#1CFFFFFF" />
-                                            <GradientStop Offset="1" Color="#00FFFFFF" />
+                                            <GradientStop Offset="0" Color="#00000000" />
+                                            <GradientStop Offset="0.5" Color="#08000000" />
+                                            <GradientStop Offset="1" Color="#2E000000" />
                                         </LinearGradientBrush>
                                     </Border.Background>
                                 </Border>
                                 <Path Data="M 0,0 L 144,0 L 144,24 Q 72,56 0,24 Z">
                                     <Path.Fill>
                                         <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
-                                            <GradientStop Offset="0" Color="#52FFFFFF" />
-                                            <GradientStop Offset="1" Color="#0CFFFFFF" />
+                                            <GradientStop Offset="0" Color="#96FFFFFF" />
+                                            <GradientStop Offset="1" Color="#22FFFFFF" />
                                         </LinearGradientBrush>
                                     </Path.Fill>
                                 </Path>
+                                <Path Data="M 144,24 Q 72,56 0,24"
+                                      Stroke="#78FFFFFF"
+                                      StrokeThickness="1" />
                             </Grid>
                             <!-- bezel corner screws -->
                             <Control Template="{StaticResource MilPanelScrew}"
