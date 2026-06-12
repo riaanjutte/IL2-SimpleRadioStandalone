@@ -209,6 +209,90 @@
                     <GroupBox Header="Favourites">
                         <clientWindow:FavouriteServersView DataContext="{Binding Path=FavouriteServersViewModel}" MaxHeight="230" />
                     </GroupBox>
+
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
+
+                        <GroupBox Grid.Column="0" Header="Microphone">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="Auto" />
+                                </Grid.ColumnDefinitions>
+                                <ComboBox x:Name="Mic"
+                                          Grid.Column="0"
+                                          Margin="0,0,14,0"
+                                          HorizontalAlignment="Stretch"
+                                          VerticalAlignment="Top"
+                                          ItemsSource="{Binding Path=AudioInput.InputAudioDevices}"
+                                          SelectedItem="{Binding Path=AudioInput.SelectedAudioInput, Mode=TwoWay}"
+                                          ToolTip="{Binding Path=AudioInput.MicrophoneAvailable, Converter={StaticResource MicAvailabilityTooltipConverter}}" />
+                                <StackPanel Grid.Column="1" HorizontalAlignment="Right">
+                                    <ProgressBar Name="Mic_VU"
+                                                 Width="150"
+                                                 Height="80"
+                                                 Value="-100"
+                                                 Maximum="18"
+                                                 Minimum="-100"
+                                                 ToolTip="{Binding Path=AudioInput.MicrophoneAvailable, Converter={StaticResource MicAvailabilityTooltipConverter}}" />
+                                    <Button x:Name="Preview"
+                                            Margin="0,8,0,0"
+                                            HorizontalAlignment="Center"
+                                            Click="PreviewAudio"
+                                            Content="Audio Preview"
+                                            Style="{DynamicResource SquareButtonStyle}"
+                                            ToolTipService.ShowOnDisabled="True"
+                                            IsEnabled="{Binding AudioInput.MicrophoneAvailable}"
+                                            ToolTip="{Binding Path=AudioInput.MicrophoneAvailable, Converter={StaticResource MicAvailabilityTooltipConverter}}" />
+                                </StackPanel>
+                            </Grid>
+                        </GroupBox>
+
+                        <GroupBox Grid.Column="1" Header="Speakers &amp; Optional Mic Output">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="Auto" />
+                                </Grid.ColumnDefinitions>
+                                <StackPanel Grid.Column="0"
+                                            Margin="0,0,14,0"
+                                            VerticalAlignment="Top">
+                                    <ComboBox x:Name="Speakers"
+                                              Margin="0,0,0,10"
+                                              HorizontalAlignment="Stretch"
+                                              ItemsSource="{Binding Path=AudioOutput.OutputAudioDevices}"
+                                              SelectedItem="{Binding Path=AudioOutput.SelectedAudioOutput, Mode=TwoWay}" />
+                                    <ComboBox x:Name="MicOutput"
+                                              HorizontalAlignment="Stretch"
+                                              ItemsSource="{Binding Path=AudioOutput.MicOutputAudioDevices}"
+                                              SelectedItem="{Binding Path=AudioOutput.SelectedMicAudioOutput, Mode=TwoWay}" />
+                                </StackPanel>
+                                <StackPanel Grid.Column="1" HorizontalAlignment="Right">
+                                    <ProgressBar Name="Speaker_VU"
+                                                 Width="150"
+                                                 Height="80"
+                                                 Value="-100"
+                                                 Maximum="18"
+                                                 Minimum="-100" />
+                                    <Slider x:Name="SpeakerBoost"
+                                            Width="150"
+                                            Margin="0,8,0,0"
+                                            HorizontalAlignment="Center"
+                                            Maximum="1.0"
+                                            Minimum="0.0"
+                                            IsMoveToPointEnabled="true"
+                                            ValueChanged="SpeakerBoost_ValueChanged" />
+                                    <StackPanel HorizontalAlignment="Center" Orientation="Horizontal">
+                                        <Label Content="Speaker Boost:" />
+                                        <Label x:Name="SpeakerBoostLabel" Content="+/- %" />
+                                    </StackPanel>
+                                </StackPanel>
+                            </Grid>
+                        </GroupBox>
+                    </Grid>
                 </StackPanel>
             </ScrollViewer>
         </TabItem>
@@ -429,83 +513,6 @@
         <TabItem Header="Audio">
             <ScrollViewer HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto">
                 <StackPanel Margin="10,0">
-                    <GroupBox Header="Microphone">
-                        <Grid>
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="*" />
-                                <ColumnDefinition Width="Auto" />
-                            </Grid.ColumnDefinitions>
-                            <ComboBox x:Name="Mic"
-                                      Grid.Column="0"
-                                      Width="320"
-                                      Margin="0,0,24,0"
-                                      HorizontalAlignment="Left"
-                                      VerticalAlignment="Top"
-                                      ItemsSource="{Binding Path=AudioInput.InputAudioDevices}"
-                                      SelectedItem="{Binding Path=AudioInput.SelectedAudioInput, Mode=TwoWay}"
-                                      ToolTip="{Binding Path=AudioInput.MicrophoneAvailable, Converter={StaticResource MicAvailabilityTooltipConverter}}" />
-                            <StackPanel Grid.Column="1" HorizontalAlignment="Right">
-                                <ProgressBar Name="Mic_VU"
-                                             Width="150"
-                                             Height="80"
-                                             Value="-100"
-                                             Maximum="18"
-                                             Minimum="-100"
-                                             ToolTip="{Binding Path=AudioInput.MicrophoneAvailable, Converter={StaticResource MicAvailabilityTooltipConverter}}" />
-                                <Button x:Name="Preview"
-                                        Margin="0,8,0,0"
-                                        HorizontalAlignment="Center"
-                                        Click="PreviewAudio"
-                                        Content="Audio Preview"
-                                        Style="{DynamicResource SquareButtonStyle}"
-                                        ToolTipService.ShowOnDisabled="True"
-                                        IsEnabled="{Binding AudioInput.MicrophoneAvailable}"
-                                        ToolTip="{Binding Path=AudioInput.MicrophoneAvailable, Converter={StaticResource MicAvailabilityTooltipConverter}}" />
-                            </StackPanel>
-                        </Grid>
-                    </GroupBox>
-                    <GroupBox Header="Speakers &amp; Optional Mic Output">
-                        <Grid>
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="*" />
-                                <ColumnDefinition Width="Auto" />
-                            </Grid.ColumnDefinitions>
-                            <StackPanel Grid.Column="0"
-                                        Margin="0,0,24,0"
-                                        HorizontalAlignment="Left"
-                                        VerticalAlignment="Top">
-                                <ComboBox x:Name="Speakers"
-                                          Width="320"
-                                          Margin="0,0,0,10"
-                                          ItemsSource="{Binding Path=AudioOutput.OutputAudioDevices}"
-                                          SelectedItem="{Binding Path=AudioOutput.SelectedAudioOutput, Mode=TwoWay}" />
-                                <ComboBox x:Name="MicOutput"
-                                          Width="320"
-                                          ItemsSource="{Binding Path=AudioOutput.MicOutputAudioDevices}"
-                                          SelectedItem="{Binding Path=AudioOutput.SelectedMicAudioOutput, Mode=TwoWay}" />
-                            </StackPanel>
-                            <StackPanel Grid.Column="1" HorizontalAlignment="Right">
-                                <ProgressBar Name="Speaker_VU"
-                                             Width="150"
-                                             Height="80"
-                                             Value="-100"
-                                             Maximum="18"
-                                             Minimum="-100" />
-                                <Slider x:Name="SpeakerBoost"
-                                        Width="150"
-                                        Margin="0,8,0,0"
-                                        HorizontalAlignment="Center"
-                                        Maximum="1.0"
-                                        Minimum="0.0"
-                                        IsMoveToPointEnabled="true"
-                                        ValueChanged="SpeakerBoost_ValueChanged" />
-                                <StackPanel HorizontalAlignment="Center" Orientation="Horizontal">
-                                    <Label Content="Speaker Boost:" />
-                                    <Label x:Name="SpeakerBoostLabel" Content="+/- %" />
-                                </StackPanel>
-                            </StackPanel>
-                        </Grid>
-                    </GroupBox>
                     <GroupBox Header="Audio Options">
                         <Grid HorizontalAlignment="Center">
                             <Grid.ColumnDefinitions>
