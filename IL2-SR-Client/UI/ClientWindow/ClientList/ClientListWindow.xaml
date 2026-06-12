@@ -77,21 +77,27 @@
             </ListBox.ItemContainerStyle>
             <ListBox.ItemTemplate>
                 <DataTemplate>
-                    <Grid Margin="0,2">
+                    <Grid Margin="0,2,4,2">
                         <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="5*" />
-                            <ColumnDefinition Width="0.5*" />
-                            <ColumnDefinition Width="0.5*" />
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="Auto" />
                         </Grid.ColumnDefinitions>
-                        <TextBlock Text="{Binding Name}"  Grid.Column="0" TextTrimming="CharacterEllipsis" />
-                        <TextBlock Text="{Binding Channel}"  Grid.Column="1" />
+                        <TextBlock Text="{Binding Name}"
+                                   Grid.Column="0"
+                                   Margin="0,0,8,0"
+                                   TextTrimming="CharacterEllipsis"
+                                   VerticalAlignment="Center" />
+                        <TextBlock Text="{Binding Channel}"
+                                   Grid.Column="1"
+                                   Margin="0,0,10,0"
+                                   VerticalAlignment="Center" />
 
                         <!-- coalition jewel lamp -->
                         <Grid Width="14"
                               Height="14"
                               Grid.Column="2"
-                              Margin="2"
-                              HorizontalAlignment="Right"
+                              Margin="0,0,2,0"
                               VerticalAlignment="Center">
                             <Ellipse Fill="{StaticResource MilLampBezelBrush}" />
                             <Ellipse Margin="2" Fill="{Binding ClientCoalitionColour}" />
