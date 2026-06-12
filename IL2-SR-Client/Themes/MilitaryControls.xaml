@@ -374,6 +374,20 @@
         </Setter>
     </Style>
 
+    <!-- Slotted panel screw (shared by plates and meters) -->
+    <ControlTemplate x:Key="MilPanelScrew" TargetType="{x:Type Control}">
+        <Grid Width="9" Height="9">
+            <Ellipse Fill="{StaticResource MilScrewBrush}"
+                     Stroke="#15100A"
+                     StrokeThickness="0.8" />
+            <Rectangle Width="6.5"
+                       Height="1.2"
+                       Fill="#241F14"
+                       RenderTransformOrigin="0.5,0.5"
+                       utils:ScrewSlotRandomizer.RandomAngle="True" />
+        </Grid>
+    </ControlTemplate>
+
     <!-- ============ ProgressBar: analog VU dial (needle meter) ============ -->
     <converters:VuNeedleAngleConverter x:Key="MilVuNeedleConverter" />
 
@@ -444,16 +458,39 @@
                                          Width="10" Height="10"
                                          Fill="#1A150D" />
                             </Canvas>
-                            <!-- glass -->
-                            <Border Margin="3" CornerRadius="4">
-                                <Border.Background>
-                                    <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
-                                        <GradientStop Offset="0" Color="#28FFFFFF" />
-                                        <GradientStop Offset="0.45" Color="#08FFFFFF" />
-                                        <GradientStop Offset="1" Color="#00FFFFFF" />
-                                    </LinearGradientBrush>
-                                </Border.Background>
-                            </Border>
+                            <!-- glossy glass cover: curved specular sweep over the face -->
+                            <Grid Margin="3">
+                                <Grid.Clip>
+                                    <RectangleGeometry RadiusX="4"
+                                                       RadiusY="4"
+                                                       Rect="0,0,144,74" />
+                                </Grid.Clip>
+                                <Border>
+                                    <Border.Background>
+                                        <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
+                                            <GradientStop Offset="0" Color="#1CFFFFFF" />
+                                            <GradientStop Offset="1" Color="#00FFFFFF" />
+                                        </LinearGradientBrush>
+                                    </Border.Background>
+                                </Border>
+                                <Path Data="M 0,0 L 144,0 L 144,24 Q 72,56 0,24 Z">
+                                    <Path.Fill>
+                                        <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
+                                            <GradientStop Offset="0" Color="#52FFFFFF" />
+                                            <GradientStop Offset="1" Color="#0CFFFFFF" />
+                                        </LinearGradientBrush>
+                                    </Path.Fill>
+                                </Path>
+                            </Grid>
+                            <!-- bezel corner screws -->
+                            <Control Template="{StaticResource MilPanelScrew}"
+                                     HorizontalAlignment="Left" VerticalAlignment="Top" Margin="6,6,0,0" />
+                            <Control Template="{StaticResource MilPanelScrew}"
+                                     HorizontalAlignment="Right" VerticalAlignment="Top" Margin="0,6,6,0" />
+                            <Control Template="{StaticResource MilPanelScrew}"
+                                     HorizontalAlignment="Left" VerticalAlignment="Bottom" Margin="6,0,0,6" />
+                            <Control Template="{StaticResource MilPanelScrew}"
+                                     HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="0,0,6,6" />
                         </Grid>
                     </Viewbox>
                 </ControlTemplate>
@@ -462,19 +499,6 @@
     </Style>
 
     <!-- ============ GroupBox: riveted equipment plate with corner screws ============ -->
-    <ControlTemplate x:Key="MilPanelScrew" TargetType="{x:Type Control}">
-        <Grid Width="9" Height="9">
-            <Ellipse Fill="{StaticResource MilScrewBrush}"
-                     Stroke="#15100A"
-                     StrokeThickness="0.8" />
-            <Rectangle Width="6.5"
-                       Height="1.2"
-                       Fill="#241F14"
-                       RenderTransformOrigin="0.5,0.5"
-                       utils:ScrewSlotRandomizer.RandomAngle="True" />
-        </Grid>
-    </ControlTemplate>
-
     <Style TargetType="{x:Type GroupBox}">
         <Setter Property="Foreground" Value="{StaticResource MilTextPrimaryBrush}" />
         <Setter Property="Margin" Value="0,5,0,5" />
