@@ -125,7 +125,7 @@
     </UserControl.Resources>
 
     <StackPanel Orientation="Vertical"
-                Background="{StaticResource OverlayEquipmentPanelBrush}"
+                Background="Transparent"
                 HorizontalAlignment="Center"
                 Width="130"
                 Style="{x:Null}">

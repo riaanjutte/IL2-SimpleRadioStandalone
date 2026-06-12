@@ -37,7 +37,7 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Overlay
         private readonly double _originalMinHeight;
         private HwndSource _hwndSource;
         private const double AssignedCallsignMinHeightDelta = 20.0;
-        private const double Radio2MinHeightDelta = 71.0;
+        private const double Radio2MinHeightDelta = 90.0;
         private const double RciStatusMinHeightDelta = 14.0;
         private const double RciCallsignMinHeightDelta = 10.0;
         private const double AssignedCallsignScrollPixelsPerSecond = 18.0;
@@ -141,7 +141,6 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Overlay
                 {
                     //show
                     Radio2.Visibility = Visibility.Visible;
-                    Radio2Seperator.Visibility = Visibility.Visible;
                     UpdateOverlayMinimumHeight();
                 }
 
@@ -153,7 +152,6 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Overlay
                 if (Radio2.Visibility != Visibility.Collapsed)
                 {
                     Radio2.Visibility = Visibility.Collapsed;
-                    Radio2Seperator.Visibility = Visibility.Collapsed;
                     UpdateOverlayMinimumHeight();
                 }
             }
