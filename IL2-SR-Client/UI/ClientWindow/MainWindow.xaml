@@ -448,20 +448,21 @@
             <ScrollViewer HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto">
                 <StackPanel Margin="10,0">
                     <GroupBox Header="Microphone">
-                        <Grid HorizontalAlignment="Center">
+                        <Grid>
                             <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="*" />
                                 <ColumnDefinition Width="Auto" />
                             </Grid.ColumnDefinitions>
                             <ComboBox x:Name="Mic"
                                       Grid.Column="0"
                                       Width="320"
                                       Margin="0,0,24,0"
+                                      HorizontalAlignment="Left"
                                       VerticalAlignment="Center"
                                       ItemsSource="{Binding Path=AudioInput.InputAudioDevices}"
                                       SelectedItem="{Binding Path=AudioInput.SelectedAudioInput, Mode=TwoWay}"
                                       ToolTip="{Binding Path=AudioInput.MicrophoneAvailable, Converter={StaticResource MicAvailabilityTooltipConverter}}" />
-                            <StackPanel Grid.Column="1" HorizontalAlignment="Center">
+                            <StackPanel Grid.Column="1" HorizontalAlignment="Right">
                                 <ProgressBar Name="Mic_VU"
                                              Width="150"
                                              Height="80"
@@ -482,25 +483,26 @@
                         </Grid>
                     </GroupBox>
                     <GroupBox Header="Speakers &amp; Optional Mic Output">
-                        <Grid HorizontalAlignment="Center">
+                        <Grid>
                             <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="*" />
                                 <ColumnDefinition Width="Auto" />
                             </Grid.ColumnDefinitions>
                             <StackPanel Grid.Column="0"
                                         Margin="0,0,24,0"
+                                        HorizontalAlignment="Left"
                                         VerticalAlignment="Center">
                                 <ComboBox x:Name="Speakers"
-                                          Width="280"
+                                          Width="320"
                                           Margin="0,0,0,10"
                                           ItemsSource="{Binding Path=AudioOutput.OutputAudioDevices}"
                                           SelectedItem="{Binding Path=AudioOutput.SelectedAudioOutput, Mode=TwoWay}" />
                                 <ComboBox x:Name="MicOutput"
-                                          Width="280"
+                                          Width="320"
                                           ItemsSource="{Binding Path=AudioOutput.MicOutputAudioDevices}"
                                           SelectedItem="{Binding Path=AudioOutput.SelectedMicAudioOutput, Mode=TwoWay}" />
                             </StackPanel>
-                            <StackPanel Grid.Column="1" HorizontalAlignment="Center">
+                            <StackPanel Grid.Column="1" HorizontalAlignment="Right">
                                 <ProgressBar Name="Speaker_VU"
                                              Width="150"
                                              Height="80"
