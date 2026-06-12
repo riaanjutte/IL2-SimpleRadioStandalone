@@ -38,7 +38,7 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Overlay
         private HwndSource _hwndSource;
         private const double AssignedCallsignMinHeightDelta = 20.0;
         private const double Radio2MinHeightDelta = 90.0;
-        private const double RciStatusMinHeightDelta = 14.0;
+        private const double RciStatusMinHeightDelta = 20.0;
         private const double RciCallsignMinHeightDelta = 10.0;
         private const double AssignedCallsignScrollPixelsPerSecond = 18.0;
         private const double AssignedCallsignInitialScrollPauseMilliseconds = 700.0;
