@@ -159,44 +159,31 @@
                         <clientWindow:FavouriteServersView DataContext="{Binding Path=FavouriteServersViewModel}" MaxHeight="230" />
                     </GroupBox>
                     <GroupBox Header="Overlays">
-                        <StackPanel HorizontalAlignment="Center">
-                            <StackPanel Margin="0"
-                                        HorizontalAlignment="Center"
-                                        Orientation="Horizontal">
-                                <Button x:Name="ShowOverlay"
-                                        Width="220"
-                                        Margin="0,15,12,0"
-                                        HorizontalAlignment="Center"
-                                        Click="ShowOverlay_OnClick"
-                                        Content="Toggle Radio Overlay"
-                                        Style="{DynamicResource SquareButtonStyle}" />
-                                <Button x:Name="ShowClientList"
-                                        Width="220"
-                                        Margin="0,15,0,0"
-                                        HorizontalAlignment="Center"
-                                        Click="ShowClientList_OnClick"
-                                        Content="Toggle Client List"
-                                        Style="{DynamicResource SquareButtonStyle}" />
-                            </StackPanel>
-                            <StackPanel Margin="0"
-                                        HorizontalAlignment="Center"
-                                        Orientation="Horizontal">
-                                <Button x:Name="ShowPilotRoster"
-                                        Width="220"
-                                        Margin="0,15,0,0"
-                                        HorizontalAlignment="Center"
-                                        Click="ShowPilotRoster_OnClick"
-                                        Content="Toggle Pilot Roster"
-                                        Style="{DynamicResource SquareButtonStyle}" />
-                            </StackPanel>
-                            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
-                                <Button Content="Patreon - Support SRS"
-                                        Width="190"
-                                        Click="Donate_OnClick" Margin="5" />
-                            </StackPanel>
+                        <StackPanel HorizontalAlignment="Left">
+                            <Button x:Name="ShowOverlay"
+                                    Width="220"
+                                    Margin="0,8,0,8"
+                                    HorizontalAlignment="Left"
+                                    Click="ShowOverlay_OnClick"
+                                    Content="Toggle Radio Overlay"
+                                    Style="{DynamicResource SquareButtonStyle}" />
+                            <Button x:Name="ShowClientList"
+                                    Width="220"
+                                    Margin="0,8,0,8"
+                                    HorizontalAlignment="Left"
+                                    Click="ShowClientList_OnClick"
+                                    Content="Toggle Client List"
+                                    Style="{DynamicResource SquareButtonStyle}" />
+                            <Button x:Name="ShowPilotRoster"
+                                    Width="220"
+                                    Margin="0,8,0,8"
+                                    HorizontalAlignment="Left"
+                                    Click="ShowPilotRoster_OnClick"
+                                    Content="Toggle Pilot Roster"
+                                    Style="{DynamicResource SquareButtonStyle}" />
                             <StackPanel x:Name="RciStatusPanel"
-                                        Margin="0,0,0,5"
-                                        HorizontalAlignment="Center"
+                                        Margin="0,4,0,5"
+                                        HorizontalAlignment="Left"
                                         Visibility="Collapsed">
                                 <Grid Width="190"
                                       Height="18">
@@ -1454,7 +1441,14 @@
 
         <TabItem Header="Help">
             <GroupBox Header="Help &amp; About">
-                <FlowDocumentScrollViewer>
+                <DockPanel>
+                    <Button DockPanel.Dock="Bottom"
+                            Width="190"
+                            Margin="0,10,0,4"
+                            HorizontalAlignment="Center"
+                            Click="Donate_OnClick"
+                            Content="Patreon - Support SRS" />
+                    <FlowDocumentScrollViewer>
                     <FlowDocument x:Name="AboutFlowDocument"
                                   FontFamily="{StaticResource MilFontMono}"
                                   FontSize="14"
@@ -1516,6 +1510,7 @@
 
                     </FlowDocument>
                 </FlowDocumentScrollViewer>
+                </DockPanel>
             </GroupBox>
         </TabItem>
 
