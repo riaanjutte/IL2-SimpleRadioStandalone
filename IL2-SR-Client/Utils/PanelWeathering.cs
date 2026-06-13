@@ -90,7 +90,7 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.Utils
                 var end = new Point(x + Math.Cos(angle) * length, y + Math.Sin(angle) * length);
 
                 // light catch on one side of the gouge, shadow on the other
-                var alpha = (byte)(18 + Rng.Next(36));
+                var alpha = (byte)(9 + Rng.Next(18));
                 var colour = Rng.NextDouble() < 0.5
                     ? Color.FromArgb(alpha, 0xFF, 0xF6, 0xDC)
                     : Color.FromArgb(alpha, 0x00, 0x00, 0x00);
