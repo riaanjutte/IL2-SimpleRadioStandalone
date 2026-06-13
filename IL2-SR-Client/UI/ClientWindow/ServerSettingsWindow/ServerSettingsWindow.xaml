@@ -30,6 +30,7 @@
                        VerticalAlignment="Center"
                        FontFamily="{StaticResource MilFontStencil}"
                        FontSize="17"
+                       Foreground="{StaticResource MilAccentBrush}"
                        Text="{Binding Converter={StaticResource MilUpperConverter}}" />
         </DataTemplate>
     </controls:MetroWindow.TitleTemplate>
