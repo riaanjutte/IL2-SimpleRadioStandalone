@@ -116,4 +116,12 @@
     <SolidColorBrush x:Key="OverlayRaisedBorderBrush" Color="#16110A" />
     <SolidColorBrush x:Key="OverlayEdgeHighlightBrush" Color="#7B6C4C" />
 
+    <!-- Accent-tinted raised brush for overlay channel up/down buttons. -->
+    <LinearGradientBrush x:Key="OverlayAccentRaisedBrush" StartPoint="0,0" EndPoint="0,1">
+        <GradientStop Color="#E0B95C" Offset="0" />
+        <GradientStop Color="#C99B3F" Offset="0.52" />
+        <GradientStop Color="#7E5F22" Offset="1" />
+    </LinearGradientBrush>
+    <SolidColorBrush x:Key="OverlayAccentRaisedBorderBrush" Color="#3B2C10" />
+
 </ResourceDictionary>
