@@ -2,8 +2,7 @@
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
 
     <!-- Vintage 1940s communication-set palette: warm bakelite browns, aged ivory,
-         brass/amber accents. Original olive utility palette preserved at git tag
-         checkpoint-pre-vintage. See docs/superpowers/specs/2026-06-11-client-ui-redesign-design.md -->
+         brass/amber accents. -->
     <Color x:Key="MilWindowBackgroundColor">#322A20</Color>
     <Color x:Key="MilChromeColor">#261F16</Color>
     <Color x:Key="MilWellColor">#1F1912</Color>
