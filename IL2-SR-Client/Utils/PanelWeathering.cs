@@ -80,7 +80,7 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.Utils
 
         private static void DrawScratches(DrawingContext dc, int w, int h)
         {
-            var count = 6 + (w * h) / 11000;
+            var count = 12 + (w * h) / 5500;
             for (var i = 0; i < count; i++)
             {
                 var x = Rng.NextDouble() * w;
@@ -90,7 +90,7 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.Utils
                 var end = new Point(x + Math.Cos(angle) * length, y + Math.Sin(angle) * length);
 
                 // light catch on one side of the gouge, shadow on the other
-                var alpha = (byte)(12 + Rng.Next(24));
+                var alpha = (byte)(18 + Rng.Next(36));
                 var colour = Rng.NextDouble() < 0.5
                     ? Color.FromArgb(alpha, 0xFF, 0xF6, 0xDC)
                     : Color.FromArgb(alpha, 0x00, 0x00, 0x00);
@@ -104,7 +104,7 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.Utils
         {
             // scuffs as clusters of short parallel hairlines (gradients band visibly
             // at low alpha, so build smudges from strokes instead)
-            var count = 3 + (w * h) / 47000;
+            var count = 6 + (w * h) / 23500;
             for (var i = 0; i < count; i++)
             {
                 var cx = Rng.NextDouble() * w;
@@ -118,7 +118,7 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.Utils
                     var ox = cx + Math.Cos(angle + Math.PI / 2) * offset;
                     var oy = cy + Math.Sin(angle + Math.PI / 2) * offset;
                     var len = 4 + Rng.NextDouble() * 12;
-                    var alpha = (byte)(6 + Rng.Next(12));
+                    var alpha = (byte)(9 + Rng.Next(18));
                     var colour = light
                         ? Color.FromArgb(alpha, 0xFF, 0xF6, 0xDC)
                         : Color.FromArgb(alpha, 0x00, 0x00, 0x00);
@@ -149,14 +149,14 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.Utils
             };
             foreach (var corner in corners)
             {
-                var chips = 6 + Rng.Next(10);
+                var chips = 12 + Rng.Next(20);
                 for (var i = 0; i < chips; i++)
                 {
                     var dx = Rng.NextDouble() * Rng.NextDouble() * 26;
                     var dy = Rng.NextDouble() * Rng.NextDouble() * 26;
                     var x = corner.X == 0 ? dx : corner.X - dx;
                     var y = corner.Y == 0 ? dy : corner.Y - dy;
-                    var alpha = (byte)(14 + Rng.Next(30));
+                    var alpha = (byte)(21 + Rng.Next(45));
                     var brush = new SolidColorBrush(
                         Color.FromArgb(alpha, metal[Rng.Next(metal.Length)].R, metal[Rng.Next(metal.Length)].G, metal[Rng.Next(metal.Length)].B));
                     brush.Freeze();
@@ -166,7 +166,7 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.Utils
             }
 
             // edge rub patches: runs of short strokes parallel to the nearest edge
-            var patches = 3 + Rng.Next(4) + (w + h) / 400;
+            var patches = 6 + Rng.Next(8) + (w + h) / 200;
             for (var i = 0; i < patches; i++)
             {
                 var edge = Rng.Next(4); // 0=top 1=bottom 2=left 3=right
@@ -189,7 +189,7 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.Utils
                     var ox = cx + Math.Cos(angle + Math.PI / 2) * offset + (Rng.NextDouble() - 0.5) * 4;
                     var oy = cy + Math.Sin(angle + Math.PI / 2) * offset + (Rng.NextDouble() - 0.5) * 2;
                     var len = 5 + Rng.NextDouble() * 16;
-                    var alpha = (byte)(8 + Rng.Next(14));
+                    var alpha = (byte)(12 + Rng.Next(20));
                     var pen = new Pen(new SolidColorBrush(Color.FromArgb(alpha, tone.R, tone.G, tone.B)),
                         0.6 + Rng.NextDouble() * 0.6);
                     pen.Freeze();
@@ -200,12 +200,12 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.Utils
             }
 
             // stray chips scattered across the face
-            var flecks = 8 + (w * h) / 30000;
+            var flecks = 16 + (w * h) / 15000;
             for (var i = 0; i < flecks; i++)
             {
                 var x = Rng.NextDouble() * w;
                 var y = Rng.NextDouble() * h;
-                var alpha = (byte)(10 + Rng.Next(22));
+                var alpha = (byte)(15 + Rng.Next(33));
                 var tone = metal[Rng.Next(metal.Length)];
                 var brush = new SolidColorBrush(Color.FromArgb(alpha, tone.R, tone.G, tone.B));
                 brush.Freeze();
@@ -217,7 +217,7 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.Utils
         private static void DrawGrime(DrawingContext dc, int w, int h)
         {
             // dirt collects along edges and in corners: dense speckle, no gradients
-            var count = 120 + (w * h) / 600;
+            var count = 240 + (w * h) / 300;
             for (var i = 0; i < count; i++)
             {
                 // bias positions towards the plate border
@@ -230,7 +230,7 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.Utils
                     : (Rng.NextDouble() < 0.5 ? Rng.NextDouble() * Rng.NextDouble() * h * 0.25 : h - Rng.NextDouble() * Rng.NextDouble() * h * 0.25);
 
                 var radius = 0.4 + Rng.NextDouble() * 1.1;
-                var alpha = (byte)(12 + Rng.Next(26));
+                var alpha = (byte)(18 + Rng.Next(38));
                 var brush = new SolidColorBrush(Color.FromArgb(alpha, 0x0A, 0x07, 0x03));
                 brush.Freeze();
                 dc.DrawEllipse(brush, null, new Point(x, y), radius, radius);
