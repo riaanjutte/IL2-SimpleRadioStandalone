@@ -1,5 +1,22 @@
 # Changelog
 
+## IL2-SRS 1.0.4.5-beta.10 community update
+
+### Changed
+
+- Redesigned the client UI as a vintage 1940s communication set: skeuomorphic equipment plates with bevelled edges, corner screws (randomised slots), and procedural grunge/scratches/chipped-paint weathering.
+- Added two selectable themes - warm "Bakelite" (default) and cool "Grey" - chosen from Settings; the whole app and the radio overlay follow the selection.
+- Replaced the bar VU meters with analog needle dials (dB scale, overload zone, glass cover).
+- Indicator lamps now use bright-green "on" jewels; status lamps and coalition dots render as bezelled jewels.
+- Increased UI text size ~20% for readability and switched headings/titles to a stencil face.
+- Reorganised the General tab (Server and Overlays side by side; Microphone and Speakers panels moved here) and moved Audio Options into Settings.
+- Gave the radio overlay the same equipment-plate treatment, themed to match the selected client theme.
+- Themed the Connected Clients, Server Settings, and profile-name dialogs.
+
+### Validation
+
+- Built `IL2-SimpleRadioStandalone.sln` Release/x64 successfully.
+
 ## IL2-SRS 1.0.4.3 community update
 
 ### Changed
