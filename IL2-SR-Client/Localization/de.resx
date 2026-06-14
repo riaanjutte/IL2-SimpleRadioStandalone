@@ -153,6 +153,27 @@
   <data name="Show Server Settings" xml:space="preserve">
     <value>Servereinstellungen anzeigen</value>
   </data>
+  <data name="Hide Server Settings" xml:space="preserve">
+    <value>Servereinstellungen ausblenden</value>
+  </data>
+  <data name="Show Radio Overlay" xml:space="preserve">
+    <value>Funk-Overlay anzeigen</value>
+  </data>
+  <data name="Hide Radio Overlay" xml:space="preserve">
+    <value>Funk-Overlay ausblenden</value>
+  </data>
+  <data name="Show Client List" xml:space="preserve">
+    <value>Teilnehmerliste anzeigen</value>
+  </data>
+  <data name="Hide Client List" xml:space="preserve">
+    <value>Teilnehmerliste ausblenden</value>
+  </data>
+  <data name="Show Pilot Roster" xml:space="preserve">
+    <value>Rufzeichenliste anzeigen</value>
+  </data>
+  <data name="Hide Pilot Roster" xml:space="preserve">
+    <value>Rufzeichenliste ausblenden</value>
+  </data>
   <data name="Toggle Radio Overlay" xml:space="preserve">
     <value>Funkgerät ein-/ausblenden</value>
   </data>

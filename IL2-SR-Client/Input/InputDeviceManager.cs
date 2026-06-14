@@ -556,65 +556,67 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.Settings
                     var pollStopwatch = Stopwatch.StartNew();
                     try
                     {
-                    var bindStates = GenerateBindStateList();
+                        var bindStates = GenerateBindStateList();
+                        var deviceStateCache = new Dictionary<Guid, object>();
 
-                    for (var i = 0; i < bindStates.Count; i++)
-                    {
-                        //contains main binding and optional modifier binding + states of each
-                        var bindState = bindStates[i];
-
-                        bindState.MainDeviceState = GetButtonState(bindState.MainDevice);
-
-                        if (bindState.ModifierDevice != null)
+                        for (var i = 0; i < bindStates.Count; i++)
                         {
-                            bindState.ModifierState = GetButtonState(bindState.ModifierDevice);
+                            //contains main binding and optional modifier binding + states of each
+                            var bindState = bindStates[i];
 
-                            bindState.IsActive = bindState.MainDeviceState && bindState.ModifierState;
-                        }
-                        else
-                        {
-                            bindState.IsActive = bindState.MainDeviceState;
-                        }
+                            bindState.MainDeviceState = GetButtonState(bindState.MainDevice, deviceStateCache);
 
-                        //now check this is the best binding and no previous ones are better
-                        //Means you can have better binds like PTT  = Space and Radio 1 is Space +1 - holding space +1 will actually trigger radio 1 not PTT
-                        if (bindState.IsActive)
-                        {
-                            for (int j = 0; j < i; j++)
+                            if (bindState.ModifierDevice != null)
                             {
-                                //check previous bindings
-                                var previousBind = bindStates[j];
+                                bindState.ModifierState = GetButtonState(bindState.ModifierDevice, deviceStateCache);
 
-                                if (!previousBind.IsActive)
-                                {
-                                    continue;
-                                }
+                                bindState.IsActive = bindState.MainDeviceState && bindState.ModifierState;
+                            }
+                            else
+                            {
+                                bindState.IsActive = bindState.MainDeviceState;
+                            }
 
-                                if (previousBind.ModifierDevice == null && bindState.ModifierDevice != null)
+                            //now check this is the best binding and no previous ones are better
+                            //Means you can have better binds like PTT  = Space and Radio 1 is Space +1 - holding space +1 will actually trigger radio 1 not PTT
+                            if (bindState.IsActive)
+                            {
+                                for (int j = 0; j < i; j++)
                                 {
-                                    //set previous bind to off if previous bind Main == main or modifier of bindstate
-                                    if (previousBind.MainDevice.IsSameBind(bindState.MainDevice))
+                                    //check previous bindings
+                                    var previousBind = bindStates[j];
+
+                                    if (!previousBind.IsActive)
                                     {
-                                        previousBind.IsActive = false;
-                                        break;
+                                        continue;
                                     }
-                                    if (previousBind.MainDevice.IsSameBind(bindState.ModifierDevice))
+
+                                    if (previousBind.ModifierDevice == null && bindState.ModifierDevice != null)
                                     {
-                                        previousBind.IsActive = false;
-                                        break;
+                                        //set previous bind to off if previous bind Main == main or modifier of bindstate
+                                        if (previousBind.MainDevice.IsSameBind(bindState.MainDevice))
+                                        {
+                                            previousBind.IsActive = false;
+                                            break;
+                                        }
+                                        if (previousBind.MainDevice.IsSameBind(bindState.ModifierDevice))
+                                        {
+                                            previousBind.IsActive = false;
+                                            break;
+                                        }
                                     }
-                                }
-                                else if (previousBind.ModifierDevice != null && bindState.ModifierDevice == null)
-                                {
-                                    if (previousBind.MainDevice.IsSameBind(bindState.MainDevice))
+                                    else if (previousBind.ModifierDevice != null && bindState.ModifierDevice == null)
                                     {
-                                        bindState.IsActive = false;
-                                        break;
-                                    }
-                                    if (previousBind.ModifierDevice.IsSameBind(bindState.MainDevice))
-                                    {
-                                        bindState.IsActive = false;
-                                        break;
+                                        if (previousBind.MainDevice.IsSameBind(bindState.MainDevice))
+                                        {
+                                            bindState.IsActive = false;
+                                            break;
+                                        }
+                                        if (previousBind.ModifierDevice.IsSameBind(bindState.MainDevice))
+                                        {
+                                            bindState.IsActive = false;
+                                            break;
+                                        }
                                     }
                                 }
                             }
@@ -887,7 +889,7 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.Settings
                         "Slow DirectInput devices can delay PTT and other keybinds.");
         }
 
-        private bool GetButtonState(InputDevice inputDeviceBinding)
+        private bool GetButtonState(InputDevice inputDeviceBinding, Dictionary<Guid, object> deviceStateCache)
         {
             Guid instanceGuid;
             Device device;
@@ -905,14 +907,7 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.Settings
 
             try
             {
-                var buttonState = ReadButtonState(device, inputDeviceBinding);
-                bool recoveredButtonState;
-                if (!buttonState && TryGetRecoveredActiveButtonState(inputDeviceBinding, instanceGuid, out recoveredButtonState))
-                {
-                    return recoveredButtonState;
-                }
-
-                return buttonState;
+                return ReadButtonState(device, inputDeviceBinding, instanceGuid, deviceStateCache);
             }
             catch (Exception e)
             {
@@ -926,12 +921,16 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.Settings
             return false;
         }
 
-        private bool ReadButtonState(Device device, InputDevice inputDeviceBinding)
+        private bool ReadButtonState(Device device, InputDevice inputDeviceBinding, Guid instanceGuid, Dictionary<Guid, object> deviceStateCache)
         {
             if (device is Joystick)
             {
-                device.Poll();
-                var state = (device as Joystick).GetCurrentState();
+                var state = GetDeviceState<JoystickState>(device, instanceGuid, deviceStateCache,
+                    () =>
+                    {
+                        device.Poll();
+                        return (device as Joystick).GetCurrentState();
+                    });
 
                 if (inputDeviceBinding.Button >= 128) //its a POV!
                 {
@@ -951,8 +950,12 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.Settings
             if (device is Keyboard)
             {
                 var keyboard = device as Keyboard;
-                keyboard.Poll();
-                var state = keyboard.GetCurrentState();
+                var state = GetDeviceState<KeyboardState>(device, instanceGuid, deviceStateCache,
+                    () =>
+                    {
+                        keyboard.Poll();
+                        return keyboard.GetCurrentState();
+                    });
                 return inputDeviceBinding.Button >= 0 &&
                        inputDeviceBinding.Button < state.AllKeys.Count &&
                        state.IsPressed(state.AllKeys[inputDeviceBinding.Button]);
@@ -960,8 +963,12 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.Settings
 
             if (device is Mouse)
             {
-                device.Poll();
-                var state = (device as Mouse).GetCurrentState();
+                var state = GetDeviceState<MouseState>(device, instanceGuid, deviceStateCache,
+                    () =>
+                    {
+                        device.Poll();
+                        return (device as Mouse).GetCurrentState();
+                    });
 
                 //just incase mouse changes number of buttons, like logitech can?
                 return inputDeviceBinding.Button >= 0 &&
@@ -970,6 +977,25 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.Settings
             }
 
             return false;
+        }
+
+        private TState GetDeviceState<TState>(Device device, Guid instanceGuid, Dictionary<Guid, object> deviceStateCache, Func<TState> pollState)
+        {
+            object cachedState;
+            if (deviceStateCache != null &&
+                deviceStateCache.TryGetValue(instanceGuid, out cachedState) &&
+                cachedState is TState)
+            {
+                return (TState)cachedState;
+            }
+
+            var state = pollState();
+            if (deviceStateCache != null)
+            {
+                deviceStateCache[instanceGuid] = state;
+            }
+
+            return state;
         }
 
         private bool TryGetRecoveredActiveButtonState(InputDevice inputDeviceBinding, Guid currentInstanceGuid, out bool buttonState)
@@ -987,7 +1013,7 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.Settings
 
                 try
                 {
-                    if (!ReadButtonState(device, inputDeviceBinding))
+                    if (!ReadButtonState(device, inputDeviceBinding, kpDevice.Key, null))
                     {
                         continue;
                     }

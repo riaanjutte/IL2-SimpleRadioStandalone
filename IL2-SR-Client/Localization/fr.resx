@@ -153,6 +153,27 @@
   <data name="Show Server Settings" xml:space="preserve">
     <value>Afficher les parametres serveur</value>
   </data>
+  <data name="Hide Server Settings" xml:space="preserve">
+    <value>Masquer les parametres serveur</value>
+  </data>
+  <data name="Show Radio Overlay" xml:space="preserve">
+    <value>Ouvrir l'overlay radio</value>
+  </data>
+  <data name="Hide Radio Overlay" xml:space="preserve">
+    <value>Masquer l'overlay radio</value>
+  </data>
+  <data name="Show Client List" xml:space="preserve">
+    <value>Ouvrir la liste clients</value>
+  </data>
+  <data name="Hide Client List" xml:space="preserve">
+    <value>Masquer la liste clients</value>
+  </data>
+  <data name="Show Pilot Roster" xml:space="preserve">
+    <value>Ouvrir la liste pilotes</value>
+  </data>
+  <data name="Hide Pilot Roster" xml:space="preserve">
+    <value>Masquer la liste pilotes</value>
+  </data>
   <data name="Toggle Radio Overlay" xml:space="preserve">
     <value>Ouvrir l'overlay radio</value>
   </data>

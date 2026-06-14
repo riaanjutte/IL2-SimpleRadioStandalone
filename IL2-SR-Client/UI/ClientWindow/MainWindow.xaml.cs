@@ -144,6 +144,9 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI
             DataContext = this;
 
             var client = ClientStateSingleton.Instance;
+            client.PropertyChanged += ClientState_PropertyChanged;
+            UpdateConnectionStatusStrip();
+            UpdateWindowButtonLabels();
 
             WindowStartupLocation = WindowStartupLocation.Manual;
             Left = _globalSettings.GetFinitePositionSetting(GlobalSettingsKeys.ClientX, DefaultClientX);
@@ -1105,6 +1108,60 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI
             }
         }
 
+        private void ClientState_PropertyChanged(object sender, PropertyChangedEventArgs e)
+        {
+            if (e.PropertyName == nameof(ClientStateSingleton.IsConnected)
+                || e.PropertyName == nameof(ClientStateSingleton.IsConnectionErrored)
+                || e.PropertyName == nameof(ClientStateSingleton.IsGameConnected))
+            {
+                Dispatcher.BeginInvoke(new Action(UpdateConnectionStatusStrip));
+            }
+        }
+
+        private Brush GetConnectionStatusBrush(string resourceKey, Brush fallback)
+        {
+            return TryFindResource(resourceKey) as Brush ?? fallback;
+        }
+
+        private void UpdateConnectionStatusStrip()
+        {
+            if (ConnectionStatusStrip == null || ConnectionStatusLamp == null || ConnectionStatusText == null || ConnectionStatusHint == null)
+            {
+                return;
+            }
+
+            if (ClientState.IsConnectionErrored)
+            {
+                ConnectionStatusStrip.Background = new SolidColorBrush(Color.FromRgb(0x32, 0x1C, 0x18));
+                ConnectionStatusStrip.BorderBrush = GetConnectionStatusBrush("MilLedErrorBrush", Brushes.Red);
+                ConnectionStatusLamp.Fill = GetConnectionStatusBrush("MilLedErrorBrush", Brushes.Red);
+                ConnectionStatusText.Foreground = GetConnectionStatusBrush("MilLedErrorBrush", Brushes.Red);
+                ConnectionStatusText.Text = "CONNECTION ERROR";
+                ConnectionStatusHint.Text = "Check address or network";
+                return;
+            }
+
+            if (ClientState.IsConnected)
+            {
+                ConnectionStatusStrip.Background = new SolidColorBrush(Color.FromRgb(0x20, 0x30, 0x1C));
+                ConnectionStatusStrip.BorderBrush = GetConnectionStatusBrush("MilLedOnBrush", Brushes.LimeGreen);
+                ConnectionStatusLamp.Fill = GetConnectionStatusBrush("MilLedOnBrush", Brushes.LimeGreen);
+                ConnectionStatusText.Foreground = GetConnectionStatusBrush("MilLedOnBrush", Brushes.LimeGreen);
+                ConnectionStatusText.Text = "CONNECTED";
+                ConnectionStatusHint.Text = ClientState.IsGameConnected
+                    ? "Server and IL-2 active"
+                    : "Server link established";
+                return;
+            }
+
+            ConnectionStatusStrip.Background = new SolidColorBrush(Color.FromRgb(0x2B, 0x25, 0x1B));
+            ConnectionStatusStrip.BorderBrush = GetConnectionStatusBrush("MilLedOffBrush", Brushes.Gray);
+            ConnectionStatusLamp.Fill = GetConnectionStatusBrush("MilLedOffBrush", Brushes.Gray);
+            ConnectionStatusText.Foreground = GetConnectionStatusBrush("MilTextSecondaryBrush", Brushes.LightGray);
+            ConnectionStatusText.Text = "DISCONNECTED";
+            ConnectionStatusHint.Text = "Server link inactive";
+        }
+
         private void ConnectCallback(bool result, bool connectionError, string connection)
         {
             string currentConnection = ServerIp.Text.Trim();
@@ -1178,6 +1235,7 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI
 
         protected override void OnClosing(CancelEventArgs e)
         {
+            ClientStateSingleton.Instance.PropertyChanged -= ClientState_PropertyChanged;
             MessageHub.Instance.ClearSubscriptions();
             _il2RadioSyncManager.Stop();
 
@@ -1388,6 +1446,40 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI
             ToggleOverlay(true);
         }
 
+        private static bool IsWindowOpen(Window window)
+        {
+            return window != null
+                   && window.IsVisible
+                   && window.WindowState != WindowState.Minimized;
+        }
+
+        private void UpdateWindowButtonLabels()
+        {
+            if (ToggleServerSettings != null)
+            {
+                ToggleServerSettings.Content = LocalizationManager.Get(
+                    IsWindowOpen(_serverSettingsWindow) ? "Hide Server Settings" : "Show Server Settings");
+            }
+
+            if (ShowOverlay != null)
+            {
+                ShowOverlay.Content = LocalizationManager.Get(
+                    IsWindowOpen(_radioOverlayWindow) ? "Hide Radio Overlay" : "Show Radio Overlay");
+            }
+
+            if (ShowClientList != null)
+            {
+                ShowClientList.Content = LocalizationManager.Get(
+                    IsWindowOpen(_clientListWindow) ? "Hide Client List" : "Show Client List");
+            }
+
+            if (ShowPilotRoster != null)
+            {
+                ShowPilotRoster.Content = LocalizationManager.Get(
+                    IsWindowOpen(_pilotRosterWindow) ? "Hide Pilot Roster" : "Show Pilot Roster");
+            }
+        }
+
         private void ToggleOverlay(bool uiButton)
         {
             //debounce show hide (1 tick = 100ns, 6000000 ticks = 600ms debounce)
@@ -1403,6 +1495,7 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI
                 {
                     _radioOverlayWindow?.Close();
                     _radioOverlayWindow = null;
+                    UpdateWindowButtonLabels();
                 }
             }
         }
@@ -1444,8 +1537,17 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI
             {
                 ShowInTaskbar = !_globalSettings.GetClientSettingBool(GlobalSettingsKeys.RadioOverlayTaskbarHide)
             };
+            _radioOverlayWindow.Closed += (sender, args) =>
+            {
+                if (ReferenceEquals(_radioOverlayWindow, sender))
+                {
+                    _radioOverlayWindow = null;
+                }
+                UpdateWindowButtonLabels();
+            };
             _radioOverlayWindow.SetRciIndicatorEnabled(ShouldShowRciStatus());
             _radioOverlayWindow.Show();
+            UpdateWindowButtonLabels();
         }
 
      
@@ -1556,12 +1658,22 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI
                 _serverSettingsWindow = new ServerSettingsWindow();
                 _serverSettingsWindow.WindowStartupLocation = WindowStartupLocation.CenterOwner;
                 _serverSettingsWindow.Owner = this;
+                _serverSettingsWindow.Closed += (closedSender, args) =>
+                {
+                    if (ReferenceEquals(_serverSettingsWindow, closedSender))
+                    {
+                        _serverSettingsWindow = null;
+                    }
+                    UpdateWindowButtonLabels();
+                };
                 _serverSettingsWindow.Show();
+                UpdateWindowButtonLabels();
             }
             else
             {
                 _serverSettingsWindow?.Close();
                 _serverSettingsWindow = null;
+                UpdateWindowButtonLabels();
             }
         }
 
@@ -1916,12 +2028,22 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI
                 _clientListWindow = new ClientListWindow();
                 _clientListWindow.WindowStartupLocation = WindowStartupLocation.CenterOwner;
                 _clientListWindow.Owner = this;
+                _clientListWindow.Closed += (closedSender, args) =>
+                {
+                    if (ReferenceEquals(_clientListWindow, closedSender))
+                    {
+                        _clientListWindow = null;
+                    }
+                    UpdateWindowButtonLabels();
+                };
                 _clientListWindow.Show();
+                UpdateWindowButtonLabels();
             }
             else
             {
                 _clientListWindow?.Close();
                 _clientListWindow = null;
+                UpdateWindowButtonLabels();
             }
         }
 
@@ -1948,6 +2070,7 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI
             {
                 _pilotRosterWindow?.Close();
                 _pilotRosterWindow = null;
+                UpdateWindowButtonLabels();
             }
         }
 
@@ -1964,7 +2087,16 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI
 
             _pilotRosterWindow = new PilotRosterWindow(showUnavailableMessage);
             _pilotRosterWindow.WindowStartupLocation = WindowStartupLocation.Manual;
+            _pilotRosterWindow.Closed += (closedSender, args) =>
+            {
+                if (ReferenceEquals(_pilotRosterWindow, closedSender))
+                {
+                    _pilotRosterWindow = null;
+                }
+                UpdateWindowButtonLabels();
+            };
             _pilotRosterWindow.Show();
+            UpdateWindowButtonLabels();
         }
 
         private void ShowTransmitterName_OnClick_OnClick(object sender, RoutedEventArgs e)

@@ -53,21 +53,30 @@
                             <Setter TargetName="Content" Property="Margin" Value="0,1,0,-1" />
                         </Trigger>
                         <Trigger Property="IsEnabled" Value="False">
-                            <Setter Property="Foreground" Value="{StaticResource MilTextSecondaryBrush}" />
-                            <Setter TargetName="Face" Property="Background" Value="{StaticResource MilWellBrush}" />
-                            <Setter TargetName="Face" Property="BorderBrush" Value="#15FFF6DC" />
+                            <Setter Property="Foreground" Value="#B8AD94" />
+                            <Setter TargetName="Rim" Property="Background" Value="#100D08" />
+                            <Setter TargetName="Face" Property="Background" Value="#262117" />
+                            <Setter TargetName="Face" Property="BorderBrush" Value="#4B4537" />
                         </Trigger>
                     </ControlTemplate.Triggers>
                 </ControlTemplate>
             </Setter.Value>
         </Setter>
         <Style.Triggers>
-            <Trigger Property="IsMouseOver" Value="True">
+            <MultiTrigger>
+                <MultiTrigger.Conditions>
+                    <Condition Property="IsEnabled" Value="True" />
+                    <Condition Property="IsMouseOver" Value="True" />
+                </MultiTrigger.Conditions>
                 <Setter Property="Background" Value="{StaticResource MilBtnDarkHoverBrush}" />
-            </Trigger>
-            <Trigger Property="IsPressed" Value="True">
+            </MultiTrigger>
+            <MultiTrigger>
+                <MultiTrigger.Conditions>
+                    <Condition Property="IsEnabled" Value="True" />
+                    <Condition Property="IsPressed" Value="True" />
+                </MultiTrigger.Conditions>
                 <Setter Property="Background" Value="{StaticResource MilBtnDarkPressedBrush}" />
-            </Trigger>
+            </MultiTrigger>
         </Style.Triggers>
     </Style>
 
@@ -80,12 +89,20 @@
         <Setter Property="Background" Value="{StaticResource MilBtnBrassFaceBrush}" />
         <Setter Property="FontFamily" Value="{StaticResource MilFontMono}" />
         <Style.Triggers>
-            <Trigger Property="IsMouseOver" Value="True">
+            <MultiTrigger>
+                <MultiTrigger.Conditions>
+                    <Condition Property="IsEnabled" Value="True" />
+                    <Condition Property="IsMouseOver" Value="True" />
+                </MultiTrigger.Conditions>
                 <Setter Property="Background" Value="{StaticResource MilBtnBrassHoverBrush}" />
-            </Trigger>
-            <Trigger Property="IsPressed" Value="True">
+            </MultiTrigger>
+            <MultiTrigger>
+                <MultiTrigger.Conditions>
+                    <Condition Property="IsEnabled" Value="True" />
+                    <Condition Property="IsPressed" Value="True" />
+                </MultiTrigger.Conditions>
                 <Setter Property="Background" Value="{StaticResource MilBtnBrassPressedBrush}" />
-            </Trigger>
+            </MultiTrigger>
         </Style.Triggers>
     </Style>
 
@@ -147,7 +164,10 @@
                 <Setter Property="BorderBrush" Value="{StaticResource MilAccentBrush}" />
             </Trigger>
             <Trigger Property="IsEnabled" Value="False">
-                <Setter Property="Foreground" Value="{StaticResource MilTextSecondaryBrush}" />
+                <Setter Property="Foreground" Value="#B8AD94" />
+                <Setter Property="Background" Value="#211D16" />
+                <Setter Property="BorderBrush" Value="#4B4537" />
+                <Setter Property="CaretBrush" Value="#B8AD94" />
             </Trigger>
         </Style.Triggers>
     </Style>
@@ -162,15 +182,26 @@
                             BorderBrush="{StaticResource MilBorderBrush}"
                             BorderThickness="1"
                             CornerRadius="2">
-                        <Path HorizontalAlignment="Right"
+                        <Path x:Name="Arrow"
+                              HorizontalAlignment="Right"
                               VerticalAlignment="Center"
                               Margin="0,0,8,0"
                               Data="M 0 0 L 4 4 L 8 0 Z"
                               Fill="{StaticResource MilAccentBrush}" />
                     </Border>
                     <ControlTemplate.Triggers>
-                        <Trigger Property="IsMouseOver" Value="True">
+                        <MultiTrigger>
+                            <MultiTrigger.Conditions>
+                                <Condition Property="IsEnabled" Value="True" />
+                                <Condition Property="IsMouseOver" Value="True" />
+                            </MultiTrigger.Conditions>
                             <Setter TargetName="Bd" Property="BorderBrush" Value="{StaticResource MilAccentBrush}" />
+                        </MultiTrigger>
+                        <Trigger Property="IsEnabled" Value="False">
+                            <Setter TargetName="Bd" Property="Background" Value="#211D16" />
+                            <Setter TargetName="Bd" Property="BorderBrush" Value="#4B4537" />
+                            <Setter TargetName="Arrow" Property="Fill" Value="#6B6251" />
+                            <Setter TargetName="Arrow" Property="Opacity" Value="0.55" />
                         </Trigger>
                     </ControlTemplate.Triggers>
                 </ControlTemplate>
@@ -222,7 +253,7 @@
                     </Grid>
                     <ControlTemplate.Triggers>
                         <Trigger Property="IsEnabled" Value="False">
-                            <Setter Property="Foreground" Value="{StaticResource MilTextSecondaryBrush}" />
+                            <Setter Property="Foreground" Value="#B8AD94" />
                         </Trigger>
                     </ControlTemplate.Triggers>
                 </ControlTemplate>

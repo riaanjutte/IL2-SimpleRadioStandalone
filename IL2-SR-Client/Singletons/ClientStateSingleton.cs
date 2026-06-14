@@ -68,7 +68,7 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.Singletons
             set
             {
                 isConnectionErrored = value;
-                NotifyPropertyChanged("isConnectionErrored");
+                NotifyPropertyChanged("IsConnectionErrored");
             }
         }
 

@@ -221,6 +221,99 @@
                                          MaxLines="1"
                                          Text="127.0.0.1:6002"
                                          TextWrapping="Wrap" />
+                                <Border x:Name="ConnectionStatusStrip"
+                                        Width="220"
+                                        Height="38"
+                                        Margin="0,0,0,8"
+                                        BorderThickness="1">
+                                    <Border.Style>
+                                        <Style TargetType="Border">
+                                            <Setter Property="Background" Value="#2B251B" />
+                                            <Setter Property="BorderBrush" Value="{StaticResource MilLedOffBrush}" />
+                                            <Style.Triggers>
+                                                <DataTrigger Binding="{Binding ClientState.IsConnected}" Value="True">
+                                                    <Setter Property="Background" Value="#20301C" />
+                                                    <Setter Property="BorderBrush" Value="{StaticResource MilLedOnBrush}" />
+                                                </DataTrigger>
+                                                <DataTrigger Binding="{Binding ClientState.IsConnectionErrored}" Value="True">
+                                                    <Setter Property="Background" Value="#321C18" />
+                                                    <Setter Property="BorderBrush" Value="{StaticResource MilLedErrorBrush}" />
+                                                </DataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </Border.Style>
+                                    <Grid Margin="8,4">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="Auto" />
+                                            <ColumnDefinition Width="*" />
+                                        </Grid.ColumnDefinitions>
+                                        <Grid Width="16"
+                                              Height="16"
+                                              VerticalAlignment="Center">
+                                            <Ellipse Fill="{StaticResource MilLampBezelBrush}" />
+                                            <Ellipse x:Name="ConnectionStatusLamp"
+                                                     Margin="3">
+                                                <Ellipse.Style>
+                                                    <Style TargetType="Ellipse">
+                                                        <Setter Property="Fill" Value="{StaticResource MilLedOffBrush}" />
+                                                        <Style.Triggers>
+                                                            <DataTrigger Binding="{Binding ClientState.IsConnected}" Value="True">
+                                                                <Setter Property="Fill" Value="{StaticResource MilLedOnBrush}" />
+                                                            </DataTrigger>
+                                                            <DataTrigger Binding="{Binding ClientState.IsConnectionErrored}" Value="True">
+                                                                <Setter Property="Fill" Value="{StaticResource MilLedErrorBrush}" />
+                                                            </DataTrigger>
+                                                        </Style.Triggers>
+                                                    </Style>
+                                                </Ellipse.Style>
+                                            </Ellipse>
+                                            <Ellipse Margin="3" Fill="{StaticResource MilLampGlassBrush}" />
+                                        </Grid>
+                                        <StackPanel Grid.Column="1"
+                                                    Margin="8,0,0,0"
+                                                    VerticalAlignment="Center">
+                                            <TextBlock x:Name="ConnectionStatusText"
+                                                       FontFamily="{StaticResource MilFontMono}"
+                                                       FontSize="13"
+                                                       FontWeight="Bold">
+                                                <TextBlock.Style>
+                                                    <Style TargetType="TextBlock">
+                                                        <Setter Property="Foreground" Value="{StaticResource MilTextSecondaryBrush}" />
+                                                        <Setter Property="Text" Value="DISCONNECTED" />
+                                                        <Style.Triggers>
+                                                            <DataTrigger Binding="{Binding ClientState.IsConnected}" Value="True">
+                                                                <Setter Property="Foreground" Value="{StaticResource MilLedOnBrush}" />
+                                                                <Setter Property="Text" Value="CONNECTED" />
+                                                            </DataTrigger>
+                                                            <DataTrigger Binding="{Binding ClientState.IsConnectionErrored}" Value="True">
+                                                                <Setter Property="Foreground" Value="{StaticResource MilLedErrorBrush}" />
+                                                                <Setter Property="Text" Value="CONNECTION ERROR" />
+                                                            </DataTrigger>
+                                                        </Style.Triggers>
+                                                    </Style>
+                                                </TextBlock.Style>
+                                            </TextBlock>
+                                            <TextBlock x:Name="ConnectionStatusHint"
+                                                       Margin="0,1,0,0"
+                                                       FontSize="11"
+                                                       Foreground="{StaticResource MilTextSecondaryBrush}">
+                                                <TextBlock.Style>
+                                                    <Style TargetType="TextBlock">
+                                                        <Setter Property="Text" Value="Server link inactive" />
+                                                        <Style.Triggers>
+                                                            <DataTrigger Binding="{Binding ClientState.IsConnected}" Value="True">
+                                                                <Setter Property="Text" Value="Server link established" />
+                                                            </DataTrigger>
+                                                            <DataTrigger Binding="{Binding ClientState.IsConnectionErrored}" Value="True">
+                                                                <Setter Property="Text" Value="Check address or network" />
+                                                            </DataTrigger>
+                                                        </Style.Triggers>
+                                                    </Style>
+                                                </TextBlock.Style>
+                                            </TextBlock>
+                                        </StackPanel>
+                                    </Grid>
+                                </Border>
                                 <Button x:Name="StartStop"
                                         Width="220"
                                         Margin="0,0,0,8"
@@ -239,23 +332,23 @@
 
                         <GroupBox Grid.Column="1" Header="Overlays">
                         <StackPanel HorizontalAlignment="Center">
-                            <Button x:Name="ShowOverlay"
+                                <Button x:Name="ShowOverlay"
                                     Width="220"
                                     Margin="0,8,0,8"
                                     Click="ShowOverlay_OnClick"
-                                    Content="Toggle Radio Overlay"
+                                    Content="Show Radio Overlay"
                                     Style="{DynamicResource SquareButtonStyle}" />
                             <Button x:Name="ShowClientList"
                                     Width="220"
                                     Margin="0,0,0,8"
                                     Click="ShowClientList_OnClick"
-                                    Content="Toggle Client List"
+                                    Content="Show Client List"
                                     Style="{DynamicResource SquareButtonStyle}" />
                             <Button x:Name="ShowPilotRoster"
                                     Width="220"
                                     Margin="0,0,0,8"
                                     Click="ShowPilotRoster_OnClick"
-                                    Content="Toggle Pilot Roster"
+                                    Content="Show Pilot Roster"
                                     Style="{DynamicResource SquareButtonStyle}" />
                             <StackPanel x:Name="RciStatusPanel"
                                         Margin="0,4,0,5"
