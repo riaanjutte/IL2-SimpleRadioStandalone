@@ -5,6 +5,8 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
+using System.Windows;
+using System.Windows.Input;
 using System.Windows.Threading;
 using Ciribob.IL2.SimpleRadio.Standalone.Client.Localization;
 using Ciribob.IL2.SimpleRadio.Standalone.Client.Singletons;
@@ -15,7 +17,7 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI.ClientWindow.ClientList
     /// <summary>
     /// Interaction logic for ClientListWindow.xaml
     /// </summary>
-    public partial class ClientListWindow :  MetroWindow
+    public partial class ClientListWindow :  Window
     {
         private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
         private readonly DispatcherTimer _updateTimer;
@@ -78,6 +80,14 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI.ClientWindow.ClientList
         private void UpdateTimer_Tick(object sender, EventArgs e)
         {
             UpdateList();
+        }
+
+        private void ClientListWindow_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+        {
+            if (e.ChangedButton == MouseButton.Left)
+            {
+                DragMove();
+            }
         }
 
         protected override void OnClosing(CancelEventArgs e)

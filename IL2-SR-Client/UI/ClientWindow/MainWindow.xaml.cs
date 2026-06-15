@@ -82,6 +82,8 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI
         private readonly DelegateCommand _connectCommand;
         private bool _initialisingLanguagePicker;
         private bool _initialisingThemePicker;
+        private bool _initialisingOverlayOpacitySliders;
+        private bool _initialisingWeatheringControls;
         private const string ThemeBakelite = "Bakelite";
         private const string ThemeGrey = "Grey";
 
@@ -105,6 +107,12 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI
         private const double DefaultPilotRosterY = 260;
         private const double DefaultPilotRosterWidth = 560;
         private const double DefaultPilotRosterHeight = 420;
+        private const double DefaultOverlayOpacity = 1.0;
+        private const double DefaultWeatheringOpacity = 0.5;
+        private const string WeatheringOpacityResourceKey = "WeatheringOpacity";
+        private const string WeatheringExtraOpacityResourceKey = "WeatheringExtraOpacity";
+        private const string OverlayWeatheringOpacityResourceKey = "OverlayWeatheringOpacity";
+        private const string OverlayWeatheringExtraOpacityResourceKey = "OverlayWeatheringExtraOpacity";
 
         /// <remarks>Used in the XAML for DataBinding many things</remarks>
         public ClientStateSingleton ClientState { get; } = ClientStateSingleton.Instance;
@@ -125,6 +133,7 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI
         {
             GCSettings.LatencyMode = GCLatencyMode.SustainedLowLatency;
 
+            _initialisingOverlayOpacitySliders = true;
             InitializeComponent();
             LocalizationManager.LocalizeElement(this);
             RciStatusLabel.Text = LocalizationManager.Get("RCI");
@@ -186,6 +195,9 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI
             FavouriteServersViewModel = new FavouriteServersViewModel(new CsvFavouriteServerStore());
 
             InitDefaultAddress();
+
+            InitOverlayOpacitySliders();
+            InitWeatheringControls();
 
             SpeakerBoost.Value = _globalSettings.GetClientSetting(GlobalSettingsKeys.SpeakerBoost).DoubleValue;
 
@@ -909,6 +921,7 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI
             yield return PlayConnectionSounds;
             yield return RequireAdminToggle;
             yield return ShowTransmitterName;
+            yield return WeatheringEffectToggle;
             yield return RadioSwitchIsPTT;
             yield return RadioTxStartToggle;
             yield return RadioTxEndToggle;
@@ -1355,6 +1368,7 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI
         private void UpdateCombatBoxFeatureVisibility(bool showCombatBoxFeatures)
         {
             ShowPilotRoster.Visibility = Visibility.Visible;
+            CombatBoxRciPanel.Visibility = showCombatBoxFeatures ? Visibility.Visible : Visibility.Collapsed;
 
             if (!showCombatBoxFeatures && (_pilotRosterWindow?.IsUnavailableMode == false))
             {
@@ -1535,7 +1549,8 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI
 
             _radioOverlayWindow = new Overlay.RadioOverlayWindow
             {
-                ShowInTaskbar = !_globalSettings.GetClientSettingBool(GlobalSettingsKeys.RadioOverlayTaskbarHide)
+                ShowInTaskbar = !_globalSettings.GetClientSettingBool(GlobalSettingsKeys.RadioOverlayTaskbarHide),
+                Opacity = GetOverlayOpacity(GlobalSettingsKeys.RadioOpacity)
             };
             _radioOverlayWindow.Closed += (sender, args) =>
             {
@@ -1548,6 +1563,136 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI
             _radioOverlayWindow.SetRciIndicatorEnabled(ShouldShowRciStatus());
             _radioOverlayWindow.Show();
             UpdateWindowButtonLabels();
+        }
+
+        private void InitOverlayOpacitySliders()
+        {
+            _initialisingOverlayOpacitySliders = true;
+            try
+            {
+                RadioOverlayOpacitySlider.Value = GetOverlayOpacity(GlobalSettingsKeys.RadioOpacity);
+                ClientListOpacitySlider.Value = GetOverlayOpacity(GlobalSettingsKeys.ClientListOpacity);
+                PilotRosterOpacitySlider.Value = GetOverlayOpacity(GlobalSettingsKeys.PilotRosterOpacity);
+            }
+            finally
+            {
+                _initialisingOverlayOpacitySliders = false;
+            }
+        }
+
+        private double GetOverlayOpacity(GlobalSettingsKeys key)
+        {
+            return _globalSettings.GetBoundedPositionSetting(key, DefaultOverlayOpacity, 0.05, 1.0);
+        }
+
+        private void SetOverlayOpacity(GlobalSettingsKeys key, Window window, double value)
+        {
+            if (_initialisingOverlayOpacitySliders)
+            {
+                return;
+            }
+
+            _globalSettings.SetPositionSetting(key, value);
+
+            if (window != null)
+            {
+                window.Opacity = value;
+            }
+        }
+
+        private void RadioOverlayOpacitySlider_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
+        {
+            SetOverlayOpacity(GlobalSettingsKeys.RadioOpacity, _radioOverlayWindow, e.NewValue);
+        }
+
+        private void ClientListOpacitySlider_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
+        {
+            SetOverlayOpacity(GlobalSettingsKeys.ClientListOpacity, _clientListWindow, e.NewValue);
+        }
+
+        private void PilotRosterOpacitySlider_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
+        {
+            SetOverlayOpacity(GlobalSettingsKeys.PilotRosterOpacity, _pilotRosterWindow, e.NewValue);
+        }
+
+        private void InitWeatheringControls()
+        {
+            _initialisingWeatheringControls = true;
+            try
+            {
+                var enabled = _globalSettings.GetClientSettingBool(GlobalSettingsKeys.WeatheringEnabled);
+                WeatheringEffectToggle.IsChecked = enabled;
+                WeatheringOpacitySlider.Value = GetWeatheringOpacity();
+                WeatheringOpacitySlider.IsEnabled = enabled;
+            }
+            finally
+            {
+                _initialisingWeatheringControls = false;
+            }
+
+            ApplyWeatheringOpacity();
+        }
+
+        private double GetWeatheringOpacity()
+        {
+            return _globalSettings.GetBoundedPositionSetting(
+                GlobalSettingsKeys.WeatheringOpacity,
+                DefaultWeatheringOpacity,
+                0.0,
+                2.0);
+        }
+
+        private void ApplyWeatheringOpacity()
+        {
+            var enabled = _globalSettings.GetClientSettingBool(GlobalSettingsKeys.WeatheringEnabled);
+            var rawOpacity = enabled ? GetWeatheringOpacity() : 0.0;
+            var opacity = Math.Min(rawOpacity, 1.0);
+            var extraOpacity = Math.Max(0.0, rawOpacity - 1.0);
+            var overlayOpacity = opacity * 0.5;
+            var overlayExtraOpacity = extraOpacity * 0.5;
+            Application.Current.Resources[WeatheringOpacityResourceKey] = opacity;
+            Application.Current.Resources[WeatheringExtraOpacityResourceKey] = extraOpacity;
+            Application.Current.Resources[OverlayWeatheringOpacityResourceKey] = overlayOpacity;
+            Application.Current.Resources[OverlayWeatheringExtraOpacityResourceKey] = overlayExtraOpacity;
+            Resources[WeatheringOpacityResourceKey] = opacity;
+            Resources[WeatheringExtraOpacityResourceKey] = extraOpacity;
+            Resources[OverlayWeatheringOpacityResourceKey] = overlayOpacity;
+            Resources[OverlayWeatheringExtraOpacityResourceKey] = overlayExtraOpacity;
+
+            foreach (Window window in Application.Current.Windows)
+            {
+                window.Resources[WeatheringOpacityResourceKey] = opacity;
+                window.Resources[WeatheringExtraOpacityResourceKey] = extraOpacity;
+                window.Resources[OverlayWeatheringOpacityResourceKey] = overlayOpacity;
+                window.Resources[OverlayWeatheringExtraOpacityResourceKey] = overlayExtraOpacity;
+            }
+
+            if (WeatheringOpacitySlider != null)
+            {
+                WeatheringOpacitySlider.IsEnabled = enabled;
+            }
+        }
+
+        private void WeatheringEffectToggle_Click(object sender, RoutedEventArgs e)
+        {
+            if (_initialisingWeatheringControls)
+            {
+                return;
+            }
+
+            _globalSettings.SetClientSetting(GlobalSettingsKeys.WeatheringEnabled, (bool)WeatheringEffectToggle.IsChecked);
+            ApplyWeatheringOpacity();
+        }
+
+        private void WeatheringOpacitySlider_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
+        {
+            if (_initialisingWeatheringControls)
+            {
+                return;
+            }
+
+            _globalSettings.SetPositionSetting(GlobalSettingsKeys.WeatheringOpacity, e.NewValue);
+            ApplyWeatheringOpacity();
         }
 
      
@@ -1646,6 +1791,10 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI
             _globalSettings.SetPositionSetting(GlobalSettingsKeys.RadioHeight, 300);
                          
             _globalSettings.SetPositionSetting(GlobalSettingsKeys.RadioOpacity, 1.0);
+            if (RadioOverlayOpacitySlider != null)
+            {
+                RadioOverlayOpacitySlider.Value = 1.0;
+            }
         }
 
         private void ToggleServerSettings_OnClick(object sender, RoutedEventArgs e)
@@ -2025,7 +2174,10 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI
             {
                 _clientListWindow?.Close();
 
-                _clientListWindow = new ClientListWindow();
+                _clientListWindow = new ClientListWindow
+                {
+                    Opacity = GetOverlayOpacity(GlobalSettingsKeys.ClientListOpacity)
+                };
                 _clientListWindow.WindowStartupLocation = WindowStartupLocation.CenterOwner;
                 _clientListWindow.Owner = this;
                 _clientListWindow.Closed += (closedSender, args) =>
@@ -2085,7 +2237,10 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI
 
             _pilotRosterWindow?.Close();
 
-            _pilotRosterWindow = new PilotRosterWindow(showUnavailableMessage);
+            _pilotRosterWindow = new PilotRosterWindow(showUnavailableMessage)
+            {
+                Opacity = GetOverlayOpacity(GlobalSettingsKeys.PilotRosterOpacity)
+            };
             _pilotRosterWindow.WindowStartupLocation = WindowStartupLocation.Manual;
             _pilotRosterWindow.Closed += (closedSender, args) =>
             {

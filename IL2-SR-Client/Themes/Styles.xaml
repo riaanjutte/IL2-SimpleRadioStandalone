@@ -2,6 +2,7 @@
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
                     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+                    xmlns:sys="clr-namespace:System;assembly=mscorlib"
                     xmlns:utils="clr-namespace:Ciribob.IL2.SimpleRadio.Standalone.Client.Utils"
                     mc:Ignorable="d">
 
@@ -60,6 +61,10 @@
     <SolidColorBrush x:Key="MouseOverButtonBackground" Color="#AAAAAA" />
     <SolidColorBrush x:Key="DisabledButtonBackground" Color="#2E3235" />
     <SolidColorBrush x:Key="DisabledButtonForeground" Color="#A8ADB2" />
+    <sys:Double x:Key="WeatheringOpacity">1.0</sys:Double>
+    <sys:Double x:Key="WeatheringExtraOpacity">0.0</sys:Double>
+    <sys:Double x:Key="OverlayWeatheringOpacity">0.5</sys:Double>
+    <sys:Double x:Key="OverlayWeatheringExtraOpacity">0.0</sys:Double>
 
     <!-- OverlayEquipmentPanelBrush / OverlayRaisedControlBrush / OverlayPressedControlBrush /
          OverlayRaisedBorderBrush / OverlayEdgeHighlightBrush are theme-dependent and now
@@ -141,7 +146,7 @@
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="{x:Type ContentControl}">
-                    <Grid Margin="3,2,3,2">
+                    <Grid Margin="2,0.5,2,0.5">
                         <Border Background="{DynamicResource OverlayEquipmentPanelBrush}"
                                 BorderBrush="#15170F"
                                 BorderThickness="1"
@@ -156,12 +161,24 @@
                         <Border Background="{StaticResource OverlayWeatheringTexture}"
                                 CornerRadius="3"
                                 IsHitTestVisible="False"
+                                Opacity="{DynamicResource OverlayWeatheringOpacity}"
+                                Style="{x:Null}" />
+                        <Border Background="{StaticResource OverlayWeatheringTexture}"
+                                CornerRadius="3"
+                                IsHitTestVisible="False"
+                                Opacity="{DynamicResource OverlayWeatheringExtraOpacity}"
                                 Style="{x:Null}" />
                         <Rectangle RadiusX="3"
                                    RadiusY="3"
                                    IsHitTestVisible="False"
+                                   Opacity="{DynamicResource OverlayWeatheringOpacity}"
                                    utils:PanelWeathering.Enabled="True" />
-                        <ContentPresenter Margin="9,5,9,5" />
+                        <Rectangle RadiusX="3"
+                                   RadiusY="3"
+                                   IsHitTestVisible="False"
+                                   Opacity="{DynamicResource OverlayWeatheringExtraOpacity}"
+                                   utils:PanelWeathering.Enabled="True" />
+                        <ContentPresenter Margin="9,4,9,4" />
                         <Control Template="{StaticResource OverlayScrew}"
                                  HorizontalAlignment="Left" VerticalAlignment="Top" Margin="2.5" />
                         <Control Template="{StaticResource OverlayScrew}"
@@ -190,7 +207,7 @@
     <Style x:Key="OverlaySliderThumb" TargetType="{x:Type Thumb}">
         <Setter Property="Focusable" Value="False" />
         <Setter Property="Width" Value="8" />
-        <Setter Property="Height" Value="16" />
+        <Setter Property="Height" Value="12" />
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="{x:Type Thumb}">
@@ -211,7 +228,7 @@
     </Style>
 
     <Style x:Key="OverlaySlider" TargetType="{x:Type Slider}">
-        <Setter Property="Height" Value="18" />
+        <Setter Property="Height" Value="14" />
         <Setter Property="IsMoveToPointEnabled" Value="True" />
         <Setter Property="Template">
             <Setter.Value>

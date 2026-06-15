@@ -573,6 +573,11 @@
                                 <!-- procedural wear: scratches, scuffs, edge grime -->
                                 <Rectangle RadiusX="5"
                                            RadiusY="5"
+                                           Opacity="{DynamicResource WeatheringOpacity}"
+                                           utils:PanelWeathering.Enabled="True" />
+                                <Rectangle RadiusX="5"
+                                           RadiusY="5"
+                                           Opacity="{DynamicResource WeatheringExtraOpacity}"
                                            utils:PanelWeathering.Enabled="True" />
 
                                 <!-- corner screws -->

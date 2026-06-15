@@ -35,13 +35,32 @@
                     Orientation="Vertical"
                     Background="Transparent">
 
-        <!-- Plate 1: assigned callsign + Radio 1 -->
+        <!-- Plate 1: Radio 1 -->
         <ContentControl Style="{StaticResource OverlayPlate}">
+            <radioOverlayWindow:RadioControlGroup x:Name="Radio1" RadioId="1" />
+        </ContentControl>
+
+        <!-- Plate 2: Radio 2 (shown when a second radio is available) -->
+        <ContentControl x:Name="Radio2Plate"
+                        Style="{StaticResource OverlayPlate}"
+                        Visibility="{Binding ElementName=Radio2, Path=Visibility}">
+            <radioOverlayWindow:RadioControlGroup x:Name="Radio2" RadioId="2" Visibility="Collapsed" />
+        </ContentControl>
+
+        <!-- Plate 3: Intercom -->
+        <ContentControl Style="{StaticResource OverlayPlate}">
+            <local:IntercomControlGroup x:Name="Intercom" RadioId="0" />
+        </ContentControl>
+
+        <!-- Plate 4: Callsign + RCI status -->
+        <ContentControl x:Name="BottomStatusPlate"
+                        Style="{StaticResource OverlayPlate}"
+                        Visibility="Collapsed">
             <StackPanel Orientation="Vertical">
                 <Border x:Name="AssignedCallsignPanel"
                         Width="122"
                         Height="14"
-                        Margin="0,0,0,2"
+                        Margin="0,0,0,1"
                         HorizontalAlignment="Center"
                         Background="{StaticResource OverlayDisplayBrush}"
                         BorderBrush="#242824"
@@ -70,25 +89,7 @@
                         </Canvas>
                     </Grid>
                 </Border>
-                <radioOverlayWindow:RadioControlGroup x:Name="Radio1" RadioId="1" />
-            </StackPanel>
-        </ContentControl>
 
-        <!-- Plate 2: Radio 2 (shown when a second radio is available) -->
-        <ContentControl x:Name="Radio2Plate"
-                        Style="{StaticResource OverlayPlate}"
-                        Visibility="{Binding ElementName=Radio2, Path=Visibility}">
-            <radioOverlayWindow:RadioControlGroup x:Name="Radio2" RadioId="2" Visibility="Collapsed" />
-        </ContentControl>
-
-        <!-- Plate 3: Intercom -->
-        <ContentControl Style="{StaticResource OverlayPlate}">
-            <local:IntercomControlGroup x:Name="Intercom" RadioId="0" />
-        </ContentControl>
-
-        <!-- Plate 4: RCI status + window opacity -->
-        <ContentControl Style="{StaticResource OverlayPlate}">
-            <StackPanel Orientation="Vertical">
                 <StackPanel x:Name="RciStatusPanel"
                             Width="122"
                             HorizontalAlignment="Center"
@@ -136,18 +137,6 @@
                                TextTrimming="CharacterEllipsis"
                                Visibility="Collapsed" />
                 </StackPanel>
-
-                <Slider Margin="0,3,0,0" x:Name="WindowOpacitySlider"
-                        Width="122"
-                        Height="18"
-                        VerticalAlignment="Center"
-                        HorizontalAlignment="Center"
-                        Style="{StaticResource OverlaySlider}"
-                        Maximum="1.0"
-                        Minimum="0.05"
-                        ToolTip="Window Opacity"
-                        ValueChanged="windowOpacitySlider_ValueChanged"
-                        Value="1.0" />
             </StackPanel>
         </ContentControl>
         </StackPanel>

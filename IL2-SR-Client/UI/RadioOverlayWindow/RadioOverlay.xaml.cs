@@ -77,7 +77,6 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Overlay
 
             AllowsTransparency = true;
             Opacity = _globalSettings.GetBoundedPositionSetting(GlobalSettingsKeys.RadioOpacity, DefaultOverlayOpacity, 0.0, 1.0);
-            WindowOpacitySlider.Value = Opacity;
 
             //allows click and drag anywhere on the window
             ContainerPanel.MouseLeftButtonDown += WrapPanel_MouseLeftButtonDown;
@@ -171,9 +170,23 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Overlay
             }
 
             var previousVisibility = AssignedCallsignPanel.Visibility;
+            if (!_rciIndicatorEnabled)
+            {
+                SetAssignedCallsignText(string.Empty);
+                AssignedCallsignPanel.Visibility = Visibility.Collapsed;
+                UpdateBottomStatusPlateVisibility();
+
+                if (previousVisibility != AssignedCallsignPanel.Visibility)
+                {
+                    UpdateOverlayMinimumHeight();
+                }
+
+                return;
+            }
+
             var assignedCallsign = ConnectedClientsSingleton.Instance.GetOwnAssignedCallsign();
             var hasAssignedCallsign = !string.IsNullOrWhiteSpace(assignedCallsign);
-            var showRequestPrompt = !hasAssignedCallsign && _rciIndicatorEnabled;
+            var showRequestPrompt = !hasAssignedCallsign;
             var friendlyRciCallsigns = showRequestPrompt && _clientStateSingleton.PlayerGameState != null
                 ? ConnectedClientsSingleton.Instance.GetFriendlyRciCallsign(_clientStateSingleton.PlayerGameState.coalition)
                 : string.Empty;
@@ -218,6 +231,7 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Overlay
 
             if (previousVisibility != AssignedCallsignPanel.Visibility)
             {
+                UpdateBottomStatusPlateVisibility();
                 UpdateOverlayMinimumHeight();
             }
         }
@@ -322,6 +336,7 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Overlay
             if (!_rciIndicatorEnabled)
             {
                 UpdateRciCallsignLabel(string.Empty);
+                UpdateBottomStatusPlateVisibility();
                 UpdateOverlayMinimumHeightIfChanged(previousRciVisibility, previousCallsignVisibility);
                 return;
             }
@@ -335,6 +350,7 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Overlay
             RciStatusLabel.Text = displayState.StatusText;
             RciStatusLabel.Foreground = displayState.OverlayStatusForeground;
             UpdateRciCallsignLabel(displayState.RcoOnDutyText);
+            UpdateBottomStatusPlateVisibility();
             UpdateOverlayMinimumHeightIfChanged(previousRciVisibility, previousCallsignVisibility);
         }
 
@@ -431,6 +447,7 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Overlay
             RciStatusLabel.Text = state.RciStatusText;
             RciStatusLabel.Foreground = state.RciStatusForeground;
             UpdateRciCallsignLabel(state.RciCallsignText);
+            UpdateBottomStatusPlateVisibility();
             UpdateOverlayMinimumHeight();
         }
 
@@ -473,11 +490,26 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Overlay
 
         private void UpdateOverlayMinimumHeightIfChanged(Visibility previousRciVisibility, Visibility previousCallsignVisibility)
         {
+            var previousBottomPlateVisibility = BottomStatusPlate.Visibility;
+            UpdateBottomStatusPlateVisibility();
+
             if (previousRciVisibility != RciStatusPanel.Visibility ||
-                previousCallsignVisibility != RciCallsignLabel.Visibility)
+                previousCallsignVisibility != RciCallsignLabel.Visibility ||
+                previousBottomPlateVisibility != BottomStatusPlate.Visibility)
             {
                 UpdateOverlayMinimumHeight();
             }
+        }
+
+        private void UpdateBottomStatusPlateVisibility()
+        {
+            BottomStatusPlate.Visibility =
+                _rciIndicatorEnabled &&
+                AssignedCallsignPanel.Visibility == Visibility.Visible ||
+                _rciIndicatorEnabled &&
+                RciStatusPanel.Visibility == Visibility.Visible
+                    ? Visibility.Visible
+                    : Visibility.Collapsed;
         }
 
         private void UpdateOverlayMinimumHeight()
@@ -560,11 +592,6 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Overlay
             _hwndSource?.RemoveHook(WndProc);
             _updateTimer.Stop();
             _overlayTestTimer?.Stop();
-        }
-
-        private void windowOpacitySlider_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
-        {
-            Opacity = e.NewValue;
         }
 
         private void CalculateScale()

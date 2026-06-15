@@ -17,6 +17,8 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Overlay
         private const string IntercomLabelText = "CREW INTERCOM";
         private const int MaxIntercomSpeakerNameLength = 14;
         private static readonly Color ActiveGreen = (Color)ColorConverter.ConvertFromString("#96FF6D");
+        private static readonly Color InactiveGrey = (Color)ColorConverter.ConvertFromString("#3A3A3A");
+        private static readonly Color TxRed = (Color)ColorConverter.ConvertFromString("#FF3B30");
         private bool _dragging;
         private bool _syncingSliderFromState;
         private readonly ClientStateSingleton _clientStateSingleton = ClientStateSingleton.Instance;
@@ -68,7 +70,7 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Overlay
 
             if ((IL2PlayerRadioInfo == null) || !_clientStateSingleton.IsConnected)
             {
-                RadioActive.Fill = CreateStatusBrush(Colors.Red);
+                UpdateStatusLeds(false, false, true);
                 RadioLabel.Content = LocalizedIntercomLabelText;
                 RadioLabel.FontSize = 7;
                 RadioLabel.ToolTip = null;
@@ -84,25 +86,10 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Overlay
                 var currentRadio = IL2PlayerRadioInfo.radios[RadioId];
                 var transmitting = _clientStateSingleton.RadioSendingState;
                 var receiving = _clientStateSingleton.RadioReceivingState[0];
-                var speakingOnThisRadio = transmitting.IsSending && (transmitting.SendingOn == RadioId)
-                                          || receiving != null && receiving.IsReceiving;
+                var txActive = transmitting.IsSending && transmitting.SendingOn == RadioId;
+                var rxActive = receiving != null && receiving.IsReceiving;
                 UpdateIntercomLabel(receiving);
-
-                if (RadioId == IL2PlayerRadioInfo.selected)
-                {
-                    if (speakingOnThisRadio)
-                    {
-                        RadioActive.Fill = CreateStatusBrush(ActiveGreen);
-                    }
-                    else
-                    {
-                        RadioActive.Fill = CreateStatusBrush(Colors.Green);
-                    }
-                }
-                else
-                {
-                    RadioActive.Fill = CreateStatusBrush(speakingOnThisRadio ? ActiveGreen : Colors.Green);
-                }
+                UpdateStatusLeds(txActive, rxActive, false);
 
                 if (receiving != null && receiving.IsReceiving)
                 {
@@ -134,6 +121,19 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Overlay
                     _syncingSliderFromState = false;
                 }
             }
+        }
+
+        private void UpdateStatusLeds(bool txActive, bool rxActive, bool disconnected)
+        {
+            if (disconnected)
+            {
+                TxActive.Fill = CreateStatusBrush(Colors.Red);
+                RxActive.Fill = CreateStatusBrush(Colors.Red);
+                return;
+            }
+
+            TxActive.Fill = CreateStatusBrush(txActive ? TxRed : InactiveGrey);
+            RxActive.Fill = CreateStatusBrush(rxActive ? ActiveGreen : InactiveGrey);
         }
 
         private void UpdateIntercomLabel(RadioReceivingState receiving)

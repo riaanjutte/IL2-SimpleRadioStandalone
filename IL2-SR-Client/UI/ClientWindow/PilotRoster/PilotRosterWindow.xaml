@@ -1,7 +1,6 @@
-<controls:MetroWindow x:Class="Ciribob.IL2.SimpleRadio.Standalone.Client.UI.ClientWindow.PilotRoster.PilotRosterWindow"
+<Window x:Class="Ciribob.IL2.SimpleRadio.Standalone.Client.UI.ClientWindow.PilotRoster.PilotRosterWindow"
                       xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
                       xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-                      xmlns:controls="clr-namespace:MahApps.Metro.Controls;assembly=MahApps.Metro"
                       Name="PilotRosterWin"
                       Title="IL2-SRS Pilot Roster"
                       MinWidth="460"
@@ -9,15 +8,11 @@
                       Width="560"
                       Height="420"
                       ShowInTaskbar="True"
-                      ShowTitleBar="False"
-                      ShowMinButton="False"
-                      ShowMaxRestoreButton="False"
-                      ShowCloseButton="False"
                       WindowStyle="None"
-                      AllowsTransparency="False"
+                      AllowsTransparency="True"
                       ResizeMode="CanResizeWithGrip"
-                      Background="#242820">
-    <controls:MetroWindow.Resources>
+                      Background="Transparent">
+    <Window.Resources>
         <Style x:Key="RosterCellTextStyle" TargetType="{x:Type TextBlock}">
             <Setter Property="Foreground" Value="#F1E6BD" />
             <Setter Property="FontFamily" Value="pack://application:,,,/IL2-SR-ClientRadio;component/Fonts/#Just Another Hand" />
@@ -69,7 +64,7 @@
                 </Trigger>
             </Style.Triggers>
         </Style>
-    </controls:MetroWindow.Resources>
+    </Window.Resources>
 
     <Grid ClipToBounds="True">
     <Border x:Name="RosterFrame"
@@ -150,4 +145,4 @@
         </Grid>
     </Border>
     </Grid>
-</controls:MetroWindow>
+</Window>

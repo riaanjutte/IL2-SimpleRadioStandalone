@@ -330,59 +330,126 @@
                             </StackPanel>
                         </GroupBox>
 
-                        <GroupBox Grid.Column="1" Header="Overlays">
-                        <StackPanel HorizontalAlignment="Center">
-                                <Button x:Name="ShowOverlay"
-                                    Width="220"
-                                    Margin="0,8,0,8"
-                                    Click="ShowOverlay_OnClick"
-                                    Content="Show Radio Overlay"
-                                    Style="{DynamicResource SquareButtonStyle}" />
-                            <Button x:Name="ShowClientList"
-                                    Width="220"
-                                    Margin="0,0,0,8"
-                                    Click="ShowClientList_OnClick"
-                                    Content="Show Client List"
-                                    Style="{DynamicResource SquareButtonStyle}" />
-                            <Button x:Name="ShowPilotRoster"
-                                    Width="220"
-                                    Margin="0,0,0,8"
-                                    Click="ShowPilotRoster_OnClick"
-                                    Content="Show Pilot Roster"
-                                    Style="{DynamicResource SquareButtonStyle}" />
-                            <StackPanel x:Name="RciStatusPanel"
-                                        Margin="0,4,0,5"
-                                        HorizontalAlignment="Center"
-                                        Visibility="Collapsed">
-                                <Grid Width="220"
-                                      Height="18">
-                                    <Border x:Name="RciStatusIndicator"
-                                            Background="#444"
-                                            BorderBrush="#666"
-                                            BorderThickness="1" />
-                                    <TextBlock x:Name="RciStatusLabel"
+                        <Grid Grid.Column="1"
+                              Margin="0,5,0,5">
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="*" />
+                                <RowDefinition Height="Auto" />
+                            </Grid.RowDefinitions>
+
+                            <GroupBox Grid.Row="0" Header="Overlays" Margin="0">
+                                <StackPanel HorizontalAlignment="Center"
+                                            VerticalAlignment="Center">
+                                    <Grid Width="260" Margin="0,8,0,8">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="170" />
+                                            <ColumnDefinition Width="10" />
+                                            <ColumnDefinition Width="80" />
+                                        </Grid.ColumnDefinitions>
+                                        <Button x:Name="ShowOverlay"
+                                                Grid.Column="0"
+                                                Width="170"
+                                                Click="ShowOverlay_OnClick"
+                                                Content="Show Radio Overlay"
+                                                Style="{DynamicResource SquareButtonStyle}" />
+                                        <Slider x:Name="RadioOverlayOpacitySlider"
+                                                Grid.Column="2"
+                                                Width="80"
+                                                VerticalAlignment="Center"
+                                                IsMoveToPointEnabled="True"
+                                                Maximum="1.0"
+                                                Minimum="0.05"
+                                                ToolTip="Radio Overlay Opacity"
+                                                Value="1.0"
+                                                ValueChanged="RadioOverlayOpacitySlider_ValueChanged" />
+                                    </Grid>
+                                    <Grid Width="260" Margin="0,0,0,8">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="170" />
+                                            <ColumnDefinition Width="10" />
+                                            <ColumnDefinition Width="80" />
+                                        </Grid.ColumnDefinitions>
+                                        <Button x:Name="ShowClientList"
+                                                Grid.Column="0"
+                                                Width="170"
+                                                Click="ShowClientList_OnClick"
+                                                Content="Show Client List"
+                                                Style="{DynamicResource SquareButtonStyle}" />
+                                        <Slider x:Name="ClientListOpacitySlider"
+                                                Grid.Column="2"
+                                                Width="80"
+                                                VerticalAlignment="Center"
+                                                IsMoveToPointEnabled="True"
+                                                Maximum="1.0"
+                                                Minimum="0.05"
+                                                ToolTip="Client List Opacity"
+                                                Value="1.0"
+                                                ValueChanged="ClientListOpacitySlider_ValueChanged" />
+                                    </Grid>
+                                    <Grid Width="260" Margin="0,0,0,8">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="170" />
+                                            <ColumnDefinition Width="10" />
+                                            <ColumnDefinition Width="80" />
+                                        </Grid.ColumnDefinitions>
+                                        <Button x:Name="ShowPilotRoster"
+                                                Grid.Column="0"
+                                                Width="170"
+                                                Click="ShowPilotRoster_OnClick"
+                                                Content="Show Pilot Roster"
+                                                Style="{DynamicResource SquareButtonStyle}" />
+                                        <Slider x:Name="PilotRosterOpacitySlider"
+                                                Grid.Column="2"
+                                                Width="80"
+                                                VerticalAlignment="Center"
+                                                IsMoveToPointEnabled="True"
+                                                Maximum="1.0"
+                                                Minimum="0.05"
+                                                ToolTip="Pilot Roster Opacity"
+                                                Value="1.0"
+                                                ValueChanged="PilotRosterOpacitySlider_ValueChanged" />
+                                    </Grid>
+                                </StackPanel>
+                            </GroupBox>
+
+                            <GroupBox x:Name="CombatBoxRciPanel"
+                                      Grid.Row="1"
+                                      Header="Combat Box RCI"
+                                      Margin="0"
+                                      Visibility="Collapsed">
+                                <StackPanel x:Name="RciStatusPanel"
+                                            Margin="0,4,0,5"
+                                            HorizontalAlignment="Center"
+                                            Visibility="Collapsed">
+                                    <Grid Width="220"
+                                          Height="18">
+                                        <Border x:Name="RciStatusIndicator"
+                                                Background="#444"
+                                                BorderBrush="#666"
+                                                BorderThickness="1" />
+                                        <TextBlock x:Name="RciStatusLabel"
+                                                   HorizontalAlignment="Center"
+                                                   VerticalAlignment="Center"
+                                                   FontFamily="Courier New"
+                                                   FontSize="12"
+                                                   FontWeight="Bold"
+                                                   Foreground="#E7E7E7"
+                                                   Text="RCI" />
+                                    </Grid>
+                                    <TextBlock x:Name="RciCallsignLabel"
+                                               Width="220"
+                                               Margin="0,2,0,0"
                                                HorizontalAlignment="Center"
-                                               VerticalAlignment="Center"
                                                FontFamily="Courier New"
                                                FontSize="12"
                                                FontWeight="Bold"
-                                               Foreground="#E7E7E7"
-                                               Text="RCI" />
-                                </Grid>
-                                <TextBlock x:Name="RciCallsignLabel"
-                                           Width="220"
-                                           Margin="0,2,0,0"
-                                           HorizontalAlignment="Center"
-                                           FontFamily="Courier New"
-                                           FontSize="12"
-                                           FontWeight="Bold"
-                                           Foreground="{StaticResource ForegroundBrush}"
-                                           TextAlignment="Center"
-                                           TextTrimming="CharacterEllipsis"
-                                           Visibility="Collapsed" />
-                            </StackPanel>
-                        </StackPanel>
-                        </GroupBox>
+                                               Foreground="{StaticResource ForegroundBrush}"
+                                               TextAlignment="Center"
+                                               TextTrimming="CharacterEllipsis"
+                                               Visibility="Collapsed" />
+                                </StackPanel>
+                            </GroupBox>
+                        </Grid>
                     </Grid>
                     <GroupBox Header="Favourites">
                         <clientWindow:FavouriteServersView DataContext="{Binding Path=FavouriteServersViewModel}" MaxHeight="230" />
@@ -618,6 +685,7 @@
 
                             </Grid.ColumnDefinitions>
                             <Grid.RowDefinitions>
+                                <RowDefinition />
                                 <RowDefinition />
                                 <RowDefinition />
                                 <RowDefinition />
@@ -976,6 +1044,50 @@
                                       HorizontalContentAlignment="Center"
                                       VerticalContentAlignment="Center"
                                       SelectionChanged="ThemePicker_SelectionChanged" />
+
+                            <Label Grid.Row="14"
+                                   Grid.Column="0"
+                                   HorizontalContentAlignment="Center"
+                                   VerticalContentAlignment="Center"
+                                   Content="Weathering" />
+
+                            <Grid Grid.Row="14"
+                                  Grid.Column="1"
+                                  HorizontalAlignment="Stretch">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="90" />
+                                    <ColumnDefinition Width="12" />
+                                    <ColumnDefinition Width="*" />
+                                </Grid.ColumnDefinitions>
+                                <ToggleButton Name="WeatheringEffectToggle"
+                                              Grid.Column="0"
+                                              HorizontalContentAlignment="Center"
+                                              VerticalContentAlignment="Center"
+                                              Click="WeatheringEffectToggle_Click">
+                                    <ToggleButton.Style>
+                                        <Style TargetType="{x:Type ToggleButton}" BasedOn="{StaticResource {x:Type ToggleButton}}">
+                                            <Setter Property="Content" Value="ON" />
+                                            <Style.Triggers>
+                                                <Trigger Property="IsChecked" Value="True">
+                                                    <Setter Property="Content" Value="ON" />
+                                                </Trigger>
+                                                <Trigger Property="IsChecked" Value="False">
+                                                    <Setter Property="Content" Value="OFF" />
+                                                </Trigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </ToggleButton.Style>
+                                </ToggleButton>
+                                <Slider x:Name="WeatheringOpacitySlider"
+                                        Grid.Column="2"
+                                        VerticalAlignment="Center"
+                                        IsMoveToPointEnabled="True"
+                                        Maximum="2.0"
+                                        Minimum="0.0"
+                                        ToolTip="Weathering Opacity"
+                                        Value="1.0"
+                                        ValueChanged="WeatheringOpacitySlider_ValueChanged" />
+                            </Grid>
 
                         </Grid>
 
@@ -1539,7 +1651,7 @@
                             HorizontalAlignment="Center"
                             Click="Donate_OnClick"
                             Content="Patreon - Support SRS" />
-                    <FlowDocumentScrollViewer>
+                    <FlowDocumentScrollViewer VerticalScrollBarVisibility="Auto">
                     <FlowDocument x:Name="AboutFlowDocument"
                                   FontFamily="{StaticResource MilFontMono}"
                                   FontSize="14"

@@ -9,11 +9,10 @@ using System.Windows.Threading;
 using Ciribob.IL2.SimpleRadio.Standalone.Client.Localization;
 using Ciribob.IL2.SimpleRadio.Standalone.Client.Settings;
 using Ciribob.IL2.SimpleRadio.Standalone.Client.Singletons;
-using MahApps.Metro.Controls;
 
 namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI.ClientWindow.PilotRoster
 {
-    public partial class PilotRosterWindow : MetroWindow
+    public partial class PilotRosterWindow : Window
     {
         private const int ResizeHitTestThickness = 8;
         private const int WmNcHitTest = 0x0084;

@@ -1,45 +1,30 @@
-<controls:MetroWindow x:Class="Ciribob.IL2.SimpleRadio.Standalone.Client.UI.ClientWindow.ClientList.ClientListWindow"
+<Window x:Class="Ciribob.IL2.SimpleRadio.Standalone.Client.UI.ClientWindow.ClientList.ClientListWindow"
                             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
                       xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-                      xmlns:controls="clr-namespace:MahApps.Metro.Controls;assembly=MahApps.Metro"
                       xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
                       xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
                       Title="Connected Clients"
                       MinWidth="300"
-                            MinHeight="390"
+                      MinHeight="390"
                       Width="300"
                       Height="390"
+                      AllowsTransparency="True"
                       ResizeMode="CanResizeWithGrip"
-                      Background="{StaticResource MilWindowBackgroundBrush}"
+                      WindowStyle="None"
+                      Background="Transparent"
                       Foreground="{StaticResource MilTextPrimaryBrush}"
                       FontSize="14"
-                      WindowTitleBrush="{StaticResource MilChromeBrush}"
-                      NonActiveWindowTitleBrush="{StaticResource MilChromeBrush}"
-                      GlowBrush="{StaticResource MilBorderBrush}"
-                      NonActiveGlowBrush="{StaticResource MilChromeBrush}"
-                      TitleCharacterCasing="Upper"
                       xmlns:clients="clr-namespace:Ciribob.IL2.SimpleRadio.Standalone.Client.UI.ClientWindow.ClientList"
                      >
-    <controls:MetroWindow.Resources>
+    <Window.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
                 <ResourceDictionary Source="pack://application:,,,/IL2-SR-ClientRadio;component/Themes/MilitaryControls.xaml" />
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
-    </controls:MetroWindow.Resources>
+    </Window.Resources>
 
-    <controls:MetroWindow.TitleTemplate>
-        <DataTemplate>
-            <TextBlock Margin="8,0,8,0"
-                       VerticalAlignment="Center"
-                       FontFamily="{StaticResource MilFontStencil}"
-                       FontSize="17"
-                       Foreground="{StaticResource MilAccentBrush}"
-                       Text="{Binding Converter={StaticResource MilUpperConverter}}" />
-        </DataTemplate>
-    </controls:MetroWindow.TitleTemplate>
-
-    <GroupBox Header="Roster" Margin="6,2,6,6">
+    <GroupBox Header="Roster" Margin="6,2,6,6" MouseLeftButtonDown="ClientListWindow_MouseLeftButtonDown">
         <ListBox Name="ClientList"
                  HorizontalContentAlignment="Stretch"
                  Padding="5"
@@ -111,4 +96,4 @@
         </ListBox>
     </GroupBox>
 
-</controls:MetroWindow>
+</Window>

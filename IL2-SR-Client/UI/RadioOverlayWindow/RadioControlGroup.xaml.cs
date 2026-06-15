@@ -25,6 +25,8 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI.RadioOverlayWindow
         private const double SpeakerNameScrollPixelsPerSecond = 18.0;
         private const double SpeakerNameScrollPauseMilliseconds = 700.0;
         private static readonly Color ActiveGreen = (Color)ColorConverter.ConvertFromString("#96FF6D");
+        private static readonly Color InactiveGrey = (Color)ColorConverter.ConvertFromString("#3A3A3A");
+        private static readonly Color TxRed = (Color)ColorConverter.ConvertFromString("#FF3B30");
 
         private bool _dragging;
         private bool _syncingSliderFromState;
@@ -160,7 +162,7 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI.RadioOverlayWindow
 
             if (IL2PlayerRadioInfo == null || !_clientStateSingleton.IsConnected)
             {
-                RadioActive.Fill = CreateStatusBrush(Colors.Red);
+                UpdateStatusLeds(false, false, true);
                 SetDisplayText(LocalizationManager.Get("Not Connected"),
                     new SolidColorBrush((Color)ColorConverter.ConvertFromString("#00FF00")),
                     1.0,
@@ -192,24 +194,9 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI.RadioOverlayWindow
 
                 var transmitting = _clientStateSingleton.RadioSendingState;
                 var receiving = _clientStateSingleton.RadioReceivingState[RadioId];
-                var speakingOnThisRadio = transmitting.IsSending && (transmitting.SendingOn == RadioId)
-                                          || receiving != null && receiving.IsReceiving;
-                if (RadioId == IL2PlayerRadioInfo.selected)
-                {
-
-                    if (speakingOnThisRadio)
-                    {
-                        RadioActive.Fill = CreateStatusBrush(ActiveGreen);
-                    }
-                    else
-                    {
-                        RadioActive.Fill = CreateStatusBrush(Colors.Green);
-                    }
-                }
-                else
-                {
-                    RadioActive.Fill = CreateStatusBrush(speakingOnThisRadio ? ActiveGreen : Colors.Green);
-                }
+                var txActive = transmitting.IsSending && transmitting.SendingOn == RadioId;
+                var rxActive = receiving != null && receiving.IsReceiving;
+                UpdateStatusLeds(txActive, rxActive, false);
 
                 if (!_speakerDisplayActive)
                 {
@@ -231,6 +218,19 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI.RadioOverlayWindow
                     _syncingSliderFromState = false;
                 }
             }
+        }
+
+        private void UpdateStatusLeds(bool txActive, bool rxActive, bool disconnected)
+        {
+            if (disconnected)
+            {
+                TxActive.Fill = CreateStatusBrush(Colors.Red);
+                RxActive.Fill = CreateStatusBrush(Colors.Red);
+                return;
+            }
+
+            TxActive.Fill = CreateStatusBrush(txActive ? TxRed : InactiveGrey);
+            RxActive.Fill = CreateStatusBrush(rxActive ? ActiveGreen : InactiveGrey);
         }
 
         private void RefreshChannelOccupancyIndicatorsIfNeeded()

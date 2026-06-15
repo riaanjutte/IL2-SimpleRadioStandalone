@@ -6,19 +6,19 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              Name="RadioControlContainer"
              Width="130"
-             Height="40">
+             Height="34">
     <StackPanel Orientation="Vertical"
                 HorizontalAlignment="Center"
                 Width="130"
                 Background="Transparent">
 
-        <Grid HorizontalAlignment="Left" Width="122" Height="14" Margin="4,3,0,0">
+        <Grid HorizontalAlignment="Left" Width="126" Height="18" Margin="4,1,0,0">
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="83" />
+                <ColumnDefinition Width="77" />
                 <ColumnDefinition Width="1" />
                 <ColumnDefinition Width="25" />
                 <ColumnDefinition Width="1" />
-                <ColumnDefinition Width="12" />
+                <ColumnDefinition Width="22" />
             </Grid.ColumnDefinitions>
 
             <Label Name="TunedCount" 
@@ -31,7 +31,7 @@
 
 
             <Border Grid.Column="0"
-                    Width="83"
+                    Width="77"
                     Height="12"
                     HorizontalAlignment="Left"
                     VerticalAlignment="Center"
@@ -119,35 +119,94 @@
                 </Grid>
             </Border>
 
-            <Ellipse x:Name="RadioActive"
-                      Grid.Column="4"
-                      Width="12"
-                      Height="12"
-                      Margin="0"
-                      HorizontalAlignment="Right"
-                      VerticalAlignment="Center"
-                     Fill="Green"
-                      MouseDown="RadioSelectSwitch"
-                      Stroke="Black"
-                      StrokeThickness="1.5"
-                      Style="{x:Null}"
-                     ToolTip="Selected Radio">
-                <Ellipse.Effect>
-                    <DropShadowEffect BlurRadius="2"
-                                      Direction="315"
-                                      Opacity="0.55"
-                                      ShadowDepth="1"
-                                      Color="#000000" />
-                </Ellipse.Effect>
-            </Ellipse>
+            <Grid Grid.Column="4"
+                  Width="22"
+                  Height="16"
+                  HorizontalAlignment="Right"
+                  VerticalAlignment="Center"
+                  Style="{x:Null}">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="6" />
+                    <RowDefinition Height="10" />
+                </Grid.RowDefinitions>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="10" />
+                    <ColumnDefinition Width="2" />
+                    <ColumnDefinition Width="10" />
+                </Grid.ColumnDefinitions>
+
+                <TextBlock Grid.Row="0"
+                           Grid.Column="0"
+                           HorizontalAlignment="Center"
+                           VerticalAlignment="Center"
+                           FontFamily="Courier New"
+                           FontSize="4"
+                           Foreground="White"
+                           Style="{x:Null}"
+                           Text="TX" />
+                <TextBlock Grid.Row="0"
+                           Grid.Column="2"
+                           HorizontalAlignment="Center"
+                           VerticalAlignment="Center"
+                           FontFamily="Courier New"
+                           FontSize="4"
+                           Foreground="White"
+                           Style="{x:Null}"
+                           Text="RX" />
+
+                <Ellipse x:Name="TxActive"
+                         Grid.Row="1"
+                         Grid.Column="0"
+                         Width="9"
+                         Height="9"
+                         HorizontalAlignment="Center"
+                         VerticalAlignment="Center"
+                         Fill="Green"
+                         MouseDown="RadioSelectSwitch"
+                         Stroke="Black"
+                         StrokeThickness="1"
+                         Style="{x:Null}"
+                         ToolTip="Transmit status">
+                    <Ellipse.Effect>
+                        <DropShadowEffect BlurRadius="2"
+                                          Direction="315"
+                                          Opacity="0.55"
+                                          ShadowDepth="1"
+                                          Color="#000000" />
+                    </Ellipse.Effect>
+                </Ellipse>
+
+                <Ellipse x:Name="RxActive"
+                         Grid.Row="1"
+                         Grid.Column="2"
+                         Width="9"
+                         Height="9"
+                         HorizontalAlignment="Center"
+                         VerticalAlignment="Center"
+                         Fill="Green"
+                         MouseDown="RadioSelectSwitch"
+                         Stroke="Black"
+                         StrokeThickness="1"
+                         Style="{x:Null}"
+                         ToolTip="Receive status">
+                    <Ellipse.Effect>
+                        <DropShadowEffect BlurRadius="2"
+                                          Direction="315"
+                                          Opacity="0.55"
+                                          ShadowDepth="1"
+                                          Color="#000000" />
+                    </Ellipse.Effect>
+                </Ellipse>
+            </Grid>
 
         </Grid>
        
         
+        <Grid Width="122" HorizontalAlignment="Left" Height="14" Margin="4,0,0,0">
             <Slider x:Name="RadioVolume"
                     Width="122"
-                    Height="18"
-                    Margin="4,0,0,0"
+                    Height="14"
+                    Margin="0"
                     HorizontalAlignment="Left"
                     Style="{StaticResource OverlaySlider}"
                     IsEnabled="True"
@@ -156,6 +215,7 @@
                     Thumb.DragCompleted="RadioVolume_DragCompleted"
                     Thumb.DragStarted="RadioVolume_DragStarted"
                     ValueChanged="RadioVolume_ValueChanged" />
+        </Grid>
         
 
       
