@@ -621,7 +621,6 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.Settings
                                 }
                             }
                         }
-                    }
 
                     callback(bindStates);
                     MarkPttInputPoll();
@@ -896,7 +895,8 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.Settings
             if (!TryGetInputDeviceForBinding(inputDeviceBinding, out instanceGuid, out device))
             {
                 bool recoveredButtonState;
-                if (TryGetRecoveredActiveButtonState(inputDeviceBinding, Guid.Empty, out recoveredButtonState))
+                if (InputPollingCycleCache.ShouldAttemptRecoveryScan(false) &&
+                    TryGetRecoveredActiveButtonState(inputDeviceBinding, Guid.Empty, out recoveredButtonState))
                 {
                     return recoveredButtonState;
                 }
@@ -981,21 +981,7 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.Settings
 
         private TState GetDeviceState<TState>(Device device, Guid instanceGuid, Dictionary<Guid, object> deviceStateCache, Func<TState> pollState)
         {
-            object cachedState;
-            if (deviceStateCache != null &&
-                deviceStateCache.TryGetValue(instanceGuid, out cachedState) &&
-                cachedState is TState)
-            {
-                return (TState)cachedState;
-            }
-
-            var state = pollState();
-            if (deviceStateCache != null)
-            {
-                deviceStateCache[instanceGuid] = state;
-            }
-
-            return state;
+            return InputPollingCycleCache.GetOrPoll(instanceGuid, deviceStateCache, pollState);
         }
 
         private bool TryGetRecoveredActiveButtonState(InputDevice inputDeviceBinding, Guid currentInstanceGuid, out bool buttonState)

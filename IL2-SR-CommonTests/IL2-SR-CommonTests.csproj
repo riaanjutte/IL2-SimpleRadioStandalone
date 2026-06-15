@@ -74,6 +74,7 @@
   <ItemGroup>
     <Compile Include="DCSState\PlayerGameStateTests.cs" />
     <Compile Include="Helpers\ConversionHelpersTests.cs" />
+    <Compile Include="Input\InputPollingCycleCacheTests.cs" />
     <Compile Include="Network\CombatBoxCallsignRosterTests.cs" />
     <Compile Include="Network\UpdaterArgumentsTests.cs" />
     <Compile Include="Network\UpdateReleaseSelectorTests.cs" />

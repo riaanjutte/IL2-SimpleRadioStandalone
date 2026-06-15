@@ -255,6 +255,7 @@
     </Compile>
     <Compile Include="Input\InputDevice.cs" />
     <Compile Include="Input\InputDeviceManager.cs" />
+    <Compile Include="Input\InputPollingCycleCache.cs" />
     <Compile Include="Settings\RadioChannels\PresetChannel.cs" />
     <Compile Include="Settings\RadioChannels\IPresetChannelsStore.cs" />
     <Compile Include="UI\ClientWindow\AudioDeviceListItem.cs" />
