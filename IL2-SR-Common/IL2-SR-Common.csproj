@@ -86,6 +86,9 @@
     <Reference Include="System.Net.Http" />
     <Reference Include="System.Xml" />
     <Reference Include="WindowsBase" />
+    <Reference Include="WPFCustomMessageBox, Version=1.0.7.39267, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\WPFCustomMessageBox.1.0.7\lib\WPFCustomMessageBox.dll</HintPath>
+    </Reference>
     <Reference Include="Xceed.Wpf.AvalonDock, Version=3.2.0.0, Culture=neutral, PublicKeyToken=3e4669d2f30244f4, processorArchitecture=MSIL">
       <HintPath>..\packages\Extended.Wpf.Toolkit.3.2.0\lib\net40\Xceed.Wpf.AvalonDock.dll</HintPath>
     </Reference>
@@ -149,11 +152,11 @@
     <PropertyGroup>
       <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
     </PropertyGroup>
-    <Error Condition="!Exists('..\packages\Fody.2.1.2\build\netstandard1.0\Fody.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Fody.2.1.2\build\netstandard1.0\Fody.targets'))" />
+    <Error Condition="'$(MSBuildRuntimeType)' != 'Core' And !Exists('..\packages\Fody.2.1.2\build\netstandard1.0\Fody.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Fody.2.1.2\build\netstandard1.0\Fody.targets'))" />
     <Error Condition="!Exists('..\packages\SourceLink.Create.GitHub.2.8.0\build\SourceLink.Create.GitHub.props')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\SourceLink.Create.GitHub.2.8.0\build\SourceLink.Create.GitHub.props'))" />
     <Error Condition="!Exists('..\packages\SourceLink.Create.GitHub.2.8.0\build\SourceLink.Create.GitHub.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\SourceLink.Create.GitHub.2.8.0\build\SourceLink.Create.GitHub.targets'))" />
   </Target>
-  <Import Project="..\packages\Fody.2.1.2\build\netstandard1.0\Fody.targets" Condition="Exists('..\packages\Fody.2.1.2\build\netstandard1.0\Fody.targets')" />
+  <Import Project="..\packages\Fody.2.1.2\build\netstandard1.0\Fody.targets" Condition="'$(MSBuildRuntimeType)' != 'Core' And Exists('..\packages\Fody.2.1.2\build\netstandard1.0\Fody.targets')" />
   <Import Project="..\packages\SourceLink.Create.GitHub.2.8.0\build\SourceLink.Create.GitHub.targets" Condition="Exists('..\packages\SourceLink.Create.GitHub.2.8.0\build\SourceLink.Create.GitHub.targets')" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

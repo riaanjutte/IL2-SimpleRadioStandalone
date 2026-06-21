@@ -128,5 +128,25 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Common.Tests.Network
             Assert.AreEqual(1, callsigns.Count);
             Assert.AreEqual("VALID-CALLSIGN", callsigns[new CallsignRosterKey("Valid", 1)]);
         }
+
+        [TestMethod]
+        public void ParseAssignmentsExtractsVehiclesWhenAvailable()
+        {
+            const string roster = @"{
+  ""players"": [
+    { ""name"": ""Assigned"", ""coalitionCode"": 1, ""callsign"": ""RAVEN-1"", ""vehicle"": ""  Spitfire Mk.IXe  "" },
+    { ""name"": ""VehicleOnly"", ""coalitionCode"": 1, ""vehicle"": ""Bf 109 G-14"" },
+    { ""name"": ""Empty"", ""coalitionCode"": 1, ""callsign"": """", ""vehicle"": """" }
+  ]
+}";
+
+            var assignments = CombatBoxCallsignRoster.ParseAssignments(roster);
+
+            Assert.AreEqual(2, assignments.Count);
+            Assert.AreEqual("RAVEN-1", assignments[new CallsignRosterKey("Assigned", 1)].Callsign);
+            Assert.AreEqual("Spitfire Mk.IXe", assignments[new CallsignRosterKey("Assigned", 1)].Vehicle);
+            Assert.AreEqual("", assignments[new CallsignRosterKey("VehicleOnly", 1)].Callsign);
+            Assert.AreEqual("Bf 109 G-14", assignments[new CallsignRosterKey("VehicleOnly", 1)].Vehicle);
+        }
     }
 }

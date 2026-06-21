@@ -4,6 +4,7 @@ using System.Windows.Media;
 using Ciribob.IL2.SimpleRadio.Standalone.Client.Localization;
 using Ciribob.IL2.SimpleRadio.Standalone.Client.Network;
 using Ciribob.IL2.SimpleRadio.Standalone.Client.Singletons;
+using Ciribob.IL2.SimpleRadio.Standalone.Client.UI.RadioOverlayWindow;
 using Ciribob.IL2.SimpleRadio.Standalone.Client.Utils;
 using Ciribob.IL2.SimpleRadio.Standalone.Common;
 
@@ -16,13 +17,22 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Overlay
     {
         private const string IntercomLabelText = "CREW INTERCOM";
         private const int MaxIntercomSpeakerNameLength = 14;
+        private const double ReceiveIndicatorHoldMilliseconds = 500.0;
+        private const double TransmitIndicatorHoldMilliseconds = 250.0;
         private static readonly Color ActiveGreen = (Color)ColorConverter.ConvertFromString("#96FF6D");
         private static readonly Color InactiveGrey = (Color)ColorConverter.ConvertFromString("#3A3A3A");
         private static readonly Color TxRed = (Color)ColorConverter.ConvertFromString("#FF3B30");
+        private static readonly Brush TxActiveBrush = CreateFrozenStatusBrush(TxRed);
+        private static readonly Brush RxActiveBrush = CreateFrozenStatusBrush(ActiveGreen);
+        private static readonly Brush InactiveLedBrush = CreateFrozenStatusBrush(InactiveGrey);
+        private static readonly Brush DisconnectedLedBrush = CreateFrozenStatusBrush(Colors.Red);
         private bool _dragging;
         private bool _syncingSliderFromState;
         private readonly ClientStateSingleton _clientStateSingleton = ClientStateSingleton.Instance;
         private readonly ConnectedClientsSingleton _connectClientsSingleton = ConnectedClientsSingleton.Instance;
+        private bool? _lastTxActive;
+        private bool? _lastRxActive;
+        private bool? _lastDisconnected;
         private static string LocalizedIntercomLabelText => LocalizationManager.Get(IntercomLabelText);
 
         public IntercomControlGroup()
@@ -30,6 +40,13 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Overlay
             InitializeComponent();
             LocalizationManager.LocalizeElement(this);
         }
+
+        public void RefreshLocalization()
+        {
+            LocalizationManager.LocalizeElement(this);
+            RepaintRadioStatus();
+        }
+
         public int RadioId { private get; set; }
 
         private void RadioSelectSwitch(object sender, RoutedEventArgs e)
@@ -66,6 +83,81 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Overlay
 
         internal void RepaintRadioStatus()
         {
+            RepaintRadioStatus(includeTelemetry: true);
+        }
+
+        internal void RepaintRadioLiveState()
+        {
+            RepaintRadioStatus(includeTelemetry: false);
+        }
+
+        internal void ApplyFastState(OverlayRadioFastState state)
+        {
+            if (!state.IsConnected || !state.IsAvailable)
+            {
+                UpdateStatusLeds(false, false, true);
+                RadioLabel.Content = LocalizedIntercomLabelText;
+                RadioLabel.FontSize = 7;
+                RadioLabel.ToolTip = null;
+                TunedCount.Content = "";
+                _dragging = false;
+                return;
+            }
+
+            UpdateStatusLeds(state.TxActive, state.RxActive, false);
+            UpdateIntercomLabel(state.RxActive, state.SpeakerName);
+
+            if (state.RxActive)
+            {
+                RadioLabel.Foreground = Brushes.White;
+                TunedCount.Foreground = RadioLabel.Foreground;
+            }
+            else
+            {
+                RadioLabel.Foreground = Brushes.Lime;
+                TunedCount.Foreground = RadioLabel.Foreground;
+            }
+
+            if (!_dragging && System.Math.Abs(RadioVolume.Value - state.VolumePercent) > 0.1)
+            {
+                _syncingSliderFromState = true;
+                RadioVolume.Value = state.VolumePercent;
+                _syncingSliderFromState = false;
+            }
+        }
+
+        internal void RefreshOverlayTelemetry()
+        {
+            var IL2PlayerRadioInfo = _clientStateSingleton.PlayerGameState;
+
+            if ((IL2PlayerRadioInfo == null) || !_clientStateSingleton.IsConnected)
+            {
+                TunedCount.Content = "";
+                IntercomUsersCount.Text = "0";
+                return;
+            }
+
+            var currentRadio = IL2PlayerRadioInfo.radios[RadioId];
+            if (currentRadio == null)
+            {
+                return;
+            }
+
+            int count = _connectClientsSingleton.ClientsOnFreq(currentRadio.freq, currentRadio.modulation);
+            IntercomUsersCount.Text = count.ToString(System.Globalization.CultureInfo.InvariantCulture);
+
+            if (count > 0)
+            {
+                TunedCount.Content = "👤" + count;
+            }
+            else
+            {
+                TunedCount.Content = "";
+            }
+        }
+
+        private void RepaintRadioStatus(bool includeTelemetry)
+        {
             var IL2PlayerRadioInfo = _clientStateSingleton.PlayerGameState;
 
             if ((IL2PlayerRadioInfo == null) || !_clientStateSingleton.IsConnected)
@@ -86,12 +178,14 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Overlay
                 var currentRadio = IL2PlayerRadioInfo.radios[RadioId];
                 var transmitting = _clientStateSingleton.RadioSendingState;
                 var receiving = _clientStateSingleton.RadioReceivingState[0];
-                var txActive = transmitting.IsSending && transmitting.SendingOn == RadioId;
-                var rxActive = receiving != null && receiving.IsReceiving;
+                var txActive = transmitting != null &&
+                               transmitting.SendingOn == RadioId &&
+                               (transmitting.IsSending || IsRecent(transmitting.LastSentAt, TransmitIndicatorHoldMilliseconds));
+                var rxActive = receiving != null && IsRecent(receiving.LastReceivedAt, ReceiveIndicatorHoldMilliseconds);
                 UpdateIntercomLabel(receiving);
                 UpdateStatusLeds(txActive, rxActive, false);
 
-                if (receiving != null && receiving.IsReceiving)
+                if (rxActive)
                 {
                     RadioLabel.Foreground = new SolidColorBrush(Colors.White);
                     TunedCount.Foreground = RadioLabel.Foreground;
@@ -102,16 +196,19 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Overlay
                     TunedCount.Foreground = RadioLabel.Foreground;
                 }
 
-                int count = _connectClientsSingleton.ClientsOnFreq(currentRadio.freq, currentRadio.modulation);
-                IntercomUsersCount.Text = count.ToString(System.Globalization.CultureInfo.InvariantCulture);
+                if (includeTelemetry)
+                {
+                    int count = _connectClientsSingleton.ClientsOnFreq(currentRadio.freq, currentRadio.modulation);
+                    IntercomUsersCount.Text = count.ToString(System.Globalization.CultureInfo.InvariantCulture);
 
-                if (count > 0)
-                {
-                    TunedCount.Content = "👤" + count;
-                }
-                else
-                {
-                    TunedCount.Content = "";
+                    if (count > 0)
+                    {
+                        TunedCount.Content = "👤" + count;
+                    }
+                    else
+                    {
+                        TunedCount.Content = "";
+                    }
                 }
 
                 if (_dragging == false)
@@ -125,24 +222,55 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Overlay
 
         private void UpdateStatusLeds(bool txActive, bool rxActive, bool disconnected)
         {
-            if (disconnected)
+            if (_lastTxActive == txActive && _lastRxActive == rxActive && _lastDisconnected == disconnected)
             {
-                TxActive.Fill = CreateStatusBrush(Colors.Red);
-                RxActive.Fill = CreateStatusBrush(Colors.Red);
                 return;
             }
 
-            TxActive.Fill = CreateStatusBrush(txActive ? TxRed : InactiveGrey);
-            RxActive.Fill = CreateStatusBrush(rxActive ? ActiveGreen : InactiveGrey);
+            _lastTxActive = txActive;
+            _lastRxActive = rxActive;
+            _lastDisconnected = disconnected;
+
+            if (disconnected)
+            {
+                TxActive.Fill = DisconnectedLedBrush;
+                RxActive.Fill = DisconnectedLedBrush;
+                return;
+            }
+
+            TxActive.Fill = txActive ? TxActiveBrush : InactiveLedBrush;
+            RxActive.Fill = rxActive ? RxActiveBrush : InactiveLedBrush;
+        }
+
+        private static Brush CreateFrozenStatusBrush(Color color)
+        {
+            var brush = CreateStatusBrush(color);
+            brush.Freeze();
+            return brush;
         }
 
         private void UpdateIntercomLabel(RadioReceivingState receiving)
         {
-            if (receiving != null && receiving.IsReceiving && !string.IsNullOrWhiteSpace(receiving.SentBy))
+            if (receiving != null && IsRecent(receiving.LastReceivedAt, ReceiveIndicatorHoldMilliseconds) && !string.IsNullOrWhiteSpace(receiving.SentBy))
             {
                 RadioLabel.Content = TrimSpeakerName(receiving.SentBy);
                 RadioLabel.FontSize = 7;
                 RadioLabel.ToolTip = receiving.SentBy;
+                return;
+            }
+
+            RadioLabel.Content = LocalizedIntercomLabelText;
+            RadioLabel.FontSize = 7;
+            RadioLabel.ToolTip = null;
+        }
+
+        private void UpdateIntercomLabel(bool receivingNow, string speakerName)
+        {
+            if (receivingNow && !string.IsNullOrWhiteSpace(speakerName))
+            {
+                RadioLabel.Content = TrimSpeakerName(speakerName);
+                RadioLabel.FontSize = 7;
+                RadioLabel.ToolTip = speakerName;
                 return;
             }
 
@@ -204,6 +332,16 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Overlay
         private static byte Subtract(byte value, byte amount)
         {
             return value < amount ? (byte)0 : (byte)(value - amount);
+        }
+
+        private static bool IsRecent(long timestampTicks, double holdMilliseconds)
+        {
+            if (timestampTicks <= 0)
+            {
+                return false;
+            }
+
+            return (System.DateTime.Now.Ticks - timestampTicks) < System.TimeSpan.FromMilliseconds(holdMilliseconds).Ticks;
         }
 
     }

@@ -77,7 +77,7 @@
                       Height="9"
                       Data="M 4,0 L 4,8 M 0,4 L 8,4"
                       Stretch="Uniform"
-                      Stroke="{StaticResource MilLedOnBrush}"
+                      Stroke="{DynamicResource MilLedOnBrush}"
                       StrokeThickness="1.5" />
             </Button>
         </Grid>
@@ -113,7 +113,7 @@
                         </DataTemplate>
                     </DataGridTemplateColumn.CellTemplate>
                 </DataGridTemplateColumn>
-                <DataGridTemplateColumn Header="Default"                                        Width="80">
+                <DataGridTemplateColumn Header="Is Default"                                        Width="80">
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate DataType="ui:ServerAddress">
 
@@ -131,7 +131,7 @@
                                             <Setter.Value>
                                                 <Path Height="15"
                                                       Data="F1 M 5.33334,3.05176e-005C 8.27869,3.05176e-005 10.6667,2.38669 10.6667,5.33334L 10.6667,128C 10.6667,130.947 8.27869,133.333 5.33334,133.333C 2.38669,133.333 0,130.947 0,128L 0,5.33334C 0,2.38669 2.38669,3.05176e-005 5.33334,3.05176e-005 Z M 58.4986,3.84378C 65.2643,6.4642 70.6588,8.52805 80,4.45712L 80,44.6909C 70.2527,48.5827 64.0612,46.1921 57.5364,43.664C 52.8828,41.8627 48.0729,40 41.3333,40C 27.6667,40 17.9681,48.1263 16,49.9122L 16,9.08273C 20.028,5.89725 29.1282,3.05176e-005 41.3333,3.05176e-005C 48.5703,3.05176e-005 53.845,2.04163 58.4986,3.84378 Z "
-                                                      Fill="{StaticResource MilTextPrimaryBrush}"
+                                                      Fill="{DynamicResource MilTextPrimaryBrush}"
                                                       Stretch="Uniform" />
                                             </Setter.Value>
                                         </Setter>
@@ -156,7 +156,7 @@
                                       Height="9"
                                       Data="M 0,0 L 8,8 M 8,0 L 0,8"
                                       Stretch="Uniform"
-                                      Stroke="{StaticResource MilLedErrorBrush}"
+                                      Stroke="{DynamicResource MilLedErrorBrush}"
                                       StrokeThickness="1.5" />
                             </Button>
                         </DataTemplate>

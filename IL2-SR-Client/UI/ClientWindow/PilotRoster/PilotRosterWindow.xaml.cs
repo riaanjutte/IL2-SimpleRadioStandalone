@@ -1,10 +1,12 @@
 using System;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Interop;
+using System.Windows.Media;
 using System.Windows.Threading;
 using Ciribob.IL2.SimpleRadio.Standalone.Client.Localization;
 using Ciribob.IL2.SimpleRadio.Standalone.Client.Settings;
@@ -19,10 +21,8 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI.ClientWindow.PilotRoster
         private const int HtRight = 11;
         private const int HtBottom = 15;
         private const int HtBottomRight = 17;
-        private const double RosterRowHeight = 31.0;
-        private const double RosterHeaderHeight = 30.0;
-        private const double RosterWindowVerticalChrome = 30.0;
         private const double RosterMaximumScreenMargin = 80.0;
+        private const double RosterGridHeightSafetyPadding = 8.0;
         private const double DefaultRosterX = 360.0;
         private const double DefaultRosterY = 260.0;
         private const double DefaultRosterWidth = 560.0;
@@ -74,6 +74,18 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI.ClientWindow.PilotRoster
             Title = "IL2-SRS Pilot Roster";
             CallsignColumn.Header = UppercaseLocalized("CALLSIGN");
             PilotColumn.Header = UppercaseLocalized("PILOT");
+            VehicleColumn.Header = UppercaseLocalized("VEHICLE");
+        }
+
+        public void RefreshLocalization()
+        {
+            LocalizationManager.LocalizeElement(this);
+            ApplyLocalizedText();
+
+            if (IsUnavailableMode)
+            {
+                ShowUnavailableMessage();
+            }
         }
 
         private static string UppercaseLocalized(string key)
@@ -122,7 +134,9 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI.ClientWindow.PilotRoster
         {
             PilotList.Visibility = Visibility.Collapsed;
             UnavailableMessage.Text =
-                "Pilot roster is currently only available when connected to Combat Box.\r\n\r\nConnect to srs.combatbox.net and open Pilot Roster again.";
+                LocalizationManager.Get("Pilot roster is currently only available when connected to Combat Box.")
+                + "\r\n\r\n"
+                + LocalizationManager.Get("Connect to srs.combatbox.net and open Pilot Roster again.");
             UnavailableMessage.Visibility = Visibility.Visible;
 
             Width = Math.Max(MinWidth, 500);
@@ -152,34 +166,109 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI.ClientWindow.PilotRoster
                 _pilotRoster.Add(entry);
             }
 
-            Dispatcher.BeginInvoke(new Action(RefreshAutoColumnWidths), DispatcherPriority.Loaded);
-            FitHeightToRoster(entries.Count);
+            Dispatcher.BeginInvoke(new Action(RefreshRosterLayout), DispatcherPriority.Loaded);
+        }
+
+        private void RefreshRosterLayout()
+        {
+            VehicleColumn.Visibility = _pilotRoster.Any(entry => entry.HasVehicle) ? Visibility.Visible : Visibility.Collapsed;
+            RefreshAutoColumnWidths();
+            FitHeightToRoster();
         }
 
         private void RefreshAutoColumnWidths()
         {
             CallsignColumn.Width = DataGridLength.Auto;
+            VehicleColumn.Width = DataGridLength.Auto;
             Radio1Column.Width = DataGridLength.Auto;
             Radio2Column.Width = DataGridLength.Auto;
             PilotColumn.Width = new DataGridLength(1, DataGridLengthUnitType.Star);
             PilotList.UpdateLayout();
         }
 
-        private void FitHeightToRoster(int playerCount)
+        private void FitHeightToRoster()
         {
-            var desiredHeight = RosterWindowVerticalChrome +
-                                RosterHeaderHeight +
-                                Math.Max(0, playerCount) * RosterRowHeight;
+            if (PilotList.Visibility != Visibility.Visible)
+            {
+                return;
+            }
+
+            PilotList.UpdateLayout();
+
+            var currentGridHeight = PilotList.ActualHeight;
+            if (currentGridHeight <= 0)
+            {
+                return;
+            }
+
+            var desiredGridHeight = PilotList.ColumnHeaderHeight +
+                                    _pilotRoster.Count * PilotList.RowHeight +
+                                    PilotList.BorderThickness.Top +
+                                    PilotList.BorderThickness.Bottom +
+                                    RosterGridHeightSafetyPadding;
+            var rosterChromeHeight = Math.Max(0, ActualHeight - currentGridHeight);
+            var desiredHeight = rosterChromeHeight + desiredGridHeight;
             var maxHeight = Math.Max(MinHeight, SystemParameters.WorkArea.Height - RosterMaximumScreenMargin);
             var fittedHeight = Math.Max(MinHeight, Math.Min(maxHeight, desiredHeight));
+            var shouldScroll = desiredHeight > maxHeight;
+
+            SetPilotListScrollMode(shouldScroll);
 
             if (Math.Abs(Height - fittedHeight) < 0.5)
             {
+                PilotList.UpdateLayout();
+                Dispatcher.BeginInvoke(new Action(() => SetPilotListScrollMode(shouldScroll)), DispatcherPriority.Render);
                 return;
             }
 
             Height = fittedHeight;
             EnsureWindowIsOnScreen();
+            PilotList.UpdateLayout();
+            Dispatcher.BeginInvoke(new Action(() => SetPilotListScrollMode(shouldScroll)), DispatcherPriority.Render);
+        }
+
+        private void SetPilotListScrollMode(bool shouldScroll)
+        {
+            var visibility = shouldScroll ? ScrollBarVisibility.Auto : ScrollBarVisibility.Disabled;
+            ScrollViewer.SetVerticalScrollBarVisibility(PilotList, visibility);
+
+            var scrollViewer = FindVisualChild<ScrollViewer>(PilotList);
+            if (scrollViewer == null)
+            {
+                return;
+            }
+
+            scrollViewer.VerticalScrollBarVisibility = visibility;
+            if (!shouldScroll)
+            {
+                scrollViewer.ScrollToTop();
+            }
+        }
+
+        private static T FindVisualChild<T>(DependencyObject parent) where T : DependencyObject
+        {
+            if (parent == null)
+            {
+                return null;
+            }
+
+            var childCount = VisualTreeHelper.GetChildrenCount(parent);
+            for (var index = 0; index < childCount; index++)
+            {
+                var child = VisualTreeHelper.GetChild(parent, index);
+                if (child is T typedChild)
+                {
+                    return typedChild;
+                }
+
+                var descendant = FindVisualChild<T>(child);
+                if (descendant != null)
+                {
+                    return descendant;
+                }
+            }
+
+            return null;
         }
 
         private void EnsureWindowIsOnScreen()

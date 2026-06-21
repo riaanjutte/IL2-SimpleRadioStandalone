@@ -8,6 +8,7 @@ using System.Windows;
 using Ciribob.IL2.SimpleRadio.Standalone.Common.Network;
 using NLog;
 using Octokit;
+using WPFCustomMessageBox;
 
 namespace Ciribob.IL2.SimpleRadio.Standalone.Common
 {
@@ -70,8 +71,13 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Common
         {
             _logger.Warn($"New {branch} version available on GitHub: {version}");
 
-            var result = MessageBox.Show($"New {branch} version {version} available!\n\nDo you want to auto update? \n\nYes - Launch Auto Update \n\nNo - Manual update - launches browser\n\nCancel - ignores the update",
-                "Update available", MessageBoxButton.YesNoCancel, MessageBoxImage.Information);
+            var result = CustomMessageBox.ShowYesNoCancel(
+                $"New {branch} version {version} available!\n\nDo you want to auto update? \n\nYes - Launch Auto Update \n\nNo - Manual update - launches browser\n\nCancel - ignores the update",
+                "Update available",
+                GetLocalizedDialogButtonText("Yes"),
+                GetLocalizedDialogButtonText("No"),
+                GetLocalizedDialogButtonText("Cancel"),
+                MessageBoxImage.Information);
 
             if (result == MessageBoxResult.Yes)
             {
@@ -151,6 +157,72 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Common
 
                 Process.Start(startInfo);
             }
+        }
+
+        private static string GetLocalizedDialogButtonText(string key)
+        {
+            var language = System.Threading.Thread.CurrentThread.CurrentUICulture.TwoLetterISOLanguageName;
+
+            switch (language)
+            {
+                case "de":
+                    switch (key)
+                    {
+                        case "Yes":
+                            return "Ja";
+                        case "No":
+                            return "Nein";
+                        case "Cancel":
+                            return "Abbrechen";
+                    }
+                    break;
+                case "fr":
+                    switch (key)
+                    {
+                        case "Yes":
+                            return "Oui";
+                        case "No":
+                            return "Non";
+                        case "Cancel":
+                            return "Annuler";
+                    }
+                    break;
+                case "es":
+                    switch (key)
+                    {
+                        case "Yes":
+                            return "Sí";
+                        case "No":
+                            return "No";
+                        case "Cancel":
+                            return "Cancelar";
+                    }
+                    break;
+                case "it":
+                    switch (key)
+                    {
+                        case "Yes":
+                            return "Sì";
+                        case "No":
+                            return "No";
+                        case "Cancel":
+                            return "Annulla";
+                    }
+                    break;
+                case "ru":
+                    switch (key)
+                    {
+                        case "Yes":
+                            return "Да";
+                        case "No":
+                            return "Нет";
+                        case "Cancel":
+                            return "Отмена";
+                    }
+                    break;
+            }
+
+            return key;
         }
 
         private static string ResolveUpdaterPath()

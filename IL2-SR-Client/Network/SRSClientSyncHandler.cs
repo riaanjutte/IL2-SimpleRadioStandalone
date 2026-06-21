@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Concurrent;
 using System.IO;
 using System.Net;
@@ -256,6 +256,7 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.Network
                                                 srClient.Coalition = updatedSrClient.Coalition;
                                                 srClient.AssignedCallsign = updatedSrClient.AssignedCallsign;
 
+                                                srClient.AssignedVehicle = updatedSrClient.AssignedVehicle;
                                                 if (updatedSrClient.GameState != null)
                                                 {
                                                     srClient.GameState = updatedSrClient.GameState;

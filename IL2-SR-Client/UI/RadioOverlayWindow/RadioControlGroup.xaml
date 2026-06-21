@@ -10,12 +10,13 @@
             <GradientStop Color="#72766F" Offset="0.52" />
             <GradientStop Color="#585D55" Offset="1" />
         </LinearGradientBrush>
+        <SolidColorBrush x:Key="OverlayChannelStepButtonShadowBrush" Color="#99000000" />
 
         <Style x:Key="OverlayChannelButton" TargetType="{x:Type Button}">
-            <Setter Property="Background" Value="{StaticResource OverlayRaisedControlBrush}" />
-            <Setter Property="BorderBrush" Value="{StaticResource OverlayRaisedBorderBrush}" />
+            <Setter Property="Background" Value="{DynamicResource OverlayRaisedControlBrush}" />
+            <Setter Property="BorderBrush" Value="{DynamicResource OverlayRaisedBorderBrush}" />
             <Setter Property="BorderThickness" Value="1" />
-            <Setter Property="Foreground" Value="{StaticResource ButtonForeground}" />
+            <Setter Property="Foreground" Value="{DynamicResource OverlayChannelButtonForegroundBrush}" />
             <Setter Property="Padding" Value="0" />
             <Setter Property="Template">
                 <Setter.Value>
@@ -26,10 +27,10 @@
                                 CornerRadius="3"
                                 Style="{x:Null}">
                             <Grid>
-                                <Border BorderBrush="{StaticResource OverlayEdgeHighlightBrush}"
+                                <Border BorderBrush="{DynamicResource OverlayEdgeHighlightBrush}"
                                         BorderThickness="1,1,0,0"
                                         CornerRadius="3"
-                                        Opacity="0.35"
+                                        Opacity="{DynamicResource ThreeDEffectOpacity}"
                                         Style="{x:Null}" />
                                 <ContentPresenter HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
                                                   VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
@@ -41,7 +42,7 @@
                                 <Setter Property="Background" Value="{StaticResource MouseOverButtonBackground}" />
                             </Trigger>
                             <Trigger Property="IsPressed" Value="true">
-                                <Setter Property="Background" Value="{StaticResource OverlayPressedControlBrush}" />
+                                <Setter Property="Background" Value="{DynamicResource OverlayPressedControlBrush}" />
                             </Trigger>
                         </ControlTemplate.Triggers>
                     </ControlTemplate>
@@ -66,10 +67,18 @@
                                      StrokeThickness="1"
                                      Style="{x:Null}" />
                             <Polyline Points="4,11 9,4 14,11"
-                                      Stroke="{StaticResource OverlayEdgeHighlightBrush}"
+                                      Stroke="{DynamicResource OverlayEdgeHighlightBrush}"
                                       StrokeThickness="1"
-                                      Opacity="0.4"
+                                      Opacity="{DynamicResource ThreeDEffectOpacity}"
                                       Style="{x:Null}" />
+                            <Line X1="2"
+                                  Y1="13"
+                                  X2="16"
+                                  Y2="13"
+                                  Stroke="{StaticResource OverlayChannelStepButtonShadowBrush}"
+                                  StrokeThickness="1"
+                                  Opacity="{DynamicResource ThreeDEffectOpacity}"
+                                  Style="{x:Null}" />
                         </Grid>
                         <ControlTemplate.Triggers>
                             <Trigger Property="IsMouseOver" Value="true">
@@ -101,10 +110,18 @@
                                      Stroke="{TemplateBinding BorderBrush}"
                                      StrokeThickness="1"
                                      Style="{x:Null}" />
-                            <Polyline Points="4,3 9,10 14,3"
-                                      Stroke="{StaticResource OverlayEdgeHighlightBrush}"
+                            <Line X1="2"
+                                  Y1="1"
+                                  X2="16"
+                                  Y2="1"
+                                  Stroke="{DynamicResource OverlayEdgeHighlightBrush}"
+                                  StrokeThickness="1"
+                                  Opacity="{DynamicResource ThreeDEffectOpacity}"
+                                  Style="{x:Null}" />
+                            <Polyline Points="2,1 9,12 16,1"
+                                      Stroke="{StaticResource OverlayChannelStepButtonShadowBrush}"
                                       StrokeThickness="1"
-                                      Opacity="0.4"
+                                      Opacity="{DynamicResource ThreeDEffectOpacity}"
                                       Style="{x:Null}" />
                         </Grid>
                         <ControlTemplate.Triggers>
@@ -190,19 +207,19 @@
                     Height="12"
                     HorizontalAlignment="Left"
                     VerticalAlignment="Center"
-                    Background="{StaticResource OverlayDisplayBrush}"
+                    Background="{DynamicResource OverlayDisplayBrush}"
                     BorderBrush="#242824"
                     BorderThickness="1"
                     MouseDown="RadioFrequencyText_Click">
                 <Grid x:Name="RadioFrequencyViewport"
                       ClipToBounds="True"
                       MouseDown="RadioFrequencyText_Click">
-                    <Border Background="{StaticResource OverlayDisplayGlassBrush}"
+                    <Border Background="{DynamicResource OverlayDisplayGlassBrush}"
                             Opacity="0.55"
                             Style="{x:Null}" />
                     <Border Height="5"
                             VerticalAlignment="Top"
-                            Background="{StaticResource OverlayDisplayTopReflectionBrush}"
+                            Background="{DynamicResource OverlayDisplayTopReflectionBrush}"
                             Opacity="0.65"
                             Style="{x:Null}" />
                     <Canvas x:Name="RadioFrequencyCanvas"
@@ -230,24 +247,24 @@
                     Height="12"
                     HorizontalAlignment="Left"
                     VerticalAlignment="Center"
-                    Background="{StaticResource OverlayDisplayBrush}"
+                    Background="{DynamicResource OverlayDisplayBrush}"
                     BorderBrush="#242824"
                     BorderThickness="1"
                     ToolTip="Number of pilots on this channel">
                 <Border.Effect>
                     <DropShadowEffect BlurRadius="1"
                                       Direction="315"
-                                      Opacity="0.25"
+                                      Opacity="{DynamicResource ThreeDEffectOpacity}"
                                       ShadowDepth="1"
                                       Color="#000000" />
                 </Border.Effect>
                 <Grid ClipToBounds="True">
-                    <Border Background="{StaticResource OverlayDisplayGlassBrush}"
+                    <Border Background="{DynamicResource OverlayDisplayGlassBrush}"
                             Opacity="0.5"
                             Style="{x:Null}" />
                     <Border Height="5"
                             VerticalAlignment="Top"
-                            Background="{StaticResource OverlayDisplayTopReflectionBrush}"
+                            Background="{DynamicResource OverlayDisplayTopReflectionBrush}"
                             Opacity="0.6"
                             Style="{x:Null}" />
                     <Grid Width="25"
@@ -307,7 +324,7 @@
                            VerticalAlignment="Center"
                            FontFamily="Courier New"
                            FontSize="4"
-                           Foreground="White"
+                           Foreground="{DynamicResource OverlayTxRxLabelBrush}"
                            Style="{x:Null}"
                            Text="TX" />
                 <TextBlock Grid.Row="0"
@@ -316,15 +333,15 @@
                            VerticalAlignment="Center"
                            FontFamily="Courier New"
                            FontSize="4"
-                           Foreground="White"
+                           Foreground="{DynamicResource OverlayTxRxLabelBrush}"
                            Style="{x:Null}"
                            Text="RX" />
 
                 <Ellipse x:Name="TxActive"
                          Grid.Row="1"
                          Grid.Column="0"
-                         Width="9"
-                         Height="9"
+                         Width="7"
+                         Height="7"
                          HorizontalAlignment="Center"
                          VerticalAlignment="Center"
                          Fill="Green"
@@ -336,7 +353,7 @@
                     <Ellipse.Effect>
                         <DropShadowEffect BlurRadius="2"
                                           Direction="315"
-                                          Opacity="0.55"
+                                          Opacity="{DynamicResource ThreeDEffectOpacity}"
                                           ShadowDepth="1"
                                           Color="#000000" />
                     </Ellipse.Effect>
@@ -345,8 +362,8 @@
                 <Ellipse x:Name="RxActive"
                          Grid.Row="1"
                          Grid.Column="2"
-                         Width="9"
-                         Height="9"
+                         Width="7"
+                         Height="7"
                          HorizontalAlignment="Center"
                          VerticalAlignment="Center"
                          Fill="Green"
@@ -358,7 +375,7 @@
                     <Ellipse.Effect>
                         <DropShadowEffect BlurRadius="2"
                                           Direction="315"
-                                          Opacity="0.55"
+                                          Opacity="{DynamicResource ThreeDEffectOpacity}"
                                           ShadowDepth="1"
                                           Color="#000000" />
                     </Ellipse.Effect>

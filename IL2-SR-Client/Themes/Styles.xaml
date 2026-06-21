@@ -65,6 +65,12 @@
     <sys:Double x:Key="WeatheringExtraOpacity">0.0</sys:Double>
     <sys:Double x:Key="OverlayWeatheringOpacity">0.5</sys:Double>
     <sys:Double x:Key="OverlayWeatheringExtraOpacity">0.0</sys:Double>
+    <sys:Double x:Key="ThreeDEffectOpacity">1.0</sys:Double>
+    <sys:Double x:Key="ThreeDGlassOpacity">1.0</sys:Double>
+    <sys:Double x:Key="ThreeDScrewOpacity">1.0</sys:Double>
+    <SolidColorBrush x:Key="ThreeDHighlightBrush" Color="#38FFF6DC" />
+    <SolidColorBrush x:Key="ThreeDSoftHighlightBrush" Color="#2BFFF6DC" />
+    <SolidColorBrush x:Key="ThreeDDarkRimBrush" Color="#15100A" />
 
     <!-- OverlayEquipmentPanelBrush / OverlayRaisedControlBrush / OverlayPressedControlBrush /
          OverlayRaisedBorderBrush / OverlayEdgeHighlightBrush are theme-dependent and now
@@ -113,13 +119,14 @@
     <DropShadowEffect x:Key="OverlayRaisedShadow"
                       BlurRadius="2"
                       Direction="315"
-                      Opacity="0.35"
+                      Opacity="{DynamicResource ThreeDEffectOpacity}"
                       ShadowDepth="1"
                       Color="#000000" />
 
-    <!-- Small slotted panel screw for overlay equipment plates -->
+    <!-- Slotted panel screw for overlay equipment plates.
+         This is smaller than MilPanelScrew because the radio overlay content is scaled. -->
     <ControlTemplate x:Key="OverlayScrew" TargetType="{x:Type Control}">
-        <Grid Width="6" Height="6">
+        <Grid Width="6.5" Height="6.5">
             <Ellipse Style="{x:Null}"
                      Stroke="#15170F"
                      StrokeThickness="0.6">
@@ -131,7 +138,7 @@
                     </RadialGradientBrush>
                 </Ellipse.Fill>
             </Ellipse>
-            <Rectangle Width="4.2"
+            <Rectangle Width="4.7"
                        Height="0.9"
                        Fill="#1B1E18"
                        RenderTransformOrigin="0.5,0.5"
@@ -156,7 +163,7 @@
                                 BorderThickness="1,1,0,0"
                                 CornerRadius="3"
                                 Margin="1"
-                                Opacity="0.4"
+                                Opacity="{DynamicResource ThreeDEffectOpacity}"
                                 Style="{x:Null}" />
                         <Border Background="{StaticResource OverlayWeatheringTexture}"
                                 CornerRadius="3"
@@ -180,13 +187,17 @@
                                    utils:PanelWeathering.Enabled="True" />
                         <ContentPresenter Margin="9,4,9,4" />
                         <Control Template="{StaticResource OverlayScrew}"
-                                 HorizontalAlignment="Left" VerticalAlignment="Top" Margin="2.5" />
+                                 HorizontalAlignment="Left" VerticalAlignment="Top" Margin="2.5"
+                                 Opacity="{DynamicResource ThreeDScrewOpacity}" />
                         <Control Template="{StaticResource OverlayScrew}"
-                                 HorizontalAlignment="Right" VerticalAlignment="Top" Margin="2.5" />
+                                 HorizontalAlignment="Right" VerticalAlignment="Top" Margin="2.5"
+                                 Opacity="{DynamicResource ThreeDScrewOpacity}" />
                         <Control Template="{StaticResource OverlayScrew}"
-                                 HorizontalAlignment="Left" VerticalAlignment="Bottom" Margin="2.5" />
+                                 HorizontalAlignment="Left" VerticalAlignment="Bottom" Margin="2.5"
+                                 Opacity="{DynamicResource ThreeDScrewOpacity}" />
                         <Control Template="{StaticResource OverlayScrew}"
-                                 HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="2.5" />
+                                 HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="2.5"
+                                 Opacity="{DynamicResource ThreeDScrewOpacity}" />
                     </Grid>
                 </ControlTemplate>
             </Setter.Value>
@@ -211,15 +222,15 @@
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="{x:Type Thumb}">
-                    <Border Background="{DynamicResource OverlayRaisedControlBrush}"
-                            BorderBrush="{DynamicResource OverlayRaisedBorderBrush}"
+                    <Border Background="{DynamicResource OverlayAccentRaisedBrush}"
+                            BorderBrush="{DynamicResource OverlayAccentRaisedBorderBrush}"
                             BorderThickness="1"
                             CornerRadius="2"
                             Style="{x:Null}">
                         <Border BorderBrush="{DynamicResource OverlayEdgeHighlightBrush}"
                                 BorderThickness="1,1,0,0"
                                 CornerRadius="2"
-                                Opacity="0.45"
+                                Opacity="{DynamicResource ThreeDEffectOpacity}"
                                 Style="{x:Null}" />
                     </Border>
                 </ControlTemplate>
@@ -236,11 +247,11 @@
                     <Grid Height="{TemplateBinding Height}">
                         <Border Height="4"
                                 VerticalAlignment="Center"
-                                Background="#050605"
-                                BorderBrush="#15170F"
+                                Background="{DynamicResource OverlayAccentRaisedBrush}"
+                                BorderBrush="{DynamicResource OverlayAccentRaisedBorderBrush}"
                                 BorderThickness="1"
                                 Style="{x:Null}">
-                            <Border BorderBrush="#242824"
+                            <Border BorderBrush="{DynamicResource OverlayEdgeHighlightBrush}"
                                     BorderThickness="0,1,0,0"
                                     Opacity="0.55"
                                     Style="{x:Null}" />

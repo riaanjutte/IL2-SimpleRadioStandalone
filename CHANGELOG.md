@@ -1,5 +1,34 @@
 # Changelog
 
+## IL2-SRS 1.0.4.5 community update
+
+### Added
+
+- Added a Combat Box Pilot Roster window showing friendly callsigns, pilot names, tuned radio channels, and aircraft/vehicle when available from the roster JSON.
+- Added Combat Box RCI/RCO status displays in the main client and radio overlay.
+- Added full 12-channel radio controls directly in the overlay, including channel up/down controls and channel/intercom pilot counts.
+- Added community-editable localization support for English, German, French, Spanish, Italian, and Russian.
+
+### Changed
+
+- Redesigned the client UI as a vintage 1940s communication set with themed equipment plates, readable status lamps, larger text, and analog VU meters.
+- Reworked the radio overlay to follow the selected client theme and better handle speaker names, channel displays, sizing, and clipping.
+- Improved selected-radio mute behavior so receive-only muting preserves transmit state and normal volume settings.
+- Improved IL-2 `startup.cfg` telemetry setup and repair during install/client startup.
+- Improved updater behavior, including beta release handling, direct updater download support, and more reliable release selection.
+
+### Fixed
+
+- Fixed joystick/PTT recovery after temporary USB disconnect/reconnect.
+- Hardened microphone capture recovery to reduce cases where outgoing voice requires a restart.
+- Cleaned up disconnect handling to reduce stuck transmit/receive state and lingering audio.
+- Fixed IL-2 intercom routing for vehicle owners, commanders, and crew members.
+
+### Validation
+
+- Built `IL2-SimpleRadioStandalone.sln` Release/x64 successfully.
+- Ran `IL2-SR-CommonTests` Release/x64: 84/84 passed.
+
 ## IL2-SRS 1.0.4.5-beta.10 community update
 
 ### Changed

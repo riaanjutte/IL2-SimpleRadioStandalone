@@ -1,4 +1,4 @@
-<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                     xmlns:converters="clr-namespace:Ciribob.IL2.SimpleRadio.Standalone.Client.Utils.ValueConverters"
                     xmlns:utils="clr-namespace:Ciribob.IL2.SimpleRadio.Standalone.Client.Utils">
@@ -12,7 +12,7 @@
 
     <!-- ============ Labels & text ============ -->
     <Style TargetType="{x:Type Label}">
-        <Setter Property="Foreground" Value="{StaticResource MilTextPrimaryBrush}" />
+        <Setter Property="Foreground" Value="{DynamicResource MilTextPrimaryBrush}" />
         <Setter Property="FontSize" Value="14" />
         <Setter Property="Padding" Value="4,2" />
         <Setter Property="VerticalContentAlignment" Value="Center" />
@@ -20,8 +20,8 @@
 
     <!-- ============ Buttons: physical pushbuttons (dark rim, bevelled gradient face) ============ -->
     <Style x:Key="MilButtonBase" TargetType="{x:Type ButtonBase}">
-        <Setter Property="Foreground" Value="{StaticResource MilTextPrimaryBrush}" />
-        <Setter Property="Background" Value="{StaticResource MilBtnDarkFaceBrush}" />
+        <Setter Property="Foreground" Value="{DynamicResource MilTextPrimaryBrush}" />
+        <Setter Property="Background" Value="{DynamicResource MilBtnDarkFaceBrush}" />
         <Setter Property="Padding" Value="10,4" />
         <Setter Property="FontSize" Value="14" />
         <Setter Property="HorizontalContentAlignment" Value="Center" />
@@ -31,12 +31,12 @@
             <Setter.Value>
                 <ControlTemplate TargetType="{x:Type ButtonBase}">
                     <Border x:Name="Rim"
-                            Background="#15100A"
+                            Background="{DynamicResource ThreeDDarkRimBrush}"
                             CornerRadius="4"
                             Padding="1">
                         <Border x:Name="Face"
                                 Background="{TemplateBinding Background}"
-                                BorderBrush="#38FFF6DC"
+                                BorderBrush="{DynamicResource ThreeDHighlightBrush}"
                                 BorderThickness="1,1,1,0"
                                 CornerRadius="3"
                                 Padding="{TemplateBinding Padding}">
@@ -49,7 +49,7 @@
                     <ControlTemplate.Triggers>
                         <Trigger Property="IsPressed" Value="True">
                             <Setter TargetName="Face" Property="BorderThickness" Value="1,0,1,1" />
-                            <Setter TargetName="Face" Property="BorderBrush" Value="#22FFF6DC" />
+                            <Setter TargetName="Face" Property="BorderBrush" Value="{DynamicResource ThreeDSoftHighlightBrush}" />
                             <Setter TargetName="Content" Property="Margin" Value="0,1,0,-1" />
                         </Trigger>
                         <Trigger Property="IsEnabled" Value="False">
@@ -68,14 +68,14 @@
                     <Condition Property="IsEnabled" Value="True" />
                     <Condition Property="IsMouseOver" Value="True" />
                 </MultiTrigger.Conditions>
-                <Setter Property="Background" Value="{StaticResource MilBtnDarkHoverBrush}" />
+                <Setter Property="Background" Value="{DynamicResource MilBtnDarkHoverBrush}" />
             </MultiTrigger>
             <MultiTrigger>
                 <MultiTrigger.Conditions>
                     <Condition Property="IsEnabled" Value="True" />
                     <Condition Property="IsPressed" Value="True" />
                 </MultiTrigger.Conditions>
-                <Setter Property="Background" Value="{StaticResource MilBtnDarkPressedBrush}" />
+                <Setter Property="Background" Value="{DynamicResource MilBtnDarkPressedBrush}" />
             </MultiTrigger>
         </Style.Triggers>
     </Style>
@@ -86,7 +86,7 @@
          via DynamicResource; defining the same key here makes those buttons pick up the
          military action look with zero per-button XAML edits. -->
     <Style x:Key="SquareButtonStyle" TargetType="{x:Type Button}" BasedOn="{StaticResource MilButtonBase}">
-        <Setter Property="Background" Value="{StaticResource MilBtnBrassFaceBrush}" />
+        <Setter Property="Background" Value="{DynamicResource MilBtnBrassFaceBrush}" />
         <Setter Property="FontFamily" Value="{StaticResource MilFontMono}" />
         <Style.Triggers>
             <MultiTrigger>
@@ -94,14 +94,14 @@
                     <Condition Property="IsEnabled" Value="True" />
                     <Condition Property="IsMouseOver" Value="True" />
                 </MultiTrigger.Conditions>
-                <Setter Property="Background" Value="{StaticResource MilBtnBrassHoverBrush}" />
+                <Setter Property="Background" Value="{DynamicResource MilBtnBrassHoverBrush}" />
             </MultiTrigger>
             <MultiTrigger>
                 <MultiTrigger.Conditions>
                     <Condition Property="IsEnabled" Value="True" />
                     <Condition Property="IsPressed" Value="True" />
                 </MultiTrigger.Conditions>
-                <Setter Property="Background" Value="{StaticResource MilBtnBrassPressedBrush}" />
+                <Setter Property="Background" Value="{DynamicResource MilBtnBrassPressedBrush}" />
             </MultiTrigger>
         </Style.Triggers>
     </Style>
@@ -112,27 +112,27 @@
         <Setter Property="FontFamily" Value="{StaticResource MilFontMono}" />
         <Style.Triggers>
             <Trigger Property="IsMouseOver" Value="True">
-                <Setter Property="Background" Value="{StaticResource MilBtnDarkHoverBrush}" />
+                <Setter Property="Background" Value="{DynamicResource MilBtnDarkHoverBrush}" />
             </Trigger>
             <Trigger Property="IsChecked" Value="True">
-                <Setter Property="Background" Value="{StaticResource MilBtnBrassFaceBrush}" />
+                <Setter Property="Background" Value="{DynamicResource MilBtnBrassFaceBrush}" />
             </Trigger>
             <Trigger Property="IsPressed" Value="True">
-                <Setter Property="Background" Value="{StaticResource MilBtnDarkPressedBrush}" />
+                <Setter Property="Background" Value="{DynamicResource MilBtnDarkPressedBrush}" />
             </Trigger>
         </Style.Triggers>
     </Style>
 
     <!-- ============ TextBox: inset well with inner top shadow ============ -->
     <Style TargetType="{x:Type TextBox}">
-        <Setter Property="Foreground" Value="{StaticResource MilTextPrimaryBrush}" />
-        <Setter Property="Background" Value="{StaticResource MilWellBrush}" />
+        <Setter Property="Foreground" Value="{DynamicResource MilTextPrimaryBrush}" />
+        <Setter Property="Background" Value="{DynamicResource MilWellBrush}" />
         <Setter Property="BorderBrush" Value="#120D07" />
         <Setter Property="BorderThickness" Value="1" />
         <Setter Property="Padding" Value="4,2" />
         <Setter Property="FontSize" Value="14" />
-        <Setter Property="CaretBrush" Value="{StaticResource MilTextPrimaryBrush}" />
-        <Setter Property="SelectionBrush" Value="{StaticResource MilAccentBrush}" />
+        <Setter Property="CaretBrush" Value="{DynamicResource MilTextPrimaryBrush}" />
+        <Setter Property="SelectionBrush" Value="{DynamicResource MilAccentBrush}" />
         <Setter Property="VerticalContentAlignment" Value="Center" />
         <Setter Property="Template">
             <Setter.Value>
@@ -146,11 +146,13 @@
                                     Margin="1,1,1,0"
                                     VerticalAlignment="Top"
                                     Background="#40000000"
-                                    CornerRadius="1" />
+                                    CornerRadius="1"
+                                    Opacity="{DynamicResource ThreeDEffectOpacity}" />
                             <Border Height="1"
                                     Margin="1,0,1,1"
                                     VerticalAlignment="Bottom"
-                                    Background="#14FFF6DC" />
+                                    Background="#14FFF6DC"
+                                    Opacity="{DynamicResource ThreeDEffectOpacity}" />
                             <ScrollViewer x:Name="PART_ContentHost"
                                           Margin="{TemplateBinding Padding}"
                                           VerticalAlignment="Center" />
@@ -161,7 +163,7 @@
         </Setter>
         <Style.Triggers>
             <Trigger Property="IsKeyboardFocused" Value="True">
-                <Setter Property="BorderBrush" Value="{StaticResource MilAccentBrush}" />
+                <Setter Property="BorderBrush" Value="{DynamicResource MilAccentBrush}" />
             </Trigger>
             <Trigger Property="IsEnabled" Value="False">
                 <Setter Property="Foreground" Value="#B8AD94" />
@@ -178,8 +180,8 @@
             <Setter.Value>
                 <ControlTemplate TargetType="{x:Type ToggleButton}">
                     <Border x:Name="Bd"
-                            Background="{StaticResource MilWellBrush}"
-                            BorderBrush="{StaticResource MilBorderBrush}"
+                            Background="{DynamicResource MilWellBrush}"
+                            BorderBrush="{DynamicResource MilBorderBrush}"
                             BorderThickness="1"
                             CornerRadius="2">
                         <Path x:Name="Arrow"
@@ -187,7 +189,7 @@
                               VerticalAlignment="Center"
                               Margin="0,0,8,0"
                               Data="M 0 0 L 4 4 L 8 0 Z"
-                              Fill="{StaticResource MilAccentBrush}" />
+                              Fill="{DynamicResource MilAccentBrush}" />
                     </Border>
                     <ControlTemplate.Triggers>
                         <MultiTrigger>
@@ -195,7 +197,7 @@
                                 <Condition Property="IsEnabled" Value="True" />
                                 <Condition Property="IsMouseOver" Value="True" />
                             </MultiTrigger.Conditions>
-                            <Setter TargetName="Bd" Property="BorderBrush" Value="{StaticResource MilAccentBrush}" />
+                            <Setter TargetName="Bd" Property="BorderBrush" Value="{DynamicResource MilAccentBrush}" />
                         </MultiTrigger>
                         <Trigger Property="IsEnabled" Value="False">
                             <Setter TargetName="Bd" Property="Background" Value="#211D16" />
@@ -210,8 +212,8 @@
     </Style>
 
     <Style TargetType="{x:Type ComboBox}">
-        <Setter Property="Foreground" Value="{StaticResource MilTextPrimaryBrush}" />
-        <Setter Property="Background" Value="{StaticResource MilWellBrush}" />
+        <Setter Property="Foreground" Value="{DynamicResource MilTextPrimaryBrush}" />
+        <Setter Property="Background" Value="{DynamicResource MilWellBrush}" />
         <Setter Property="MinHeight" Value="24" />
         <Setter Property="FontSize" Value="14" />
         <Setter Property="SnapsToDevicePixels" Value="True" />
@@ -240,8 +242,8 @@
                                PopupAnimation="Slide">
                             <Grid MinWidth="{TemplateBinding ActualWidth}"
                                   MaxHeight="{TemplateBinding MaxDropDownHeight}">
-                                <Border Background="{StaticResource MilWellBrush}"
-                                        BorderBrush="{StaticResource MilBorderBrush}"
+                                <Border Background="{DynamicResource MilWellBrush}"
+                                        BorderBrush="{DynamicResource MilBorderBrush}"
                                         BorderThickness="1">
                                     <ScrollViewer SnapsToDevicePixels="True">
                                         <StackPanel IsItemsHost="True"
@@ -262,7 +264,7 @@
     </Style>
 
     <Style TargetType="{x:Type ComboBoxItem}">
-        <Setter Property="Foreground" Value="{StaticResource MilTextPrimaryBrush}" />
+        <Setter Property="Foreground" Value="{DynamicResource MilTextPrimaryBrush}" />
         <Setter Property="Padding" Value="6,3" />
         <Setter Property="Template">
             <Setter.Value>
@@ -272,7 +274,7 @@
                     </Border>
                     <ControlTemplate.Triggers>
                         <Trigger Property="IsHighlighted" Value="True">
-                            <Setter TargetName="Bd" Property="Background" Value="{StaticResource MilActionBrush}" />
+                            <Setter TargetName="Bd" Property="Background" Value="{DynamicResource MilActionBrush}" />
                         </Trigger>
                     </ControlTemplate.Triggers>
                 </ControlTemplate>
@@ -282,7 +284,7 @@
 
     <!-- ============ CheckBox ============ -->
     <Style TargetType="{x:Type CheckBox}">
-        <Setter Property="Foreground" Value="{StaticResource MilTextPrimaryBrush}" />
+        <Setter Property="Foreground" Value="{DynamicResource MilTextPrimaryBrush}" />
         <Setter Property="FontSize" Value="14" />
         <Setter Property="Template">
             <Setter.Value>
@@ -291,12 +293,12 @@
                         <Border x:Name="Box"
                                 Width="14" Height="14"
                                 VerticalAlignment="Center"
-                                Background="{StaticResource MilWellBrush}"
-                                BorderBrush="{StaticResource MilBorderBrush}"
+                                Background="{DynamicResource MilWellBrush}"
+                                BorderBrush="{DynamicResource MilBorderBrush}"
                                 BorderThickness="1">
                             <Path x:Name="Check"
                                   Data="M 2 7 L 6 11 L 12 3"
-                                  Stroke="{StaticResource MilAccentBrush}"
+                                  Stroke="{DynamicResource MilAccentBrush}"
                                   StrokeThickness="2"
                                   Visibility="Collapsed" />
                         </Border>
@@ -307,7 +309,7 @@
                             <Setter TargetName="Check" Property="Visibility" Value="Visible" />
                         </Trigger>
                         <Trigger Property="IsMouseOver" Value="True">
-                            <Setter TargetName="Box" Property="BorderBrush" Value="{StaticResource MilAccentBrush}" />
+                            <Setter TargetName="Box" Property="BorderBrush" Value="{DynamicResource MilAccentBrush}" />
                         </Trigger>
                     </ControlTemplate.Triggers>
                 </ControlTemplate>
@@ -317,7 +319,7 @@
 
     <!-- ============ RadioButton ============ -->
     <Style TargetType="{x:Type RadioButton}">
-        <Setter Property="Foreground" Value="{StaticResource MilTextPrimaryBrush}" />
+        <Setter Property="Foreground" Value="{DynamicResource MilTextPrimaryBrush}" />
         <Setter Property="FontSize" Value="14" />
         <Setter Property="Template">
             <Setter.Value>
@@ -326,12 +328,12 @@
                         <Grid VerticalAlignment="Center">
                             <Ellipse x:Name="Outer"
                                      Width="14" Height="14"
-                                     Fill="{StaticResource MilWellBrush}"
-                                     Stroke="{StaticResource MilBorderBrush}"
+                                     Fill="{DynamicResource MilWellBrush}"
+                                     Stroke="{DynamicResource MilBorderBrush}"
                                      StrokeThickness="1" />
                             <Ellipse x:Name="Dot"
                                      Width="6" Height="6"
-                                     Fill="{StaticResource MilAccentBrush}"
+                                     Fill="{DynamicResource MilAccentBrush}"
                                      Visibility="Collapsed" />
                         </Grid>
                         <ContentPresenter Margin="6,0,0,0" VerticalAlignment="Center" RecognizesAccessKey="True" />
@@ -341,7 +343,7 @@
                             <Setter TargetName="Dot" Property="Visibility" Value="Visible" />
                         </Trigger>
                         <Trigger Property="IsMouseOver" Value="True">
-                            <Setter TargetName="Outer" Property="Stroke" Value="{StaticResource MilAccentBrush}" />
+                            <Setter TargetName="Outer" Property="Stroke" Value="{DynamicResource MilAccentBrush}" />
                         </Trigger>
                     </ControlTemplate.Triggers>
                 </ControlTemplate>
@@ -363,30 +365,44 @@
     </Style>
 
     <Style x:Key="MilSliderThumb" TargetType="{x:Type Thumb}">
+        <Setter Property="Focusable" Value="False" />
+        <Setter Property="Width" Value="16" />
+        <Setter Property="Height" Value="24" />
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="{x:Type Thumb}">
-                    <Border Width="10" Height="18"
-                            Background="{StaticResource MilAccentBrush}"
-                            BorderBrush="{StaticResource MilChromeBrush}"
+                    <Border Background="{DynamicResource OverlayAccentRaisedBrush}"
+                            BorderBrush="{DynamicResource OverlayAccentRaisedBorderBrush}"
                             BorderThickness="1"
-                            CornerRadius="1" />
+                            CornerRadius="2">
+                        <Border BorderBrush="{DynamicResource OverlayEdgeHighlightBrush}"
+                                BorderThickness="1,1,0,0"
+                                CornerRadius="2"
+                                Opacity="{DynamicResource ThreeDEffectOpacity}" />
+                    </Border>
                 </ControlTemplate>
             </Setter.Value>
         </Setter>
     </Style>
 
     <Style TargetType="{x:Type Slider}">
+        <Setter Property="Height" Value="26" />
+        <Setter Property="IsMoveToPointEnabled" Value="True" />
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="{x:Type Slider}">
-                    <Grid MinHeight="18" Background="Transparent">
+                    <Grid Height="{TemplateBinding Height}" Background="Transparent">
                         <Border Height="4"
                                 VerticalAlignment="Center"
-                                Background="{StaticResource MilWellBrush}"
-                                BorderBrush="{StaticResource MilBorderBrush}"
-                                BorderThickness="1" />
-                        <Track x:Name="PART_Track">
+                                Background="{DynamicResource OverlayAccentRaisedBrush}"
+                                BorderBrush="{DynamicResource OverlayAccentRaisedBorderBrush}"
+                                BorderThickness="1">
+                            <Border BorderBrush="{DynamicResource OverlayEdgeHighlightBrush}"
+                                    BorderThickness="0,1,0,0"
+                                    Opacity="0.55" />
+                        </Border>
+                        <Track x:Name="PART_Track"
+                               VerticalAlignment="Center">
                             <Track.DecreaseRepeatButton>
                                 <RepeatButton Style="{StaticResource MilSliderRepeatButton}"
                                               Command="Slider.DecreaseLarge" />
@@ -407,12 +423,12 @@
 
     <!-- Slotted panel screw (shared by plates and meters) -->
     <ControlTemplate x:Key="MilPanelScrew" TargetType="{x:Type Control}">
-        <Grid Width="9" Height="9">
-            <Ellipse Fill="{StaticResource MilScrewBrush}"
+        <Grid Width="10.125" Height="10.125">
+            <Ellipse Fill="{DynamicResource MilScrewBrush}"
                      Stroke="#15100A"
-                     StrokeThickness="0.8" />
-            <Rectangle Width="6.5"
-                       Height="1.2"
+                     StrokeThickness="0.9" />
+            <Rectangle Width="7.3125"
+                       Height="1.35"
                        Fill="#241F14"
                        RenderTransformOrigin="0.5,0.5"
                        utils:ScrewSlotRandomizer.RandomAngle="True" />
@@ -432,63 +448,63 @@
                             <Border Background="#15100A" CornerRadius="6" />
                             <!-- ivory face -->
                             <Border Margin="3"
-                                    Background="{StaticResource MilTextPrimaryBrush}"
+                                    Background="{DynamicResource MilVuFaceBrush}"
                                     CornerRadius="4" />
                             <Canvas>
                                 <!-- scale arc -->
                                 <Path Data="M 32.4,42.2 A 52,52 0 0 1 117.6,42.2"
-                                      Stroke="#2A251C"
+                                      Stroke="{DynamicResource MilVuMarkBrush}"
                                       StrokeThickness="2" />
                                 <!-- overload zone (0 dB onward) -->
                                 <Path Data="M 94.5,23.8 A 52,52 0 0 1 117.6,42.2"
-                                      Stroke="{StaticResource MilLedErrorBrush}"
+                                      Stroke="{DynamicResource MilLedErrorBrush}"
                                       StrokeThickness="3" />
                                 <!-- major ticks -->
-                                <Line X1="32.4" Y1="42.2" X2="37.3" Y2="45.6" Stroke="#2A251C" StrokeThickness="1.5" />
-                                <Line X1="46.7" Y1="28.4" X2="49.9" Y2="33.4" Stroke="#2A251C" StrokeThickness="1.5" />
-                                <Line X1="61.5" Y1="21.8" X2="63.1" Y2="27.6" Stroke="#2A251C" StrokeThickness="1.5" />
-                                <Line X1="94.5" Y1="23.8" X2="92.2" Y2="29.4" Stroke="#2A251C" StrokeThickness="1.5" />
-                                <Line X1="117.6" Y1="42.2" X2="112.7" Y2="45.6" Stroke="#2A251C" StrokeThickness="1.5" />
+                                <Line X1="32.4" Y1="42.2" X2="37.3" Y2="45.6" Stroke="{DynamicResource MilVuMarkBrush}" StrokeThickness="1.5" />
+                                <Line X1="46.7" Y1="28.4" X2="49.9" Y2="33.4" Stroke="{DynamicResource MilVuMarkBrush}" StrokeThickness="1.5" />
+                                <Line X1="61.5" Y1="21.8" X2="63.1" Y2="27.6" Stroke="{DynamicResource MilVuMarkBrush}" StrokeThickness="1.5" />
+                                <Line X1="94.5" Y1="23.8" X2="92.2" Y2="29.4" Stroke="{DynamicResource MilVuMarkBrush}" StrokeThickness="1.5" />
+                                <Line X1="117.6" Y1="42.2" X2="112.7" Y2="45.6" Stroke="{DynamicResource MilVuMarkBrush}" StrokeThickness="1.5" />
                                 <!-- minor ticks -->
-                                <Line X1="38.9" Y1="34.6" X2="41.3" Y2="37.1" Stroke="#2A251C" StrokeThickness="1" />
-                                <Line X1="53.8" Y1="24.5" X2="55.2" Y2="27.7" Stroke="#2A251C" StrokeThickness="1" />
-                                <Line X1="78.2" Y1="20.1" X2="78.0" Y2="23.6" Stroke="#2A251C" StrokeThickness="1" />
-                                <Line X1="107.3" Y1="31.3" X2="105.2" Y2="34.0" Stroke="#2A251C" StrokeThickness="1" />
+                                <Line X1="38.9" Y1="34.6" X2="41.3" Y2="37.1" Stroke="{DynamicResource MilVuMarkBrush}" StrokeThickness="1" />
+                                <Line X1="53.8" Y1="24.5" X2="55.2" Y2="27.7" Stroke="{DynamicResource MilVuMarkBrush}" StrokeThickness="1" />
+                                <Line X1="78.2" Y1="20.1" X2="78.0" Y2="23.6" Stroke="{DynamicResource MilVuMarkBrush}" StrokeThickness="1" />
+                                <Line X1="107.3" Y1="31.3" X2="105.2" Y2="34.0" Stroke="{DynamicResource MilVuMarkBrush}" StrokeThickness="1" />
                                 <!-- dB figures -->
                                 <TextBlock Canvas.Left="17" Canvas.Top="31"
                                            FontFamily="{StaticResource MilFontMono}"
                                            FontSize="8"
-                                           Foreground="#2A251C"
+                                           Foreground="{DynamicResource MilVuMarkBrush}"
                                            Text="-20" />
                                 <TextBlock Canvas.Left="35" Canvas.Top="14"
                                            FontFamily="{StaticResource MilFontMono}"
                                            FontSize="8"
-                                           Foreground="#2A251C"
+                                           Foreground="{DynamicResource MilVuMarkBrush}"
                                            Text="-10" />
                                 <TextBlock Canvas.Left="55" Canvas.Top="7"
                                            FontFamily="{StaticResource MilFontMono}"
                                            FontSize="8"
-                                           Foreground="#2A251C"
+                                           Foreground="{DynamicResource MilVuMarkBrush}"
                                            Text="-5" />
                                 <TextBlock Canvas.Left="95" Canvas.Top="9"
                                            FontFamily="{StaticResource MilFontMono}"
                                            FontSize="8"
-                                           Foreground="#2A251C"
+                                           Foreground="{DynamicResource MilVuMarkBrush}"
                                            Text="0" />
                                 <TextBlock Canvas.Left="119" Canvas.Top="31"
                                            FontFamily="{StaticResource MilFontMono}"
                                            FontSize="8"
-                                           Foreground="{StaticResource MilLedErrorBrush}"
+                                           Foreground="{DynamicResource MilLedErrorBrush}"
                                            Text="+3" />
                                 <TextBlock Canvas.Left="66" Canvas.Top="44"
                                            FontFamily="{StaticResource MilFontMono}"
                                            FontSize="13"
                                            FontWeight="Bold"
-                                           Foreground="#2A251C"
+                                           Foreground="{DynamicResource MilVuMarkBrush}"
                                            Text="VU" />
                                 <!-- needle -->
                                 <Line X1="75" Y1="72" X2="75" Y2="23"
-                                      Stroke="#1A150D"
+                                      Stroke="{DynamicResource MilVuNeedleBrush}"
                                       StrokeEndLineCap="Round"
                                       StrokeStartLineCap="Round"
                                       StrokeThickness="2">
@@ -507,12 +523,13 @@
                                 <!-- needle hub -->
                                 <Ellipse Canvas.Left="70" Canvas.Top="67"
                                          Width="10" Height="10"
-                                         Fill="#1A150D" />
+                                         Fill="{DynamicResource MilVuNeedleBrush}" />
                             </Canvas>
                             <!-- glossy glass cover: bright curved band on top, curvature
                                  shadow below; white alone vanishes on the ivory face, so
                                  the read comes from the band edge and the dark shading -->
-                            <Grid Margin="3">
+                            <Grid Margin="3"
+                                  Opacity="{DynamicResource ThreeDGlassOpacity}">
                                 <Grid.Clip>
                                     <RectangleGeometry RadiusX="4"
                                                        RadiusY="4"
@@ -541,13 +558,17 @@
                             </Grid>
                             <!-- bezel corner screws -->
                             <Control Template="{StaticResource MilPanelScrew}"
-                                     HorizontalAlignment="Left" VerticalAlignment="Top" Margin="6,6,0,0" />
+                                     HorizontalAlignment="Left" VerticalAlignment="Top" Margin="6,6,0,0"
+                                     Opacity="{DynamicResource ThreeDScrewOpacity}" />
                             <Control Template="{StaticResource MilPanelScrew}"
-                                     HorizontalAlignment="Right" VerticalAlignment="Top" Margin="0,6,6,0" />
+                                     HorizontalAlignment="Right" VerticalAlignment="Top" Margin="0,6,6,0"
+                                     Opacity="{DynamicResource ThreeDScrewOpacity}" />
                             <Control Template="{StaticResource MilPanelScrew}"
-                                     HorizontalAlignment="Left" VerticalAlignment="Bottom" Margin="6,0,0,6" />
+                                     HorizontalAlignment="Left" VerticalAlignment="Bottom" Margin="6,0,0,6"
+                                     Opacity="{DynamicResource ThreeDScrewOpacity}" />
                             <Control Template="{StaticResource MilPanelScrew}"
-                                     HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="0,0,6,6" />
+                                     HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="0,0,6,6"
+                                     Opacity="{DynamicResource ThreeDScrewOpacity}" />
                         </Grid>
                     </Viewbox>
                 </ControlTemplate>
@@ -557,16 +578,16 @@
 
     <!-- ============ GroupBox: riveted equipment plate with corner screws ============ -->
     <Style TargetType="{x:Type GroupBox}">
-        <Setter Property="Foreground" Value="{StaticResource MilTextPrimaryBrush}" />
+        <Setter Property="Foreground" Value="{DynamicResource MilTextPrimaryBrush}" />
         <Setter Property="Margin" Value="0,5,0,5" />
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="{x:Type GroupBox}">
-                    <Border Background="{StaticResource MilPanelFaceBrush}"
+                    <Border Background="{DynamicResource MilPanelFaceBrush}"
                             BorderBrush="#15100A"
                             BorderThickness="1"
                             CornerRadius="6">
-                        <Border BorderBrush="#2BFFF6DC"
+                        <Border BorderBrush="{DynamicResource ThreeDSoftHighlightBrush}"
                                 BorderThickness="1,1,0,0"
                                 CornerRadius="5">
                             <Grid>
@@ -582,33 +603,37 @@
 
                                 <!-- corner screws -->
                                 <Control Template="{StaticResource MilPanelScrew}"
-                                         HorizontalAlignment="Left" VerticalAlignment="Top" Margin="5,5,0,0" />
+                                         HorizontalAlignment="Left" VerticalAlignment="Top" Margin="5,5,0,0"
+                                         Opacity="{DynamicResource ThreeDScrewOpacity}" />
                                 <Control Template="{StaticResource MilPanelScrew}"
-                                         HorizontalAlignment="Right" VerticalAlignment="Top" Margin="0,5,5,0" />
+                                         HorizontalAlignment="Right" VerticalAlignment="Top" Margin="0,5,5,0"
+                                         Opacity="{DynamicResource ThreeDScrewOpacity}" />
                                 <Control Template="{StaticResource MilPanelScrew}"
-                                         HorizontalAlignment="Left" VerticalAlignment="Bottom" Margin="5,0,0,5" />
+                                         HorizontalAlignment="Left" VerticalAlignment="Bottom" Margin="5,0,0,5"
+                                         Opacity="{DynamicResource ThreeDScrewOpacity}" />
                                 <Control Template="{StaticResource MilPanelScrew}"
-                                         HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="0,0,5,5" />
+                                         HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="0,0,5,5"
+                                         Opacity="{DynamicResource ThreeDScrewOpacity}" />
 
                                 <DockPanel Margin="20,6,20,10">
                                     <DockPanel DockPanel.Dock="Top" Margin="0,2,0,6" LastChildFill="True">
                                         <ContentPresenter DockPanel.Dock="Left"
                                                           ContentSource="Header"
                                                           VerticalAlignment="Center"
-                                                          TextElement.Foreground="{StaticResource MilAccentBrush}"
+                                                          TextElement.Foreground="{DynamicResource MilAccentBrush}"
                                                           TextElement.FontFamily="{StaticResource MilFontStencil}"
                                                           TextElement.FontSize="14">
                                             <ContentPresenter.Effect>
                                                 <DropShadowEffect BlurRadius="0"
                                                                   Direction="270"
-                                                                  Opacity="0.65"
+                                                                  Opacity="{DynamicResource ThreeDEffectOpacity}"
                                                                   ShadowDepth="1"
                                                                   Color="#000000" />
                                             </ContentPresenter.Effect>
                                         </ContentPresenter>
                                         <StackPanel Margin="10,2,0,0" VerticalAlignment="Center">
                                             <Border Height="1" Background="#15100A" />
-                                            <Border Height="1" Background="#2BFFF6DC" />
+                                            <Border Height="1" Background="{DynamicResource ThreeDSoftHighlightBrush}" />
                                         </StackPanel>
                                     </DockPanel>
                                     <ContentPresenter Margin="2,0,2,2" />
@@ -623,13 +648,13 @@
 
     <!-- ============ Tabs ============ -->
     <Style TargetType="{x:Type TabControl}">
-        <Setter Property="Background" Value="{StaticResource MilWindowBackgroundBrush}" />
+        <Setter Property="Background" Value="{DynamicResource MilWindowBackgroundBrush}" />
         <Setter Property="BorderThickness" Value="0" />
         <Setter Property="Padding" Value="4" />
     </Style>
 
     <Style TargetType="{x:Type TabItem}">
-        <Setter Property="Foreground" Value="{StaticResource MilTextSecondaryBrush}" />
+        <Setter Property="Foreground" Value="{DynamicResource MilTextSecondaryBrush}" />
         <Setter Property="HeaderTemplate">
             <Setter.Value>
                 <DataTemplate>
@@ -649,8 +674,8 @@
                             Margin="0,3,3,0"
                             Padding="1,1,1,0">
                         <Border x:Name="Face"
-                                Background="{StaticResource MilBtnDarkFaceBrush}"
-                                BorderBrush="#30FFF6DC"
+                                Background="{DynamicResource MilBtnDarkFaceBrush}"
+                                BorderBrush="{DynamicResource ThreeDHighlightBrush}"
                                 BorderThickness="1,1,1,0"
                                 CornerRadius="3,3,0,0"
                                 Padding="12,5">
@@ -659,11 +684,11 @@
                                       Height="9"
                                       Margin="0,0,7,0"
                                       VerticalAlignment="Center">
-                                    <Ellipse Fill="{StaticResource MilLampBezelBrush}" />
+                                    <Ellipse Fill="{DynamicResource MilLampBezelBrush}" />
                                     <Ellipse x:Name="Lamp"
                                              Margin="1.5"
-                                             Fill="{StaticResource MilLedOffBrush}" />
-                                    <Ellipse Margin="1.5" Fill="{StaticResource MilLampGlassBrush}" />
+                                             Fill="{DynamicResource MilLedOffBrush}" />
+                                    <Ellipse Margin="1.5" Fill="{DynamicResource MilLampGlassBrush}" />
                                 </Grid>
                                 <ContentPresenter ContentSource="Header" VerticalAlignment="Center" />
                             </StackPanel>
@@ -672,24 +697,25 @@
                     <ControlTemplate.Triggers>
                         <Trigger Property="IsSelected" Value="True">
                             <Setter TargetName="Rim" Property="Margin" Value="0,0,3,0" />
-                            <Setter TargetName="Face" Property="Background" Value="{StaticResource MilPanelFaceBrush}" />
-                            <Setter TargetName="Lamp" Property="Fill" Value="{StaticResource MilLedOnBrush}" />
+                            <Setter TargetName="Face" Property="Background" Value="{DynamicResource MilPanelFaceBrush}" />
+                            <Setter TargetName="Lamp" Property="Fill" Value="{DynamicResource MilLedOnBrush}" />
                             <Setter TargetName="Lamp" Property="Effect">
                                 <Setter.Value>
                                     <DropShadowEffect BlurRadius="7"
                                                       ShadowDepth="0"
+                                                      Opacity="{DynamicResource ThreeDEffectOpacity}"
                                                       Color="#4FE34F" />
                                 </Setter.Value>
                             </Setter>
-                            <Setter Property="Foreground" Value="{StaticResource MilTextPrimaryBrush}" />
+                            <Setter Property="Foreground" Value="{DynamicResource MilTextPrimaryBrush}" />
                         </Trigger>
                         <MultiTrigger>
                             <MultiTrigger.Conditions>
                                 <Condition Property="IsMouseOver" Value="True" />
                                 <Condition Property="IsSelected" Value="False" />
                             </MultiTrigger.Conditions>
-                            <Setter Property="Foreground" Value="{StaticResource MilTextPrimaryBrush}" />
-                            <Setter TargetName="Face" Property="Background" Value="{StaticResource MilBtnDarkHoverBrush}" />
+                            <Setter Property="Foreground" Value="{DynamicResource MilTextPrimaryBrush}" />
+                            <Setter TargetName="Face" Property="Background" Value="{DynamicResource MilBtnDarkHoverBrush}" />
                         </MultiTrigger>
                     </ControlTemplate.Triggers>
                 </ControlTemplate>
@@ -702,14 +728,14 @@
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="{x:Type Thumb}">
-                    <Border Background="{StaticResource MilBorderBrush}" CornerRadius="3" />
+                    <Border Background="{DynamicResource MilBorderBrush}" CornerRadius="3" />
                 </ControlTemplate>
             </Setter.Value>
         </Setter>
     </Style>
 
     <Style TargetType="{x:Type ScrollBar}">
-        <Setter Property="Background" Value="{StaticResource MilChromeBrush}" />
+        <Setter Property="Background" Value="{DynamicResource MilChromeBrush}" />
         <Setter Property="Width" Value="9" />
         <Setter Property="Template">
             <Setter.Value>
@@ -763,9 +789,9 @@
 
     <!-- ============ ToolTip ============ -->
     <Style TargetType="{x:Type ToolTip}">
-        <Setter Property="Foreground" Value="{StaticResource MilTextPrimaryBrush}" />
-        <Setter Property="Background" Value="{StaticResource MilChromeBrush}" />
-        <Setter Property="BorderBrush" Value="{StaticResource MilBorderBrush}" />
+        <Setter Property="Foreground" Value="{DynamicResource MilTextPrimaryBrush}" />
+        <Setter Property="Background" Value="{DynamicResource MilChromeBrush}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource MilBorderBrush}" />
         <Setter Property="BorderThickness" Value="1" />
         <Setter Property="Padding" Value="8,4" />
         <Setter Property="FontSize" Value="14" />
@@ -773,21 +799,21 @@
 
     <!-- ============ DataGrid (FavouriteServersView renders inside MainWindow) ============ -->
     <Style TargetType="{x:Type DataGrid}">
-        <Setter Property="Background" Value="{StaticResource MilWindowBackgroundBrush}" />
-        <Setter Property="Foreground" Value="{StaticResource MilTextPrimaryBrush}" />
-        <Setter Property="BorderBrush" Value="{StaticResource MilBorderBrush}" />
+        <Setter Property="Background" Value="{DynamicResource MilWindowBackgroundBrush}" />
+        <Setter Property="Foreground" Value="{DynamicResource MilTextPrimaryBrush}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource MilBorderBrush}" />
         <Setter Property="BorderThickness" Value="1" />
-        <Setter Property="RowBackground" Value="{StaticResource MilWellBrush}" />
-        <Setter Property="AlternatingRowBackground" Value="{StaticResource MilRowAltBrush}" />
-        <Setter Property="HorizontalGridLinesBrush" Value="{StaticResource MilChromeBrush}" />
-        <Setter Property="VerticalGridLinesBrush" Value="{StaticResource MilChromeBrush}" />
+        <Setter Property="RowBackground" Value="{DynamicResource MilWellBrush}" />
+        <Setter Property="AlternatingRowBackground" Value="{DynamicResource MilRowAltBrush}" />
+        <Setter Property="HorizontalGridLinesBrush" Value="{DynamicResource MilChromeBrush}" />
+        <Setter Property="VerticalGridLinesBrush" Value="{DynamicResource MilChromeBrush}" />
         <Setter Property="FontSize" Value="14" />
     </Style>
 
     <Style TargetType="{x:Type DataGridColumnHeader}">
-        <Setter Property="Background" Value="{StaticResource MilChromeBrush}" />
-        <Setter Property="Foreground" Value="{StaticResource MilAccentBrush}" />
-        <Setter Property="BorderBrush" Value="{StaticResource MilBorderBrush}" />
+        <Setter Property="Background" Value="{DynamicResource MilChromeBrush}" />
+        <Setter Property="Foreground" Value="{DynamicResource MilAccentBrush}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource MilBorderBrush}" />
         <Setter Property="BorderThickness" Value="0,0,1,1" />
         <Setter Property="Padding" Value="6,4" />
         <Setter Property="FontFamily" Value="{StaticResource MilFontMono}" />
@@ -799,16 +825,16 @@
         <Setter Property="Padding" Value="4,2" />
         <Style.Triggers>
             <Trigger Property="IsSelected" Value="True">
-                <Setter Property="Background" Value="{StaticResource MilActionBrush}" />
-                <Setter Property="Foreground" Value="{StaticResource MilTextPrimaryBrush}" />
+                <Setter Property="Background" Value="{DynamicResource MilActionBrush}" />
+                <Setter Property="Foreground" Value="{DynamicResource MilTextPrimaryBrush}" />
             </Trigger>
         </Style.Triggers>
     </Style>
 
     <!-- Row-header gutter: dark instead of the default light strip -->
     <Style TargetType="{x:Type DataGridRowHeader}">
-        <Setter Property="Background" Value="{StaticResource MilChromeBrush}" />
-        <Setter Property="BorderBrush" Value="{StaticResource MilBorderBrush}" />
+        <Setter Property="Background" Value="{DynamicResource MilChromeBrush}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource MilBorderBrush}" />
         <Setter Property="BorderThickness" Value="0,0,1,0" />
         <Setter Property="Template">
             <Setter.Value>

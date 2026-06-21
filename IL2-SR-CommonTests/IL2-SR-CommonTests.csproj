@@ -80,6 +80,7 @@
     <Compile Include="Network\UpdateReleaseSelectorTests.cs" />
     <Compile Include="Network\UDPVoicePacketTests.cs" />
     <Compile Include="Singletons\ConnectedClientsSingletonTests.cs" />
+    <Compile Include="UI\MemoryLeakGuardTests.cs" />
     <Compile Include="UI\RciDisplayStateTests.cs" />
     <Compile Include="UI\RadioOverlaySpeakerNameScrollTests.cs" />
     <Compile Include="UI\PilotRosterBuilderTests.cs" />

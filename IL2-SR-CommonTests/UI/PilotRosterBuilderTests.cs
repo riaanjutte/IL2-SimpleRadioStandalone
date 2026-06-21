@@ -113,19 +113,35 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Common.Tests.UI
             Assert.IsTrue(roster.Any(entry => entry.PilotName == "NOCALLSIGNTWO" && entry.Callsign == "--"));
         }
 
+
+        [TestMethod]
+        public void BuildIncludesAssignedVehicleWhenAvailable()
+        {
+            var roster = PilotRosterBuilder.Build(CreateState(FriendlyCoalition, 1, 2), new[]
+            {
+                CreateClient("friendly-1", "Assigned", "COWBOY-6", FriendlyCoalition, 3, 2, "  P-51D-15  ")
+            }).ToList();
+
+            Assert.AreEqual(1, roster.Count);
+            Assert.AreEqual("P-51D-15", roster[0].Vehicle);
+            Assert.IsTrue(roster[0].HasVehicle);
+        }
+
         private static SRClient CreateClient(
             string guid,
             string name,
             string callsign,
             int coalition,
             int radio1Channel,
-            int radio2Channel)
+            int radio2Channel,
+            string vehicle = null)
         {
             return new SRClient
             {
                 ClientGuid = guid,
                 Name = name,
                 AssignedCallsign = callsign,
+                AssignedVehicle = vehicle,
                 Coalition = coalition,
                 GameState = CreateState(coalition, radio1Channel, radio2Channel)
             };

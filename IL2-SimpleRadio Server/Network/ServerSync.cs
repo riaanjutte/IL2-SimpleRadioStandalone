@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Net;
@@ -220,6 +220,7 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Server.Network
 
                 srClient.ClientSession = state;
                 srClient.AssignedCallsign = _callsignProvider.GetAssignedCallsign(srClient.Name, srClient.Coalition);
+                srClient.AssignedVehicle = _callsignProvider.GetAssignedVehicle(srClient.Name, srClient.Coalition);
 
                 // add to proper list
                 _clients[srClient.ClientGuid] = srClient;
@@ -273,6 +274,7 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Server.Network
                     client.Coalition = message.Client.Coalition;
                     client.Seat = message.Client.Seat;
                     client.AssignedCallsign = _callsignProvider.GetAssignedCallsign(client.Name, client.Coalition);
+                    client.AssignedVehicle = _callsignProvider.GetAssignedVehicle(client.Name, client.Coalition);
 
                     Logger.Debug($"Client metadata update: {message.Client.ClientGuid} ({message.Client.Name}) coalition {message.Client.Coalition} callsign {client.AssignedCallsign}");
 
@@ -287,7 +289,8 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Server.Network
                             Coalition = client.Coalition,
                             Name = client.Name,
                             Seat = client.Seat,
-                            AssignedCallsign = client.AssignedCallsign
+                            AssignedCallsign = client.AssignedCallsign,
+                                AssignedVehicle = client.AssignedVehicle
                         }
                     };
 
@@ -337,6 +340,7 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Server.Network
                     //update to local ticks
                     message.Client.GameState.LastUpdate = DateTime.Now.Ticks;
                     var assignedCallsign = _callsignProvider.GetAssignedCallsign(message.Client.Name, message.Client.Coalition);
+                    var assignedVehicle = _callsignProvider.GetAssignedVehicle(message.Client.Name, message.Client.Coalition);
 
                     var changed = false;
 
@@ -349,7 +353,8 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Server.Network
                     {
                         changed = !client.GameState.Equals(message.Client.GameState) ||
                                   client.Coalition != message.Client.Coalition ||
-                                  !string.Equals(client.AssignedCallsign, assignedCallsign, StringComparison.Ordinal);
+                                  !string.Equals(client.AssignedCallsign, assignedCallsign, StringComparison.Ordinal) ||
+                                  !string.Equals(client.AssignedVehicle, assignedVehicle, StringComparison.Ordinal);
                     }
 
                     client.LastUpdate = DateTime.Now.Ticks;
@@ -359,6 +364,7 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Server.Network
                     client.GameState = message.Client.GameState;
                     client.Seat = message.Client.Seat;
                     client.AssignedCallsign = assignedCallsign;
+                    client.AssignedVehicle = assignedVehicle;
 
                     Logger.Debug($"Client radio update: {message.Client.ClientGuid} ({message.Client.Name}) Coalition {message.Client.Coalition}, Callsign {client.AssignedCallsign}, Radios {PrettyPrint(message.Client.GameState.radios)}");
 
@@ -382,7 +388,8 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Server.Network
                                     Name = client.Name,
                                     GameState = client.GameState, //send radio info
                                     Seat = client.Seat,
-                                    AssignedCallsign = client.AssignedCallsign
+                                    AssignedCallsign = client.AssignedCallsign,
+                                AssignedVehicle = client.AssignedVehicle
                                 }
                             };
                             Multicast(replyMessage.Encode());
@@ -428,7 +435,8 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Server.Network
                     Coalition = message.Client.Coalition,
                     GameState = message.Client.GameState,
                     Name = message.Client.Name,
-                    AssignedCallsign = _callsignProvider.GetAssignedCallsign(message.Client.Name, message.Client.Coalition)
+                    AssignedCallsign = _callsignProvider.GetAssignedCallsign(message.Client.Name, message.Client.Coalition),
+                    AssignedVehicle = _callsignProvider.GetAssignedVehicle(message.Client.Name, message.Client.Coalition)
                 }
             };
 
@@ -458,6 +466,7 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Server.Network
                 }
 
                 client.AssignedCallsign = _callsignProvider.GetAssignedCallsign(client.Name, client.Coalition);
+                client.AssignedVehicle = _callsignProvider.GetAssignedVehicle(client.Name, client.Coalition);
             }
         }
 
@@ -478,12 +487,15 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Server.Network
                         }
 
                         var assignedCallsign = _callsignProvider.GetAssignedCallsign(client.Name, client.Coalition);
-                        if (string.Equals(client.AssignedCallsign, assignedCallsign, StringComparison.Ordinal))
+                        var assignedVehicle = _callsignProvider.GetAssignedVehicle(client.Name, client.Coalition);
+                        if (string.Equals(client.AssignedCallsign, assignedCallsign, StringComparison.Ordinal) &&
+                            string.Equals(client.AssignedVehicle, assignedVehicle, StringComparison.Ordinal))
                         {
                             continue;
                         }
 
                         client.AssignedCallsign = assignedCallsign;
+                        client.AssignedVehicle = assignedVehicle;
                         changedClients.Add(client);
                     }
 
@@ -498,7 +510,8 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Server.Network
                                 Coalition = client.Coalition,
                                 Name = client.Name,
                                 Seat = client.Seat,
-                                AssignedCallsign = client.AssignedCallsign
+                                AssignedCallsign = client.AssignedCallsign,
+                                AssignedVehicle = client.AssignedVehicle
                             }
                         };
 

@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <root>
   <!-- 
     Microsoft ResX Schema 
@@ -138,6 +138,9 @@
   <data name="Speaker Boost:" xml:space="preserve">
     <value>Speaker Boost:</value>
   </data>
+  <data name="Speaker Boost" xml:space="preserve">
+    <value>Speaker Boost</value>
+  </data>
   <data name="Server" xml:space="preserve">
     <value>Server</value>
   </data>
@@ -219,6 +222,21 @@
   <data name="Theme" xml:space="preserve">
     <value>Theme</value>
   </data>
+  <data name="VU Meter" xml:space="preserve">
+    <value>VU Meter</value>
+  </data>
+  <data name="Auto" xml:space="preserve">
+    <value>Auto</value>
+  </data>
+  <data name="Weathering" xml:space="preserve">
+    <value>Weathering</value>
+  </data>
+  <data name="Weathering Opacity" xml:space="preserve">
+    <value>Weathering Opacity</value>
+  </data>
+  <data name="3D Effects" xml:space="preserve">
+    <value>3D Effects</value>
+  </data>
   <data name="Light" xml:space="preserve">
     <value>Light</value>
   </data>
@@ -290,6 +308,12 @@
   </data>
   <data name="Cancel" xml:space="preserve">
     <value>Cancel</value>
+  </data>
+  <data name="Yes" xml:space="preserve">
+    <value>Yes</value>
+  </data>
+  <data name="No" xml:space="preserve">
+    <value>No</value>
   </data>
   <data name="Rename" xml:space="preserve">
     <value>Rename</value>
@@ -474,6 +498,12 @@
   <data name="Please restart SRS for the language change to take effect." xml:space="preserve">
     <value>Please restart SRS for the language change to take effect.</value>
   </data>
+  <data name="Please restart SRS for the 3D effects setting to take effect." xml:space="preserve">
+    <value>Please restart SRS for the 3D effects setting to take effect.</value>
+  </data>
+  <data name="Restart SRS now to apply the 3D effects setting?" xml:space="preserve">
+    <value>Restart SRS now to apply the 3D effects setting?</value>
+  </data>
   <data name="Restart SRS now to apply the language change?" xml:space="preserve">
     <value>Restart SRS now to apply the language change?</value>
   </data>
@@ -533,6 +563,9 @@
   </data>
   <data name="Server Settings" xml:space="preserve">
     <value>Server Settings</value>
+  </data>
+  <data name="Reported by server" xml:space="preserve">
+    <value>Reported by server</value>
   </data>
   <data name="Coalition Security" xml:space="preserve">
     <value>Coalition Security</value>
@@ -741,7 +774,52 @@
   <data name="Overlays" xml:space="preserve">
     <value>Overlays</value>
   </data>
+  <data name="DISCONNECTED" xml:space="preserve">
+    <value>DISCONNECTED</value>
+  </data>
+  <data name="CONNECTED" xml:space="preserve">
+    <value>CONNECTED</value>
+  </data>
+  <data name="CONNECTION ERROR" xml:space="preserve">
+    <value>CONNECTION ERROR</value>
+  </data>
+  <data name="Server link inactive" xml:space="preserve">
+    <value>Server link inactive</value>
+  </data>
+  <data name="Server link established" xml:space="preserve">
+    <value>Server link established</value>
+  </data>
+  <data name="Server and IL-2 active" xml:space="preserve">
+    <value>Server and IL-2 active</value>
+  </data>
+  <data name="Check address or network" xml:space="preserve">
+    <value>Check address or network</value>
+  </data>
   <data name="Mic" xml:space="preserve">
     <value>Mic</value>
+  </data>
+  <data name="Report a Problem" xml:space="preserve">
+    <value>Report a Problem</value>
+  </data>
+  <data name="Suggest an Improvement" xml:space="preserve">
+    <value>Suggest an Improvement</value>
+  </data>
+  <data name="Redact personal details in diagnostics" xml:space="preserve">
+    <value>Redact personal details in diagnostics</value>
+  </data>
+  <data name="DiagnosticBundlePrivacyWarning" xml:space="preserve">
+    <value>The diagnostic bundle may include device names, server addresses, player names, and recent connection/audio events. Please review it before attaching it publicly.</value>
+  </data>
+  <data name="DiagnosticBundleCreatedMessage" xml:space="preserve">
+    <value>Diagnostic bundle created at:
+{0}
+
+Attach this ZIP to the GitHub issue that opened in your browser.</value>
+  </data>
+  <data name="DiagnosticBundleCreateFailed" xml:space="preserve">
+    <value>Failed to create the diagnostic bundle. Please attach clientlog.txt manually when reporting the issue.</value>
+  </data>
+  <data name="SuggestionPageOpenFailed" xml:space="preserve">
+    <value>Failed to open the GitHub suggestion page.</value>
   </data>
 </root>

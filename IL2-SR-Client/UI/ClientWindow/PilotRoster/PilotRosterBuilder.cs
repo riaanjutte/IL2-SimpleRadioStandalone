@@ -23,6 +23,7 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI.ClientWindow.PilotRoster
                 .Select(client => new PilotRosterEntry(
                     client.AssignedCallsign,
                     client.Name,
+                    client.AssignedVehicle,
                     FormatRadioChannel(client.GameState, 1),
                     FormatRadioChannel(client.GameState, 2)))
                 .OrderBy(entry => entry.Callsign == "--" ? 1 : 0)

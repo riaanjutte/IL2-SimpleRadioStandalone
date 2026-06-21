@@ -3,6 +3,7 @@ using System.ComponentModel;
 using System.Diagnostics;
 using System.Linq;
 using System.Runtime.InteropServices;
+using System.Threading;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -15,6 +16,7 @@ using Ciribob.IL2.SimpleRadio.Standalone.Client.Settings;
 using Ciribob.IL2.SimpleRadio.Standalone.Client.Singletons;
 using Ciribob.IL2.SimpleRadio.Standalone.Client.UI;
 using Ciribob.IL2.SimpleRadio.Standalone.Client.UI.RadioOverlayWindow;
+using Ciribob.IL2.SimpleRadio.Standalone.Client.Utils;
 using Ciribob.IL2.SimpleRadio.Standalone.Common;
 
 namespace Ciribob.IL2.SimpleRadio.Standalone.Overlay
@@ -28,7 +30,11 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Overlay
         private readonly Logger Logger = LogManager.GetCurrentClassLogger();
 
 
-        private readonly DispatcherTimer _updateTimer;
+        private readonly DispatcherTimer _telemetryUpdateTimer;
+        private readonly DispatcherTimer _focusTimer;
+        private Timer _fastUpdateTimer;
+        private int _fastApplyQueued;
+        private OverlayFastSnapshot _latestFastSnapshot;
 
         private readonly ClientStateSingleton _clientStateSingleton = ClientStateSingleton.Instance;
 
@@ -101,12 +107,35 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Overlay
 
             LocationChanged += Location_Changed;
 
-            RadioRefresh(null, null);
+            ApplyFastSnapshot(CaptureFastSnapshot());
+            TelemetryRefresh(null, null);
 
-            //init radio refresh
-            _updateTimer = new DispatcherTimer {Interval = TimeSpan.FromMilliseconds(80)};
-            _updateTimer.Tick += RadioRefresh;
-            _updateTimer.Start();
+            _fastUpdateTimer = new Timer(FastOverlayRefresh, null, TimeSpan.Zero, TimeSpan.FromMilliseconds(40));
+
+            _telemetryUpdateTimer = new DispatcherTimer(DispatcherPriority.Background, Dispatcher)
+            {
+                Interval = TimeSpan.FromMilliseconds(250)
+            };
+            _telemetryUpdateTimer.Tick += TelemetryRefresh;
+            _telemetryUpdateTimer.Start();
+
+            _focusTimer = new DispatcherTimer(DispatcherPriority.Background, Dispatcher)
+            {
+                Interval = TimeSpan.FromMilliseconds(250)
+            };
+            _focusTimer.Tick += FocusRefresh;
+            _focusTimer.Start();
+        }
+
+        public void RefreshLocalization()
+        {
+            LocalizationManager.LocalizeElement(this);
+            Radio1?.RefreshLocalization();
+            Radio2?.RefreshLocalization();
+            Intercom?.RefreshLocalization();
+            UpdateRciStatusIndicator();
+            ApplyFastSnapshot(CaptureFastSnapshot());
+            TelemetryRefresh(null, null);
         }
 
         private void Location_Changed(object sender, EventArgs e)
@@ -126,26 +155,118 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Overlay
             _hwndSource?.AddHook(WndProc);
         }
 
-        private void RadioRefresh(object sender, EventArgs eventArgs)
+        private void FastOverlayRefresh(object state)
+        {
+            _latestFastSnapshot = CaptureFastSnapshot();
+            if (Interlocked.Exchange(ref _fastApplyQueued, 1) == 1)
+            {
+                return;
+            }
+
+            Dispatcher.BeginInvoke(new Action(ApplyLatestFastSnapshot), DispatcherPriority.Send);
+        }
+
+        private void ApplyLatestFastSnapshot()
+        {
+            var snapshot = _latestFastSnapshot;
+            Interlocked.Exchange(ref _fastApplyQueued, 0);
+
+            if (snapshot == null || !IsVisible)
+            {
+                return;
+            }
+
+            ApplyFastSnapshot(snapshot);
+
+            if (!ReferenceEquals(snapshot, _latestFastSnapshot) &&
+                Interlocked.Exchange(ref _fastApplyQueued, 1) == 0)
+            {
+                Dispatcher.BeginInvoke(new Action(ApplyLatestFastSnapshot), DispatcherPriority.Send);
+            }
+        }
+
+        private OverlayFastSnapshot CaptureFastSnapshot()
         {
             var IL2PlayerRadioInfo = _clientStateSingleton.PlayerGameState;
+            var isConnected = _clientStateSingleton.IsConnected && IL2PlayerRadioInfo != null;
+            var secondRadioEnabled = isConnected &&
+                                     IL2PlayerRadioInfo.radios.Length > 2 &&
+                                     IL2PlayerRadioInfo.radios[2].modulation != RadioInformation.Modulation.DISABLED;
 
-            UpdateAssignedCallsignIndicator();
-           
-            Radio1.RepaintRadioStatus();
-            Radio1.RepaintRadioReceive();
+            return new OverlayFastSnapshot
+            {
+                Radio1 = CaptureRadioFastState(IL2PlayerRadioInfo, isConnected, 1, true),
+                Radio2 = CaptureRadioFastState(IL2PlayerRadioInfo, isConnected, 2, secondRadioEnabled),
+                Intercom = CaptureRadioFastState(IL2PlayerRadioInfo, isConnected, 0, true),
+                SecondRadioEnabled = secondRadioEnabled
+            };
+        }
 
-            if (IL2PlayerRadioInfo.radios[2].modulation != RadioInformation.Modulation.DISABLED)
+        private OverlayRadioFastState CaptureRadioFastState(
+            PlayerGameState playerState,
+            bool isConnected,
+            int radioId,
+            bool isAvailable)
+        {
+            var state = new OverlayRadioFastState
+            {
+                IsConnected = isConnected,
+                IsAvailable = isAvailable,
+                RadioId = radioId
+            };
+
+            if (!isConnected || !isAvailable || playerState == null ||
+                radioId < 0 || radioId >= playerState.radios.Length ||
+                playerState.radios[radioId] == null)
+            {
+                return state;
+            }
+
+            var radio = playerState.radios[radioId];
+            var transmitting = _clientStateSingleton.RadioSendingState;
+            var receiving = radioId < _clientStateSingleton.RadioReceivingState.Length
+                ? _clientStateSingleton.RadioReceivingState[radioId]
+                : null;
+
+            state.Channel = radio.channel;
+            state.VolumePercent = RadioHelper.GetEffectiveReceiveVolume(radioId, radio) * 100.0;
+            state.TxActive = transmitting != null &&
+                             transmitting.SendingOn == radioId &&
+                             (transmitting.IsSending || IsRecent(transmitting.LastSentAt, 250.0));
+            state.RxActive = receiving != null && IsRecent(receiving.LastReceivedAt, 500.0);
+            state.SpeakerName = state.RxActive ? receiving?.SentBy : null;
+
+            return state;
+        }
+
+        private static bool IsRecent(long timestampTicks, double holdMilliseconds)
+        {
+            if (timestampTicks <= 0)
+            {
+                return false;
+            }
+
+            return (DateTime.Now.Ticks - timestampTicks) < TimeSpan.FromMilliseconds(holdMilliseconds).Ticks;
+        }
+
+        private void ApplyFastSnapshot(OverlayFastSnapshot snapshot)
+        {
+            if (snapshot == null)
+            {
+                return;
+            }
+
+            Radio1.ApplyFastState(snapshot.Radio1);
+
+            if (snapshot.SecondRadioEnabled)
             {
                 if (Radio2.Visibility == Visibility.Collapsed)
                 {
-                    //show
                     Radio2.Visibility = Visibility.Visible;
                     UpdateOverlayMinimumHeight();
                 }
 
-                Radio2.RepaintRadioStatus();
-                Radio2.RepaintRadioReceive();
+                Radio2.ApplyFastState(snapshot.Radio2);
             }
             else
             {
@@ -156,9 +277,27 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Overlay
                 }
             }
 
-            Intercom.RepaintRadioStatus();
-            UpdateRciStatusIndicator();
+            Intercom.ApplyFastState(snapshot.Intercom);
+        }
 
+        private void TelemetryRefresh(object sender, EventArgs eventArgs)
+        {
+            UpdateAssignedCallsignIndicator();
+            Radio1.RefreshOverlayTelemetry();
+            if (Radio2.Visibility == Visibility.Visible)
+            {
+                Radio2.RefreshOverlayTelemetry();
+            }
+            else
+            {
+                Radio2.RefreshOverlayTelemetry();
+            }
+            Intercom.RefreshOverlayTelemetry();
+            UpdateRciStatusIndicator();
+        }
+
+        private void FocusRefresh(object sender, EventArgs eventArgs)
+        {
             FocusIL2();
         }
 
@@ -590,7 +729,10 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Overlay
             base.OnClosing(e);
 
             _hwndSource?.RemoveHook(WndProc);
-            _updateTimer.Stop();
+            _fastUpdateTimer?.Dispose();
+            _fastUpdateTimer = null;
+            _telemetryUpdateTimer.Stop();
+            _focusTimer.Stop();
             _overlayTestTimer?.Stop();
         }
 

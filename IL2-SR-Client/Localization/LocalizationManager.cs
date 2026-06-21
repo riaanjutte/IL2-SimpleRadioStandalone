@@ -36,6 +36,20 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.Localization
     {
         private const string DefaultLanguage = "en";
         private const string LocalizationFolder = "Localization";
+        private static readonly DependencyProperty WindowTitleKeyProperty =
+            DependencyProperty.RegisterAttached("WindowTitleKey", typeof(string), typeof(LocalizationManager));
+        private static readonly DependencyProperty DataGridColumnHeaderKeyProperty =
+            DependencyProperty.RegisterAttached("DataGridColumnHeaderKey", typeof(string), typeof(LocalizationManager));
+        private static readonly DependencyProperty HeaderKeyProperty =
+            DependencyProperty.RegisterAttached("HeaderKey", typeof(string), typeof(LocalizationManager));
+        private static readonly DependencyProperty ContentKeyProperty =
+            DependencyProperty.RegisterAttached("ContentKey", typeof(string), typeof(LocalizationManager));
+        private static readonly DependencyProperty TextKeyProperty =
+            DependencyProperty.RegisterAttached("TextKey", typeof(string), typeof(LocalizationManager));
+        private static readonly DependencyProperty ToolTipKeyProperty =
+            DependencyProperty.RegisterAttached("ToolTipKey", typeof(string), typeof(LocalizationManager));
+        private static readonly DependencyProperty RunTextKeyProperty =
+            DependencyProperty.RegisterAttached("RunTextKey", typeof(string), typeof(LocalizationManager));
 
         private static readonly List<LanguageOption> Languages = new List<LanguageOption>
         {
@@ -56,6 +70,7 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.Localization
             {"Stop Preview", "Stop Preview"},
             {"Speakers & Optional Mic Output", "Speakers & Optional Mic Output"},
             {"Speaker Boost:", "Speaker Boost:"},
+            {"Speaker Boost", "Speaker Boost"},
             {"Server", "Server"},
             {"Connect", "Connect"},
             {"Connecting...", "Connecting..."},
@@ -76,6 +91,10 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.Localization
             {"Global Settings", "Global Settings"},
             {"Language", "Language"},
             {"Theme", "Theme"},
+            {"VU Meter", "VU Meter"},
+            {"Auto", "Auto"},
+            {"Weathering", "Weathering"},
+            {"Weathering Opacity", "Weathering Opacity"},
             {"Light", "Light"},
             {"Dark", "Dark"},
             {"Use Windows setting", "Use Windows setting"},
@@ -100,6 +119,8 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.Localization
             {"Create Profile", "Create Profile"},
             {"Create", "Create"},
             {"Cancel", "Cancel"},
+            {"Yes", "Yes"},
+            {"No", "No"},
             {"Rename", "Rename"},
             {"Please Enter a Profile Name", "Please Enter a Profile Name"},
             {"Copy Profile", "Copy Profile"},
@@ -181,6 +202,7 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.Localization
             {"ServerAddress/port", "ServerAddress/port"},
             {"Is Default", "Is Default"},
             {"Server Settings", "Server Settings"},
+            {"Reported by server", "Reported by server"},
             {"Coalition Security", "Coalition Security"},
             {"Unknown", "Unknown"},
             {"Spectator Audio", "Spectator Audio"},
@@ -193,6 +215,13 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.Localization
             {"Close", "Close"},
             {"DISABLED", "DISABLED"},
             {"ENABLED", "ENABLED"},
+            {"DISCONNECTED", "DISCONNECTED"},
+            {"CONNECTED", "CONNECTED"},
+            {"CONNECTION ERROR", "CONNECTION ERROR"},
+            {"Server link inactive", "Server link inactive"},
+            {"Server link established", "Server link established"},
+            {"Server and IL-2 active", "Server and IL-2 active"},
+            {"Check address or network", "Check address or network"},
             {"CREW INTERCOM", "CREW INTERCOM"},
             {"PLTS:", "PLTS:"},
             {"Not Connected", "Not Connected"},
@@ -207,6 +236,7 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.Localization
             {"Channel 4", "Channel 4"},
             {"Channel 5", "Channel 5"},
             {"Window Opacity", "Window Opacity"},
+            {"Overlays", "Overlays"},
             {"Select First Radio", "Select First Radio"},
             {"Select Second Radio", "Select Second Radio"},
             {"Push To Talk - PTT", "Push To Talk - PTT"},
@@ -258,6 +288,7 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.Localization
                     {"Stop Preview", "Vorschau stoppen"},
                     {"Speakers & Optional Mic Output", "Lautsprecher & optionaler Mikrofonausgang"},
                     {"Speaker Boost:", "Lautsprecherverstärkung:"},
+                    {"Speaker Boost", "Lautsprecherverstärkung"},
                     {"Server", "Server"},
                     {"Connect", "Verbinden"},
                     {"Connecting...", "Verbinden..."},
@@ -278,6 +309,8 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.Localization
                     {"Global Settings", "Globale Einstellungen"},
                     {"Language", "Sprache"},
                     {"Theme", "Design"},
+                    {"Weathering", "Alterung"},
+                    {"Weathering Opacity", "Alterungsstarke"},
                     {"Light", "Hell"},
                     {"Dark", "Dunkel"},
                     {"Use Windows setting", "Windows-Einstellung verwenden"},
@@ -302,6 +335,8 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.Localization
                     {"Create Profile", "Profil erstellen"},
                     {"Create", "Erstellen"},
                     {"Cancel", "Abbrechen"},
+                    {"Yes", "Ja"},
+                    {"No", "Nein"},
                     {"Rename", "Umbenennen"},
                     {"Please Enter a Profile Name", "Bitte Profilnamen eingeben"},
                     {"Copy Profile", "Profil kopieren"},
@@ -383,6 +418,7 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.Localization
                     {"ServerAddress/port", "Serveradresse/Port"},
                     {"Is Default", "Ist Standard"},
                     {"Server Settings", "Servereinstellungen"},
+                    {"Reported by server", "Vom Server gemeldet"},
                     {"Coalition Security", "Koalitionssicherheit"},
                     {"Unknown", "Unbekannt"},
                     {"Spectator Audio", "Zuschauer-Audio"},
@@ -395,6 +431,13 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.Localization
                     {"Close", "Schliessen"},
                     {"DISABLED", "DEAKTIVIERT"},
                     {"ENABLED", "AKTIVIERT"},
+                    {"DISCONNECTED", "GETRENNT"},
+                    {"CONNECTED", "VERBUNDEN"},
+                    {"CONNECTION ERROR", "VERBINDUNGSFEHLER"},
+                    {"Server link inactive", "Serververbindung inaktiv"},
+                    {"Server link established", "Serververbindung hergestellt"},
+                    {"Server and IL-2 active", "Server und IL-2 aktiv"},
+                    {"Check address or network", "Adresse oder Netzwerk pruefen"},
                     {"CREW INTERCOM", "Crew-Intercom"},
                     {"PLTS:", "PIL:"},
                     {"Not Connected", "Nicht verbunden"},
@@ -409,6 +452,7 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.Localization
                     {"Channel 4", "Kanal 4"},
                     {"Channel 5", "Kanal 5"},
                     {"Window Opacity", "Fensterdeckkraft"},
+                    {"Overlays", "Einblendungen"},
                     {"Select First Radio", "Erstes Funkgeraet waehlen"},
                     {"Select Second Radio", "Zweites Funkgeraet waehlen"},
                     {"Push To Talk - PTT", "Push To Talk - PTT"},
@@ -455,6 +499,7 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.Localization
                     {"Stop Preview", "Arreter l'apercu"},
                     {"Speakers & Optional Mic Output", "Haut-parleurs et sortie micro optionnelle"},
                     {"Speaker Boost:", "Amplification haut-parleur :"},
+                    {"Speaker Boost", "Amplification haut-parleur"},
                     {"Server", "Serveur"},
                     {"Connect", "Connexion"},
                     {"Connecting...", "Connexion..."},
@@ -475,6 +520,8 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.Localization
                     {"Global Settings", "Parametres globaux"},
                     {"Language", "Langue"},
                     {"Theme", "Theme"},
+                    {"Weathering", "Patine"},
+                    {"Weathering Opacity", "Intensite de la patine"},
                     {"Light", "Clair"},
                     {"Dark", "Sombre"},
                     {"Use Windows setting", "Utiliser le parametre Windows"},
@@ -499,6 +546,8 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.Localization
                     {"Create Profile", "Creer un profil"},
                     {"Create", "Creer"},
                     {"Cancel", "Annuler"},
+                    {"Yes", "Oui"},
+                    {"No", "Non"},
                     {"Rename", "Renommer"},
                     {"Please Enter a Profile Name", "Veuillez saisir un nom de profil"},
                     {"Copy Profile", "Copier le profil"},
@@ -580,6 +629,7 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.Localization
                     {"ServerAddress/port", "Adresse serveur/port"},
                     {"Is Default", "Par defaut"},
                     {"Server Settings", "Parametres serveur"},
+                    {"Reported by server", "Signale par le serveur"},
                     {"Coalition Security", "Securite coalition"},
                     {"Unknown", "Inconnu"},
                     {"Spectator Audio", "Audio spectateur"},
@@ -592,6 +642,13 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.Localization
                     {"Close", "Fermer"},
                     {"DISABLED", "DESACTIVE"},
                     {"ENABLED", "ACTIVE"},
+                    {"DISCONNECTED", "DECONNECTE"},
+                    {"CONNECTED", "CONNECTE"},
+                    {"CONNECTION ERROR", "ERREUR DE CONNEXION"},
+                    {"Server link inactive", "Lien serveur inactif"},
+                    {"Server link established", "Lien serveur etabli"},
+                    {"Server and IL-2 active", "Serveur et IL-2 actifs"},
+                    {"Check address or network", "Verifier l'adresse ou le reseau"},
                     {"CREW INTERCOM", "I/C EQUIPAGE"},
                     {"Not Connected", "Non connecte"},
                     {"CHN {0}", "CANAL {0}"},
@@ -605,6 +662,7 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.Localization
                     {"Channel 4", "Canal 4"},
                     {"Channel 5", "Canal 5"},
                     {"Window Opacity", "Opacite de la fenetre"},
+                    {"Overlays", "Superpositions"},
                     {"Select First Radio", "Selectionner la premiere radio"},
                     {"Select Second Radio", "Selectionner la deuxieme radio"},
                     {"Push To Talk - PTT", "Push To Talk - PTT"},
@@ -651,6 +709,7 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.Localization
                     {"Stop Preview", "Detener vista previa"},
                     {"Speakers & Optional Mic Output", "Altavoces y salida opcional de microfono"},
                     {"Speaker Boost:", "Refuerzo de altavoz:"},
+                    {"Speaker Boost", "Refuerzo de altavoz"},
                     {"Server", "Servidor"},
                     {"Connect", "Conectar"},
                     {"Connecting...", "Conectando..."},
@@ -671,6 +730,8 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.Localization
                     {"Global Settings", "Ajustes globales"},
                     {"Language", "Idioma"},
                     {"Theme", "Tema"},
+                    {"Weathering", "Desgaste"},
+                    {"Weathering Opacity", "Opacidad del desgaste"},
                     {"Light", "Claro"},
                     {"Dark", "Oscuro"},
                     {"Use Windows setting", "Usar configuracion de Windows"},
@@ -695,6 +756,8 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.Localization
                     {"Create Profile", "Crear perfil"},
                     {"Create", "Crear"},
                     {"Cancel", "Cancelar"},
+                    {"Yes", "Sí"},
+                    {"No", "No"},
                     {"Rename", "Renombrar"},
                     {"Please Enter a Profile Name", "Introduce un nombre de perfil"},
                     {"Copy Profile", "Copiar perfil"},
@@ -776,6 +839,7 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.Localization
                     {"ServerAddress/port", "Direccion/puerto del servidor"},
                     {"Is Default", "Predeterminado"},
                     {"Server Settings", "Ajustes del servidor"},
+                    {"Reported by server", "Informado por el servidor"},
                     {"Coalition Security", "Seguridad de coalicion"},
                     {"Unknown", "Desconocido"},
                     {"Spectator Audio", "Audio de espectador"},
@@ -788,6 +852,13 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.Localization
                     {"Close", "Cerrar"},
                     {"DISABLED", "DESACTIVADO"},
                     {"ENABLED", "ACTIVADO"},
+                    {"DISCONNECTED", "DESCONECTADO"},
+                    {"CONNECTED", "CONECTADO"},
+                    {"CONNECTION ERROR", "ERROR DE CONEXION"},
+                    {"Server link inactive", "Enlace del servidor inactivo"},
+                    {"Server link established", "Enlace del servidor establecido"},
+                    {"Server and IL-2 active", "Servidor e IL-2 activos"},
+                    {"Check address or network", "Comprueba la direccion o la red"},
                     {"CREW INTERCOM", "CREW INTERCOM"},
                     {"Not Connected", "No conectado"},
                     {"CHN {0}", "CANAL {0}"},
@@ -801,6 +872,7 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.Localization
                     {"Channel 4", "Canal 4"},
                     {"Channel 5", "Canal 5"},
                     {"Window Opacity", "Opacidad de ventana"},
+                    {"Overlays", "Superposiciones"},
                     {"Select First Radio", "Seleccionar primera radio"},
                     {"Select Second Radio", "Seleccionar segunda radio"},
                     {"Push To Talk - PTT", "Push To Talk - PTT"},
@@ -938,6 +1010,11 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.Localization
             var children = GetLocalizableChildren(root);
             LocalizeObject(root);
 
+            if (root is ComboBox || root is ListBox)
+            {
+                return;
+            }
+
             foreach (var child in children)
             {
                 LocalizeElement(child);
@@ -962,7 +1039,7 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.Localization
             var window = item as Window;
             if (window != null && !string.IsNullOrEmpty(window.Title))
             {
-                window.Title = Get(window.Title);
+                window.Title = Get(GetOrSetLocalizationKey(window, WindowTitleKeyProperty, window.Title));
             }
 
             var dataGrid = item as DataGrid;
@@ -973,7 +1050,7 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.Localization
                     var columnHeader = column.Header as string;
                     if (columnHeader != null)
                     {
-                        column.Header = Get(columnHeader);
+                        column.Header = Get(GetOrSetLocalizationKey(column, DataGridColumnHeaderKeyProperty, columnHeader));
                     }
                 }
             }
@@ -982,36 +1059,48 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.Localization
             var header = headeredContentControl?.Header as string;
             if (header != null)
             {
-                headeredContentControl.Header = Get(header);
+                headeredContentControl.Header = Get(GetOrSetLocalizationKey(headeredContentControl, HeaderKeyProperty, header));
             }
 
             var headeredItemsControl = item as HeaderedItemsControl;
             var itemsHeader = headeredItemsControl?.Header as string;
             if (itemsHeader != null)
             {
-                headeredItemsControl.Header = Get(itemsHeader);
+                headeredItemsControl.Header = Get(GetOrSetLocalizationKey(headeredItemsControl, HeaderKeyProperty, itemsHeader));
             }
 
             var contentControl = item as ContentControl;
             var content = contentControl?.Content as string;
             if (content != null)
             {
-                contentControl.Content = Get(content);
+                contentControl.Content = Get(GetOrSetLocalizationKey(contentControl, ContentKeyProperty, content));
             }
 
             var textBlock = item as TextBlock;
             if (textBlock != null &&
                 BindingOperations.GetBindingExpressionBase(textBlock, TextBlock.TextProperty) == null)
             {
-                textBlock.Text = Get(textBlock.Text);
+                textBlock.Text = Get(GetOrSetLocalizationKey(textBlock, TextKeyProperty, textBlock.Text));
             }
 
             var frameworkElement = item as FrameworkElement;
             var tooltip = frameworkElement?.ToolTip as string;
             if (tooltip != null)
             {
-                frameworkElement.ToolTip = Get(tooltip);
+                frameworkElement.ToolTip = Get(GetOrSetLocalizationKey(frameworkElement, ToolTipKeyProperty, tooltip));
             }
+        }
+
+        private static string GetOrSetLocalizationKey(DependencyObject item, DependencyProperty property, string currentText)
+        {
+            var key = item.GetValue(property) as string;
+            if (!string.IsNullOrEmpty(key))
+            {
+                return key;
+            }
+
+            item.SetValue(property, currentText);
+            return currentText;
         }
 
         private static List<DependencyObject> GetLocalizableChildren(DependencyObject root)
@@ -1052,7 +1141,7 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.Localization
             var run = element as Run;
             if (run != null)
             {
-                run.Text = Get(run.Text);
+                run.Text = Get(GetOrSetLocalizationKey(run, RunTextKeyProperty, run.Text));
             }
 
             var paragraph = element as Paragraph;

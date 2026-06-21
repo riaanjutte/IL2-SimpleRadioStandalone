@@ -16,7 +16,7 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Server.Network
         private static readonly TimeSpan ReadErrorLogInterval = TimeSpan.FromMinutes(1);
 
         private readonly ServerSettingsStore _serverSettings;
-        private Dictionary<CallsignRosterKey, string> _callsigns = new Dictionary<CallsignRosterKey, string>();
+        private Dictionary<CallsignRosterKey, CombatBoxRosterAssignment> _assignments = new Dictionary<CallsignRosterKey, CombatBoxRosterAssignment>();
         private DateTime _lastRefreshUtc = DateTime.MinValue;
         private DateTime _lastMissingFileLogUtc = DateTime.MinValue;
         private DateTime _lastReadErrorLogUtc = DateTime.MinValue;
@@ -28,16 +28,12 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Server.Network
 
         public string GetAssignedCallsign(string playerName, int coalition)
         {
-            RefreshIfNeeded();
+            return GetAssignment(playerName, coalition)?.Callsign ?? string.Empty;
+        }
 
-            if (string.IsNullOrWhiteSpace(playerName) || coalition <= 0)
-            {
-                return string.Empty;
-            }
-
-            return _callsigns.TryGetValue(new CallsignRosterKey(playerName, coalition), out var assignedCallsign)
-                ? assignedCallsign
-                : string.Empty;
+        public string GetAssignedVehicle(string playerName, int coalition)
+        {
+            return GetAssignment(playerName, coalition)?.Vehicle ?? string.Empty;
         }
 
         public void RefreshIfNeeded()
@@ -56,7 +52,7 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Server.Network
 
             if (!File.Exists(path))
             {
-                _callsigns = new Dictionary<CallsignRosterKey, string>();
+                _assignments = new Dictionary<CallsignRosterKey, CombatBoxRosterAssignment>();
                 LogMissingFile(path);
                 return;
             }
@@ -70,12 +66,26 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Server.Network
                     text = reader.ReadToEnd();
                 }
 
-                _callsigns = CombatBoxCallsignRoster.Parse(text);
+                _assignments = CombatBoxCallsignRoster.ParseAssignments(text);
             }
             catch (Exception ex)
             {
                 LogReadError(path, ex);
             }
+        }
+
+        private CombatBoxRosterAssignment GetAssignment(string playerName, int coalition)
+        {
+            RefreshIfNeeded();
+
+            if (string.IsNullOrWhiteSpace(playerName) || coalition <= 0)
+            {
+                return null;
+            }
+
+            return _assignments.TryGetValue(new CallsignRosterKey(playerName, coalition), out var assignment)
+                ? assignment
+                : null;
         }
 
         private string ResolveCurrentStatePath()

@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using Newtonsoft.Json;
 
 namespace Ciribob.IL2.SimpleRadio.Standalone.Common.Network
@@ -8,33 +9,45 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Common.Network
     {
         public static Dictionary<CallsignRosterKey, string> Parse(string rosterJson)
         {
-            var callsigns = new Dictionary<CallsignRosterKey, string>();
+            return ParseAssignments(rosterJson)
+                .Where(pair => !string.IsNullOrWhiteSpace(pair.Value.Callsign))
+                .ToDictionary(pair => pair.Key, pair => pair.Value.Callsign);
+        }
+
+        public static Dictionary<CallsignRosterKey, CombatBoxRosterAssignment> ParseAssignments(string rosterJson)
+        {
+            var assignments = new Dictionary<CallsignRosterKey, CombatBoxRosterAssignment>();
 
             if (string.IsNullOrWhiteSpace(rosterJson))
             {
-                return callsigns;
+                return assignments;
             }
 
             var roster = JsonConvert.DeserializeObject<CallsignRoster>(rosterJson);
             if (roster?.Players == null)
             {
-                return callsigns;
+                return assignments;
             }
 
             foreach (var player in roster.Players)
             {
                 if (player == null ||
                     string.IsNullOrWhiteSpace(player.Name) ||
-                    string.IsNullOrWhiteSpace(player.Callsign) ||
                     player.CoalitionCode <= 0)
                 {
                     continue;
                 }
 
-                callsigns[new CallsignRosterKey(player.Name, player.CoalitionCode)] = player.Callsign.Trim();
+                var assignment = new CombatBoxRosterAssignment(player.Callsign, player.Vehicle);
+                if (!assignment.HasCallsign && !assignment.HasVehicle)
+                {
+                    continue;
+                }
+
+                assignments[new CallsignRosterKey(player.Name, player.CoalitionCode)] = assignment;
             }
 
-            return callsigns;
+            return assignments;
         }
 
         private class CallsignRoster
@@ -53,6 +66,33 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Common.Network
 
             [JsonProperty("callsign")]
             public string Callsign { get; set; }
+
+            [JsonProperty("vehicle")]
+            public string Vehicle { get; set; }
+        }
+    }
+
+    public class CombatBoxRosterAssignment
+    {
+        public CombatBoxRosterAssignment(string callsign, string vehicle)
+        {
+            Callsign = Normalize(callsign);
+            Vehicle = Normalize(vehicle);
+        }
+
+        public string Callsign { get; }
+
+        public string Vehicle { get; }
+
+        public bool HasCallsign => !string.IsNullOrWhiteSpace(Callsign);
+
+        public bool HasVehicle => !string.IsNullOrWhiteSpace(Vehicle);
+
+        private static string Normalize(string value)
+        {
+            return string.IsNullOrWhiteSpace(value)
+                ? string.Empty
+                : value.Trim();
         }
     }
 

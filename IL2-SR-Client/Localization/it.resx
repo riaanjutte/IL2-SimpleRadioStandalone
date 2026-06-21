@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <root>
   <!-- 
     Microsoft ResX Schema 
@@ -138,6 +138,9 @@
   <data name="Speaker Boost:" xml:space="preserve">
     <value>Amplificazione altoparlante:</value>
   </data>
+  <data name="Speaker Boost" xml:space="preserve">
+    <value>Amplificazione altoparlante</value>
+  </data>
   <data name="Server" xml:space="preserve">
     <value>Server</value>
   </data>
@@ -219,6 +222,21 @@
   <data name="Theme" xml:space="preserve">
     <value>Tema</value>
   </data>
+  <data name="VU Meter" xml:space="preserve">
+    <value>Indicatore VU</value>
+  </data>
+  <data name="Auto" xml:space="preserve">
+    <value>Auto</value>
+  </data>
+  <data name="Weathering" xml:space="preserve">
+    <value>Usura</value>
+  </data>
+  <data name="Weathering Opacity" xml:space="preserve">
+    <value>Opacità dell'usura</value>
+  </data>
+  <data name="3D Effects" xml:space="preserve">
+    <value>Effetti 3D</value>
+  </data>
   <data name="Light" xml:space="preserve">
     <value>Chiaro</value>
   </data>
@@ -290,6 +308,12 @@
   </data>
   <data name="Cancel" xml:space="preserve">
     <value>Annulla</value>
+  </data>
+  <data name="Yes" xml:space="preserve">
+    <value>Sì</value>
+  </data>
+  <data name="No" xml:space="preserve">
+    <value>No</value>
   </data>
   <data name="Rename" xml:space="preserve">
     <value>Rinomina</value>
@@ -474,6 +498,12 @@
   <data name="Please restart SRS for the language change to take effect." xml:space="preserve">
     <value>Riavvia SRS per applicare il cambio lingua.</value>
   </data>
+  <data name="Please restart SRS for the 3D effects setting to take effect." xml:space="preserve">
+    <value>Riavvia SRS per applicare l'impostazione degli effetti 3D.</value>
+  </data>
+  <data name="Restart SRS now to apply the 3D effects setting?" xml:space="preserve">
+    <value>Riavviare SRS ora per applicare l'impostazione degli effetti 3D?</value>
+  </data>
   <data name="Restart SRS now to apply the language change?" xml:space="preserve">
     <value>Riavviare SRS ora per applicare il cambio lingua?</value>
   </data>
@@ -533,6 +563,9 @@
   </data>
   <data name="Server Settings" xml:space="preserve">
     <value>Impostazioni server</value>
+  </data>
+  <data name="Reported by server" xml:space="preserve">
+    <value>Segnalato dal server</value>
   </data>
   <data name="Coalition Security" xml:space="preserve">
     <value>Sicurezza coalizione</value>
@@ -741,7 +774,52 @@
   <data name="Overlays" xml:space="preserve">
     <value>Overlay</value>
   </data>
+  <data name="DISCONNECTED" xml:space="preserve">
+    <value>DISCONNESSO</value>
+  </data>
+  <data name="CONNECTED" xml:space="preserve">
+    <value>CONNESSO</value>
+  </data>
+  <data name="CONNECTION ERROR" xml:space="preserve">
+    <value>ERRORE DI CONNESSIONE</value>
+  </data>
+  <data name="Server link inactive" xml:space="preserve">
+    <value>Collegamento server inattivo</value>
+  </data>
+  <data name="Server link established" xml:space="preserve">
+    <value>Collegamento server stabilito</value>
+  </data>
+  <data name="Server and IL-2 active" xml:space="preserve">
+    <value>Server e IL-2 attivi</value>
+  </data>
+  <data name="Check address or network" xml:space="preserve">
+    <value>Controlla indirizzo o rete</value>
+  </data>
   <data name="Mic" xml:space="preserve">
     <value>Micro</value>
+  </data>
+  <data name="Report a Problem" xml:space="preserve">
+    <value>Segnala un problema</value>
+  </data>
+  <data name="Suggest an Improvement" xml:space="preserve">
+    <value>Suggerisci un miglioramento</value>
+  </data>
+  <data name="Redact personal details in diagnostics" xml:space="preserve">
+    <value>Oscura i dati personali nella diagnostica</value>
+  </data>
+  <data name="DiagnosticBundlePrivacyWarning" xml:space="preserve">
+    <value>Il pacchetto diagnostico puo includere nomi dei dispositivi, indirizzi server, nomi dei giocatori ed eventi recenti di connessione o audio. Controllalo prima di allegarlo pubblicamente.</value>
+  </data>
+  <data name="DiagnosticBundleCreatedMessage" xml:space="preserve">
+    <value>Pacchetto diagnostico creato in:
+{0}
+
+Allega questo ZIP all'issue GitHub aperta nel browser.</value>
+  </data>
+  <data name="DiagnosticBundleCreateFailed" xml:space="preserve">
+    <value>Impossibile creare il pacchetto diagnostico. Allega clientlog.txt manualmente quando segnali il problema.</value>
+  </data>
+  <data name="SuggestionPageOpenFailed" xml:space="preserve">
+    <value>Impossibile aprire la pagina GitHub per i suggerimenti.</value>
   </data>
 </root>

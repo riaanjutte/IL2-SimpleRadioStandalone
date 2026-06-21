@@ -1,4 +1,4 @@
-﻿<controls:MetroWindow x:Class="Ciribob.IL2.SimpleRadio.Standalone.Client.UI.MainWindow"
+<controls:MetroWindow x:Class="Ciribob.IL2.SimpleRadio.Standalone.Client.UI.MainWindow"
                       xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
                       xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                       xmlns:clientWindow="clr-namespace:Ciribob.IL2.SimpleRadio.Standalone.Client.UI.ClientWindow"
@@ -13,13 +13,13 @@
                       MinWidth="640"
                       Height="650"
                       MinHeight="560"
-                      Background="{StaticResource MilWindowBackgroundBrush}"
-                      Foreground="{StaticResource MilTextPrimaryBrush}"
+                      Background="{DynamicResource MilWindowBackgroundBrush}"
+                      Foreground="{DynamicResource MilTextPrimaryBrush}"
                       FontSize="14"
-                      WindowTitleBrush="{StaticResource MilChromeBrush}"
-                      NonActiveWindowTitleBrush="{StaticResource MilChromeBrush}"
-                      GlowBrush="{StaticResource MilBorderBrush}"
-                      NonActiveGlowBrush="{StaticResource MilChromeBrush}"
+                      WindowTitleBrush="{DynamicResource MilChromeBrush}"
+                      NonActiveWindowTitleBrush="{DynamicResource MilChromeBrush}"
+                      GlowBrush="{DynamicResource MilBorderBrush}"
+                      NonActiveGlowBrush="{DynamicResource MilChromeBrush}"
                       TitleCharacterCasing="Upper"
                       d:DataContext="{d:DesignInstance local:MainWindow}"
                       ResizeMode="CanResizeWithGrip"
@@ -41,72 +41,72 @@
                        VerticalAlignment="Center"
                        FontFamily="{StaticResource MilFontStencil}"
                        FontSize="17"
-                       Foreground="{StaticResource MilAccentBrush}"
+                       Foreground="{DynamicResource MilAccentBrush}"
                        Text="{Binding Converter={StaticResource MilUpperConverter}}" />
         </DataTemplate>
     </controls:MetroWindow.TitleTemplate>
 
     <DockPanel>
         <Border DockPanel.Dock="Bottom"
-                Background="{StaticResource MilWellBrush}"
-                BorderBrush="{StaticResource MilBorderBrush}"
+                Background="{DynamicResource MilWellBrush}"
+                BorderBrush="{DynamicResource MilBorderBrush}"
                 BorderThickness="0,1,0,0">
             <DockPanel Margin="10,3" LastChildFill="False">
                 <StackPanel DockPanel.Dock="Left" Orientation="Horizontal">
                     <Grid Width="13" Height="13" VerticalAlignment="Center">
-                        <Ellipse Fill="{StaticResource MilLampBezelBrush}" />
+                        <Ellipse Fill="{DynamicResource MilLampBezelBrush}" />
                         <Ellipse Margin="2"
                                  Fill="{Binding AudioInput.MicrophoneAvailable, Converter={StaticResource LedBrushConverter}}" />
-                        <Ellipse Margin="2" Fill="{StaticResource MilLampGlassBrush}" />
+                        <Ellipse Margin="2" Fill="{DynamicResource MilLampGlassBrush}" />
                     </Grid>
                     <Label Content="Mic" Margin="1,0,10,0" Padding="2,0"
                            FontFamily="{StaticResource MilFontMono}" FontSize="13"
-                           Foreground="{StaticResource MilTextSecondaryBrush}" />
+                           Foreground="{DynamicResource MilTextSecondaryBrush}" />
                     <Grid Width="13" Height="13" VerticalAlignment="Center">
-                        <Ellipse Fill="{StaticResource MilLampBezelBrush}" />
+                        <Ellipse Fill="{DynamicResource MilLampBezelBrush}" />
                         <Ellipse Margin="2"
                                  Fill="{Binding ClientState.IsConnected, Converter={StaticResource LedBrushConverter}}" />
-                        <Ellipse Margin="2" Fill="{StaticResource MilLampGlassBrush}" />
+                        <Ellipse Margin="2" Fill="{DynamicResource MilLampGlassBrush}" />
                     </Grid>
                     <Label Content="Server" Margin="1,0,10,0" Padding="2,0"
                            FontFamily="{StaticResource MilFontMono}" FontSize="13"
-                           Foreground="{StaticResource MilTextSecondaryBrush}" />
+                           Foreground="{DynamicResource MilTextSecondaryBrush}" />
                     <Grid Width="13" Height="13" VerticalAlignment="Center">
-                        <Ellipse Fill="{StaticResource MilLampBezelBrush}" />
+                        <Ellipse Fill="{DynamicResource MilLampBezelBrush}" />
                         <Ellipse Margin="2"
                                  Fill="{Binding ClientState.IsVoipConnected, Converter={StaticResource LedBrushConverter}}" />
-                        <Ellipse Margin="2" Fill="{StaticResource MilLampGlassBrush}" />
+                        <Ellipse Margin="2" Fill="{DynamicResource MilLampGlassBrush}" />
                     </Grid>
                     <Label Content="VOIP" Margin="1,0,10,0" Padding="2,0"
                            FontFamily="{StaticResource MilFontMono}" FontSize="13"
-                           Foreground="{StaticResource MilTextSecondaryBrush}" />
+                           Foreground="{DynamicResource MilTextSecondaryBrush}" />
                     <Grid Width="13" Height="13" VerticalAlignment="Center">
-                        <Ellipse Fill="{StaticResource MilLampBezelBrush}" />
+                        <Ellipse Fill="{DynamicResource MilLampBezelBrush}" />
                         <Ellipse Margin="2"
                                  Fill="{Binding ClientState.IsGameConnected, Converter={StaticResource LedBrushConverter}}" />
-                        <Ellipse Margin="2" Fill="{StaticResource MilLampGlassBrush}" />
+                        <Ellipse Margin="2" Fill="{DynamicResource MilLampGlassBrush}" />
                     </Grid>
                     <Label Content="Il-2" Margin="1,0,0,0" Padding="2,0"
                            FontFamily="{StaticResource MilFontMono}" FontSize="13"
-                           Foreground="{StaticResource MilTextSecondaryBrush}" />
+                           Foreground="{DynamicResource MilTextSecondaryBrush}" />
                 </StackPanel>
                 <StackPanel DockPanel.Dock="Right" Orientation="Horizontal">
                     <Label Content="Connected Clients:" Padding="2,0"
                            FontFamily="{StaticResource MilFontMono}" FontSize="13"
-                           Foreground="{StaticResource MilTextSecondaryBrush}" />
+                           Foreground="{DynamicResource MilTextSecondaryBrush}" />
                     <TextBlock Text="{Binding Clients.Total}" VerticalAlignment="Center"
                                FontFamily="{StaticResource MilFontMono}" FontSize="13"
-                               Foreground="{StaticResource MilTextPrimaryBrush}" />
+                               Foreground="{DynamicResource MilTextPrimaryBrush}" />
                     <TextBlock Text="  |  " VerticalAlignment="Center" FontSize="13"
-                               Foreground="{StaticResource MilBorderBrush}" />
+                               Foreground="{DynamicResource MilBorderBrush}" />
                     <Label Name="CurrentProfile" Content="None" Padding="2,0"
                            FontFamily="{StaticResource MilFontMono}" FontSize="13"
-                           Foreground="{StaticResource MilTextPrimaryBrush}" />
+                           Foreground="{DynamicResource MilTextPrimaryBrush}" />
                     <TextBlock Text="  |  " VerticalAlignment="Center" FontSize="13"
-                               Foreground="{StaticResource MilBorderBrush}" />
+                               Foreground="{DynamicResource MilBorderBrush}" />
                     <TextBlock x:Name="StatusVersionLabel" VerticalAlignment="Center"
                                FontFamily="{StaticResource MilFontMono}" FontSize="13"
-                               Foreground="{StaticResource MilTextSecondaryBrush}" />
+                               Foreground="{DynamicResource MilTextSecondaryBrush}" />
                 </StackPanel>
             </DockPanel>
         </Border>
@@ -229,15 +229,15 @@
                                     <Border.Style>
                                         <Style TargetType="Border">
                                             <Setter Property="Background" Value="#2B251B" />
-                                            <Setter Property="BorderBrush" Value="{StaticResource MilLedOffBrush}" />
+                                            <Setter Property="BorderBrush" Value="{DynamicResource MilLedOffBrush}" />
                                             <Style.Triggers>
                                                 <DataTrigger Binding="{Binding ClientState.IsConnected}" Value="True">
                                                     <Setter Property="Background" Value="#20301C" />
-                                                    <Setter Property="BorderBrush" Value="{StaticResource MilLedOnBrush}" />
+                                                    <Setter Property="BorderBrush" Value="{DynamicResource MilLedOnBrush}" />
                                                 </DataTrigger>
                                                 <DataTrigger Binding="{Binding ClientState.IsConnectionErrored}" Value="True">
                                                     <Setter Property="Background" Value="#321C18" />
-                                                    <Setter Property="BorderBrush" Value="{StaticResource MilLedErrorBrush}" />
+                                                    <Setter Property="BorderBrush" Value="{DynamicResource MilLedErrorBrush}" />
                                                 </DataTrigger>
                                             </Style.Triggers>
                                         </Style>
@@ -250,24 +250,24 @@
                                         <Grid Width="16"
                                               Height="16"
                                               VerticalAlignment="Center">
-                                            <Ellipse Fill="{StaticResource MilLampBezelBrush}" />
+                                            <Ellipse Fill="{DynamicResource MilLampBezelBrush}" />
                                             <Ellipse x:Name="ConnectionStatusLamp"
                                                      Margin="3">
                                                 <Ellipse.Style>
                                                     <Style TargetType="Ellipse">
-                                                        <Setter Property="Fill" Value="{StaticResource MilLedOffBrush}" />
+                                                        <Setter Property="Fill" Value="{DynamicResource MilLedOffBrush}" />
                                                         <Style.Triggers>
                                                             <DataTrigger Binding="{Binding ClientState.IsConnected}" Value="True">
-                                                                <Setter Property="Fill" Value="{StaticResource MilLedOnBrush}" />
+                                                                <Setter Property="Fill" Value="{DynamicResource MilLedOnBrush}" />
                                                             </DataTrigger>
                                                             <DataTrigger Binding="{Binding ClientState.IsConnectionErrored}" Value="True">
-                                                                <Setter Property="Fill" Value="{StaticResource MilLedErrorBrush}" />
+                                                                <Setter Property="Fill" Value="{DynamicResource MilLedErrorBrush}" />
                                                             </DataTrigger>
                                                         </Style.Triggers>
                                                     </Style>
                                                 </Ellipse.Style>
                                             </Ellipse>
-                                            <Ellipse Margin="3" Fill="{StaticResource MilLampGlassBrush}" />
+                                            <Ellipse Margin="3" Fill="{DynamicResource MilLampGlassBrush}" />
                                         </Grid>
                                         <StackPanel Grid.Column="1"
                                                     Margin="8,0,0,0"
@@ -278,15 +278,15 @@
                                                        FontWeight="Bold">
                                                 <TextBlock.Style>
                                                     <Style TargetType="TextBlock">
-                                                        <Setter Property="Foreground" Value="{StaticResource MilTextSecondaryBrush}" />
+                                                        <Setter Property="Foreground" Value="{DynamicResource MilTextSecondaryBrush}" />
                                                         <Setter Property="Text" Value="DISCONNECTED" />
                                                         <Style.Triggers>
                                                             <DataTrigger Binding="{Binding ClientState.IsConnected}" Value="True">
-                                                                <Setter Property="Foreground" Value="{StaticResource MilLedOnBrush}" />
+                                                                <Setter Property="Foreground" Value="{DynamicResource MilLedOnBrush}" />
                                                                 <Setter Property="Text" Value="CONNECTED" />
                                                             </DataTrigger>
                                                             <DataTrigger Binding="{Binding ClientState.IsConnectionErrored}" Value="True">
-                                                                <Setter Property="Foreground" Value="{StaticResource MilLedErrorBrush}" />
+                                                                <Setter Property="Foreground" Value="{DynamicResource MilLedErrorBrush}" />
                                                                 <Setter Property="Text" Value="CONNECTION ERROR" />
                                                             </DataTrigger>
                                                         </Style.Triggers>
@@ -296,7 +296,7 @@
                                             <TextBlock x:Name="ConnectionStatusHint"
                                                        Margin="0,1,0,0"
                                                        FontSize="11"
-                                                       Foreground="{StaticResource MilTextSecondaryBrush}">
+                                                       Foreground="{DynamicResource MilTextSecondaryBrush}">
                                                 <TextBlock.Style>
                                                     <Style TargetType="TextBlock">
                                                         <Setter Property="Text" Value="Server link inactive" />
@@ -340,21 +340,19 @@
                             <GroupBox Grid.Row="0" Header="Overlays" Margin="0">
                                 <StackPanel HorizontalAlignment="Center"
                                             VerticalAlignment="Center">
-                                    <Grid Width="260" Margin="0,8,0,8">
+                                    <Grid Width="330" Margin="0,8,0,8">
                                         <Grid.ColumnDefinitions>
-                                            <ColumnDefinition Width="170" />
-                                            <ColumnDefinition Width="10" />
-                                            <ColumnDefinition Width="80" />
+                                            <ColumnDefinition Width="230" />
+                                            <ColumnDefinition Width="12" />
+                                            <ColumnDefinition Width="88" />
                                         </Grid.ColumnDefinitions>
-                                        <Button x:Name="ShowOverlay"
+                                        <Button x:Name="ShowOverlayButton"
                                                 Grid.Column="0"
-                                                Width="170"
                                                 Click="ShowOverlay_OnClick"
                                                 Content="Show Radio Overlay"
                                                 Style="{DynamicResource SquareButtonStyle}" />
                                         <Slider x:Name="RadioOverlayOpacitySlider"
                                                 Grid.Column="2"
-                                                Width="80"
                                                 VerticalAlignment="Center"
                                                 IsMoveToPointEnabled="True"
                                                 Maximum="1.0"
@@ -363,21 +361,19 @@
                                                 Value="1.0"
                                                 ValueChanged="RadioOverlayOpacitySlider_ValueChanged" />
                                     </Grid>
-                                    <Grid Width="260" Margin="0,0,0,8">
+                                    <Grid Width="330" Margin="0,0,0,8">
                                         <Grid.ColumnDefinitions>
-                                            <ColumnDefinition Width="170" />
-                                            <ColumnDefinition Width="10" />
-                                            <ColumnDefinition Width="80" />
+                                            <ColumnDefinition Width="230" />
+                                            <ColumnDefinition Width="12" />
+                                            <ColumnDefinition Width="88" />
                                         </Grid.ColumnDefinitions>
                                         <Button x:Name="ShowClientList"
                                                 Grid.Column="0"
-                                                Width="170"
                                                 Click="ShowClientList_OnClick"
                                                 Content="Show Client List"
                                                 Style="{DynamicResource SquareButtonStyle}" />
                                         <Slider x:Name="ClientListOpacitySlider"
                                                 Grid.Column="2"
-                                                Width="80"
                                                 VerticalAlignment="Center"
                                                 IsMoveToPointEnabled="True"
                                                 Maximum="1.0"
@@ -386,21 +382,19 @@
                                                 Value="1.0"
                                                 ValueChanged="ClientListOpacitySlider_ValueChanged" />
                                     </Grid>
-                                    <Grid Width="260" Margin="0,0,0,8">
+                                    <Grid Width="330" Margin="0,0,0,8">
                                         <Grid.ColumnDefinitions>
-                                            <ColumnDefinition Width="170" />
-                                            <ColumnDefinition Width="10" />
-                                            <ColumnDefinition Width="80" />
+                                            <ColumnDefinition Width="230" />
+                                            <ColumnDefinition Width="12" />
+                                            <ColumnDefinition Width="88" />
                                         </Grid.ColumnDefinitions>
                                         <Button x:Name="ShowPilotRoster"
                                                 Grid.Column="0"
-                                                Width="170"
                                                 Click="ShowPilotRoster_OnClick"
                                                 Content="Show Pilot Roster"
                                                 Style="{DynamicResource SquareButtonStyle}" />
                                         <Slider x:Name="PilotRosterOpacitySlider"
                                                 Grid.Column="2"
-                                                Width="80"
                                                 VerticalAlignment="Center"
                                                 IsMoveToPointEnabled="True"
                                                 Maximum="1.0"
@@ -464,8 +458,9 @@
 
                 <ScrollViewer HorizontalScrollBarVisibility="Hidden" VerticalScrollBarVisibility="Visible">
                     <StackPanel HorizontalAlignment="Center">
-                        <Button Width="240"
-                                HorizontalAlignment="Left"
+                        <Button Width="320"
+                                Padding="10,4"
+                                HorizontalAlignment="Center"
                                 Content="Rescan Input Devices"
                                 Click="RescanInputDevices" />
                         <Grid Width="610">
@@ -700,6 +695,8 @@
                                 <RowDefinition />
                                 <RowDefinition />
                                 <RowDefinition />
+                                <RowDefinition />
+                                <RowDefinition />
                             </Grid.RowDefinitions>
 
                             <Label Grid.Row="0"
@@ -714,19 +711,6 @@
                                       HorizontalContentAlignment="Center"
                                       VerticalContentAlignment="Center"
                                       Click="AutoConnectPromptToggle_Click">
-                                <ToggleButton.Style>
-                                    <Style TargetType="{x:Type ToggleButton}" BasedOn="{StaticResource {x:Type ToggleButton}}">
-                                        <Setter Property="Content" Value="ON" />
-                                        <Style.Triggers>
-                                            <Trigger Property="IsChecked" Value="True">
-                                                <Setter Property="Content" Value="ON" />
-                                            </Trigger>
-                                            <Trigger Property="IsChecked" Value="False">
-                                                <Setter Property="Content" Value="OFF" />
-                                            </Trigger>
-                                        </Style.Triggers>
-                                    </Style>
-                                </ToggleButton.Style>
                             </ToggleButton>
 
 
@@ -742,19 +726,6 @@
                                       HorizontalContentAlignment="Center"
                                       VerticalContentAlignment="Center"
                                       Click="AutoConnectMismatchPromptToggle_Click">
-                                <ToggleButton.Style>
-                                    <Style TargetType="{x:Type ToggleButton}" BasedOn="{StaticResource {x:Type ToggleButton}}">
-                                        <Setter Property="Content" Value="ON" />
-                                        <Style.Triggers>
-                                            <Trigger Property="IsChecked" Value="True">
-                                                <Setter Property="Content" Value="ON" />
-                                            </Trigger>
-                                            <Trigger Property="IsChecked" Value="False">
-                                                <Setter Property="Content" Value="OFF" />
-                                            </Trigger>
-                                        </Style.Triggers>
-                                    </Style>
-                                </ToggleButton.Style>
                             </ToggleButton>
 
                             <Label Grid.Row="2"
@@ -783,19 +754,6 @@
                                       HorizontalContentAlignment="Center"
                                       VerticalContentAlignment="Center"
                                       Click="RadioOverlayTaskbarItem_Click">
-                                <ToggleButton.Style>
-                                    <Style TargetType="{x:Type ToggleButton}" BasedOn="{StaticResource {x:Type ToggleButton}}">
-                                        <Setter Property="Content" Value="ON" />
-                                        <Style.Triggers>
-                                            <Trigger Property="IsChecked" Value="True">
-                                                <Setter Property="Content" Value="ON" />
-                                            </Trigger>
-                                            <Trigger Property="IsChecked" Value="False">
-                                                <Setter Property="Content" Value="OFF" />
-                                            </Trigger>
-                                        </Style.Triggers>
-                                    </Style>
-                                </ToggleButton.Style>
                             </ToggleButton>
 
 
@@ -811,19 +769,6 @@
                                       HorizontalContentAlignment="Center"
                                       VerticalContentAlignment="Center"
                                       Click="AutoStartRadioOverlayToggle_Click">
-                                <ToggleButton.Style>
-                                    <Style TargetType="{x:Type ToggleButton}" BasedOn="{StaticResource {x:Type ToggleButton}}">
-                                        <Setter Property="Content" Value="ON" />
-                                        <Style.Triggers>
-                                            <Trigger Property="IsChecked" Value="True">
-                                                <Setter Property="Content" Value="ON" />
-                                            </Trigger>
-                                            <Trigger Property="IsChecked" Value="False">
-                                                <Setter Property="Content" Value="OFF" />
-                                            </Trigger>
-                                        </Style.Triggers>
-                                    </Style>
-                                </ToggleButton.Style>
                             </ToggleButton>
 
 
@@ -839,19 +784,6 @@
                                       HorizontalContentAlignment="Center"
                                       VerticalContentAlignment="Center"
                                       Click="AutoStartPilotRosterToggle_Click">
-                                <ToggleButton.Style>
-                                    <Style TargetType="{x:Type ToggleButton}" BasedOn="{StaticResource {x:Type ToggleButton}}">
-                                        <Setter Property="Content" Value="ON" />
-                                        <Style.Triggers>
-                                            <Trigger Property="IsChecked" Value="True">
-                                                <Setter Property="Content" Value="ON" />
-                                            </Trigger>
-                                            <Trigger Property="IsChecked" Value="False">
-                                                <Setter Property="Content" Value="OFF" />
-                                            </Trigger>
-                                        </Style.Triggers>
-                                    </Style>
-                                </ToggleButton.Style>
                             </ToggleButton>
 
 
@@ -867,19 +799,6 @@
                                       HorizontalContentAlignment="Center"
                                       VerticalContentAlignment="Center"
                                       Click="IL2Refocus_OnClick_Click">
-                                <ToggleButton.Style>
-                                    <Style TargetType="{x:Type ToggleButton}" BasedOn="{StaticResource {x:Type ToggleButton}}">
-                                        <Setter Property="Content" Value="ON" />
-                                        <Style.Triggers>
-                                            <Trigger Property="IsChecked" Value="True">
-                                                <Setter Property="Content" Value="ON" />
-                                            </Trigger>
-                                            <Trigger Property="IsChecked" Value="False">
-                                                <Setter Property="Content" Value="OFF" />
-                                            </Trigger>
-                                        </Style.Triggers>
-                                    </Style>
-                                </ToggleButton.Style>
                             </ToggleButton>
 
 
@@ -895,19 +814,6 @@
                                       HorizontalContentAlignment="Center"
                                       VerticalContentAlignment="Center"
                                       Click="MinimiseToTray_OnClick">
-                                <ToggleButton.Style>
-                                    <Style TargetType="{x:Type ToggleButton}" BasedOn="{StaticResource {x:Type ToggleButton}}">
-                                        <Setter Property="Content" Value="ON" />
-                                        <Style.Triggers>
-                                            <Trigger Property="IsChecked" Value="True">
-                                                <Setter Property="Content" Value="ON" />
-                                            </Trigger>
-                                            <Trigger Property="IsChecked" Value="False">
-                                                <Setter Property="Content" Value="OFF" />
-                                            </Trigger>
-                                        </Style.Triggers>
-                                    </Style>
-                                </ToggleButton.Style>
                             </ToggleButton>
 
                             <Label Grid.Row="8"
@@ -922,19 +828,6 @@
                                       HorizontalContentAlignment="Center"
                                       VerticalContentAlignment="Center"
                                       Click="StartMinimised_OnClick">
-                                <ToggleButton.Style>
-                                    <Style TargetType="{x:Type ToggleButton}" BasedOn="{StaticResource {x:Type ToggleButton}}">
-                                        <Setter Property="Content" Value="ON" />
-                                        <Style.Triggers>
-                                            <Trigger Property="IsChecked" Value="True">
-                                                <Setter Property="Content" Value="ON" />
-                                            </Trigger>
-                                            <Trigger Property="IsChecked" Value="False">
-                                                <Setter Property="Content" Value="OFF" />
-                                            </Trigger>
-                                        </Style.Triggers>
-                                    </Style>
-                                </ToggleButton.Style>
                             </ToggleButton>
 
                             <Label Grid.Row="9"
@@ -949,19 +842,6 @@
                                       HorizontalContentAlignment="Center"
                                       VerticalContentAlignment="Center"
                                       Click="CheckForBetaUpdates_OnClick">
-                                <ToggleButton.Style>
-                                    <Style TargetType="{x:Type ToggleButton}" BasedOn="{StaticResource {x:Type ToggleButton}}">
-                                        <Setter Property="Content" Value="ON" />
-                                        <Style.Triggers>
-                                            <Trigger Property="IsChecked" Value="True">
-                                                <Setter Property="Content" Value="ON" />
-                                            </Trigger>
-                                            <Trigger Property="IsChecked" Value="False">
-                                                <Setter Property="Content" Value="OFF" />
-                                            </Trigger>
-                                        </Style.Triggers>
-                                    </Style>
-                                </ToggleButton.Style>
                             </ToggleButton>
 
                             <Label Grid.Row="10"
@@ -976,19 +856,6 @@
                                       HorizontalContentAlignment="Center"
                                       VerticalContentAlignment="Center"
                                       Click="RequireAdminToggle_OnClick">
-                                <ToggleButton.Style>
-                                    <Style TargetType="{x:Type ToggleButton}" BasedOn="{StaticResource {x:Type ToggleButton}}">
-                                        <Setter Property="Content" Value="ON" />
-                                        <Style.Triggers>
-                                            <Trigger Property="IsChecked" Value="True">
-                                                <Setter Property="Content" Value="ON" />
-                                            </Trigger>
-                                            <Trigger Property="IsChecked" Value="False">
-                                                <Setter Property="Content" Value="OFF" />
-                                            </Trigger>
-                                        </Style.Triggers>
-                                    </Style>
-                                </ToggleButton.Style>
                             </ToggleButton>
 
                             <Label Grid.Row="11"
@@ -1003,19 +870,6 @@
                                           HorizontalContentAlignment="Center"
                                           VerticalContentAlignment="Center"
                                           Click="ShowTransmitterName_OnClick_OnClick">
-                                <ToggleButton.Style>
-                                    <Style TargetType="{x:Type ToggleButton}" BasedOn="{StaticResource {x:Type ToggleButton}}">
-                                        <Setter Property="Content" Value="ON" />
-                                        <Style.Triggers>
-                                            <Trigger Property="IsChecked" Value="True">
-                                                <Setter Property="Content" Value="ON" />
-                                            </Trigger>
-                                            <Trigger Property="IsChecked" Value="False">
-                                                <Setter Property="Content" Value="OFF" />
-                                            </Trigger>
-                                        </Style.Triggers>
-                                    </Style>
-                                </ToggleButton.Style>
                             </ToggleButton>
 
                             <Label Grid.Row="12"
@@ -1049,9 +903,36 @@
                                    Grid.Column="0"
                                    HorizontalContentAlignment="Center"
                                    VerticalContentAlignment="Center"
+                                   Content="VU Meter" />
+
+                            <ComboBox Name="VuMeterStylePicker"
+                                      Grid.Row="14"
+                                      Grid.Column="1"
+                                      HorizontalContentAlignment="Center"
+                                      VerticalContentAlignment="Center"
+                                      SelectionChanged="VuMeterStylePicker_SelectionChanged" />
+
+                            <Label Grid.Row="15"
+                                   Grid.Column="0"
+                                   HorizontalContentAlignment="Center"
+                                   VerticalContentAlignment="Center"
+                                   Content="3D Effects" />
+
+                            <ToggleButton Name="ThreeDEffectsToggle"
+                                          Grid.Row="15"
+                                          Grid.Column="1"
+                                          HorizontalContentAlignment="Center"
+                                          VerticalContentAlignment="Center"
+                                          Click="ThreeDEffectsToggle_Click">
+                            </ToggleButton>
+
+                            <Label Grid.Row="16"
+                                   Grid.Column="0"
+                                   HorizontalContentAlignment="Center"
+                                   VerticalContentAlignment="Center"
                                    Content="Weathering" />
 
-                            <Grid Grid.Row="14"
+                            <Grid Grid.Row="16"
                                   Grid.Column="1"
                                   HorizontalAlignment="Stretch">
                                 <Grid.ColumnDefinitions>
@@ -1064,19 +945,6 @@
                                               HorizontalContentAlignment="Center"
                                               VerticalContentAlignment="Center"
                                               Click="WeatheringEffectToggle_Click">
-                                    <ToggleButton.Style>
-                                        <Style TargetType="{x:Type ToggleButton}" BasedOn="{StaticResource {x:Type ToggleButton}}">
-                                            <Setter Property="Content" Value="ON" />
-                                            <Style.Triggers>
-                                                <Trigger Property="IsChecked" Value="True">
-                                                    <Setter Property="Content" Value="ON" />
-                                                </Trigger>
-                                                <Trigger Property="IsChecked" Value="False">
-                                                    <Setter Property="Content" Value="OFF" />
-                                                </Trigger>
-                                            </Style.Triggers>
-                                        </Style>
-                                    </ToggleButton.Style>
                                 </ToggleButton>
                                 <Slider x:Name="WeatheringOpacitySlider"
                                         Grid.Column="2"
@@ -1116,19 +984,6 @@
                                           HorizontalContentAlignment="Center"
                                           VerticalContentAlignment="Center"
                                           Click="ExpandInputDevices_OnClick_Click">
-                                <ToggleButton.Style>
-                                    <Style TargetType="{x:Type ToggleButton}" BasedOn="{StaticResource {x:Type ToggleButton}}">
-                                        <Setter Property="Content" Value="ON" />
-                                        <Style.Triggers>
-                                            <Trigger Property="IsChecked" Value="True">
-                                                <Setter Property="Content" Value="ON" />
-                                            </Trigger>
-                                            <Trigger Property="IsChecked" Value="False">
-                                                <Setter Property="Content" Value="OFF" />
-                                            </Trigger>
-                                        </Style.Triggers>
-                                    </Style>
-                                </ToggleButton.Style>
                             </ToggleButton>
 
                             <Label Grid.Row="1"
@@ -1142,19 +997,6 @@
                                           HorizontalContentAlignment="Center"
                                           VerticalContentAlignment="Center"
                                           Click="MicAGC_OnClick">
-                                <ToggleButton.Style>
-                                    <Style TargetType="{x:Type ToggleButton}" BasedOn="{StaticResource {x:Type ToggleButton}}">
-                                        <Setter Property="Content" Value="ON" />
-                                        <Style.Triggers>
-                                            <Trigger Property="IsChecked" Value="True">
-                                                <Setter Property="Content" Value="ON" />
-                                            </Trigger>
-                                            <Trigger Property="IsChecked" Value="False">
-                                                <Setter Property="Content" Value="OFF" />
-                                            </Trigger>
-                                        </Style.Triggers>
-                                    </Style>
-                                </ToggleButton.Style>
                             </ToggleButton>
 
                             <Label Grid.Row="2"
@@ -1168,19 +1010,6 @@
                                           HorizontalContentAlignment="Center"
                                           VerticalContentAlignment="Center"
                                           Click="MicDenoise_OnClick">
-                                <ToggleButton.Style>
-                                    <Style TargetType="{x:Type ToggleButton}" BasedOn="{StaticResource {x:Type ToggleButton}}">
-                                        <Setter Property="Content" Value="ON" />
-                                        <Style.Triggers>
-                                            <Trigger Property="IsChecked" Value="True">
-                                                <Setter Property="Content" Value="ON" />
-                                            </Trigger>
-                                            <Trigger Property="IsChecked" Value="False">
-                                                <Setter Property="Content" Value="OFF" />
-                                            </Trigger>
-                                        </Style.Triggers>
-                                    </Style>
-                                </ToggleButton.Style>
                             </ToggleButton>
 
                             <Label Grid.Row="3"
@@ -1194,19 +1023,6 @@
                                           HorizontalContentAlignment="Center"
                                           VerticalContentAlignment="Center"
                                           Click="PlayConnectionSounds_OnClick">
-                                <ToggleButton.Style>
-                                    <Style TargetType="{x:Type ToggleButton}" BasedOn="{StaticResource {x:Type ToggleButton}}">
-                                        <Setter Property="Content" Value="ON" />
-                                        <Style.Triggers>
-                                            <Trigger Property="IsChecked" Value="True">
-                                                <Setter Property="Content" Value="ON" />
-                                            </Trigger>
-                                            <Trigger Property="IsChecked" Value="False">
-                                                <Setter Property="Content" Value="OFF" />
-                                            </Trigger>
-                                        </Style.Triggers>
-                                    </Style>
-                                </ToggleButton.Style>
                             </ToggleButton>
                         </Grid>
                     </GroupBox>
@@ -1281,38 +1097,12 @@
                                           HorizontalContentAlignment="Center"
                                           VerticalContentAlignment="Center"
                                           Click="RadioRxStart_Click">
-                                    <ToggleButton.Style>
-                                        <Style TargetType="{x:Type ToggleButton}" BasedOn="{StaticResource {x:Type ToggleButton}}">
-                                            <Setter Property="Content" Value="ON" />
-                                            <Style.Triggers>
-                                                <Trigger Property="IsChecked" Value="True">
-                                                    <Setter Property="Content" Value="ON" />
-                                                </Trigger>
-                                                <Trigger Property="IsChecked" Value="False">
-                                                    <Setter Property="Content" Value="OFF" />
-                                                </Trigger>
-                                            </Style.Triggers>
-                                        </Style>
-                                    </ToggleButton.Style>
                                 </ToggleButton>
                                 <Label Content="End" />
                                 <ToggleButton Name="RadioRxEndToggle"
                                           HorizontalContentAlignment="Center"
                                           VerticalContentAlignment="Center"
                                           Click="RadioRxEnd_Click">
-                                    <ToggleButton.Style>
-                                        <Style TargetType="{x:Type ToggleButton}" BasedOn="{StaticResource {x:Type ToggleButton}}">
-                                            <Setter Property="Content" Value="ON" />
-                                            <Style.Triggers>
-                                                <Trigger Property="IsChecked" Value="True">
-                                                    <Setter Property="Content" Value="ON" />
-                                                </Trigger>
-                                                <Trigger Property="IsChecked" Value="False">
-                                                    <Setter Property="Content" Value="OFF" />
-                                                </Trigger>
-                                            </Style.Triggers>
-                                        </Style>
-                                    </ToggleButton.Style>
                                 </ToggleButton>
                             </WrapPanel>
 
@@ -1335,38 +1125,12 @@
                                           HorizontalContentAlignment="Center"
                                           VerticalContentAlignment="Center"
                                           Click="RadioTxStart_Click">
-                                        <ToggleButton.Style>
-                                            <Style TargetType="{x:Type ToggleButton}" BasedOn="{StaticResource {x:Type ToggleButton}}">
-                                                <Setter Property="Content" Value="ON" />
-                                                <Style.Triggers>
-                                                    <Trigger Property="IsChecked" Value="True">
-                                                        <Setter Property="Content" Value="ON" />
-                                                    </Trigger>
-                                                    <Trigger Property="IsChecked" Value="False">
-                                                        <Setter Property="Content" Value="OFF" />
-                                                    </Trigger>
-                                                </Style.Triggers>
-                                            </Style>
-                                        </ToggleButton.Style>
                                     </ToggleButton>
                                     <Label Content="End" />
                                     <ToggleButton Name="RadioTxEndToggle"
                                           HorizontalContentAlignment="Center"
                                           VerticalContentAlignment="Center"
                                           Click="RadioTxEnd_Click">
-                                        <ToggleButton.Style>
-                                            <Style TargetType="{x:Type ToggleButton}" BasedOn="{StaticResource {x:Type ToggleButton}}">
-                                                <Setter Property="Content" Value="ON" />
-                                                <Style.Triggers>
-                                                    <Trigger Property="IsChecked" Value="True">
-                                                        <Setter Property="Content" Value="ON" />
-                                                    </Trigger>
-                                                    <Trigger Property="IsChecked" Value="False">
-                                                        <Setter Property="Content" Value="OFF" />
-                                                    </Trigger>
-                                                </Style.Triggers>
-                                            </Style>
-                                        </ToggleButton.Style>
                                     </ToggleButton>
                                 </WrapPanel>
 
@@ -1385,19 +1149,6 @@
                                       HorizontalContentAlignment="Center"
                                       VerticalContentAlignment="Center"
                                       Click="RadioSwitchPTT_Click">
-                                <ToggleButton.Style>
-                                    <Style TargetType="{x:Type ToggleButton}" BasedOn="{StaticResource {x:Type ToggleButton}}">
-                                        <Setter Property="Content" Value="ON" />
-                                        <Style.Triggers>
-                                            <Trigger Property="IsChecked" Value="True">
-                                                <Setter Property="Content" Value="ON" />
-                                            </Trigger>
-                                            <Trigger Property="IsChecked" Value="False">
-                                                <Setter Property="Content" Value="OFF" />
-                                            </Trigger>
-                                        </Style.Triggers>
-                                    </Style>
-                                </ToggleButton.Style>
                             </ToggleButton>
 
 
@@ -1414,19 +1165,6 @@
                                       HorizontalContentAlignment="Center"
                                       VerticalContentAlignment="Center"
                                       Click="RadioSoundEffects_OnClick">
-                                <ToggleButton.Style>
-                                    <Style TargetType="{x:Type ToggleButton}" BasedOn="{StaticResource {x:Type ToggleButton}}">
-                                        <Setter Property="Content" Value="ON" />
-                                        <Style.Triggers>
-                                            <Trigger Property="IsChecked" Value="True">
-                                                <Setter Property="Content" Value="ON" />
-                                            </Trigger>
-                                            <Trigger Property="IsChecked" Value="False">
-                                                <Setter Property="Content" Value="OFF" />
-                                            </Trigger>
-                                        </Style.Triggers>
-                                    </Style>
-                                </ToggleButton.Style>
                             </ToggleButton>
 
 
@@ -1442,19 +1180,6 @@
                                       HorizontalContentAlignment="Center"
                                       VerticalContentAlignment="Center"
                                       Click="RadioSoundEffectsClipping_OnClick">
-                                <ToggleButton.Style>
-                                    <Style TargetType="{x:Type ToggleButton}" BasedOn="{StaticResource {x:Type ToggleButton}}">
-                                        <Setter Property="Content" Value="ON" />
-                                        <Style.Triggers>
-                                            <Trigger Property="IsChecked" Value="True">
-                                                <Setter Property="Content" Value="ON" />
-                                            </Trigger>
-                                            <Trigger Property="IsChecked" Value="False">
-                                                <Setter Property="Content" Value="OFF" />
-                                            </Trigger>
-                                        </Style.Triggers>
-                                    </Style>
-                                </ToggleButton.Style>
                             </ToggleButton>
 
                             <Label Grid.Row="7"
@@ -1469,19 +1194,6 @@
                                           HorizontalContentAlignment="Center"
                                           VerticalContentAlignment="Center"
                                           Click="EnableTextToSpeech_OnClick">
-                                <ToggleButton.Style>
-                                    <Style TargetType="{x:Type ToggleButton}" BasedOn="{StaticResource {x:Type ToggleButton}}">
-                                        <Setter Property="Content" Value="ON" />
-                                        <Style.Triggers>
-                                            <Trigger Property="IsChecked" Value="True">
-                                                <Setter Property="Content" Value="ON" />
-                                            </Trigger>
-                                            <Trigger Property="IsChecked" Value="False">
-                                                <Setter Property="Content" Value="OFF" />
-                                            </Trigger>
-                                        </Style.Triggers>
-                                    </Style>
-                                </ToggleButton.Style>
                             </ToggleButton>
 
                             <Label Grid.Row="8"
@@ -1551,19 +1263,6 @@
                                           HorizontalContentAlignment="Center"
                                           VerticalContentAlignment="Center"
                                           Click="EnableRadioWrap_OnClick">
-                                <ToggleButton.Style>
-                                    <Style TargetType="{x:Type ToggleButton}" BasedOn="{StaticResource {x:Type ToggleButton}}">
-                                        <Setter Property="Content" Value="ON" />
-                                        <Style.Triggers>
-                                            <Trigger Property="IsChecked" Value="True">
-                                                <Setter Property="Content" Value="ON" />
-                                            </Trigger>
-                                            <Trigger Property="IsChecked" Value="False">
-                                                <Setter Property="Content" Value="OFF" />
-                                            </Trigger>
-                                        </Style.Triggers>
-                                    </Style>
-                                </ToggleButton.Style>
                             </ToggleButton>
 
                             <Label Grid.Row="11"
@@ -1645,25 +1344,47 @@
         <TabItem Header="Help">
             <GroupBox Header="Help &amp; About">
                 <DockPanel>
-                    <Button DockPanel.Dock="Bottom"
-                            Width="190"
-                            Margin="0,10,0,4"
-                            HorizontalAlignment="Center"
-                            Click="Donate_OnClick"
-                            Content="Patreon - Support SRS" />
+                    <StackPanel DockPanel.Dock="Bottom"
+                                Margin="0,10,0,4"
+                                HorizontalAlignment="Center">
+                        <CheckBox x:Name="RedactDiagnosticDetails"
+                                  Margin="0,0,0,8"
+                                  HorizontalAlignment="Center"
+                                  IsChecked="True"
+                                  Content="Redact personal details in diagnostics" />
+                        <StackPanel Orientation="Horizontal"
+                                    HorizontalAlignment="Center">
+                            <Button MinWidth="170"
+                                    Margin="0,0,8,0"
+                                    Padding="10,4"
+                                    Click="ReportProblem_OnClick"
+                                    Content="Report a Problem" />
+                            <Button MinWidth="170"
+                                    Margin="8,0,0,0"
+                                    Padding="10,4"
+                                    Click="SuggestImprovement_OnClick"
+                                    Content="Suggest an Improvement" />
+                        </StackPanel>
+                        <Button MinWidth="240"
+                                Margin="0,10,0,0"
+                                Padding="10,4"
+                                HorizontalAlignment="Center"
+                                Click="Donate_OnClick"
+                                Content="Patreon - Support SRS" />
+                    </StackPanel>
                     <FlowDocumentScrollViewer VerticalScrollBarVisibility="Auto">
                     <FlowDocument x:Name="AboutFlowDocument"
                                   FontFamily="{StaticResource MilFontMono}"
                                   FontSize="14"
-                                  Foreground="{StaticResource MilTextPrimaryBrush}">
+                                  Foreground="{DynamicResource MilTextPrimaryBrush}">
                         <FlowDocument.Resources>
                             <Style TargetType="Hyperlink">
-                                <Setter Property="Foreground" Value="{StaticResource MilAccentBrush}" />
+                                <Setter Property="Foreground" Value="{DynamicResource MilAccentBrush}" />
                             </Style>
                             <Style x:Key="HelpHeading" TargetType="Paragraph">
                                 <Setter Property="FontSize" Value="16" />
                                 <Setter Property="FontWeight" Value="Bold" />
-                                <Setter Property="Foreground" Value="{StaticResource MilAccentBrush}" />
+                                <Setter Property="Foreground" Value="{DynamicResource MilAccentBrush}" />
                             </Style>
                         </FlowDocument.Resources>
 

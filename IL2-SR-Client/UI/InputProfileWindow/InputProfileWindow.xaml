@@ -9,13 +9,13 @@
         MinHeight="100"
         WindowStyle="SingleBorderWindow"
         ResizeMode="CanMinimize"
-        Background="{StaticResource MilWindowBackgroundBrush}"
-        Foreground="{StaticResource MilTextPrimaryBrush}"
+        Background="{DynamicResource MilWindowBackgroundBrush}"
+        Foreground="{DynamicResource MilTextPrimaryBrush}"
         FontSize="14"
-        WindowTitleBrush="{StaticResource MilChromeBrush}"
-        NonActiveWindowTitleBrush="{StaticResource MilChromeBrush}"
-        GlowBrush="{StaticResource MilBorderBrush}"
-        NonActiveGlowBrush="{StaticResource MilChromeBrush}"
+        WindowTitleBrush="{DynamicResource MilChromeBrush}"
+        NonActiveWindowTitleBrush="{DynamicResource MilChromeBrush}"
+        GlowBrush="{DynamicResource MilBorderBrush}"
+        NonActiveGlowBrush="{DynamicResource MilChromeBrush}"
         TitleCharacterCasing="Upper">
     <controls:MetroWindow.Resources>
         <ResourceDictionary>
@@ -31,7 +31,7 @@
                        VerticalAlignment="Center"
                        FontFamily="{StaticResource MilFontStencil}"
                        FontSize="17"
-                       Foreground="{StaticResource MilAccentBrush}"
+                       Foreground="{DynamicResource MilAccentBrush}"
                        Text="{Binding Converter={StaticResource MilUpperConverter}}" />
         </DataTemplate>
     </controls:MetroWindow.TitleTemplate>

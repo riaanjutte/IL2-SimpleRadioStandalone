@@ -1,6 +1,7 @@
 <Window x:Class="Ciribob.IL2.SimpleRadio.Standalone.Client.UI.ClientWindow.PilotRoster.PilotRosterWindow"
                       xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
                       xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                      xmlns:utils="clr-namespace:Ciribob.IL2.SimpleRadio.Standalone.Client.Utils"
                       Name="PilotRosterWin"
                       Title="IL2-SRS Pilot Roster"
                       MinWidth="460"
@@ -13,72 +14,122 @@
                       ResizeMode="CanResizeWithGrip"
                       Background="Transparent">
     <Window.Resources>
+        <ControlTemplate x:Key="PilotRosterPanelScrew" TargetType="{x:Type Control}">
+            <Grid Width="10.125" Height="10.125">
+                <Ellipse Fill="{DynamicResource MilScrewBrush}"
+                         Stroke="#15100A"
+                         StrokeThickness="0.9" />
+                <Rectangle Width="7.3125"
+                           Height="1.35"
+                           Fill="#241F14"
+                           RenderTransformOrigin="0.5,0.5"
+                           utils:ScrewSlotRandomizer.RandomAngle="True" />
+            </Grid>
+        </ControlTemplate>
+
         <Style x:Key="RosterCellTextStyle" TargetType="{x:Type TextBlock}">
-            <Setter Property="Foreground" Value="#F1E6BD" />
-            <Setter Property="FontFamily" Value="pack://application:,,,/IL2-SR-ClientRadio;component/Fonts/#Just Another Hand" />
-            <Setter Property="FontSize" Value="20" />
+            <Setter Property="Foreground" Value="{DynamicResource MilTextPrimaryBrush}" />
+            <Setter Property="FontFamily" Value="{StaticResource MilFontMono}" />
+            <Setter Property="FontSize" Value="16" />
             <Setter Property="Margin" Value="6,3" />
             <Setter Property="VerticalAlignment" Value="Center" />
             <Setter Property="TextTrimming" Value="CharacterEllipsis" />
             <Setter Property="TextWrapping" Value="NoWrap" />
         </Style>
         <Style TargetType="{x:Type DataGridColumnHeader}">
-            <Setter Property="Background" Value="#9D8A55" />
-            <Setter Property="Foreground" Value="#1C1F18" />
-            <Setter Property="FontFamily" Value="Courier New" />
+            <Setter Property="Background" Value="{DynamicResource MilActionBrush}" />
+            <Setter Property="Foreground" Value="{DynamicResource MilTextPrimaryBrush}" />
+            <Setter Property="FontFamily" Value="{StaticResource MilFontMono}" />
             <Setter Property="FontWeight" Value="Bold" />
-            <Setter Property="FontSize" Value="20" />
+            <Setter Property="FontSize" Value="16" />
             <Setter Property="Padding" Value="7,2" />
             <Setter Property="HorizontalContentAlignment" Value="Left" />
-            <Setter Property="BorderBrush" Value="#292D23" />
+            <Setter Property="BorderBrush" Value="{DynamicResource MilBorderBrush}" />
             <Setter Property="BorderThickness" Value="0,0,1,1" />
         </Style>
         <Style TargetType="{x:Type DataGridRow}">
-            <Setter Property="Background" Value="#303529" />
-            <Setter Property="BorderBrush" Value="#4B513F" />
+            <Setter Property="Background" Value="{DynamicResource MilWellBrush}" />
+            <Setter Property="BorderBrush" Value="{DynamicResource MilBorderBrush}" />
             <Setter Property="BorderThickness" Value="0,0,0,1" />
-            <Setter Property="Foreground" Value="#F1E6BD" />
+            <Setter Property="Foreground" Value="{DynamicResource MilTextPrimaryBrush}" />
             <Style.Triggers>
                 <Trigger Property="AlternationIndex" Value="1">
-                    <Setter Property="Background" Value="#292D23" />
+                    <Setter Property="Background" Value="{DynamicResource MilRowAltBrush}" />
                 </Trigger>
                 <Trigger Property="IsMouseOver" Value="True">
-                    <Setter Property="Background" Value="#3C422F" />
+                    <Setter Property="Background" Value="{DynamicResource MilBtnDarkHoverBrush}" />
                 </Trigger>
                 <Trigger Property="IsSelected" Value="True">
-                    <Setter Property="Background" Value="#4A432A" />
+                    <Setter Property="Background" Value="{DynamicResource MilActionBrush}" />
                 </Trigger>
             </Style.Triggers>
         </Style>
         <Style TargetType="{x:Type DataGridCell}">
             <Setter Property="Background" Value="{Binding Background, RelativeSource={RelativeSource AncestorType={x:Type DataGridRow}}}" />
-            <Setter Property="Foreground" Value="#F1E6BD" />
-            <Setter Property="BorderBrush" Value="#444B3A" />
+            <Setter Property="Foreground" Value="{DynamicResource MilTextPrimaryBrush}" />
+            <Setter Property="BorderBrush" Value="{DynamicResource MilBorderBrush}" />
             <Setter Property="BorderThickness" Value="0,0,1,0" />
             <Setter Property="Padding" Value="0" />
             <Setter Property="FocusVisualStyle" Value="{x:Null}" />
             <Style.Triggers>
                 <Trigger Property="IsSelected" Value="True">
-                    <Setter Property="Background" Value="#4A432A" />
-                    <Setter Property="Foreground" Value="#FFF5CC" />
+                    <Setter Property="Background" Value="{DynamicResource MilActionBrush}" />
+                    <Setter Property="Foreground" Value="{DynamicResource MilTextPrimaryBrush}" />
                 </Trigger>
             </Style.Triggers>
         </Style>
     </Window.Resources>
 
-    <Grid ClipToBounds="True">
+    <Grid ClipToBounds="True"
+          Background="{DynamicResource MilWindowBackgroundBrush}">
     <Border x:Name="RosterFrame"
             Margin="0"
-            Background="#303529"
-            BorderBrush="#9D8A55"
-            BorderThickness="2"
+            Background="{DynamicResource MilPanelFaceBrush}"
+            BorderBrush="#15100A"
+            BorderThickness="1"
+            CornerRadius="6"
             HorizontalAlignment="Stretch"
             VerticalAlignment="Stretch"
             MouseLeftButtonDown="RosterFrame_MouseLeftButtonDown">
-        <Grid Margin="12">
+        <Border BorderBrush="{DynamicResource ThreeDSoftHighlightBrush}"
+                BorderThickness="1,1,0,0"
+                CornerRadius="5">
+        <Grid Margin="18,14,18,14">
             <Grid.RowDefinitions>
                 <RowDefinition Height="*" />
             </Grid.RowDefinitions>
+
+            <Rectangle RadiusX="5"
+                       RadiusY="5"
+                       IsHitTestVisible="False"
+                       Opacity="{DynamicResource WeatheringOpacity}"
+                       utils:PanelWeathering.Enabled="True" />
+            <Rectangle RadiusX="5"
+                       RadiusY="5"
+                       IsHitTestVisible="False"
+                       Opacity="{DynamicResource WeatheringExtraOpacity}"
+                       utils:PanelWeathering.Enabled="True" />
+
+            <Control Template="{StaticResource PilotRosterPanelScrew}"
+                     HorizontalAlignment="Left"
+                     VerticalAlignment="Top"
+                     Margin="-12,-8,0,0"
+                     Opacity="{DynamicResource ThreeDScrewOpacity}" />
+            <Control Template="{StaticResource PilotRosterPanelScrew}"
+                     HorizontalAlignment="Right"
+                     VerticalAlignment="Top"
+                     Margin="0,-8,-12,0"
+                     Opacity="{DynamicResource ThreeDScrewOpacity}" />
+            <Control Template="{StaticResource PilotRosterPanelScrew}"
+                     HorizontalAlignment="Left"
+                     VerticalAlignment="Bottom"
+                     Margin="-12,0,0,-8"
+                     Opacity="{DynamicResource ThreeDScrewOpacity}" />
+            <Control Template="{StaticResource PilotRosterPanelScrew}"
+                     HorizontalAlignment="Right"
+                     VerticalAlignment="Bottom"
+                     Margin="0,0,-12,-8"
+                     Opacity="{DynamicResource ThreeDScrewOpacity}" />
 
             <DataGrid x:Name="PilotList"
                       AutoGenerateColumns="False"
@@ -94,15 +145,15 @@
                       RowHeight="31"
                       ColumnHeaderHeight="30"
                       AlternationCount="2"
-                      RowBackground="#303529"
+                      RowBackground="{DynamicResource MilWellBrush}"
                       SelectionMode="Single"
                       SelectionUnit="FullRow"
                       ScrollViewer.HorizontalScrollBarVisibility="Disabled"
-                      ScrollViewer.VerticalScrollBarVisibility="Auto"
-                      Background="#292D23"
-                      BorderBrush="#151711"
+                      ScrollViewer.VerticalScrollBarVisibility="Disabled"
+                      Background="{DynamicResource MilWellBrush}"
+                      BorderBrush="#15100A"
                       BorderThickness="1"
-                      AlternatingRowBackground="#292D23">
+                      AlternatingRowBackground="{DynamicResource MilRowAltBrush}">
                 <DataGrid.Columns>
                     <DataGridTextColumn x:Name="CallsignColumn"
                                         Header="CALLSIGN"
@@ -114,6 +165,13 @@
                                         Header="PILOT"
                                         Binding="{Binding PilotName}"
                                         Width="*"
+                                        ElementStyle="{StaticResource RosterCellTextStyle}" />
+                    <DataGridTextColumn x:Name="VehicleColumn"
+                                        Header="VEHICLE"
+                                        Binding="{Binding Vehicle}"
+                                        Width="Auto"
+                                        MinWidth="96"
+                                        Visibility="Collapsed"
                                         ElementStyle="{StaticResource RosterCellTextStyle}" />
                     <DataGridTextColumn x:Name="Radio1Column"
                                         Header="R1"
@@ -135,14 +193,15 @@
                        VerticalAlignment="Center"
                        MaxWidth="420"
                        Margin="18"
-                       Foreground="#F1E6BD"
-                       FontFamily="Courier New"
+                       Foreground="{DynamicResource MilTextPrimaryBrush}"
+                       FontFamily="{StaticResource MilFontMono}"
                        FontSize="18"
                        FontWeight="Bold"
                        TextAlignment="Center"
                        TextWrapping="Wrap"
                        Visibility="Collapsed" />
         </Grid>
+        </Border>
     </Border>
     </Grid>
 </Window>

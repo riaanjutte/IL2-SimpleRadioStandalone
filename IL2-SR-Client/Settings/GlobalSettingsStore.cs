@@ -80,6 +80,8 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.Settings
         SettingsProfiles,
         Language,
         Theme,
+        VuMeterStyle,
+        ThreeDEffectsEnabled,
 
         CommunityRecommendedSettingsChoice,
 
@@ -378,6 +380,8 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.Settings
 
             {GlobalSettingsKeys.Language.ToString(), "" },
             {GlobalSettingsKeys.Theme.ToString(), "Bakelite" },
+            {GlobalSettingsKeys.VuMeterStyle.ToString(), "Auto" },
+            {GlobalSettingsKeys.ThreeDEffectsEnabled.ToString(), "true" },
             {GlobalSettingsKeys.CommunityRecommendedSettingsChoice.ToString(), "" },
 
             {GlobalSettingsKeys.ShowTransmitterName.ToString(), "true"},

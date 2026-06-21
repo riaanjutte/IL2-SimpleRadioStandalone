@@ -1,0 +1,123 @@
+﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+    <!-- White instrument-panel variant: clean enamel panels, black engraved text,
+         steel fittings. Key set must stay identical to MilitaryPalette.xaml. -->
+    <Color x:Key="MilWindowBackgroundColor">#F4F4F1</Color>
+    <Color x:Key="MilChromeColor">#D8D8D2</Color>
+    <Color x:Key="MilWellColor">#FFFFFF</Color>
+    <Color x:Key="MilBorderColor">#6E716D</Color>
+    <Color x:Key="MilTextPrimaryColor">#111111</Color>
+    <Color x:Key="MilTextSecondaryColor">#555B58</Color>
+    <Color x:Key="MilAccentColor">#2D4D5A</Color>
+    <Color x:Key="MilActionColor">#DDE1E0</Color>
+    <Color x:Key="MilActionBorderColor">#6F7778</Color>
+    <Color x:Key="MilActionHoverColor">#E9ECEA</Color>
+    <Color x:Key="MilLedOnColor">#28B63A</Color>
+    <Color x:Key="MilLedOffColor">#7B817F</Color>
+    <Color x:Key="MilLedErrorColor">#C53328</Color>
+    <Color x:Key="MilRowAltColor">#E5E7E4</Color>
+
+    <!-- rubbed steel and grey primer showing through weathering -->
+    <Color x:Key="MilWornMetal1Color">#9FA4A2</Color>
+    <Color x:Key="MilWornMetal2Color">#B7BCBA</Color>
+    <Color x:Key="MilWornMetal3Color">#CDD0CE</Color>
+
+    <SolidColorBrush x:Key="MilWindowBackgroundBrush" Color="{StaticResource MilWindowBackgroundColor}" />
+    <SolidColorBrush x:Key="MilChromeBrush" Color="{StaticResource MilChromeColor}" />
+    <SolidColorBrush x:Key="MilWellBrush" Color="{StaticResource MilWellColor}" />
+    <SolidColorBrush x:Key="MilBorderBrush" Color="{StaticResource MilBorderColor}" />
+    <SolidColorBrush x:Key="MilTextPrimaryBrush" Color="{StaticResource MilTextPrimaryColor}" />
+    <SolidColorBrush x:Key="MilTextSecondaryBrush" Color="{StaticResource MilTextSecondaryColor}" />
+    <SolidColorBrush x:Key="MilAccentBrush" Color="{StaticResource MilAccentColor}" />
+    <SolidColorBrush x:Key="MilActionBrush" Color="{StaticResource MilActionColor}" />
+    <SolidColorBrush x:Key="MilActionBorderBrush" Color="{StaticResource MilActionBorderColor}" />
+    <SolidColorBrush x:Key="MilActionHoverBrush" Color="{StaticResource MilActionHoverColor}" />
+    <SolidColorBrush x:Key="MilLedOnBrush" Color="{StaticResource MilLedOnColor}" />
+    <SolidColorBrush x:Key="MilLedOffBrush" Color="{StaticResource MilLedOffColor}" />
+    <SolidColorBrush x:Key="MilLedErrorBrush" Color="{StaticResource MilLedErrorColor}" />
+    <SolidColorBrush x:Key="MilRowAltBrush" Color="{StaticResource MilRowAltColor}" />
+    <SolidColorBrush x:Key="MilVuFaceBrush" Color="{StaticResource MilTextPrimaryColor}" />
+    <SolidColorBrush x:Key="MilVuMarkBrush" Color="#F3F3EC" />
+    <SolidColorBrush x:Key="MilVuNeedleBrush" Color="#D33124" />
+    <SolidColorBrush x:Key="OverlayTxRxLabelBrush" Color="#000000" />
+    <SolidColorBrush x:Key="OverlayChannelButtonForegroundBrush" Color="{StaticResource MilTextPrimaryColor}" />
+    <SolidColorBrush x:Key="OverlayChannelButtonSelectedForegroundBrush" Color="{StaticResource MilTextPrimaryColor}" />
+
+    <FontFamily x:Key="MilFontStencil">pack://application:,,,/IL2-SR-ClientRadio;component/Fonts/#Allerta Stencil</FontFamily>
+    <FontFamily x:Key="MilFontMono">pack://application:,,,/IL2-SR-ClientRadio;component/Fonts/#Share Tech Mono</FontFamily>
+
+    <LinearGradientBrush x:Key="MilPanelFaceBrush" StartPoint="0,0" EndPoint="0,1">
+        <GradientStop Offset="0" Color="#FFFFFF" />
+        <GradientStop Offset="1" Color="#DDE0DD" />
+    </LinearGradientBrush>
+
+    <LinearGradientBrush x:Key="MilBtnDarkFaceBrush" StartPoint="0,0" EndPoint="0,1">
+        <GradientStop Offset="0" Color="#F5F6F4" />
+        <GradientStop Offset="1" Color="#C8CECB" />
+    </LinearGradientBrush>
+    <LinearGradientBrush x:Key="MilBtnDarkHoverBrush" StartPoint="0,0" EndPoint="0,1">
+        <GradientStop Offset="0" Color="#FFFFFF" />
+        <GradientStop Offset="1" Color="#D7DDDA" />
+    </LinearGradientBrush>
+    <LinearGradientBrush x:Key="MilBtnDarkPressedBrush" StartPoint="0,0" EndPoint="0,1">
+        <GradientStop Offset="0" Color="#AEB7B4" />
+        <GradientStop Offset="1" Color="#E2E6E3" />
+    </LinearGradientBrush>
+
+    <LinearGradientBrush x:Key="MilBtnBrassFaceBrush" StartPoint="0,0" EndPoint="0,1">
+        <GradientStop Offset="0" Color="#E8ECEA" />
+        <GradientStop Offset="1" Color="#BCC4C1" />
+    </LinearGradientBrush>
+    <LinearGradientBrush x:Key="MilBtnBrassHoverBrush" StartPoint="0,0" EndPoint="0,1">
+        <GradientStop Offset="0" Color="#F8FAF9" />
+        <GradientStop Offset="1" Color="#CAD2CF" />
+    </LinearGradientBrush>
+    <LinearGradientBrush x:Key="MilBtnBrassPressedBrush" StartPoint="0,0" EndPoint="0,1">
+        <GradientStop Offset="0" Color="#A4AFAC" />
+        <GradientStop Offset="1" Color="#DCE2DF" />
+    </LinearGradientBrush>
+
+    <RadialGradientBrush x:Key="MilScrewBrush" GradientOrigin="0.35,0.3">
+        <GradientStop Offset="0" Color="#F7F7EF" />
+        <GradientStop Offset="0.6" Color="#8D938F" />
+        <GradientStop Offset="1" Color="#333735" />
+    </RadialGradientBrush>
+
+    <RadialGradientBrush x:Key="MilLampBezelBrush" GradientOrigin="0.3,0.25">
+        <GradientStop Offset="0" Color="#D4D8D5" />
+        <GradientStop Offset="0.7" Color="#757D79" />
+        <GradientStop Offset="1" Color="#272B29" />
+    </RadialGradientBrush>
+    <RadialGradientBrush x:Key="MilLampGlassBrush" GradientOrigin="0.3,0.25" Center="0.3,0.25" RadiusX="0.7" RadiusY="0.7">
+        <GradientStop Offset="0" Color="#90FFFFFF" />
+        <GradientStop Offset="0.45" Color="#25FFFFFF" />
+        <GradientStop Offset="1" Color="#00FFFFFF" />
+    </RadialGradientBrush>
+
+    <LinearGradientBrush x:Key="OverlayEquipmentPanelBrush" StartPoint="0,0" EndPoint="0,1">
+        <GradientStop Color="#F7F7F3" Offset="0" />
+        <GradientStop Color="#E2E5E1" Offset="0.45" />
+        <GradientStop Color="#CCD2CF" Offset="1" />
+    </LinearGradientBrush>
+    <LinearGradientBrush x:Key="OverlayRaisedControlBrush" StartPoint="0,0" EndPoint="0,1">
+        <GradientStop Color="#FAFAF6" Offset="0" />
+        <GradientStop Color="#D6DCD9" Offset="0.52" />
+        <GradientStop Color="#B5BEBB" Offset="1" />
+    </LinearGradientBrush>
+    <LinearGradientBrush x:Key="OverlayPressedControlBrush" StartPoint="0,0" EndPoint="0,1">
+        <GradientStop Color="#A6B0AD" Offset="0" />
+        <GradientStop Color="#E2E6E3" Offset="1" />
+    </LinearGradientBrush>
+    <SolidColorBrush x:Key="OverlayRaisedBorderBrush" Color="#5D6562" />
+    <SolidColorBrush x:Key="OverlayEdgeHighlightBrush" Color="#FFFFFF" />
+
+    <LinearGradientBrush x:Key="OverlayAccentRaisedBrush" StartPoint="0,0" EndPoint="0,1">
+        <GradientStop Color="#F4F5F0" Offset="0" />
+        <GradientStop Color="#D5DBD8" Offset="0.52" />
+        <GradientStop Color="#AAB4B0" Offset="1" />
+    </LinearGradientBrush>
+    <SolidColorBrush x:Key="OverlayAccentRaisedBorderBrush" Color="#5A625F" />
+
+</ResourceDictionary>
+

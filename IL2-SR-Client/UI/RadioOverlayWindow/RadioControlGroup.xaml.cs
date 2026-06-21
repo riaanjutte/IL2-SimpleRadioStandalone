@@ -24,14 +24,25 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI.RadioOverlayWindow
         private const double LastSpeakerHoldMilliseconds = 3000.0;
         private const double SpeakerNameScrollPixelsPerSecond = 18.0;
         private const double SpeakerNameScrollPauseMilliseconds = 700.0;
+        private const double ReceiveIndicatorHoldMilliseconds = 500.0;
+        private const double TransmitIndicatorHoldMilliseconds = 250.0;
         private static readonly Color ActiveGreen = (Color)ColorConverter.ConvertFromString("#96FF6D");
         private static readonly Color InactiveGrey = (Color)ColorConverter.ConvertFromString("#3A3A3A");
         private static readonly Color TxRed = (Color)ColorConverter.ConvertFromString("#FF3B30");
+        private static readonly Brush TxActiveBrush = CreateFrozenStatusBrush(TxRed);
+        private static readonly Brush RxActiveBrush = CreateFrozenStatusBrush(ActiveGreen);
+        private static readonly Brush InactiveLedBrush = CreateFrozenStatusBrush(InactiveGrey);
+        private static readonly Brush DisconnectedLedBrush = CreateFrozenStatusBrush(Colors.Red);
+        private static readonly Brush SelectedChannelBorderBrush = CreateFrozenBrush("#00FF00");
+        private static readonly Brush OccupiedChannelBorderBrush = new SolidColorBrush(Color.FromArgb(128, 255, 255, 0));
+        private static readonly Brush RadioDisplayGreenBrush = CreateFrozenBrush("#00FF00");
+        private static readonly Brush SpeakerDisplayBrush = CreateFrozenBrush("#FFFFFF");
 
         private bool _dragging;
         private bool _syncingSliderFromState;
         private readonly ConcurrentDictionary<int, Button> _channelButtons = new ConcurrentDictionary<int, Button>();
         private readonly ConcurrentDictionary<int, bool> _channelOccupancyStates = new ConcurrentDictionary<int, bool>();
+        private readonly ConcurrentDictionary<int, int> _channelButtonVisualStates = new ConcurrentDictionary<int, int>();
         private readonly ClientStateSingleton _clientStateSingleton = ClientStateSingleton.Instance;
         private readonly ConnectedClientsSingleton _connectClientsSingleton = ConnectedClientsSingleton.Instance;
         private string _currentDisplayText = string.Empty;
@@ -43,6 +54,16 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI.RadioOverlayWindow
         private bool _wasReceivingSpeaker;
         private int _lastRenderedChannel = -1;
         private DateTime _lastChannelOccupancyRefresh = DateTime.MinValue;
+        private bool? _lastTxActive;
+        private bool? _lastRxActive;
+        private bool? _lastDisconnected;
+        private string _scrollMeasuredText = string.Empty;
+        private double _scrollMeasuredViewportWidth = -1.0;
+        private double _scrollTextWidth;
+        private double _scrollTextHeight;
+        private double _scrollingWidth;
+        private double _scrollTravelDistance;
+        private double _scrollTravelMilliseconds;
 
         public RadioControlGroup()
         {
@@ -51,6 +72,17 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI.RadioOverlayWindow
             InitializeComponent();
             CreateChannelButtons();
             LocalizationManager.LocalizeElement(this);
+        }
+
+        public void RefreshLocalization()
+        {
+            LocalizationManager.LocalizeElement(this);
+            foreach (var button in _channelButtons)
+            {
+                button.Value.ToolTip = LocalizationManager.Format("Channel {0}", button.Key);
+            }
+
+            RepaintRadioStatus();
         }
 
         private int _radioId;
@@ -93,7 +125,6 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI.RadioOverlayWindow
                     VerticalContentAlignment = VerticalAlignment.Center,
                     FontFamily = new FontFamily("Courier New"),
                     FontSize = channel >= 10 ? 8 : 10,
-                    Foreground = Brushes.White,
                     Content = channel.ToString(CultureInfo.InvariantCulture),
                     Tag = channel,
                     IsEnabled = true,
@@ -105,6 +136,7 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI.RadioOverlayWindow
 
                 _channelButtons[channel] = button;
                 _channelOccupancyStates[channel] = false;
+                _channelButtonVisualStates[channel] = -1;
                 ChannelGrid.Children.Add(button);
             }
         }
@@ -158,13 +190,96 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI.RadioOverlayWindow
 
         internal void RepaintRadioStatus()
         {
+            RepaintRadioStatus(includeTelemetry: true);
+        }
+
+        internal void RepaintRadioLiveState()
+        {
+            RepaintRadioStatus(includeTelemetry: false);
+        }
+
+        internal void ApplyFastState(OverlayRadioFastState state)
+        {
+            if (!state.IsConnected || !state.IsAvailable)
+            {
+                var notConnectedText = LocalizationManager.Get("Not Connected");
+                var alreadyRenderedDisconnected = _lastRenderedChannel == -1 &&
+                                                  string.Equals(_currentDisplayText, notConnectedText, StringComparison.Ordinal) &&
+                                                  !_speakerDisplayActive;
+
+                UpdateStatusLeds(false, false, true);
+                SetDisplayText(notConnectedText,
+                    RadioDisplayGreenBrush,
+                    1.0,
+                    false);
+                if (!alreadyRenderedDisconnected)
+                {
+                    ClearSpeakerDisplayState();
+                    _lastRenderedChannel = -1;
+                    UpdateChannelButtonState(-1);
+                }
+
+                _dragging = false;
+                return;
+            }
+
+            if (_lastRenderedChannel != state.Channel)
+            {
+                _lastRenderedChannel = state.Channel;
+                ClearSpeakerDisplayState();
+            }
+
+            UpdateStatusLeds(state.TxActive, state.RxActive, false);
+            UpdateReceiveDisplay(state.RxActive, state.SpeakerName);
+
+            if (!_speakerDisplayActive)
+            {
+                SetDisplayText(LocalizationManager.Format("CHN {0}", state.Channel),
+                    RadioDisplayGreenBrush,
+                    1.0,
+                    false);
+            }
+
+            UpdateChannelButtonState(state.Channel);
+
+            if (!_dragging && Math.Abs(RadioVolume.Value - state.VolumePercent) > 0.1)
+            {
+                _syncingSliderFromState = true;
+                RadioVolume.Value = state.VolumePercent;
+                _syncingSliderFromState = false;
+            }
+        }
+
+        internal void RefreshOverlayTelemetry()
+        {
+            var IL2PlayerRadioInfo = _clientStateSingleton.PlayerGameState;
+            if (IL2PlayerRadioInfo == null || !_clientStateSingleton.IsConnected)
+            {
+                UsersCount.Text = "0";
+                UpdateChannelOccupancyIndicators(true);
+                return;
+            }
+
+            var currentRadio = IL2PlayerRadioInfo.radios[RadioId];
+            if (currentRadio == null)
+            {
+                return;
+            }
+
+            RefreshChannelOccupancyIndicatorsIfNeeded();
+            int count = _connectClientsSingleton.ClientsOnFreq(currentRadio.freq, currentRadio.modulation);
+            UsersCount.Text = count.ToString(CultureInfo.InvariantCulture);
+        }
+
+        private void RepaintRadioStatus(bool includeTelemetry)
+        {
             var IL2PlayerRadioInfo = _clientStateSingleton.PlayerGameState;
 
             if (IL2PlayerRadioInfo == null || !_clientStateSingleton.IsConnected)
             {
                 UpdateStatusLeds(false, false, true);
                 SetDisplayText(LocalizationManager.Get("Not Connected"),
-                    new SolidColorBrush((Color)ColorConverter.ConvertFromString("#00FF00")),
+                    RadioDisplayGreenBrush,
                     1.0,
                     false);
                 ClearSpeakerDisplayState();
@@ -194,22 +309,26 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI.RadioOverlayWindow
 
                 var transmitting = _clientStateSingleton.RadioSendingState;
                 var receiving = _clientStateSingleton.RadioReceivingState[RadioId];
-                var txActive = transmitting.IsSending && transmitting.SendingOn == RadioId;
-                var rxActive = receiving != null && receiving.IsReceiving;
+                var txActive = transmitting != null &&
+                               transmitting.SendingOn == RadioId &&
+                               (transmitting.IsSending || IsRecent(transmitting.LastSentAt, TransmitIndicatorHoldMilliseconds));
+                var rxActive = receiving != null && IsRecent(receiving.LastReceivedAt, ReceiveIndicatorHoldMilliseconds);
                 UpdateStatusLeds(txActive, rxActive, false);
 
                 if (!_speakerDisplayActive)
                 {
                     SetDisplayText(LocalizationManager.Format("CHN {0}", currentRadio.channel),
-                        new SolidColorBrush((Color)ColorConverter.ConvertFromString("#00FF00")),
+                        RadioDisplayGreenBrush,
                         1.0,
                         false);
                 }
                 UpdateChannelButtonState(currentRadio.channel);
-                RefreshChannelOccupancyIndicatorsIfNeeded();
-
-                int count = _connectClientsSingleton.ClientsOnFreq(currentRadio.freq, currentRadio.modulation);
-                UsersCount.Text = count.ToString(CultureInfo.InvariantCulture);
+                if (includeTelemetry)
+                {
+                    RefreshChannelOccupancyIndicatorsIfNeeded();
+                    int count = _connectClientsSingleton.ClientsOnFreq(currentRadio.freq, currentRadio.modulation);
+                    UsersCount.Text = count.ToString(CultureInfo.InvariantCulture);
+                }
 
                 if (_dragging == false)
                 {
@@ -222,15 +341,24 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI.RadioOverlayWindow
 
         private void UpdateStatusLeds(bool txActive, bool rxActive, bool disconnected)
         {
-            if (disconnected)
+            if (_lastTxActive == txActive && _lastRxActive == rxActive && _lastDisconnected == disconnected)
             {
-                TxActive.Fill = CreateStatusBrush(Colors.Red);
-                RxActive.Fill = CreateStatusBrush(Colors.Red);
                 return;
             }
 
-            TxActive.Fill = CreateStatusBrush(txActive ? TxRed : InactiveGrey);
-            RxActive.Fill = CreateStatusBrush(rxActive ? ActiveGreen : InactiveGrey);
+            _lastTxActive = txActive;
+            _lastRxActive = rxActive;
+            _lastDisconnected = disconnected;
+
+            if (disconnected)
+            {
+                TxActive.Fill = DisconnectedLedBrush;
+                RxActive.Fill = DisconnectedLedBrush;
+                return;
+            }
+
+            TxActive.Fill = txActive ? TxActiveBrush : InactiveLedBrush;
+            RxActive.Fill = rxActive ? RxActiveBrush : InactiveLedBrush;
         }
 
         private void RefreshChannelOccupancyIndicatorsIfNeeded()
@@ -302,28 +430,79 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI.RadioOverlayWindow
 
         private void UpdateChannelButtonState(int selectedChannel)
         {
+            var hasVisualStateChange = false;
+            foreach (var pair in _channelButtons)
+            {
+                var visualState = GetChannelVisualState(pair.Key, selectedChannel);
+                if (!_channelButtonVisualStates.TryGetValue(pair.Key, out var previousVisualState) ||
+                    previousVisualState != visualState)
+                {
+                    hasVisualStateChange = true;
+                    break;
+                }
+            }
+
+            if (!hasVisualStateChange)
+            {
+                return;
+            }
+
             foreach (var pair in _channelButtons)
             {
                 var button = pair.Value;
-                if (pair.Key == selectedChannel)
+                var visualState = GetChannelVisualState(pair.Key, selectedChannel);
+
+                if (_channelButtonVisualStates.TryGetValue(pair.Key, out var previousVisualState) &&
+                    previousVisualState == visualState)
                 {
-                    button.Foreground = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#00FF00"));
-                    button.BorderBrush = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#00FF00"));
+                    continue;
+                }
+
+                _channelButtonVisualStates[pair.Key] = visualState;
+
+                if (visualState == 2)
+                {
+                    button.SetResourceReference(ForegroundProperty, "OverlayChannelButtonSelectedForegroundBrush");
+                    button.BorderBrush = SelectedChannelBorderBrush;
                     button.BorderThickness = new Thickness(1.5);
                 }
-                else if (_channelOccupancyStates.TryGetValue(pair.Key, out var occupied) && occupied)
+                else if (visualState == 1)
                 {
-                    button.Foreground = Brushes.White;
-                    button.BorderBrush = new SolidColorBrush(Color.FromArgb(128, 255, 255, 0));
+                    button.SetResourceReference(ForegroundProperty, "OverlayChannelButtonForegroundBrush");
+                    button.BorderBrush = OccupiedChannelBorderBrush;
                     button.BorderThickness = new Thickness(1.5);
                 }
                 else
                 {
-                    button.Foreground = Brushes.White;
+                    button.SetResourceReference(ForegroundProperty, "OverlayChannelButtonForegroundBrush");
                     button.ClearValue(BorderBrushProperty);
                     button.ClearValue(BorderThicknessProperty);
                 }
             }
+        }
+
+        private int GetChannelVisualState(int channel, int selectedChannel)
+        {
+            if (channel == selectedChannel)
+            {
+                return 2;
+            }
+
+            return _channelOccupancyStates.TryGetValue(channel, out var occupied) && occupied ? 1 : 0;
+        }
+
+        private static Brush CreateFrozenStatusBrush(Color color)
+        {
+            var brush = CreateStatusBrush(color);
+            brush.Freeze();
+            return brush;
+        }
+
+        private static Brush CreateFrozenBrush(string color)
+        {
+            var brush = new SolidColorBrush((Color)ColorConverter.ConvertFromString(color));
+            brush.Freeze();
+            return brush;
         }
 
         internal void RepaintRadioReceive()
@@ -332,19 +511,20 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI.RadioOverlayWindow
             if (IL2PlayerRadioInfo == null)
             {
                 ClearSpeakerDisplayState();
-                RadioFrequency.Foreground = new SolidColorBrush((Color) ColorConverter.ConvertFromString("#00FF00"));
+                RadioFrequency.Foreground = RadioDisplayGreenBrush;
             }
             else
             {
                 var receiveState = _clientStateSingleton.RadioReceivingState[RadioId];
+                var receivingNow = receiveState != null && IsRecent(receiveState.LastReceivedAt, ReceiveIndicatorHoldMilliseconds);
                 //check if current
 
-                if ((receiveState == null) || !receiveState.IsReceiving)
+                if (!receivingNow)
                 {
                     _currentSpeakerActive = false;
                     UpdateLastSpeakerHold();
                 }
-                else if ((receiveState != null) && receiveState.IsReceiving)
+                else if (receivingNow)
                 {
                     _currentSpeakerActive = true;
                     if (!string.IsNullOrWhiteSpace(receiveState.SentBy))
@@ -368,6 +548,40 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI.RadioOverlayWindow
             }
         }
 
+        private void UpdateReceiveDisplay(bool receivingNow, string speakerName)
+        {
+            if (!receivingNow)
+            {
+                _currentSpeakerActive = false;
+                UpdateLastSpeakerHold();
+                return;
+            }
+
+            _currentSpeakerActive = true;
+            if (!string.IsNullOrWhiteSpace(speakerName))
+            {
+                _wasReceivingSpeaker = true;
+                _speakerDisplayActive = true;
+                _lastSpeakerName = speakerName;
+                _lastSpeakerEndedAt = DateTime.MinValue;
+                SetDisplayText(speakerName, SpeakerDisplayBrush, 1.0, true);
+            }
+            else
+            {
+                ClearHeldSpeakerDisplay();
+            }
+        }
+
+        private static bool IsRecent(long timestampTicks, double holdMilliseconds)
+        {
+            if (timestampTicks <= 0)
+            {
+                return false;
+            }
+
+            return (DateTime.Now.Ticks - timestampTicks) < TimeSpan.FromMilliseconds(holdMilliseconds).Ticks;
+        }
+
         private void UpdateLastSpeakerHold()
         {
             if (_currentSpeakerActive)
@@ -384,7 +598,7 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI.RadioOverlayWindow
             if (string.IsNullOrWhiteSpace(_lastSpeakerName) || _lastSpeakerEndedAt == DateTime.MinValue)
             {
                 _speakerDisplayActive = false;
-                RadioFrequency.Foreground = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#00FF00"));
+                RadioFrequency.Foreground = RadioDisplayGreenBrush;
                 StopSpeakerNameScroll();
                 return;
             }
@@ -393,26 +607,33 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI.RadioOverlayWindow
             if (elapsed >= LastSpeakerHoldMilliseconds)
             {
                 ClearSpeakerDisplayState();
-                RadioFrequency.Foreground = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#00FF00"));
+                RadioFrequency.Foreground = RadioDisplayGreenBrush;
                 return;
             }
 
             _speakerDisplayActive = true;
-            SetDisplayText(_lastSpeakerName, new SolidColorBrush(Colors.White), 1.0, true);
+            SetDisplayText(_lastSpeakerName, SpeakerDisplayBrush, 1.0, true);
         }
 
         private void SetDisplayText(string text, Brush foreground, double opacity, bool allowScroll)
         {
             text = text ?? string.Empty;
-            if (!string.Equals(_currentDisplayText, text, StringComparison.Ordinal))
+            var textChanged = !string.Equals(_currentDisplayText, text, StringComparison.Ordinal);
+            if (textChanged)
             {
                 _currentDisplayText = text;
                 RadioFrequency.Text = text;
                 _speakerNameScrollStartedAt = DateTime.UtcNow;
+                InvalidateSpeakerNameScrollMetrics();
             }
 
             RadioFrequency.Foreground = foreground;
             RadioFrequency.Opacity = opacity;
+            if (!allowScroll && !textChanged)
+            {
+                return;
+            }
+
             UpdateSpeakerNameScroll(allowScroll);
         }
 
@@ -424,10 +645,6 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI.RadioOverlayWindow
                 return;
             }
 
-            RadioFrequency.Width = double.NaN;
-            RadioFrequency.Measure(new Size(double.PositiveInfinity, double.PositiveInfinity));
-            var textWidth = RadioFrequency.DesiredSize.Width;
-            var textHeight = RadioFrequency.DesiredSize.Height;
             var viewportWidth = RadioFrequencyViewport.ActualWidth;
             var viewportHeight = RadioFrequencyViewport.ActualHeight;
             if (viewportWidth <= 0)
@@ -440,9 +657,10 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI.RadioOverlayWindow
                 viewportHeight = 12;
             }
 
-            Canvas.SetTop(RadioFrequency, Math.Max(0, (viewportHeight - textHeight) / 2.0));
+            EnsureSpeakerNameScrollMetrics(viewportWidth);
+            Canvas.SetTop(RadioFrequency, Math.Max(0, (viewportHeight - _scrollTextHeight) / 2.0));
 
-            if (textWidth <= viewportWidth)
+            if (_scrollTextWidth <= viewportWidth)
             {
                 StopSpeakerNameScroll();
                 return;
@@ -450,13 +668,9 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI.RadioOverlayWindow
 
             RadioFrequency.HorizontalAlignment = HorizontalAlignment.Left;
             RadioFrequency.TextAlignment = TextAlignment.Left;
-            var scrollMetrics = SpeakerNameScrollLayout.Calculate(textWidth, viewportWidth);
-            var scrollingWidth = scrollMetrics.ScrollingWidth;
-            RadioFrequency.Width = scrollingWidth;
+            RadioFrequency.Width = _scrollingWidth;
 
-            var travelDistance = scrollMetrics.TravelDistance;
-            var travelMilliseconds = travelDistance / SpeakerNameScrollPixelsPerSecond * 1000.0;
-            var cycleMilliseconds = SpeakerNameScrollPauseMilliseconds + travelMilliseconds + SpeakerNameScrollPauseMilliseconds;
+            var cycleMilliseconds = SpeakerNameScrollPauseMilliseconds + _scrollTravelMilliseconds + SpeakerNameScrollPauseMilliseconds;
             var elapsed = (DateTime.UtcNow - _speakerNameScrollStartedAt).TotalMilliseconds % cycleMilliseconds;
 
             double offset;
@@ -464,16 +678,44 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI.RadioOverlayWindow
             {
                 offset = 0;
             }
-            else if (elapsed <= SpeakerNameScrollPauseMilliseconds + travelMilliseconds)
+            else if (elapsed <= SpeakerNameScrollPauseMilliseconds + _scrollTravelMilliseconds)
             {
-                offset = -travelDistance * ((elapsed - SpeakerNameScrollPauseMilliseconds) / travelMilliseconds);
+                offset = -_scrollTravelDistance * ((elapsed - SpeakerNameScrollPauseMilliseconds) / _scrollTravelMilliseconds);
             }
             else
             {
-                offset = -travelDistance;
+                offset = -_scrollTravelDistance;
             }
 
             Canvas.SetLeft(RadioFrequency, offset);
+        }
+
+        private void EnsureSpeakerNameScrollMetrics(double viewportWidth)
+        {
+            if (string.Equals(_scrollMeasuredText, RadioFrequency.Text, StringComparison.Ordinal) &&
+                Math.Abs(_scrollMeasuredViewportWidth - viewportWidth) < 0.1)
+            {
+                return;
+            }
+
+            _scrollMeasuredText = RadioFrequency.Text;
+            _scrollMeasuredViewportWidth = viewportWidth;
+
+            RadioFrequency.Width = double.NaN;
+            RadioFrequency.Measure(new Size(double.PositiveInfinity, double.PositiveInfinity));
+            _scrollTextWidth = RadioFrequency.DesiredSize.Width;
+            _scrollTextHeight = RadioFrequency.DesiredSize.Height;
+
+            var scrollMetrics = SpeakerNameScrollLayout.Calculate(_scrollTextWidth, viewportWidth);
+            _scrollingWidth = scrollMetrics.ScrollingWidth;
+            _scrollTravelDistance = scrollMetrics.TravelDistance;
+            _scrollTravelMilliseconds = _scrollTravelDistance / SpeakerNameScrollPixelsPerSecond * 1000.0;
+        }
+
+        private void InvalidateSpeakerNameScrollMetrics()
+        {
+            _scrollMeasuredText = string.Empty;
+            _scrollMeasuredViewportWidth = -1.0;
         }
 
         private void StopSpeakerNameScroll()
@@ -517,10 +759,30 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI.RadioOverlayWindow
             _wasReceivingSpeaker = false;
             _lastSpeakerName = string.Empty;
             _lastSpeakerEndedAt = DateTime.MinValue;
-            RadioFrequency.Foreground = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#00FF00"));
+            RadioFrequency.Foreground = RadioDisplayGreenBrush;
             RadioFrequency.Opacity = 1.0;
             StopSpeakerNameScroll();
         }
 
+    }
+
+    internal sealed class OverlayFastSnapshot
+    {
+        public OverlayRadioFastState Radio1 { get; set; }
+        public OverlayRadioFastState Radio2 { get; set; }
+        public OverlayRadioFastState Intercom { get; set; }
+        public bool SecondRadioEnabled { get; set; }
+    }
+
+    internal struct OverlayRadioFastState
+    {
+        public int RadioId { get; set; }
+        public bool IsConnected { get; set; }
+        public bool IsAvailable { get; set; }
+        public int Channel { get; set; }
+        public bool TxActive { get; set; }
+        public bool RxActive { get; set; }
+        public string SpeakerName { get; set; }
+        public double VolumePercent { get; set; }
     }
 }

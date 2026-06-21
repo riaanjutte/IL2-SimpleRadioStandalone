@@ -1,27 +1,28 @@
 ﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
 
-    <!-- Vintage 1940s communication-set palette: warm bakelite browns, aged ivory,
-         brass/amber accents. -->
-    <Color x:Key="MilWindowBackgroundColor">#322A20</Color>
-    <Color x:Key="MilChromeColor">#261F16</Color>
-    <Color x:Key="MilWellColor">#1F1912</Color>
-    <Color x:Key="MilBorderColor">#59492F</Color>
-    <Color x:Key="MilTextPrimaryColor">#E8D9B5</Color>
-    <Color x:Key="MilTextSecondaryColor">#97876A</Color>
-    <Color x:Key="MilAccentColor">#C99B3F</Color>
-    <Color x:Key="MilActionColor">#66522A</Color>
-    <Color x:Key="MilActionBorderColor">#8E7438</Color>
-    <Color x:Key="MilActionHoverColor">#785F2F</Color>
+    <!-- Luftwaffe RLM 66 variant: dark schwarzgrau cockpit panels, aged ivory
+         stencilling, black instrument wells, and worn steel fittings. Key set
+         must stay identical to MilitaryPalette.xaml. -->
+    <Color x:Key="MilWindowBackgroundColor">#303334</Color>
+    <Color x:Key="MilChromeColor">#252829</Color>
+    <Color x:Key="MilWellColor">#171A1B</Color>
+    <Color x:Key="MilBorderColor">#4A4F50</Color>
+    <Color x:Key="MilTextPrimaryColor">#E7E0C4</Color>
+    <Color x:Key="MilTextSecondaryColor">#A8A895</Color>
+    <Color x:Key="MilAccentColor">#C9BE8A</Color>
+    <Color x:Key="MilActionColor">#424849</Color>
+    <Color x:Key="MilActionBorderColor">#686D6E</Color>
+    <Color x:Key="MilActionHoverColor">#4E5556</Color>
     <Color x:Key="MilLedOnColor">#4FE34F</Color>
-    <Color x:Key="MilLedOffColor">#4A4136</Color>
-    <Color x:Key="MilLedErrorColor">#C25B4E</Color>
-    <Color x:Key="MilRowAltColor">#2A231A</Color>
+    <Color x:Key="MilLedOffColor">#3A3F40</Color>
+    <Color x:Key="MilLedErrorColor">#B84E42</Color>
+    <Color x:Key="MilRowAltColor">#292D2E</Color>
 
-    <!-- bare metal showing through worn paint -->
-    <Color x:Key="MilWornMetal1Color">#9C8C6A</Color>
-    <Color x:Key="MilWornMetal2Color">#A99B7C</Color>
-    <Color x:Key="MilWornMetal3Color">#B5A37F</Color>
+    <!-- dull steel and primer showing through worn RLM 66 paint -->
+    <Color x:Key="MilWornMetal1Color">#898D8E</Color>
+    <Color x:Key="MilWornMetal2Color">#9CA0A1</Color>
+    <Color x:Key="MilWornMetal3Color">#B0B4B5</Color>
 
     <SolidColorBrush x:Key="MilWindowBackgroundBrush" Color="{StaticResource MilWindowBackgroundColor}" />
     <SolidColorBrush x:Key="MilChromeBrush" Color="{StaticResource MilChromeColor}" />
@@ -47,54 +48,47 @@
     <FontFamily x:Key="MilFontStencil">pack://application:,,,/IL2-SR-ClientRadio;component/Fonts/#Allerta Stencil</FontFamily>
     <FontFamily x:Key="MilFontMono">pack://application:,,,/IL2-SR-ClientRadio;component/Fonts/#Share Tech Mono</FontFamily>
 
-    <!-- ===== Skeuomorphic surfaces: equipment plates, pushbuttons, screws, lamps ===== -->
-
-    <!-- Raised equipment plate face -->
     <LinearGradientBrush x:Key="MilPanelFaceBrush" StartPoint="0,0" EndPoint="0,1">
-        <GradientStop Offset="0" Color="#3D3426" />
-        <GradientStop Offset="1" Color="#2E2719" />
+        <GradientStop Offset="0" Color="#3A3E3F" />
+        <GradientStop Offset="1" Color="#2B2F30" />
     </LinearGradientBrush>
 
-    <!-- Dark bakelite pushbutton (default buttons) -->
     <LinearGradientBrush x:Key="MilBtnDarkFaceBrush" StartPoint="0,0" EndPoint="0,1">
-        <GradientStop Offset="0" Color="#473B28" />
-        <GradientStop Offset="1" Color="#2C2415" />
+        <GradientStop Offset="0" Color="#4C5152" />
+        <GradientStop Offset="1" Color="#2E3233" />
     </LinearGradientBrush>
     <LinearGradientBrush x:Key="MilBtnDarkHoverBrush" StartPoint="0,0" EndPoint="0,1">
-        <GradientStop Offset="0" Color="#54462F" />
-        <GradientStop Offset="1" Color="#352B19" />
+        <GradientStop Offset="0" Color="#5A6061" />
+        <GradientStop Offset="1" Color="#383D3E" />
     </LinearGradientBrush>
     <LinearGradientBrush x:Key="MilBtnDarkPressedBrush" StartPoint="0,0" EndPoint="0,1">
-        <GradientStop Offset="0" Color="#241D10" />
-        <GradientStop Offset="1" Color="#3A3020" />
+        <GradientStop Offset="0" Color="#25292A" />
+        <GradientStop Offset="1" Color="#44494A" />
     </LinearGradientBrush>
 
-    <!-- Brass pushbutton (primary actions / lit toggles) -->
     <LinearGradientBrush x:Key="MilBtnBrassFaceBrush" StartPoint="0,0" EndPoint="0,1">
-        <GradientStop Offset="0" Color="#7C6534" />
-        <GradientStop Offset="1" Color="#55431D" />
+        <GradientStop Offset="0" Color="#77796C" />
+        <GradientStop Offset="1" Color="#55584D" />
     </LinearGradientBrush>
     <LinearGradientBrush x:Key="MilBtnBrassHoverBrush" StartPoint="0,0" EndPoint="0,1">
-        <GradientStop Offset="0" Color="#8A7139" />
-        <GradientStop Offset="1" Color="#5F4B21" />
+        <GradientStop Offset="0" Color="#85887A" />
+        <GradientStop Offset="1" Color="#626558" />
     </LinearGradientBrush>
     <LinearGradientBrush x:Key="MilBtnBrassPressedBrush" StartPoint="0,0" EndPoint="0,1">
-        <GradientStop Offset="0" Color="#4A3A17" />
-        <GradientStop Offset="1" Color="#6B5527" />
+        <GradientStop Offset="0" Color="#494C42" />
+        <GradientStop Offset="1" Color="#6B6F61" />
     </LinearGradientBrush>
 
-    <!-- Slotted panel screw -->
     <RadialGradientBrush x:Key="MilScrewBrush" GradientOrigin="0.35,0.3">
-        <GradientStop Offset="0" Color="#B0A584" />
-        <GradientStop Offset="0.6" Color="#57503C" />
-        <GradientStop Offset="1" Color="#2A251A" />
+        <GradientStop Offset="0" Color="#B0B4B5" />
+        <GradientStop Offset="0.6" Color="#5A5F60" />
+        <GradientStop Offset="1" Color="#262A2B" />
     </RadialGradientBrush>
 
-    <!-- Indicator lamp bezel ring and glass specular highlight -->
     <RadialGradientBrush x:Key="MilLampBezelBrush" GradientOrigin="0.3,0.25">
-        <GradientStop Offset="0" Color="#7A7060" />
-        <GradientStop Offset="0.7" Color="#3C342A" />
-        <GradientStop Offset="1" Color="#16110B" />
+        <GradientStop Offset="0" Color="#7A7D76" />
+        <GradientStop Offset="0.7" Color="#393E3F" />
+        <GradientStop Offset="1" Color="#121516" />
     </RadialGradientBrush>
     <RadialGradientBrush x:Key="MilLampGlassBrush" GradientOrigin="0.3,0.25" Center="0.3,0.25" RadiusX="0.7" RadiusY="0.7">
         <GradientStop Offset="0" Color="#90FFF6DC" />
@@ -102,31 +96,30 @@
         <GradientStop Offset="1" Color="#00FFF6DC" />
     </RadialGradientBrush>
 
-    <!-- ===== Radio overlay equipment surfaces (bakelite). Mirrored in
-         MilitaryPaletteGrey.xaml so the overlay follows the selected theme. ===== -->
     <LinearGradientBrush x:Key="OverlayEquipmentPanelBrush" StartPoint="0,0" EndPoint="0,1">
-        <GradientStop Color="#3D3426" Offset="0" />
-        <GradientStop Color="#342C1F" Offset="0.45" />
-        <GradientStop Color="#2A2318" Offset="1" />
+        <GradientStop Color="#3A3E3F" Offset="0" />
+        <GradientStop Color="#303435" Offset="0.45" />
+        <GradientStop Color="#292D2E" Offset="1" />
     </LinearGradientBrush>
     <LinearGradientBrush x:Key="OverlayRaisedControlBrush" StartPoint="0,0" EndPoint="0,1">
-        <GradientStop Color="#54462F" Offset="0" />
-        <GradientStop Color="#43381F" Offset="0.52" />
-        <GradientStop Color="#2C2415" Offset="1" />
+        <GradientStop Color="#525758" Offset="0" />
+        <GradientStop Color="#424748" Offset="0.52" />
+        <GradientStop Color="#313637" Offset="1" />
     </LinearGradientBrush>
     <LinearGradientBrush x:Key="OverlayPressedControlBrush" StartPoint="0,0" EndPoint="0,1">
-        <GradientStop Color="#241D10" Offset="0" />
-        <GradientStop Color="#3A3020" Offset="1" />
+        <GradientStop Color="#242829" Offset="0" />
+        <GradientStop Color="#454A4B" Offset="1" />
     </LinearGradientBrush>
-    <SolidColorBrush x:Key="OverlayRaisedBorderBrush" Color="#16110A" />
-    <SolidColorBrush x:Key="OverlayEdgeHighlightBrush" Color="#7B6C4C" />
+    <SolidColorBrush x:Key="OverlayRaisedBorderBrush" Color="#121516" />
+    <SolidColorBrush x:Key="OverlayEdgeHighlightBrush" Color="#777B7C" />
 
-    <!-- Accent-tinted raised brush for overlay channel up/down buttons. -->
     <LinearGradientBrush x:Key="OverlayAccentRaisedBrush" StartPoint="0,0" EndPoint="0,1">
-        <GradientStop Color="#E0B95C" Offset="0" />
-        <GradientStop Color="#C99B3F" Offset="0.52" />
-        <GradientStop Color="#7E5F22" Offset="1" />
+        <GradientStop Color="#C9BE8A" Offset="0" />
+        <GradientStop Color="#AFA574" Offset="0.52" />
+        <GradientStop Color="#766F4B" Offset="1" />
     </LinearGradientBrush>
-    <SolidColorBrush x:Key="OverlayAccentRaisedBorderBrush" Color="#3B2C10" />
+    <SolidColorBrush x:Key="OverlayAccentRaisedBorderBrush" Color="#332F20" />
 
 </ResourceDictionary>
+
+

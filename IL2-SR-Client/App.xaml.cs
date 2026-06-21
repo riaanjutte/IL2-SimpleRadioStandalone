@@ -9,6 +9,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Media;
 using Ciribob.IL2.SimpleRadio.Standalone.Client.Localization;
 using Ciribob.IL2.SimpleRadio.Standalone.Client.Settings;
 using Ciribob.IL2.SimpleRadio.Standalone.Client.Utils;
@@ -30,6 +31,22 @@ namespace IL2_SR_Client
         private System.Windows.Forms.NotifyIcon _notifyIcon;
         private bool loggingReady = false;
         private static Logger Logger = LogManager.GetCurrentClassLogger();
+        private static readonly string[] FlattenableBrushKeys =
+        {
+            "MilPanelFaceBrush",
+            "MilBtnDarkFaceBrush",
+            "MilBtnDarkHoverBrush",
+            "MilBtnDarkPressedBrush",
+            "MilBtnBrassFaceBrush",
+            "MilBtnBrassHoverBrush",
+            "MilBtnBrassPressedBrush",
+            "MilScrewBrush",
+            "MilLampBezelBrush",
+            "OverlayEquipmentPanelBrush",
+            "OverlayRaisedControlBrush",
+            "OverlayPressedControlBrush",
+            "OverlayAccentRaisedBrush"
+        };
 
         protected override void OnStartup(StartupEventArgs e)
         {
@@ -38,39 +55,215 @@ namespace IL2_SR_Client
         }
 
         /// <summary>
-        /// Swaps the default bakelite palette for the selected variant before any
-        /// window is created. All windows resolve Mil* resources via StaticResource,
-        /// so the palette must be final before XAML loads; theme changes apply on
-        /// the next client start.
+        /// Swaps the default bakelite palette for the selected variant. Theme brushes
+        /// are consumed through DynamicResource so open windows can repaint without a
+        /// client restart.
         /// </summary>
-        private void ApplyUiTheme()
+        public static void ApplyUiTheme()
         {
             try
             {
                 var theme = GlobalSettingsStore.Instance.GetClientSetting(GlobalSettingsKeys.Theme).RawValue;
-                if (!string.Equals(theme, "Grey", StringComparison.OrdinalIgnoreCase))
+                var palette = SelectedPalette(theme);
+                var resources = Current.Resources;
+                ClearFlattenedBrushOverrides(resources);
+
+                if (palette == null)
                 {
+                    EnsurePalette(resources, "Themes/MilitaryPalette.xaml");
+                    ApplyThreeDEffectSetting();
+                    ApplyVuMeterStyle();
                     return; // bakelite is the default, already merged via App.xaml
                 }
 
-                var dictionaries = Resources.MergedDictionaries;
-                for (var i = 0; i < dictionaries.Count; i++)
-                {
-                    var source = dictionaries[i].Source?.OriginalString;
-                    if (source != null && source.EndsWith("MilitaryPalette.xaml", StringComparison.OrdinalIgnoreCase))
-                    {
-                        dictionaries[i] = new ResourceDictionary
-                        {
-                            Source = new Uri("Themes/MilitaryPaletteGrey.xaml", UriKind.Relative)
-                        };
-                        return;
-                    }
-                }
+                EnsurePalette(resources, palette);
+                ApplyThreeDEffectSetting();
+                ApplyVuMeterStyle();
             }
             catch (Exception ex)
             {
                 Logger.Error(ex, "Failed to apply UI theme, falling back to default");
             }
+        }
+
+        private static void EnsurePalette(ResourceDictionary resources, string palette)
+        {
+            var dictionaries = resources.MergedDictionaries;
+            for (var i = 0; i < dictionaries.Count; i++)
+            {
+                var source = dictionaries[i].Source?.OriginalString;
+                if (IsThemePaletteDictionary(source))
+                {
+                    dictionaries[i] = new ResourceDictionary
+                    {
+                        Source = new Uri(palette, UriKind.Relative)
+                    };
+                    return;
+                }
+            }
+
+            dictionaries.Add(new ResourceDictionary
+            {
+                Source = new Uri(palette, UriKind.Relative)
+            });
+        }
+
+        private static bool IsThemePaletteDictionary(string source)
+        {
+            if (string.IsNullOrEmpty(source))
+            {
+                return false;
+            }
+
+            var normalizedSource = source.Replace('\\', '/');
+            return normalizedSource.IndexOf("MilitaryPalette", StringComparison.OrdinalIgnoreCase) >= 0
+                   || normalizedSource.IndexOf("/MilitaryPalette", StringComparison.OrdinalIgnoreCase) >= 0
+                   || normalizedSource.IndexOf("Themes/MilitaryPalette", StringComparison.OrdinalIgnoreCase) >= 0;
+        }
+
+        public static void ApplyThreeDEffectSetting()
+        {
+            ClearFlattenedBrushOverrides(Current.Resources);
+            var effectsEnabled = GlobalSettingsStore.Instance.GetClientSettingBool(GlobalSettingsKeys.ThreeDEffectsEnabled);
+            Current.Resources["ThreeDEffectOpacity"] = effectsEnabled ? 1.0 : 0.0;
+            Current.Resources["ThreeDGlassOpacity"] = effectsEnabled ? 1.0 : 0.0;
+            Current.Resources["ThreeDScrewOpacity"] = effectsEnabled ? 1.0 : 0.0;
+            Current.Resources["ThreeDHighlightBrush"] = effectsEnabled
+                ? new SolidColorBrush((Color)ColorConverter.ConvertFromString("#38FFF6DC"))
+                : Brushes.Transparent;
+            Current.Resources["ThreeDSoftHighlightBrush"] = effectsEnabled
+                ? new SolidColorBrush((Color)ColorConverter.ConvertFromString("#2BFFF6DC"))
+                : Brushes.Transparent;
+            Current.Resources["ThreeDDarkRimBrush"] = effectsEnabled
+                ? new SolidColorBrush((Color)ColorConverter.ConvertFromString("#15100A"))
+                : BrushFromResource("MilBorderBrush", Brushes.Black);
+
+            if (effectsEnabled)
+            {
+                return;
+            }
+
+            foreach (var key in FlattenableBrushKeys)
+            {
+                var flatBrush = FlattenBrush(Current.Resources[key] as Brush);
+                if (flatBrush != null)
+                {
+                    Current.Resources[key] = flatBrush;
+                }
+            }
+        }
+
+        public static void ApplyVuMeterStyle()
+        {
+            var style = NormalizeThemeName(GlobalSettingsStore.Instance.GetClientSetting(GlobalSettingsKeys.VuMeterStyle).RawValue);
+            if (style != "light" && style != "dark")
+            {
+                Current.Resources.Remove("MilVuFaceBrush");
+                Current.Resources.Remove("MilVuMarkBrush");
+                Current.Resources.Remove("MilVuNeedleBrush");
+                return;
+            }
+
+            var useDarkMeter = style == "dark";
+
+            Current.Resources["MilVuFaceBrush"] = useDarkMeter
+                ? new SolidColorBrush((Color)ColorConverter.ConvertFromString("#221D14"))
+                : new SolidColorBrush((Color)ColorConverter.ConvertFromString("#F3E7C8"));
+            Current.Resources["MilVuMarkBrush"] = useDarkMeter
+                ? new SolidColorBrush((Color)ColorConverter.ConvertFromString("#F3E7C8"))
+                : new SolidColorBrush((Color)ColorConverter.ConvertFromString("#2A251C"));
+            Current.Resources["MilVuNeedleBrush"] = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#D33124"));
+        }
+
+        private static void ClearFlattenedBrushOverrides(ResourceDictionary resources)
+        {
+            foreach (var key in FlattenableBrushKeys)
+            {
+                resources.Remove(key);
+            }
+        }
+
+        private static Brush BrushFromResource(string key, Brush fallback)
+        {
+            return Current.Resources[key] as Brush ?? fallback;
+        }
+
+        private static SolidColorBrush FlattenBrush(Brush brush)
+        {
+            var solidBrush = brush as SolidColorBrush;
+            if (solidBrush != null)
+            {
+                return new SolidColorBrush(solidBrush.Color);
+            }
+
+            var gradientBrush = brush as GradientBrush;
+            if (gradientBrush == null || gradientBrush.GradientStops.Count == 0)
+            {
+                return null;
+            }
+
+            return new SolidColorBrush(gradientBrush.GradientStops[gradientBrush.GradientStops.Count / 2].Color);
+        }
+
+        private static string SelectedPalette(string theme)
+        {
+            var normalizedTheme = NormalizeThemeName(theme);
+
+            if (normalizedTheme == "grey")
+            {
+                return "Themes/MilitaryPaletteGrey.xaml";
+            }
+
+            if (normalizedTheme == "rafgreengrey" || normalizedTheme == "rafgreygreen")
+            {
+                return "Themes/MilitaryPaletteRafGreyGreen.xaml";
+            }
+
+            if (normalizedTheme == "usaafolivedrab" || normalizedTheme == "olivedrab")
+            {
+                return "Themes/MilitaryPaletteUsaafOliveDrab.xaml";
+            }
+
+            if (normalizedTheme == "luftwafferlm66" || normalizedTheme == "rlm66")
+            {
+                return "Themes/MilitaryPaletteLuftwaffeRlm66.xaml";
+            }
+
+            if (normalizedTheme == "sovieta14steelgrey" || normalizedTheme == "a14steelgrey" || normalizedTheme == "sovietsteelgrey")
+            {
+                return "Themes/MilitaryPaletteSovietA14SteelGrey.xaml";
+            }
+
+            if (normalizedTheme == "ivory")
+            {
+                return "Themes/MilitaryPaletteIvory.xaml";
+            }
+
+            if (normalizedTheme == "white")
+            {
+                return "Themes/MilitaryPaletteWhite.xaml";
+            }
+
+            return null;
+        }
+
+        private static string NormalizeThemeName(string theme)
+        {
+            if (string.IsNullOrWhiteSpace(theme))
+            {
+                return string.Empty;
+            }
+
+            var builder = new StringBuilder(theme.Length);
+            foreach (var character in theme)
+            {
+                if (char.IsLetterOrDigit(character))
+                {
+                    builder.Append(char.ToLowerInvariant(character));
+                }
+            }
+
+            return builder.ToString();
         }
 
         public App()

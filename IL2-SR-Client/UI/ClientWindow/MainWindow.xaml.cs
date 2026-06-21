@@ -9,6 +9,7 @@ using System.Linq;
 using System.Net;
 using System.Net.Sockets;
 using System.Runtime;
+using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
@@ -29,6 +30,7 @@ using Ciribob.IL2.SimpleRadio.Standalone.Client.Network.Models;
 using Ciribob.IL2.SimpleRadio.Standalone.Client.Preferences;
 using Ciribob.IL2.SimpleRadio.Standalone.Client.Settings;
 using Ciribob.IL2.SimpleRadio.Standalone.Client.Singletons;
+using Ciribob.IL2.SimpleRadio.Standalone.Client.UI.ClientWindow.Diagnostics;
 using Ciribob.IL2.SimpleRadio.Standalone.Client.UI.ClientWindow.ClientList;
 using Ciribob.IL2.SimpleRadio.Standalone.Client.UI.ClientWindow.Favourites;
 using Ciribob.IL2.SimpleRadio.Standalone.Client.UI.ClientWindow.PilotRoster;
@@ -82,10 +84,37 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI
         private readonly DelegateCommand _connectCommand;
         private bool _initialisingLanguagePicker;
         private bool _initialisingThemePicker;
+        private bool _initialisingVuMeterStylePicker;
         private bool _initialisingOverlayOpacitySliders;
         private bool _initialisingWeatheringControls;
         private const string ThemeBakelite = "Bakelite";
         private const string ThemeGrey = "Grey";
+        private const string ThemeRafGreyGreen = "RAF Grey-Green";
+        private const string ThemeUsaafOliveDrab = "USAAF Olive Drab";
+        private const string ThemeLuftwaffeRlm66 = "Luftwaffe RLM 66";
+        private const string ThemeSovietA14SteelGrey = "Soviet A-14 Steel Grey";
+        private const string ThemeIvory = "Ivory";
+        private const string ThemeWhite = "White";
+        private const string VuMeterStyleAuto = "Auto";
+        private const string VuMeterStyleLight = "Light";
+        private const string VuMeterStyleDark = "Dark";
+
+        private sealed class VuMeterStyleOption
+        {
+            public VuMeterStyleOption(string value)
+            {
+                Value = value;
+                DisplayName = LocalizationManager.Get(value);
+            }
+
+            public string Value { get; }
+            public string DisplayName { get; }
+
+            public override string ToString()
+            {
+                return DisplayName;
+            }
+        }
 
         private readonly GlobalSettingsStore _globalSettings = GlobalSettingsStore.Instance;
         private const string CommunitySettingsAccepted = "Accepted";
@@ -198,6 +227,8 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI
 
             InitOverlayOpacitySliders();
             InitWeatheringControls();
+            InitVuMeterStylePicker();
+            IL2_SR_Client.App.ApplyVuMeterStyle();
 
             SpeakerBoost.Value = _globalSettings.GetClientSetting(GlobalSettingsKeys.SpeakerBoost).DoubleValue;
 
@@ -230,6 +261,7 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI
         private void MainWindow_Loaded(object sender, RoutedEventArgs e)
         {
             AutoStartRadioOverlay();
+            AutoStartPilotRoster();
         }
 
         private void PromptForCommunityRecommendedSettingsOnce()
@@ -240,10 +272,9 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI
                 return;
             }
 
-            var result = MessageBox.Show(this,
+            var result = ShowLocalizedYesNo(
                 BuildCommunityRecommendedSettingsPrompt(),
                 LocalizationManager.Get("Community Recommended Profile Settings"),
-                MessageBoxButton.YesNo,
                 MessageBoxImage.Question);
 
             if (result == MessageBoxResult.Yes)
@@ -414,10 +445,9 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI
 
             if (!pilotRosterVisible)
             {
-                var result = MessageBox.Show(this,
+                var result = ShowLocalizedYesNo(
                     "The SRS pilot roster window appears to be saved off-screen, likely due to a monitor, VR, or OpenKneeboard layout change.\n\nDo you want to move it back onto the active desktop?",
                     "Pilot roster position reset",
-                    MessageBoxButton.YesNo,
                     MessageBoxImage.Warning);
 
                 if (result == MessageBoxResult.Yes)
@@ -679,6 +709,38 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI
             ToggleMicrophoneMute.InputDeviceManager = InputManager;
         }
 
+        private void RefreshInputBindingLabels()
+        {
+            Radio1.InputName = LocalizationManager.Get("Select First Radio");
+            Radio2.InputName = LocalizationManager.Get("Select Second Radio");
+            PTT.InputName = LocalizationManager.Get("Push To Talk - PTT");
+            Intercom.InputName = LocalizationManager.Get("Select Intercom");
+            RadioOverlay.InputName = LocalizationManager.Get("Overlay Toggle");
+            RadioChannelUp.InputName = LocalizationManager.Get("Radio Channel Up");
+            RadioChannelDown.InputName = LocalizationManager.Get("Radio Channel Down");
+            RadioChannel1.InputName = LocalizationManager.Get("Radio Channel 1");
+            RadioChannel2.InputName = LocalizationManager.Get("Radio Channel 2");
+            RadioChannel3.InputName = LocalizationManager.Get("Radio Channel 3");
+            RadioChannel4.InputName = LocalizationManager.Get("Radio Channel 4");
+            RadioChannel5.InputName = LocalizationManager.Get("Radio Channel 5");
+            RadioChannel6.InputName = LocalizationManager.Get("Radio Channel 6");
+            RadioChannel7.InputName = LocalizationManager.Get("Radio Channel 7");
+            RadioChannel8.InputName = LocalizationManager.Get("Radio Channel 8");
+            RadioChannel9.InputName = LocalizationManager.Get("Radio Channel 9");
+            RadioChannel10.InputName = LocalizationManager.Get("Radio Channel 10");
+            RadioChannel11.InputName = LocalizationManager.Get("Radio Channel 11");
+            RadioChannel12.InputName = LocalizationManager.Get("Radio Channel 12");
+            NextRadio.InputName = LocalizationManager.Get("Select Next Radio / Intercom");
+            PreviousRadio.InputName = LocalizationManager.Get("Select Previous Radio / Intercom");
+            ReadStatus.InputName = LocalizationManager.Get("Read Status (TTS on required)");
+            ToggleSelectedRadioMute.InputName = LocalizationManager.Get("Mute / Unmute Selected Radio");
+            ToggleOtherRadioMute.InputName = LocalizationManager.Get("Mute / Unmute Other Radio");
+            ToggleAllRadiosMute.InputName = LocalizationManager.Get("Mute / Unmute Both Radios");
+            ToggleMicrophoneMute.InputName = LocalizationManager.Get("Mute / Unmute Microphone");
+
+            ReloadInputBindings();
+        }
+
         private void OnProfileDropDownChanged(object sender, SelectionChangedEventArgs e)
         {
             if (ControlsProfile.IsEnabled)
@@ -802,6 +864,7 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI
             RequireAdminToggle.IsChecked = _globalSettings.GetClientSettingBool(GlobalSettingsKeys.RequireAdmin);
 
             ShowTransmitterName.IsChecked = _globalSettings.GetClientSettingBool(GlobalSettingsKeys.ShowTransmitterName);
+            ThreeDEffectsToggle.IsChecked = _globalSettings.GetClientSettingBool(GlobalSettingsKeys.ThreeDEffectsEnabled);
 
             RefreshOnOffToggleContent();
         }
@@ -818,37 +881,215 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI
         private void InitThemePicker()
         {
             _initialisingThemePicker = true;
-            ThemePicker.ItemsSource = new[] { ThemeBakelite, ThemeGrey };
+            ThemePicker.ItemsSource = new[] { ThemeBakelite, ThemeGrey, ThemeRafGreyGreen, ThemeUsaafOliveDrab, ThemeLuftwaffeRlm66, ThemeSovietA14SteelGrey, ThemeIvory, ThemeWhite };
             ThemePicker.SelectedItem = CurrentTheme();
             _initialisingThemePicker = false;
+        }
+
+        private void InitVuMeterStylePicker()
+        {
+            _initialisingVuMeterStylePicker = true;
+            var options = new[]
+            {
+                new VuMeterStyleOption(VuMeterStyleAuto),
+                new VuMeterStyleOption(VuMeterStyleLight),
+                new VuMeterStyleOption(VuMeterStyleDark)
+            };
+
+            var currentStyle = CurrentVuMeterStyle();
+            VuMeterStylePicker.DisplayMemberPath = nameof(VuMeterStyleOption.DisplayName);
+            VuMeterStylePicker.ItemsSource = options;
+            VuMeterStylePicker.SelectedItem = options.First(option => option.Value == currentStyle);
+            _initialisingVuMeterStylePicker = false;
+        }
+
+        private string CurrentVuMeterStyle()
+        {
+            var style = _globalSettings.GetClientSetting(GlobalSettingsKeys.VuMeterStyle).RawValue;
+            var normalizedStyle = NormalizeThemeName(style);
+            if (normalizedStyle == NormalizeThemeName(VuMeterStyleLight))
+            {
+                return VuMeterStyleLight;
+            }
+
+            if (normalizedStyle == NormalizeThemeName(VuMeterStyleDark))
+            {
+                return VuMeterStyleDark;
+            }
+
+            return VuMeterStyleAuto;
         }
 
         private string CurrentTheme()
         {
             var theme = _globalSettings.GetClientSetting(GlobalSettingsKeys.Theme).RawValue;
-            return string.Equals(theme, ThemeGrey, StringComparison.OrdinalIgnoreCase) ? ThemeGrey : ThemeBakelite;
+            var normalizedTheme = NormalizeThemeName(theme);
+            if (normalizedTheme == NormalizeThemeName(ThemeGrey))
+            {
+                return ThemeGrey;
+            }
+
+            if (normalizedTheme == NormalizeThemeName(ThemeRafGreyGreen))
+            {
+                return ThemeRafGreyGreen;
+            }
+
+            if (normalizedTheme == NormalizeThemeName(ThemeUsaafOliveDrab))
+            {
+                return ThemeUsaafOliveDrab;
+            }
+
+            if (normalizedTheme == NormalizeThemeName(ThemeLuftwaffeRlm66))
+            {
+                return ThemeLuftwaffeRlm66;
+            }
+
+            if (normalizedTheme == NormalizeThemeName(ThemeSovietA14SteelGrey))
+            {
+                return ThemeSovietA14SteelGrey;
+            }
+
+            if (normalizedTheme == NormalizeThemeName(ThemeIvory))
+            {
+                return ThemeIvory;
+            }
+
+            if (normalizedTheme == NormalizeThemeName(ThemeWhite))
+            {
+                return ThemeWhite;
+            }
+
+            return ThemeBakelite;
+        }
+
+        private static string NormalizeThemeName(string theme)
+        {
+            if (string.IsNullOrWhiteSpace(theme))
+            {
+                return string.Empty;
+            }
+
+            var builder = new StringBuilder(theme.Length);
+            foreach (var character in theme)
+            {
+                if (char.IsLetterOrDigit(character))
+                {
+                    builder.Append(char.ToLowerInvariant(character));
+                }
+            }
+
+            return builder.ToString();
         }
 
         private void ThemePicker_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            var selectedTheme = ThemePicker.SelectedItem as string;
+            var selectedTheme = ResolveThemeSelection(ThemePicker.SelectedItem);
             if (_initialisingThemePicker || selectedTheme == null || selectedTheme == CurrentTheme())
             {
                 return;
             }
 
             _globalSettings.SetClientSetting(GlobalSettingsKeys.Theme, selectedTheme);
-            var restartResult = MessageBox.Show(this,
-                LocalizationManager.Get("Please restart SRS for the theme change to take effect.") + "\n\n" +
-                LocalizationManager.Get("Restart SRS now to apply the theme change?"),
-                LocalizationManager.Get("Restart Required"),
-                MessageBoxButton.YesNo,
-                MessageBoxImage.Question);
+            IL2_SR_Client.App.ApplyUiTheme();
+            IL2_SR_Client.App.ApplyVuMeterStyle();
+            ApplyWeatheringOpacity();
+        }
 
-            if (restartResult == MessageBoxResult.Yes)
+        private void VuMeterStylePicker_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            var selectedStyle = ResolveVuMeterStyleSelection(VuMeterStylePicker.SelectedItem);
+            if (_initialisingVuMeterStylePicker || selectedStyle == null || selectedStyle == CurrentVuMeterStyle())
             {
-                RestartClient();
+                return;
             }
+
+            _globalSettings.SetClientSetting(GlobalSettingsKeys.VuMeterStyle, selectedStyle);
+            IL2_SR_Client.App.ApplyVuMeterStyle();
+        }
+
+        private static string ResolveVuMeterStyleSelection(object selectedItem)
+        {
+            var selectedOption = selectedItem as VuMeterStyleOption;
+            if (selectedOption != null)
+            {
+                return selectedOption.Value;
+            }
+
+            var selectedText = selectedItem as string;
+            if (string.IsNullOrWhiteSpace(selectedText))
+            {
+                selectedText = selectedItem?.ToString();
+            }
+
+            var normalizedStyle = NormalizeThemeName(selectedText);
+            if (normalizedStyle == NormalizeThemeName(VuMeterStyleLight))
+            {
+                return VuMeterStyleLight;
+            }
+
+            if (normalizedStyle == NormalizeThemeName(VuMeterStyleDark))
+            {
+                return VuMeterStyleDark;
+            }
+
+            if (normalizedStyle == NormalizeThemeName(VuMeterStyleAuto))
+            {
+                return VuMeterStyleAuto;
+            }
+
+            return null;
+        }
+
+        private static string ResolveThemeSelection(object selectedItem)
+        {
+            var selectedText = selectedItem as string;
+            if (string.IsNullOrWhiteSpace(selectedText))
+            {
+                selectedText = selectedItem?.ToString();
+            }
+
+            var normalizedTheme = NormalizeThemeName(selectedText);
+            if (normalizedTheme == NormalizeThemeName(ThemeGrey))
+            {
+                return ThemeGrey;
+            }
+
+            if (normalizedTheme == NormalizeThemeName(ThemeRafGreyGreen))
+            {
+                return ThemeRafGreyGreen;
+            }
+
+            if (normalizedTheme == NormalizeThemeName(ThemeUsaafOliveDrab))
+            {
+                return ThemeUsaafOliveDrab;
+            }
+
+            if (normalizedTheme == NormalizeThemeName(ThemeLuftwaffeRlm66))
+            {
+                return ThemeLuftwaffeRlm66;
+            }
+
+            if (normalizedTheme == NormalizeThemeName(ThemeSovietA14SteelGrey))
+            {
+                return ThemeSovietA14SteelGrey;
+            }
+
+            if (normalizedTheme == NormalizeThemeName(ThemeIvory))
+            {
+                return ThemeIvory;
+            }
+
+            if (normalizedTheme == NormalizeThemeName(ThemeWhite))
+            {
+                return ThemeWhite;
+            }
+
+            if (normalizedTheme == NormalizeThemeName(ThemeBakelite))
+            {
+                return ThemeBakelite;
+            }
+
+            return null;
         }
 
         private void ReloadProfileSettings()
@@ -921,6 +1162,7 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI
             yield return PlayConnectionSounds;
             yield return RequireAdminToggle;
             yield return ShowTransmitterName;
+            yield return ThreeDEffectsToggle;
             yield return WeatheringEffectToggle;
             yield return RadioSwitchIsPTT;
             yield return RadioTxStartToggle;
@@ -1149,8 +1391,8 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI
                 ConnectionStatusStrip.BorderBrush = GetConnectionStatusBrush("MilLedErrorBrush", Brushes.Red);
                 ConnectionStatusLamp.Fill = GetConnectionStatusBrush("MilLedErrorBrush", Brushes.Red);
                 ConnectionStatusText.Foreground = GetConnectionStatusBrush("MilLedErrorBrush", Brushes.Red);
-                ConnectionStatusText.Text = "CONNECTION ERROR";
-                ConnectionStatusHint.Text = "Check address or network";
+                ConnectionStatusText.Text = LocalizationManager.Get("CONNECTION ERROR");
+                ConnectionStatusHint.Text = LocalizationManager.Get("Check address or network");
                 return;
             }
 
@@ -1160,10 +1402,10 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI
                 ConnectionStatusStrip.BorderBrush = GetConnectionStatusBrush("MilLedOnBrush", Brushes.LimeGreen);
                 ConnectionStatusLamp.Fill = GetConnectionStatusBrush("MilLedOnBrush", Brushes.LimeGreen);
                 ConnectionStatusText.Foreground = GetConnectionStatusBrush("MilLedOnBrush", Brushes.LimeGreen);
-                ConnectionStatusText.Text = "CONNECTED";
+                ConnectionStatusText.Text = LocalizationManager.Get("CONNECTED");
                 ConnectionStatusHint.Text = ClientState.IsGameConnected
-                    ? "Server and IL-2 active"
-                    : "Server link established";
+                    ? LocalizationManager.Get("Server and IL-2 active")
+                    : LocalizationManager.Get("Server link established");
                 return;
             }
 
@@ -1171,8 +1413,8 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI
             ConnectionStatusStrip.BorderBrush = GetConnectionStatusBrush("MilLedOffBrush", Brushes.Gray);
             ConnectionStatusLamp.Fill = GetConnectionStatusBrush("MilLedOffBrush", Brushes.Gray);
             ConnectionStatusText.Foreground = GetConnectionStatusBrush("MilTextSecondaryBrush", Brushes.LightGray);
-            ConnectionStatusText.Text = "DISCONNECTED";
-            ConnectionStatusHint.Text = "Server link inactive";
+            ConnectionStatusText.Text = LocalizationManager.Get("DISCONNECTED");
+            ConnectionStatusHint.Text = LocalizationManager.Get("Server link inactive");
         }
 
         private void ConnectCallback(bool result, bool connectionError, string connection)
@@ -1272,6 +1514,9 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI
 
             _radioOverlayWindow?.Close();
             _radioOverlayWindow = null;
+
+            _pilotRosterWindow?.Close();
+            _pilotRosterWindow = null;
 
 
 
@@ -1475,9 +1720,9 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI
                     IsWindowOpen(_serverSettingsWindow) ? "Hide Server Settings" : "Show Server Settings");
             }
 
-            if (ShowOverlay != null)
+            if (ShowOverlayButton != null)
             {
-                ShowOverlay.Content = LocalizationManager.Get(
+                ShowOverlayButton.Content = LocalizationManager.Get(
                     IsWindowOpen(_radioOverlayWindow) ? "Hide Radio Overlay" : "Show Radio Overlay");
             }
 
@@ -1533,7 +1778,7 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI
             }
 
             _pilotRosterAutoStartedForCurrentConnection = true;
-            Dispatcher.BeginInvoke(new Action(() => EnsurePilotRosterWindow(showUnavailableMessage: false)),
+            Dispatcher.BeginInvoke(new Action(() => EnsurePilotRosterWindow(showUnavailableMessage: !ShouldShowRciStatus())),
                 DispatcherPriority.ContextIdle);
         }
 
@@ -1727,9 +1972,8 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI
                 {
                     WindowHelper.BringProcessToFront(Process.GetCurrentProcess());
 
-                    var result = MessageBox.Show(this,
+                    var result = ShowLocalizedYesNo(
                         $"Would you like to try to auto-connect to IL2-SRS @ {connection}? ", "Auto Connect",
-                        MessageBoxButton.YesNo,
                         MessageBoxImage.Question);
 
                     connectToServer = (result == MessageBoxResult.Yes) && !ClientState.IsConnected;
@@ -1755,11 +1999,10 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI
             {
                 WindowHelper.BringProcessToFront(Process.GetCurrentProcess());
 
-                var result = MessageBox.Show(this,
+                var result = ShowLocalizedYesNo(
                     $"The SRS server advertised by IL2 @ {advertisedConnection} does not match the SRS server @ {currentConnection} you are currently connected to.\n\n" +
                     $"Would you like to connect to the advertised SRS server?",
                     "Auto Connect Mismatch",
-                    MessageBoxButton.YesNo,
                     MessageBoxImage.Warning);
 
                 switchServer = result == MessageBoxResult.Yes;
@@ -1928,6 +2171,12 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI
             _globalSettings.SetClientSetting(GlobalSettingsKeys.CheckForBetaUpdates,(bool)CheckForBetaUpdates.IsChecked);
         }
 
+        private void ThreeDEffectsToggle_Click(object sender, RoutedEventArgs e)
+        {
+            _globalSettings.SetClientSetting(GlobalSettingsKeys.ThreeDEffectsEnabled, (bool)ThreeDEffectsToggle.IsChecked);
+            IL2_SR_Client.App.ApplyThreeDEffectSetting();
+        }
+
         private void PlayConnectionSounds_OnClick(object sender, RoutedEventArgs e)
         {
             _globalSettings.SetClientSetting(GlobalSettingsKeys.PlayConnectionSounds, (bool)PlayConnectionSounds.IsChecked);
@@ -1960,11 +2209,10 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI
             }
 
             _globalSettings.SetClientSetting(GlobalSettingsKeys.Language, selectedLanguage.Code);
-            var restartResult = MessageBox.Show(this,
+            var restartResult = ShowLocalizedYesNo(
                 LocalizationManager.Get("Please restart SRS for the language change to take effect.") + "\n\n" +
                 LocalizationManager.Get("Restart SRS now to apply the language change?"),
                 LocalizationManager.Get("Restart Required"),
-                MessageBoxButton.YesNo,
                 MessageBoxImage.Question);
 
             if (restartResult == MessageBoxResult.Yes)
@@ -1997,6 +2245,16 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI
                     MessageBoxButton.OK,
                     MessageBoxImage.Information);
             }
+        }
+
+        private MessageBoxResult ShowLocalizedYesNo(string message, string caption, MessageBoxImage icon)
+        {
+            return CustomMessageBox.ShowYesNo(
+                message,
+                caption,
+                LocalizationManager.Get("Yes"),
+                LocalizationManager.Get("No"),
+                icon);
         }
 
         private static string BuildRestartArguments()
@@ -2103,10 +2361,9 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI
             }
             else
             {
-                var result = MessageBox.Show(this,
+                var result = ShowLocalizedYesNo(
                     $"Are you sure you want to delete {current} ?",
                     "Confirmation",
-                    MessageBoxButton.YesNo,
                     MessageBoxImage.Warning);
 
                 if (result == MessageBoxResult.Yes)
@@ -2239,7 +2496,8 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI
 
             _pilotRosterWindow = new PilotRosterWindow(showUnavailableMessage)
             {
-                Opacity = GetOverlayOpacity(GlobalSettingsKeys.PilotRosterOpacity)
+                Opacity = GetOverlayOpacity(GlobalSettingsKeys.PilotRosterOpacity),
+                Owner = this
             };
             _pilotRosterWindow.WindowStartupLocation = WindowStartupLocation.Manual;
             _pilotRosterWindow.Closed += (closedSender, args) =>
@@ -2263,12 +2521,97 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI
         {
             try
             {
-                Process.Start(
-                    "https://www.patreon.com/ciribob");
+                OpenExternalUrl("https://www.patreon.com/ciribob");
             }
             catch (Exception ex)
             {
             }
+        }
+
+        private void ReportProblem_OnClick(object sender, RoutedEventArgs e)
+        {
+            var result = ShowLocalizedYesNo(
+                LocalizedOrDefault(
+                    "DiagnosticBundlePrivacyWarning",
+                    "The diagnostic bundle may include device names, server addresses, player names, and recent connection/audio events. Please review it before attaching it publicly."),
+                LocalizationManager.Get("Report a Problem"),
+                MessageBoxImage.Warning);
+
+            if (result != MessageBoxResult.Yes)
+            {
+                return;
+            }
+
+            try
+            {
+                var bundle = DiagnosticBundleBuilder.Create(
+                    RedactDiagnosticDetails.IsChecked == true,
+                    ServerAddress?.Name,
+                    ServerIp.Text);
+
+                OpenFileInExplorer(bundle.ZipPath);
+                OpenExternalUrl(DiagnosticBundleBuilder.BuildBugReportUrl(bundle));
+
+                MessageBox.Show(this,
+                    LocalizedFormatOrDefault(
+                        "DiagnosticBundleCreatedMessage",
+                        "Diagnostic bundle created at:\n{0}\n\nAttach this ZIP to the GitHub issue that opened in your browser.",
+                        bundle.ZipPath),
+                    LocalizationManager.Get("Report a Problem"),
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Information);
+            }
+            catch (Exception ex)
+            {
+                Logger.Error(ex, "Failed to create diagnostic bundle");
+                MessageBox.Show(this,
+                    LocalizedOrDefault(
+                        "DiagnosticBundleCreateFailed",
+                        "Failed to create the diagnostic bundle. Please attach clientlog.txt manually when reporting the issue."),
+                    LocalizationManager.Get("Report a Problem"),
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Error);
+            }
+        }
+
+        private void SuggestImprovement_OnClick(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                OpenExternalUrl(DiagnosticBundleBuilder.BuildFeatureRequestUrl());
+            }
+            catch (Exception ex)
+            {
+                Logger.Error(ex, "Failed to open feature request page");
+                MessageBox.Show(this,
+                    LocalizedOrDefault(
+                        "SuggestionPageOpenFailed",
+                        "Failed to open the GitHub suggestion page."),
+                    LocalizationManager.Get("Suggest an Improvement"),
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Error);
+            }
+        }
+
+        private static void OpenExternalUrl(string url)
+        {
+            Process.Start(new ProcessStartInfo(url) { UseShellExecute = true });
+        }
+
+        private static void OpenFileInExplorer(string path)
+        {
+            Process.Start(new ProcessStartInfo("explorer.exe", "/select,\"" + path + "\"") { UseShellExecute = true });
+        }
+
+        private static string LocalizedOrDefault(string key, string fallback)
+        {
+            var localized = LocalizationManager.Get(key);
+            return string.Equals(localized, key, StringComparison.Ordinal) ? fallback : localized;
+        }
+
+        private static string LocalizedFormatOrDefault(string key, string fallback, params object[] args)
+        {
+            return string.Format(CultureInfo.CurrentUICulture, LocalizedOrDefault(key, fallback), args);
         }
 
         private void EnableTextToSpeech_OnClick(object sender, RoutedEventArgs e)
