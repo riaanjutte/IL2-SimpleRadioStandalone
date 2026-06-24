@@ -663,6 +663,18 @@
   <data name="Radio Channel Down" xml:space="preserve">
     <value>Radio Channel Down</value>
   </data>
+  <data name="Radio 1 Channel Up" xml:space="preserve">
+    <value>Radio 1 Channel Up</value>
+  </data>
+  <data name="Radio 1 Channel Down" xml:space="preserve">
+    <value>Radio 1 Channel Down</value>
+  </data>
+  <data name="Radio 2 Channel Up" xml:space="preserve">
+    <value>Radio 2 Channel Up</value>
+  </data>
+  <data name="Radio 2 Channel Down" xml:space="preserve">
+    <value>Radio 2 Channel Down</value>
+  </data>
   <data name="Radio Channel 1" xml:space="preserve">
     <value>Radio Channel 1</value>
   </data>

@@ -49,6 +49,7 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Overlay
         private const double AssignedCallsignScrollPixelsPerSecond = 18.0;
         private const double AssignedCallsignInitialScrollPauseMilliseconds = 700.0;
         private const double AssignedCallsignRepeatScrollPauseMilliseconds = 2000.0;
+        private readonly RciOverlayMessageDelay _rciOverlayMessageDelay = new RciOverlayMessageDelay();
         private const double DefaultOverlayX = 300.0;
         private const double DefaultOverlayY = 300.0;
         private const double DefaultOverlayOpacity = 1.0;
@@ -326,10 +327,11 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Overlay
             var assignedCallsign = ConnectedClientsSingleton.Instance.GetOwnAssignedCallsign();
             var hasAssignedCallsign = !string.IsNullOrWhiteSpace(assignedCallsign);
             var showRequestPrompt = !hasAssignedCallsign;
-            var friendlyRciCallsigns = showRequestPrompt && _clientStateSingleton.PlayerGameState != null
+            var friendlyRciCallsigns = _clientStateSingleton.PlayerGameState != null
                 ? ConnectedClientsSingleton.Instance.GetFriendlyRciCallsign(_clientStateSingleton.PlayerGameState.coalition)
                 : string.Empty;
-            var showActiveRcoRequestPrompt = !string.IsNullOrWhiteSpace(friendlyRciCallsigns);
+            var visibleFriendlyRciCallsigns = _rciOverlayMessageDelay.GetVisibleCallsigns(friendlyRciCallsigns);
+            var showActiveRcoRequestPrompt = showRequestPrompt && !string.IsNullOrWhiteSpace(visibleFriendlyRciCallsigns);
 
             string displayText;
             Brush foreground;
@@ -474,6 +476,7 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Overlay
             RciStatusPanel.Visibility = _rciIndicatorEnabled ? Visibility.Visible : Visibility.Collapsed;
             if (!_rciIndicatorEnabled)
             {
+                _rciOverlayMessageDelay.Reset();
                 UpdateRciCallsignLabel(string.Empty);
                 UpdateBottomStatusPlateVisibility();
                 UpdateOverlayMinimumHeightIfChanged(previousRciVisibility, previousCallsignVisibility);
@@ -481,9 +484,11 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Overlay
             }
 
             var status = ConnectedClientsSingleton.Instance.GetRciStatus(_clientStateSingleton.PlayerGameState.coalition);
+            var friendlyRciCallsigns = ConnectedClientsSingleton.Instance.GetFriendlyRciCallsign(_clientStateSingleton.PlayerGameState.coalition);
+            var visibleFriendlyRciCallsigns = _rciOverlayMessageDelay.GetVisibleCallsigns(friendlyRciCallsigns);
             var displayState = RciDisplayState.Create(
                 status,
-                ConnectedClientsSingleton.Instance.GetFriendlyRciCallsign(_clientStateSingleton.PlayerGameState.coalition));
+                visibleFriendlyRciCallsigns);
 
             RciStatusIndicator.Background = Brushes.Transparent;
             RciStatusLabel.Text = displayState.StatusText;

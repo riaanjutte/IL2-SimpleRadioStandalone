@@ -26,14 +26,21 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI.RadioOverlayWindow
         private const double SpeakerNameScrollPauseMilliseconds = 700.0;
         private const double ReceiveIndicatorHoldMilliseconds = 500.0;
         private const double TransmitIndicatorHoldMilliseconds = 250.0;
+        private const double RadioDisplayViewportFallbackWidth = 68.0;
+        private const double RadioDisplayViewportFallbackHeight = 12.0;
+        private const double InactiveRadioControlOpacity = 0.5;
         private static readonly Color ActiveGreen = (Color)ColorConverter.ConvertFromString("#96FF6D");
-        private static readonly Color InactiveGrey = (Color)ColorConverter.ConvertFromString("#3A3A3A");
+        private static readonly Color ActiveAmber = (Color)ColorConverter.ConvertFromString("#FFB000");
         private static readonly Color TxRed = (Color)ColorConverter.ConvertFromString("#FF3B30");
+        private static readonly Brush ActiveRadioBrush = CreateFrozenStatusBrush(ActiveAmber);
+        private static readonly Brush ActiveRadioInactiveBrush = CreateFrozenStatusBrush(Fade(ActiveAmber, 0.2));
         private static readonly Brush TxActiveBrush = CreateFrozenStatusBrush(TxRed);
+        private static readonly Brush TxInactiveBrush = CreateFrozenStatusBrush(Fade(TxRed, 0.2));
         private static readonly Brush RxActiveBrush = CreateFrozenStatusBrush(ActiveGreen);
-        private static readonly Brush InactiveLedBrush = CreateFrozenStatusBrush(InactiveGrey);
+        private static readonly Brush RxInactiveBrush = CreateFrozenStatusBrush(Fade(ActiveGreen, 0.2));
         private static readonly Brush DisconnectedLedBrush = CreateFrozenStatusBrush(Colors.Red);
         private static readonly Brush SelectedChannelBorderBrush = CreateFrozenBrush("#00FF00");
+        private static readonly Brush InactiveSelectedChannelBorderBrush = CreateFrozenBrush("#8000FF00");
         private static readonly Brush OccupiedChannelBorderBrush = new SolidColorBrush(Color.FromArgb(128, 255, 255, 0));
         private static readonly Brush RadioDisplayGreenBrush = CreateFrozenBrush("#00FF00");
         private static readonly Brush SpeakerDisplayBrush = CreateFrozenBrush("#FFFFFF");
@@ -56,6 +63,8 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI.RadioOverlayWindow
         private DateTime _lastChannelOccupancyRefresh = DateTime.MinValue;
         private bool? _lastTxActive;
         private bool? _lastRxActive;
+        private bool? _lastSelectedActive;
+        private bool? _lastChannelButtonsSelectedActive;
         private bool? _lastDisconnected;
         private string _scrollMeasuredText = string.Empty;
         private double _scrollMeasuredViewportWidth = -1.0;
@@ -341,24 +350,48 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI.RadioOverlayWindow
 
         private void UpdateStatusLeds(bool txActive, bool rxActive, bool disconnected)
         {
-            if (_lastTxActive == txActive && _lastRxActive == rxActive && _lastDisconnected == disconnected)
+            var selectedActive = IsSelectedActive(disconnected);
+            if (_lastTxActive == txActive &&
+                _lastRxActive == rxActive &&
+                _lastSelectedActive == selectedActive &&
+                _lastDisconnected == disconnected)
             {
                 return;
             }
 
             _lastTxActive = txActive;
             _lastRxActive = rxActive;
+            _lastSelectedActive = selectedActive;
             _lastDisconnected = disconnected;
+            UpdateChannelStepButtonOpacity(selectedActive, disconnected);
 
             if (disconnected)
             {
+                RadioSelectedActive.Fill = DisconnectedLedBrush;
                 TxActive.Fill = DisconnectedLedBrush;
                 RxActive.Fill = DisconnectedLedBrush;
                 return;
             }
 
-            TxActive.Fill = txActive ? TxActiveBrush : InactiveLedBrush;
-            RxActive.Fill = rxActive ? RxActiveBrush : InactiveLedBrush;
+            RadioSelectedActive.Fill = selectedActive ? ActiveRadioBrush : ActiveRadioInactiveBrush;
+            TxActive.Fill = txActive ? TxActiveBrush : TxInactiveBrush;
+            RxActive.Fill = rxActive ? RxActiveBrush : RxInactiveBrush;
+        }
+
+        private bool IsSelectedActive(bool disconnected)
+        {
+            return !disconnected &&
+                   _clientStateSingleton.PlayerGameState != null &&
+                   _clientStateSingleton.PlayerGameState.selected == RadioId;
+        }
+
+        private void UpdateChannelStepButtonOpacity(bool selectedActive, bool disconnected)
+        {
+            var opacity = !disconnected && !selectedActive
+                ? InactiveRadioControlOpacity
+                : 1.0;
+            ChannelUpButton.Opacity = opacity;
+            ChannelDownButton.Opacity = opacity;
         }
 
         private void RefreshChannelOccupancyIndicatorsIfNeeded()
@@ -417,6 +450,14 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI.RadioOverlayWindow
                 Subtract(color.B, amount));
         }
 
+        private static Color Fade(Color color, double opacity)
+        {
+            return Color.FromArgb((byte)Math.Round(byte.MaxValue * opacity),
+                color.R,
+                color.G,
+                color.B);
+        }
+
         private static byte Add(byte value, byte amount)
         {
             var result = value + amount;
@@ -430,6 +471,8 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI.RadioOverlayWindow
 
         private void UpdateChannelButtonState(int selectedChannel)
         {
+            var selectedRadioActive = _lastSelectedActive == true;
+            var activeStateChanged = _lastChannelButtonsSelectedActive != selectedRadioActive;
             var hasVisualStateChange = false;
             foreach (var pair in _channelButtons)
             {
@@ -442,18 +485,20 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI.RadioOverlayWindow
                 }
             }
 
-            if (!hasVisualStateChange)
+            if (!hasVisualStateChange && !activeStateChanged)
             {
                 return;
             }
 
+            _lastChannelButtonsSelectedActive = selectedRadioActive;
             foreach (var pair in _channelButtons)
             {
                 var button = pair.Value;
                 var visualState = GetChannelVisualState(pair.Key, selectedChannel);
 
                 if (_channelButtonVisualStates.TryGetValue(pair.Key, out var previousVisualState) &&
-                    previousVisualState == visualState)
+                    previousVisualState == visualState &&
+                    !activeStateChanged)
                 {
                     continue;
                 }
@@ -463,7 +508,7 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI.RadioOverlayWindow
                 if (visualState == 2)
                 {
                     button.SetResourceReference(ForegroundProperty, "OverlayChannelButtonSelectedForegroundBrush");
-                    button.BorderBrush = SelectedChannelBorderBrush;
+                    button.BorderBrush = selectedRadioActive ? SelectedChannelBorderBrush : InactiveSelectedChannelBorderBrush;
                     button.BorderThickness = new Thickness(1.5);
                 }
                 else if (visualState == 1)
@@ -649,12 +694,12 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI.RadioOverlayWindow
             var viewportHeight = RadioFrequencyViewport.ActualHeight;
             if (viewportWidth <= 0)
             {
-                viewportWidth = 76;
+                viewportWidth = RadioDisplayViewportFallbackWidth;
             }
 
             if (viewportHeight <= 0)
             {
-                viewportHeight = 12;
+                viewportHeight = RadioDisplayViewportFallbackHeight;
             }
 
             EnsureSpeakerNameScrollMetrics(viewportWidth);
@@ -728,17 +773,24 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI.RadioOverlayWindow
             var viewportHeight = RadioFrequencyViewport.ActualHeight;
             if (viewportWidth <= 0)
             {
-                viewportWidth = 76;
+                viewportWidth = RadioDisplayViewportFallbackWidth;
             }
 
             if (viewportHeight <= 0)
             {
-                viewportHeight = 12;
+                viewportHeight = RadioDisplayViewportFallbackHeight;
             }
 
-            RadioFrequency.HorizontalAlignment = HorizontalAlignment.Center;
-            RadioFrequency.TextAlignment = TextAlignment.Center;
-            Canvas.SetLeft(RadioFrequency, Math.Max(0, (viewportWidth - textWidth) / 2.0));
+            var textIsWiderThanViewport = textWidth > viewportWidth;
+            RadioFrequency.HorizontalAlignment = textIsWiderThanViewport
+                ? HorizontalAlignment.Left
+                : HorizontalAlignment.Center;
+            RadioFrequency.TextAlignment = textIsWiderThanViewport
+                ? TextAlignment.Left
+                : TextAlignment.Center;
+            Canvas.SetLeft(RadioFrequency, textIsWiderThanViewport
+                ? 0
+                : Math.Max(0, (viewportWidth - textWidth) / 2.0));
             Canvas.SetTop(RadioFrequency, Math.Max(0, (viewportHeight - textHeight) / 2.0));
         }
 

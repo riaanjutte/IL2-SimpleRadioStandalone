@@ -14,11 +14,11 @@
 
         <Grid HorizontalAlignment="Left" Width="126" Height="18" Margin="4,1,0,0">
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="77" />
+                <ColumnDefinition Width="68" />
                 <ColumnDefinition Width="1" />
                 <ColumnDefinition Width="25" />
                 <ColumnDefinition Width="1" />
-                <ColumnDefinition Width="22" />
+                <ColumnDefinition Width="31" />
             </Grid.ColumnDefinitions>
 
             <Label Name="TunedCount"
@@ -31,21 +31,28 @@
 
 
             <Border Grid.Column="0"
-                    Width="77"
+                    Width="68"
                     Height="12"
                     HorizontalAlignment="Left"
                     VerticalAlignment="Center"
                     Background="{DynamicResource OverlayDisplayBrush}"
                     BorderBrush="#242824"
                     BorderThickness="1">
+                <Border.Effect>
+                    <DropShadowEffect BlurRadius="1"
+                                      Direction="315"
+                                      Opacity="{DynamicResource ThreeDEffectOpacity}"
+                                      ShadowDepth="1"
+                                      Color="#000000" />
+                </Border.Effect>
                 <Grid>
                     <Border Background="{DynamicResource OverlayDisplayGlassBrush}"
-                            Opacity="0.55"
+                            Opacity="0.5"
                             Style="{x:Null}" />
                     <Border Height="5"
                             VerticalAlignment="Top"
                             Background="{DynamicResource OverlayDisplayTopReflectionBrush}"
-                            Opacity="0.65"
+                            Opacity="0.6"
                             Style="{x:Null}" />
                     <Label x:Name="RadioLabel"
                            HorizontalAlignment="Center"
@@ -120,7 +127,7 @@
             </Border>
 
             <Grid Grid.Column="4"
-                  Width="22"
+                  Width="27"
                   Height="16"
                   HorizontalAlignment="Right"
                   VerticalAlignment="Center"
@@ -130,9 +137,11 @@
                     <RowDefinition Height="10" />
                 </Grid.RowDefinitions>
                 <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="10" />
-                    <ColumnDefinition Width="2" />
-                    <ColumnDefinition Width="10" />
+                    <ColumnDefinition Width="9" />
+                    <ColumnDefinition Width="0" />
+                    <ColumnDefinition Width="9" />
+                    <ColumnDefinition Width="0" />
+                    <ColumnDefinition Width="9" />
                 </Grid.ColumnDefinitions>
 
                 <TextBlock Grid.Row="0"
@@ -143,7 +152,7 @@
                            FontSize="4"
                            Foreground="{DynamicResource OverlayTxRxLabelBrush}"
                            Style="{x:Null}"
-                           Text="TX" />
+                           Text="ACT" />
                 <TextBlock Grid.Row="0"
                            Grid.Column="2"
                            HorizontalAlignment="Center"
@@ -152,11 +161,42 @@
                            FontSize="4"
                            Foreground="{DynamicResource OverlayTxRxLabelBrush}"
                            Style="{x:Null}"
+                           Text="TX" />
+                <TextBlock Grid.Row="0"
+                           Grid.Column="4"
+                           HorizontalAlignment="Center"
+                           VerticalAlignment="Center"
+                           FontFamily="Courier New"
+                           FontSize="4"
+                           Foreground="{DynamicResource OverlayTxRxLabelBrush}"
+                           Style="{x:Null}"
                            Text="RX" />
+
+                <Ellipse x:Name="RadioSelectedActive"
+                         Grid.Row="1"
+                         Grid.Column="0"
+                         Width="7"
+                         Height="7"
+                         HorizontalAlignment="Center"
+                         VerticalAlignment="Center"
+                         Fill="Green"
+                         MouseDown="RadioSelectSwitch"
+                         Stroke="Black"
+                         StrokeThickness="1"
+                         Style="{x:Null}"
+                         ToolTip="Active radio">
+                    <Ellipse.Effect>
+                        <DropShadowEffect BlurRadius="2"
+                                          Direction="315"
+                                          Opacity="{DynamicResource ThreeDEffectOpacity}"
+                                          ShadowDepth="1"
+                                          Color="#000000" />
+                    </Ellipse.Effect>
+                </Ellipse>
 
                 <Ellipse x:Name="TxActive"
                          Grid.Row="1"
-                         Grid.Column="0"
+                         Grid.Column="2"
                          Width="7"
                          Height="7"
                          HorizontalAlignment="Center"
@@ -178,7 +218,7 @@
 
                 <Ellipse x:Name="RxActive"
                          Grid.Row="1"
-                         Grid.Column="2"
+                         Grid.Column="4"
                          Width="7"
                          Height="7"
                          HorizontalAlignment="Center"

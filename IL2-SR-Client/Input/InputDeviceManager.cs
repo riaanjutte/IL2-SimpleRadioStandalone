@@ -637,7 +637,7 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.Settings
                             break;
                         }
                         else if ((int)bindState.MainDevice.InputBind >= (int)InputBinding.RadioChannel1 &&
-                                 (int)bindState.MainDevice.InputBind <= (int)InputBinding.ToggleMicrophoneMute)
+                                 (int)bindState.MainDevice.InputBind <= (int)InputBinding.Radio2ChannelDown)
                         {
                             if (bindState.MainDevice.InputBind == _lastActiveBinding && !bindState.IsActive)
                             {
@@ -678,6 +678,18 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.Settings
                                             {
                                                 RadioHelper.RadioChannelDown(ClientStateSingleton.Instance.PlayerGameState.selected);
                                             }
+                                            break;
+                                        case InputBinding.Radio1ChannelUp:
+                                            RadioHelper.RadioChannelUp(1);
+                                            break;
+                                        case InputBinding.Radio1ChannelDown:
+                                            RadioHelper.RadioChannelDown(1);
+                                            break;
+                                        case InputBinding.Radio2ChannelUp:
+                                            RadioHelper.RadioChannelUp(2);
+                                            break;
+                                        case InputBinding.Radio2ChannelDown:
+                                            RadioHelper.RadioChannelDown(2);
                                             break;
                                         case InputBinding.RadioChannel1:
 
@@ -1241,7 +1253,7 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.Settings
 
             //REMEMBER TO UPDATE THIS WHEN NEW BINDINGS ARE ADDED
             //MIN + MAX bind numbers
-            for (int i = (int)InputBinding.Intercom; i <= (int)InputBinding.ToggleMicrophoneMute; i++)
+            for (int i = (int)InputBinding.Intercom; i <= (int)InputBinding.Radio2ChannelDown; i++)
             {
                 if (!currentInputProfile.ContainsKey((InputBinding)i))
                 {

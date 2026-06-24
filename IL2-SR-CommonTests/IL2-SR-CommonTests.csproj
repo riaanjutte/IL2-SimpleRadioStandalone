@@ -74,6 +74,7 @@
   <ItemGroup>
     <Compile Include="DCSState\PlayerGameStateTests.cs" />
     <Compile Include="Helpers\ConversionHelpersTests.cs" />
+    <Compile Include="Input\InputBindingLayoutTests.cs" />
     <Compile Include="Input\InputPollingCycleCacheTests.cs" />
     <Compile Include="Network\CombatBoxCallsignRosterTests.cs" />
     <Compile Include="Network\UpdaterArgumentsTests.cs" />
@@ -81,7 +82,9 @@
     <Compile Include="Network\UDPVoicePacketTests.cs" />
     <Compile Include="Singletons\ConnectedClientsSingletonTests.cs" />
     <Compile Include="UI\MemoryLeakGuardTests.cs" />
+    <Compile Include="UI\FavouriteServersViewModelTests.cs" />
     <Compile Include="UI\RciDisplayStateTests.cs" />
+    <Compile Include="UI\RciOverlayMessageDelayTests.cs" />
     <Compile Include="UI\RadioOverlaySpeakerNameScrollTests.cs" />
     <Compile Include="UI\PilotRosterBuilderTests.cs" />
     <Compile Include="Utils\RadioHelperMuteTests.cs" />

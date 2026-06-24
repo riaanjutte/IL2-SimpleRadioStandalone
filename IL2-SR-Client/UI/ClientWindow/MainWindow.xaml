@@ -499,6 +499,10 @@
                                 <RowDefinition Height="Auto" />
                                 <RowDefinition Height="Auto" />
                                 <RowDefinition Height="Auto" />
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="Auto" />
                             </Grid.RowDefinitions>
 
                             <Label x:Name="DeviceLabel"
@@ -660,6 +664,26 @@
                                                        Grid.ColumnSpan="5"
                                                        ControlInputBinding="{x:Static settings:InputBinding.ToggleMicrophoneMute}"
                                                        InputName="Mute / Unmute Microphone" />
+                            <local:InputBindingControl x:Name="Radio1ChannelUp"
+                                                       Grid.Row="27"
+                                                       Grid.ColumnSpan="5"
+                                                       ControlInputBinding="{x:Static settings:InputBinding.Radio1ChannelUp}"
+                                                       InputName="Radio 1 Channel Up" />
+                            <local:InputBindingControl x:Name="Radio1ChannelDown"
+                                                       Grid.Row="28"
+                                                       Grid.ColumnSpan="5"
+                                                       ControlInputBinding="{x:Static settings:InputBinding.Radio1ChannelDown}"
+                                                       InputName="Radio 1 Channel Down" />
+                            <local:InputBindingControl x:Name="Radio2ChannelUp"
+                                                       Grid.Row="29"
+                                                       Grid.ColumnSpan="5"
+                                                       ControlInputBinding="{x:Static settings:InputBinding.Radio2ChannelUp}"
+                                                       InputName="Radio 2 Channel Up" />
+                            <local:InputBindingControl x:Name="Radio2ChannelDown"
+                                                       Grid.Row="30"
+                                                       Grid.ColumnSpan="5"
+                                                       ControlInputBinding="{x:Static settings:InputBinding.Radio2ChannelDown}"
+                                                       InputName="Radio 2 Channel Down" />
                         </Grid>
                     </StackPanel>
                 </ScrollViewer>

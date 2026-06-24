@@ -51,7 +51,7 @@
                      Height="28"
                      Margin="0,0,0,6"
                      VerticalContentAlignment="Center"
-                     Text="{Binding Path=NewName}" />
+                     Text="{Binding Path=NewName, UpdateSourceTrigger=PropertyChanged}" />
 
             <TextBlock Grid.Row="2"
                        Grid.Column="0"
@@ -63,7 +63,7 @@
                      Width="180"
                      Height="28"
                      VerticalContentAlignment="Center"
-                     Text="{Binding Path=NewAddress}" />
+                     Text="{Binding Path=NewAddress, UpdateSourceTrigger=PropertyChanged}" />
             <Button Grid.Row="3"
                     Grid.Column="1"
                     Width="22"

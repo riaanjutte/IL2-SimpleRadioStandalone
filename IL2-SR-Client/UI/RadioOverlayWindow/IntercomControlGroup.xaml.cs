@@ -1,4 +1,5 @@
-﻿using System.Windows;
+﻿using System;
+using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
 using Ciribob.IL2.SimpleRadio.Standalone.Client.Localization;
@@ -20,11 +21,14 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Overlay
         private const double ReceiveIndicatorHoldMilliseconds = 500.0;
         private const double TransmitIndicatorHoldMilliseconds = 250.0;
         private static readonly Color ActiveGreen = (Color)ColorConverter.ConvertFromString("#96FF6D");
-        private static readonly Color InactiveGrey = (Color)ColorConverter.ConvertFromString("#3A3A3A");
+        private static readonly Color ActiveAmber = (Color)ColorConverter.ConvertFromString("#FFB000");
         private static readonly Color TxRed = (Color)ColorConverter.ConvertFromString("#FF3B30");
+        private static readonly Brush ActiveRadioBrush = CreateFrozenStatusBrush(ActiveAmber);
+        private static readonly Brush ActiveRadioInactiveBrush = CreateFrozenStatusBrush(Fade(ActiveAmber, 0.2));
         private static readonly Brush TxActiveBrush = CreateFrozenStatusBrush(TxRed);
+        private static readonly Brush TxInactiveBrush = CreateFrozenStatusBrush(Fade(TxRed, 0.2));
         private static readonly Brush RxActiveBrush = CreateFrozenStatusBrush(ActiveGreen);
-        private static readonly Brush InactiveLedBrush = CreateFrozenStatusBrush(InactiveGrey);
+        private static readonly Brush RxInactiveBrush = CreateFrozenStatusBrush(Fade(ActiveGreen, 0.2));
         private static readonly Brush DisconnectedLedBrush = CreateFrozenStatusBrush(Colors.Red);
         private bool _dragging;
         private bool _syncingSliderFromState;
@@ -32,6 +36,7 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Overlay
         private readonly ConnectedClientsSingleton _connectClientsSingleton = ConnectedClientsSingleton.Instance;
         private bool? _lastTxActive;
         private bool? _lastRxActive;
+        private bool? _lastSelectedActive;
         private bool? _lastDisconnected;
         private static string LocalizedIntercomLabelText => LocalizationManager.Get(IntercomLabelText);
 
@@ -222,24 +227,38 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Overlay
 
         private void UpdateStatusLeds(bool txActive, bool rxActive, bool disconnected)
         {
-            if (_lastTxActive == txActive && _lastRxActive == rxActive && _lastDisconnected == disconnected)
+            var selectedActive = IsSelectedActive(disconnected);
+            if (_lastTxActive == txActive &&
+                _lastRxActive == rxActive &&
+                _lastSelectedActive == selectedActive &&
+                _lastDisconnected == disconnected)
             {
                 return;
             }
 
             _lastTxActive = txActive;
             _lastRxActive = rxActive;
+            _lastSelectedActive = selectedActive;
             _lastDisconnected = disconnected;
 
             if (disconnected)
             {
+                RadioSelectedActive.Fill = DisconnectedLedBrush;
                 TxActive.Fill = DisconnectedLedBrush;
                 RxActive.Fill = DisconnectedLedBrush;
                 return;
             }
 
-            TxActive.Fill = txActive ? TxActiveBrush : InactiveLedBrush;
-            RxActive.Fill = rxActive ? RxActiveBrush : InactiveLedBrush;
+            RadioSelectedActive.Fill = selectedActive ? ActiveRadioBrush : ActiveRadioInactiveBrush;
+            TxActive.Fill = txActive ? TxActiveBrush : TxInactiveBrush;
+            RxActive.Fill = rxActive ? RxActiveBrush : RxInactiveBrush;
+        }
+
+        private bool IsSelectedActive(bool disconnected)
+        {
+            return !disconnected &&
+                   _clientStateSingleton.PlayerGameState != null &&
+                   _clientStateSingleton.PlayerGameState.selected == RadioId;
         }
 
         private static Brush CreateFrozenStatusBrush(Color color)
@@ -321,6 +340,14 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Overlay
                 Subtract(color.R, amount),
                 Subtract(color.G, amount),
                 Subtract(color.B, amount));
+        }
+
+        private static Color Fade(Color color, double opacity)
+        {
+            return Color.FromArgb((byte)Math.Round(byte.MaxValue * opacity),
+                color.R,
+                color.G,
+                color.B);
         }
 
         private static byte Add(byte value, byte amount)

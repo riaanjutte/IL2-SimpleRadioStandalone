@@ -198,6 +198,18 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.Settings
         ToggleMicrophoneMute = 136,
         ModifierToggleMicrophoneMute = 236,
 
+        Radio1ChannelUp = 137,
+        ModifierRadio1ChannelUp = 237,
+
+        Radio1ChannelDown = 138,
+        ModifierRadio1ChannelDown = 238,
+
+        Radio2ChannelUp = 139,
+        ModifierRadio2ChannelUp = 239,
+
+        Radio2ChannelDown = 140,
+        ModifierRadio2ChannelDown = 240,
+
     }
 
 

@@ -305,6 +305,7 @@
     <Compile Include="UI\RadioOverlayWindow\RadioControlGroup.xaml.cs">
       <DependentUpon>RadioControlGroup.xaml</DependentUpon>
     </Compile>
+    <Compile Include="UI\RadioOverlayWindow\RciOverlayMessageDelay.cs" />
     <Compile Include="UI\RadioOverlayWindow\SpeakerNameScrollLayout.cs" />
     <Compile Include="Audio\Providers\RadioFilter.cs" />
     <Compile Include="UI\RadioOverlayWindow\RadioOverlay.xaml.cs">

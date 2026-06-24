@@ -162,6 +162,9 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI
         {
             GCSettings.LatencyMode = GCLatencyMode.SustainedLowLatency;
 
+            _connectCommand = new DelegateCommand(Connect, () => ServerAddress != null);
+            FavouriteServersViewModel = new FavouriteServersViewModel(new CsvFavouriteServerStore());
+
             _initialisingOverlayOpacitySliders = true;
             InitializeComponent();
             LocalizationManager.LocalizeElement(this);
@@ -219,9 +222,6 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI
             PromptForCommunityRecommendedSettingsOnce();
 
             InitInput();
-
-            _connectCommand = new DelegateCommand(Connect, () => ServerAddress != null);
-            FavouriteServersViewModel = new FavouriteServersViewModel(new CsvFavouriteServerStore());
 
             InitDefaultAddress();
 
@@ -707,6 +707,22 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI
             ToggleMicrophoneMute.InputName = LocalizationManager.Get("Mute / Unmute Microphone");
             ToggleMicrophoneMute.ControlInputBinding = InputBinding.ToggleMicrophoneMute;
             ToggleMicrophoneMute.InputDeviceManager = InputManager;
+
+            Radio1ChannelUp.InputName = LocalizationManager.Get("Radio 1 Channel Up");
+            Radio1ChannelUp.ControlInputBinding = InputBinding.Radio1ChannelUp;
+            Radio1ChannelUp.InputDeviceManager = InputManager;
+
+            Radio1ChannelDown.InputName = LocalizationManager.Get("Radio 1 Channel Down");
+            Radio1ChannelDown.ControlInputBinding = InputBinding.Radio1ChannelDown;
+            Radio1ChannelDown.InputDeviceManager = InputManager;
+
+            Radio2ChannelUp.InputName = LocalizationManager.Get("Radio 2 Channel Up");
+            Radio2ChannelUp.ControlInputBinding = InputBinding.Radio2ChannelUp;
+            Radio2ChannelUp.InputDeviceManager = InputManager;
+
+            Radio2ChannelDown.InputName = LocalizationManager.Get("Radio 2 Channel Down");
+            Radio2ChannelDown.ControlInputBinding = InputBinding.Radio2ChannelDown;
+            Radio2ChannelDown.InputDeviceManager = InputManager;
         }
 
         private void RefreshInputBindingLabels()
@@ -737,6 +753,10 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI
             ToggleOtherRadioMute.InputName = LocalizationManager.Get("Mute / Unmute Other Radio");
             ToggleAllRadiosMute.InputName = LocalizationManager.Get("Mute / Unmute Both Radios");
             ToggleMicrophoneMute.InputName = LocalizationManager.Get("Mute / Unmute Microphone");
+            Radio1ChannelUp.InputName = LocalizationManager.Get("Radio 1 Channel Up");
+            Radio1ChannelDown.InputName = LocalizationManager.Get("Radio 1 Channel Down");
+            Radio2ChannelUp.InputName = LocalizationManager.Get("Radio 2 Channel Up");
+            Radio2ChannelDown.InputName = LocalizationManager.Get("Radio 2 Channel Down");
 
             ReloadInputBindings();
         }
@@ -775,6 +795,10 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI
             ToggleOtherRadioMute.LoadInputSettings();
             ToggleAllRadiosMute.LoadInputSettings();
             ToggleMicrophoneMute.LoadInputSettings();
+            Radio1ChannelUp.LoadInputSettings();
+            Radio1ChannelDown.LoadInputSettings();
+            Radio2ChannelUp.LoadInputSettings();
+            Radio2ChannelDown.LoadInputSettings();
         }
 
         private void ReloadRadioAudioChannelSettings()

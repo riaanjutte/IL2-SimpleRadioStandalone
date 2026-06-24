@@ -64,8 +64,20 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI.ClientWindow.Favourites
 
         private void OnNewAddress()
         {
+            var address = (NewAddress ?? string.Empty).Trim();
+            if (string.IsNullOrEmpty(address))
+            {
+                return;
+            }
+
+            var name = (NewName ?? string.Empty).Trim();
+            if (string.IsNullOrEmpty(name))
+            {
+                name = address;
+            }
+
             var isDefault = _addresses.Count == 0;
-            _addresses.Add(new ServerAddress(NewName, NewAddress, isDefault));
+            _addresses.Add(new ServerAddress(name, address, isDefault));
 
             Save();
         }
