@@ -195,15 +195,15 @@
 
         <Grid Width="126" Height="18" Margin="4,3,0,0" HorizontalAlignment="Left">
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="68" />
-                <ColumnDefinition Width="1" />
-                <ColumnDefinition Width="25" />
+                <ColumnDefinition Width="74" />
+                <ColumnDefinition Width="2" />
+                <ColumnDefinition Width="18" />
                 <ColumnDefinition Width="1" />
                 <ColumnDefinition Width="31" />
             </Grid.ColumnDefinitions>
 
             <Border Grid.Column="0"
-                    Width="68"
+                    Width="74"
                     Height="12"
                     HorizontalAlignment="Left"
                     VerticalAlignment="Center"
@@ -250,14 +250,14 @@
             </Border>
 
             <Border Grid.Column="2"
-                    Width="25"
+                    Width="18"
                     Height="12"
                     HorizontalAlignment="Left"
                     VerticalAlignment="Center"
                     Background="{DynamicResource OverlayDisplayBrush}"
                     BorderBrush="#242824"
                     BorderThickness="1"
-                    ToolTip="Number of pilots on this channel">
+                    ToolTip="Σ = number of pilots tuned to this channel">
                 <Border.Effect>
                     <DropShadowEffect BlurRadius="1"
                                       Direction="315"
@@ -274,7 +274,7 @@
                             Background="{DynamicResource OverlayDisplayTopReflectionBrush}"
                             Opacity="0.6"
                             Style="{x:Null}" />
-                    <Grid Width="25"
+                    <Grid Width="18"
                           Height="12"
                           HorizontalAlignment="Center"
                           VerticalAlignment="Center"
@@ -283,17 +283,17 @@
                             <RowDefinition Height="*" />
                         </Grid.RowDefinitions>
                         <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="14" />
+                            <ColumnDefinition Width="7" />
                             <ColumnDefinition Width="11" />
                         </Grid.ColumnDefinitions>
                         <TextBlock x:Name="UsersLabel"
                                    Grid.Column="0"
                                    HorizontalAlignment="Center"
                                    VerticalAlignment="Center"
-                                   FontSize="4"
+                                   FontSize="7"
                                    Foreground="#D8D8D8"
                                    Style="{x:Null}"
-                                   Text="PLTS:"
+                                   Text="Σ"
                                    TextAlignment="Center" />
                         <TextBlock x:Name="UsersCount"
                                    Grid.Column="1"

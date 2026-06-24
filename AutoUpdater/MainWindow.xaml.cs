@@ -21,6 +21,7 @@ using System.Windows.Navigation;
 using System.Windows.Shapes;
 using System.Windows.Threading;
 using Ciribob.IL2.SimpleRadio.Standalone.Common.Network;
+using Microsoft.Win32;
 using Octokit;
 using MessageBox = System.Windows.MessageBox;
 using Path = System.IO.Path;
@@ -32,6 +33,8 @@ namespace AutoUpdater
     /// </summary>
     public partial class MainWindow : Window
     {
+        private const string InstallRegistryPath = "HKEY_CURRENT_USER\\SOFTWARE\\IL2-SRS";
+        private const string InstallRegistryValue = "SRSPath";
         private Uri _uri;
         private string _directory;
         private string _file;
@@ -125,22 +128,46 @@ namespace AutoUpdater
 
         private static UpdateReleaseInfo GetLocalInstalledReleaseInfo()
         {
-            var baseDirectory = AppDomain.CurrentDomain.BaseDirectory;
-            var clientPath = Path.Combine(baseDirectory, "IL2-SR-ClientRadio.exe");
-
-            Version clientVersion;
-            if (TryGetProductVersion(clientPath, out clientVersion))
+            foreach (var clientPath in GetPossibleInstalledClientPaths())
             {
-                Version updaterVersion;
-                if (UpdateReleaseSelector.TryParseReleaseVersion(ReleaseMetadata.Version, out updaterVersion) && clientVersion == updaterVersion)
+                Version clientVersion;
+                if (TryGetProductVersion(clientPath, out clientVersion))
                 {
-                    return UpdateReleaseSelector.CreateCurrentReleaseInfo(ReleaseMetadata.Version, ReleaseMetadata.ReleaseTag);
-                }
+                    Version updaterVersion;
+                    if (UpdateReleaseSelector.TryParseReleaseVersion(ReleaseMetadata.Version, out updaterVersion) && clientVersion == updaterVersion)
+                    {
+                        return UpdateReleaseSelector.CreateCurrentReleaseInfo(ReleaseMetadata.Version, ReleaseMetadata.ReleaseTag);
+                    }
 
-                return UpdateReleaseSelector.CreateCurrentReleaseInfo(clientVersion.ToString(), clientVersion.ToString());
+                    return UpdateReleaseSelector.CreateCurrentReleaseInfo(clientVersion.ToString(), clientVersion.ToString());
+                }
             }
 
-            return UpdateReleaseSelector.CreateCurrentReleaseInfo(ReleaseMetadata.Version, ReleaseMetadata.ReleaseTag);
+            return null;
+        }
+
+        private static IEnumerable<string> GetPossibleInstalledClientPaths()
+        {
+            var baseDirectory = AppDomain.CurrentDomain.BaseDirectory;
+            yield return Path.Combine(baseDirectory, "IL2-SR-ClientRadio.exe");
+
+            var registryInstallPath = ReadInstalledPath();
+            if (!string.IsNullOrWhiteSpace(registryInstallPath))
+            {
+                yield return Path.Combine(registryInstallPath, "IL2-SR-ClientRadio.exe");
+            }
+        }
+
+        private static string ReadInstalledPath()
+        {
+            try
+            {
+                return Registry.GetValue(InstallRegistryPath, InstallRegistryValue, "") as string;
+            }
+            catch
+            {
+                return "";
+            }
         }
 
         private static bool TryGetProductVersion(string filePath, out Version version)

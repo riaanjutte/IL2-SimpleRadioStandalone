@@ -1,5 +1,30 @@
 # Changelog
 
+## IL2-SRS 1.0.4.6 community update
+
+### Added
+
+- Added an active-radio indicator lamp to the radio overlay before the TX/RX lamps.
+- Added separate key bindings for Radio 1 channel up/down and Radio 2 channel up/down.
+
+### Changed
+
+- Improved radio overlay inactive-state readability: inactive LEDs now show a dimmed version of their active colour instead of black.
+- Dimmed inactive radio channel up/down controls and selected-channel indicators so inactive radios are easier to distinguish.
+- Replaced the overlay player-count `PLTS:` label with compact `Σ` notation and widened the callsign/channel displays.
+- Delayed RCI/RCO overlay callout messages briefly after an RCI comes on duty so they have time to settle in before pilots start calling.
+
+### Fixed
+
+- Fixed the favourite-server add button so new server configurations can be created reliably.
+- Fixed standalone updater bootstrap behavior when launched from outside the install folder or when the installed client executable is missing.
+- Improved release selection so a missing local client is treated as an unknown install instead of incorrectly reporting that no update is available.
+
+### Validation
+
+- Built `IL2-SimpleRadioStandalone.sln` Release/x64 successfully.
+- Ran `IL2-SR-CommonTests` Release/x64: 93/93 passed.
+
 ## IL2-SRS 1.0.4.5 community update
 
 ### Added

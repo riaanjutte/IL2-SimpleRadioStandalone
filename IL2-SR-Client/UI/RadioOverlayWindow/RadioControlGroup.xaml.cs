@@ -26,7 +26,7 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI.RadioOverlayWindow
         private const double SpeakerNameScrollPauseMilliseconds = 700.0;
         private const double ReceiveIndicatorHoldMilliseconds = 500.0;
         private const double TransmitIndicatorHoldMilliseconds = 250.0;
-        private const double RadioDisplayViewportFallbackWidth = 68.0;
+        private const double RadioDisplayViewportFallbackWidth = 74.0;
         private const double RadioDisplayViewportFallbackHeight = 12.0;
         private const double InactiveRadioControlOpacity = 0.5;
         private static readonly Color ActiveGreen = (Color)ColorConverter.ConvertFromString("#96FF6D");

@@ -115,6 +115,23 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Common.Tests.Network
         }
 
         [TestMethod]
+        public void DirectStableUpdaterWithUnknownLocalInstallDownloadsLatestStable()
+        {
+            var releases = Releases(
+                Stable("v1.0.4.5"),
+                Beta("v1.0.4.6-beta.1"));
+
+            var selected = UpdateReleaseSelector.SelectAutoUpdaterDownload(
+                releases,
+                null,
+                false,
+                null);
+
+            Assert.AreEqual("v1.0.4.5", selected.TagName);
+            Assert.IsFalse(selected.IsPrerelease);
+        }
+
+        [TestMethod]
         public void DirectBetaUpdaterDownloadsLatestBeta()
         {
             var current = Current("1.0.4.5", "1.0.4.5-beta.1");
