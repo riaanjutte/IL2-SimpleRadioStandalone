@@ -1,5 +1,21 @@
 # Changelog
 
+## IL2-SRS 1.0.4.7-beta.1 community update
+
+### Added
+
+- Added preliminary IL-2 Korea standalone support for client-side game detection, overlay focus, and telemetry setup.
+- Added telemetry diagnostics in the Help tab for detecting third-party telemetry port conflicts, starting with IL2WinWing.
+
+### Changed
+
+- Improved the startup telemetry repair flow so users are warned when IL-2 is already running and the game must be restarted before repaired telemetry settings can take effect.
+- Added Help tab guidance for radio overlays and exclusive fullscreen limitations.
+
+### Notes
+
+- IL-2 Korea support is intentionally beta quality. It has been verified to receive Korea telemetry once spawned, but broader multiplayer, server, auto-connect, intercom, and Steam-version testing is still needed.
+
 ## IL2-SRS 1.0.4.6 community update
 
 ### Added

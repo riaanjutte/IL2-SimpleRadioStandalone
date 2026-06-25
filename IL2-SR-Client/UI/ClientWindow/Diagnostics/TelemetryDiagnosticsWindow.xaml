@@ -1,0 +1,48 @@
+<Window x:Class="Ciribob.IL2.SimpleRadio.Standalone.Client.UI.ClientWindow.Diagnostics.TelemetryDiagnosticsWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Telemetry Diagnostics"
+        MinWidth="520"
+        MinHeight="280"
+        Width="620"
+        Height="380"
+        WindowStartupLocation="CenterOwner"
+        ResizeMode="CanResizeWithGrip"
+        Background="{DynamicResource MilWindowBackgroundBrush}"
+        Foreground="{DynamicResource MilTextPrimaryBrush}"
+        FontSize="14">
+    <Window.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="pack://application:,,,/IL2-SR-ClientRadio;component/Themes/MilitaryControls.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </Window.Resources>
+
+    <GroupBox Header="Telemetry diagnostics" Margin="8">
+        <DockPanel Margin="8">
+            <StackPanel DockPanel.Dock="Bottom"
+                        Margin="0,8,0,0"
+                        HorizontalAlignment="Right"
+                        Orientation="Horizontal">
+                <Button MinWidth="120"
+                        Margin="0,0,8,0"
+                        Padding="10,4"
+                        Click="RunTelemetryDiagnostics_OnClick"
+                        Content="Run Check" />
+                <Button MinWidth="90"
+                        Padding="10,4"
+                        Click="Close_OnClick"
+                        Content="Close" />
+            </StackPanel>
+            <TextBox x:Name="TelemetryDiagnosticsOutput"
+                     IsReadOnly="True"
+                     TextWrapping="Wrap"
+                     VerticalScrollBarVisibility="Auto"
+                     FontFamily="{StaticResource MilFontMono}"
+                     FontSize="12"
+                     Foreground="{DynamicResource MilTextPrimaryBrush}"
+                     Text="Run the check to inspect IL-2 telemetry ports." />
+        </DockPanel>
+    </GroupBox>
+</Window>

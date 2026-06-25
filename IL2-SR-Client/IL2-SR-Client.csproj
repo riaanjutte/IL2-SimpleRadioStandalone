@@ -271,6 +271,10 @@
       <DependentUpon>ClientListWindow.xaml</DependentUpon>
     </Compile>
     <Compile Include="UI\ClientWindow\Diagnostics\DiagnosticBundleBuilder.cs" />
+    <Compile Include="UI\ClientWindow\Diagnostics\TelemetryDiagnostics.cs" />
+    <Compile Include="UI\ClientWindow\Diagnostics\TelemetryDiagnosticsWindow.xaml.cs">
+      <DependentUpon>TelemetryDiagnosticsWindow.xaml</DependentUpon>
+    </Compile>
     <Compile Include="UI\ClientWindow\PilotRoster\PilotRosterBuilder.cs" />
     <Compile Include="UI\ClientWindow\PilotRoster\PilotRosterEntry.cs" />
     <Compile Include="UI\ClientWindow\PilotRoster\PilotRosterWindow.xaml.cs">
@@ -334,6 +338,10 @@
     <Compile Include="Utils\ValueConverters\VuNeedleAngleConverter.cs" />
     <Compile Include="Utils\WPFElementHelper.cs" />
     <Page Include="UI\ClientWindow\ClientList\ClientListWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UI\ClientWindow\Diagnostics\TelemetryDiagnosticsWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

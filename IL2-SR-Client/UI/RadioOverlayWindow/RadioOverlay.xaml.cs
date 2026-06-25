@@ -58,6 +58,7 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Overlay
         private const double PreviousFramedDefaultOverlayHeight = 320.0;
         private const double OldDefaultOverlayWidth = 122.0;
         private const double OldDefaultOverlayHeight = 270.0;
+        private static readonly string[] IL2ProcessNames = {"Il-2", "IL2Series"};
         private bool _suppressSizeHandling = true;
         private bool _rciIndicatorEnabled;
         private bool _overlayTestModeEnabled;
@@ -699,19 +700,21 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Overlay
                 //focus IL2 if needed
                 var foreGround = WindowHelper.GetForegroundWindow();
 
-                Process[] localByName = Process.GetProcessesByName("Il-2");
+                Process il2Process = IL2ProcessNames
+                    .SelectMany(Process.GetProcessesByName)
+                    .FirstOrDefault(process => process.MainWindowHandle != IntPtr.Zero);
 
-                if (localByName != null && localByName.Length > 0)
+                if (il2Process != null)
                 {
                     //either IL2 is in focus OR Overlay window is not in focus
-                    if (foreGround == localByName[0].MainWindowHandle || overlayWindow != foreGround ||
+                    if (foreGround == il2Process.MainWindowHandle || overlayWindow != foreGround ||
                         this.IsMouseOver)
                     {
                         _lastFocus = DateTime.Now.Ticks;
                     }
                     else if (DateTime.Now.Ticks > _lastFocus + 20000000 && overlayWindow == foreGround)
                     {
-                        WindowHelper.BringProcessToFront(localByName[0]);
+                        WindowHelper.BringProcessToFront(il2Process);
                     }
                 }
             }

@@ -2552,6 +2552,15 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI
             }
         }
 
+        private void OpenTelemetryDiagnostics_OnClick(object sender, RoutedEventArgs e)
+        {
+            TelemetryDiagnosticsWindow window = new TelemetryDiagnosticsWindow
+            {
+                Owner = this
+            };
+            window.Show();
+        }
+
         private void ReportProblem_OnClick(object sender, RoutedEventArgs e)
         {
             var result = ShowLocalizedYesNo(

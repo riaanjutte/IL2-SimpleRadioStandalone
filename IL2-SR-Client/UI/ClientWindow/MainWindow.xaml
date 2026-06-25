@@ -1381,20 +1381,24 @@
                             <Button MinWidth="170"
                                     Margin="0,0,8,0"
                                     Padding="10,4"
+                                    Click="OpenTelemetryDiagnostics_OnClick"
+                                    Content="Telemetry Diagnostics" />
+                            <Button MinWidth="170"
+                                    Margin="8,0,8,0"
+                                    Padding="10,4"
                                     Click="ReportProblem_OnClick"
                                     Content="Report a Problem" />
                             <Button MinWidth="170"
-                                    Margin="8,0,0,0"
+                                    Margin="8,0,8,0"
                                     Padding="10,4"
                                     Click="SuggestImprovement_OnClick"
                                     Content="Suggest an Improvement" />
+                            <Button MinWidth="170"
+                                    Margin="8,0,0,0"
+                                    Padding="10,4"
+                                    Click="Donate_OnClick"
+                                    Content="Patreon - Support SRS" />
                         </StackPanel>
-                        <Button MinWidth="240"
-                                Margin="0,10,0,0"
-                                Padding="10,4"
-                                HorizontalAlignment="Center"
-                                Click="Donate_OnClick"
-                                Content="Patreon - Support SRS" />
                     </StackPanel>
                     <FlowDocumentScrollViewer VerticalScrollBarVisibility="Auto">
                     <FlowDocument x:Name="AboutFlowDocument"
@@ -1431,6 +1435,10 @@
                                 <Run Text="here"/>
                             </Hyperlink>
                             <Run Text=" and make sure to follow the information in #common-issues first before asking for help in #support"/>
+                        </Paragraph>
+                        <Paragraph>
+                            <Run FontWeight="Bold" Text="Radio overlay not visible in IL-2?"/>
+                            <Run Text=" Use IL-2 windowed or borderless display mode. Windows overlays cannot reliably appear over exclusive fullscreen games."/>
                         </Paragraph>
                         <Paragraph Style="{StaticResource HelpHeading}">
                             <Run Text="Community Edition source code"/>

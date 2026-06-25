@@ -325,7 +325,7 @@ namespace Installer
                 WritePath(srPath, "SRSPath");
 
                 if(IL2ScriptsPath!=null)
-                    WritePath(IL2ScriptsPath, "IL2Path");
+                    WritePath(path, "IL2Path");
 
                 if (shortcut)
                 {
@@ -530,12 +530,21 @@ namespace Installer
                 return "";
             }
 
-            //need bin & data folder at the root
-            if (Directory.Exists(path + "\\bin") && Directory.Exists(path + "\\data") &&
-                File.Exists(path + "\\data\\startup.cfg"))
+            var candidates = new[]
             {
-                Logger.Info($"Fould IL2 startup.cfg "+path);
-                return path;
+                path,
+                Path.Combine(path, "Game")
+            };
+
+            foreach (var candidate in candidates)
+            {
+                //need bin & data folder at the root
+                if (Directory.Exists(candidate + "\\bin") && Directory.Exists(candidate + "\\data") &&
+                    File.Exists(candidate + "\\data\\startup.cfg"))
+                {
+                    Logger.Info($"Found IL2 startup.cfg " + candidate);
+                    return candidate;
+                }
             }
 
             Logger.Info($"Could not find IL2 startup.cfg " + path);

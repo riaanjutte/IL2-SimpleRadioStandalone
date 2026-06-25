@@ -31,6 +31,7 @@ namespace IL2_SR_Client
         private System.Windows.Forms.NotifyIcon _notifyIcon;
         private bool loggingReady = false;
         private static Logger Logger = LogManager.GetCurrentClassLogger();
+        private static readonly string[] IL2ProcessNames = { "Il-2", "IL2Series" };
         private static readonly string[] FlattenableBrushKeys =
         {
             "MilPanelFaceBrush",
@@ -429,10 +430,21 @@ namespace IL2_SR_Client
 
             try
             {
+                bool il2WasRunning = IsIL2Running();
                 bool repaired = StartupConfigTelemetry.EnsureEnabled(cfgPath, message => Logger.Info(message));
                 if (repaired)
                 {
                     Logger.Info($"Repaired IL-2 startup.cfg telemetry settings at {cfgPath}");
+                    if (il2WasRunning)
+                    {
+                        Logger.Warn("IL-2 was running while startup.cfg telemetry settings were repaired; IL-2 must be restarted before telemetry changes take effect.");
+                        MessageBox.Show(
+                            "SRS repaired the IL-2 telemetry settings in startup.cfg, but IL-2 is currently running.\n\n" +
+                            "Close IL-2 completely and start it again before joining a server. Otherwise auto-connect and in-game radio data may not work.",
+                            "IL2-SRS Telemetry Check",
+                            MessageBoxButton.OK,
+                            MessageBoxImage.Information);
+                    }
                 }
                 else
                 {
@@ -463,6 +475,26 @@ namespace IL2_SR_Client
                 Logger.Error(ex, $"Unable to read installer registry path {key}");
                 return "";
             }
+        }
+
+        private static bool IsIL2Running()
+        {
+            foreach (string processName in IL2ProcessNames)
+            {
+                try
+                {
+                    if (Process.GetProcessesByName(processName).Length > 0)
+                    {
+                        return true;
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Logger.Warn(ex, $"Unable to inspect IL-2 process state for {processName}");
+                }
+            }
+
+            return false;
         }
 
         private string GetArgsString()
