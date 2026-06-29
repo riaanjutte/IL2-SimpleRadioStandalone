@@ -616,7 +616,7 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI
 
         private void InitInput()
         {
-            InputManager = new InputDeviceManager(this, ToggleOverlay);
+            InputManager = new InputDeviceManager(this, ToggleOverlay, RestartClientFromKeybind);
 
             InitSettingsProfiles();
 
@@ -741,6 +741,10 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI
             Radio2ChannelDown.InputName = LocalizationManager.Get("Radio 2 Channel Down");
             Radio2ChannelDown.ControlInputBinding = InputBinding.Radio2ChannelDown;
             Radio2ChannelDown.InputDeviceManager = InputManager;
+
+            RestartSrs.InputName = LocalizationManager.Get("Restart SRS");
+            RestartSrs.ControlInputBinding = InputBinding.RestartSrs;
+            RestartSrs.InputDeviceManager = InputManager;
         }
 
         private void RefreshInputBindingLabels()
@@ -775,6 +779,7 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI
             Radio1ChannelDown.InputName = LocalizationManager.Get("Radio 1 Channel Down");
             Radio2ChannelUp.InputName = LocalizationManager.Get("Radio 2 Channel Up");
             Radio2ChannelDown.InputName = LocalizationManager.Get("Radio 2 Channel Down");
+            RestartSrs.InputName = LocalizationManager.Get("Restart SRS");
 
             ReloadInputBindings();
         }
@@ -817,6 +822,7 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI
             Radio1ChannelDown.LoadInputSettings();
             Radio2ChannelUp.LoadInputSettings();
             Radio2ChannelDown.LoadInputSettings();
+            RestartSrs.LoadInputSettings();
         }
 
         private void ReloadRadioAudioChannelSettings()
@@ -2263,11 +2269,17 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI
 
             if (restartResult == MessageBoxResult.Yes)
             {
-                RestartClient();
+                RestartClient("language change");
             }
         }
 
-        private void RestartClient()
+        private void RestartClientFromKeybind()
+        {
+            Logger.Warn("Restarting SRS because the restart keybind was pressed");
+            RestartClient("restart keybind");
+        }
+
+        private void RestartClient(string reason)
         {
             try
             {
@@ -2284,9 +2296,9 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI
             }
             catch (Exception ex)
             {
-                Logger.Error(ex, "Unable to restart SRS after language change");
+                Logger.Error(ex, $"Unable to restart SRS after {reason}");
                 MessageBox.Show(this,
-                    LocalizationManager.Get("Please restart SRS for the language change to take effect."),
+                    LocalizationManager.Get("Please restart SRS manually."),
                     LocalizationManager.Get("Restart Required"),
                     MessageBoxButton.OK,
                     MessageBoxImage.Information);

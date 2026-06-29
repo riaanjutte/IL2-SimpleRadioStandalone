@@ -210,6 +210,9 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.Settings
         Radio2ChannelDown = 140,
         ModifierRadio2ChannelDown = 240,
 
+        RestartSrs = 141,
+        ModifierRestartSrs = 241,
+
     }
 
 

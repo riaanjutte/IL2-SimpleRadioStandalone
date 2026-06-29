@@ -11,6 +11,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Threading;
+using Ciribob.IL2.SimpleRadio.Standalone.Client.Audio.Diagnostics;
 using Ciribob.IL2.SimpleRadio.Standalone.Client.Audio.Managers;
 using Ciribob.IL2.SimpleRadio.Standalone.Client.Settings;
 using Ciribob.IL2.SimpleRadio.Standalone.Client.Singletons;
@@ -378,8 +379,11 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.Network
 
             if (!_encodedAudio.TryAdd(bytes))
             {
+                IncomingAudioQualityMonitor.Instance.RecordQueueDrop(droppedPackets);
                 return;
             }
+
+            IncomingAudioQualityMonitor.Instance.RecordQueueDrop(droppedPackets);
 
             var now = DateTime.UtcNow.Ticks;
             if (new TimeSpan(now - _lastEncodedAudioDropLog).TotalSeconds >= 5)

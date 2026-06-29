@@ -55,6 +55,7 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.Settings
         private readonly object _inputDevicesLock = new object();
         private readonly Dictionary<Guid, Device> _inputDevices = new Dictionary<Guid, Device>();
         private readonly MainWindow.ToggleOverlayCallback _toggleOverlayCallback;
+        private readonly Action _restartSrsCallback;
         private readonly IntPtr _windowHandle;
 
         private volatile bool _detectPtt;
@@ -75,7 +76,7 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.Settings
         private Settings.GlobalSettingsStore _globalSettings = Settings.GlobalSettingsStore.Instance;
 
 
-        public InputDeviceManager(Window window, MainWindow.ToggleOverlayCallback _toggleOverlayCallback)
+        public InputDeviceManager(Window window, MainWindow.ToggleOverlayCallback _toggleOverlayCallback, Action restartSrsCallback)
         {
             _directInput = new DirectInput();
 
@@ -83,6 +84,7 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.Settings
             _windowHandle = new WindowInteropHelper(window).Handle;
 
             this._toggleOverlayCallback = _toggleOverlayCallback;
+            _restartSrsCallback = restartSrsCallback;
 
             LoadWhiteList();
 
@@ -635,6 +637,22 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.Settings
                             Application.Current.Dispatcher.Invoke(
                                 () => { _toggleOverlayCallback(false); });
                             break;
+                        }
+                        else if (bindState.MainDevice.InputBind == InputBinding.RestartSrs)
+                        {
+                            if (bindState.MainDevice.InputBind == _lastActiveBinding && !bindState.IsActive)
+                            {
+                                _lastActiveBinding = InputBinding.ModifierIntercom;
+                            }
+
+                            if (bindState.IsActive && bindState.MainDevice.InputBind != _lastActiveBinding)
+                            {
+                                _lastActiveBinding = bindState.MainDevice.InputBind;
+
+                                Application.Current.Dispatcher.BeginInvoke(
+                                    new Action(() => { _restartSrsCallback?.Invoke(); }));
+                                break;
+                            }
                         }
                         else if ((int)bindState.MainDevice.InputBind >= (int)InputBinding.RadioChannel1 &&
                                  (int)bindState.MainDevice.InputBind <= (int)InputBinding.Radio2ChannelDown)
@@ -1253,7 +1271,7 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.Settings
 
             //REMEMBER TO UPDATE THIS WHEN NEW BINDINGS ARE ADDED
             //MIN + MAX bind numbers
-            for (int i = (int)InputBinding.Intercom; i <= (int)InputBinding.Radio2ChannelDown; i++)
+            for (int i = (int)InputBinding.Intercom; i <= (int)InputBinding.RestartSrs; i++)
             {
                 if (!currentInputProfile.ContainsKey((InputBinding)i))
                 {

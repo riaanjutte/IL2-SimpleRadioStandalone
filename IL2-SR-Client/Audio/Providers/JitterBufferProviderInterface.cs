@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using Ciribob.IL2.SimpleRadio.Standalone.Client.Audio.Diagnostics;
 using Ciribob.IL2.SimpleRadio.Standalone.Client.Audio.Managers;
 using NAudio.Utils;
 using NAudio.Wave;
@@ -20,6 +21,10 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.Audio
         private ulong _lastRead; // gives current index
 
         private readonly object _lock = new object();
+        private long _lastAudioAddedUtcTicks;
+        private int _recentPacketCount;
+        private int _lastAudioRadioId = -1;
+        private string _lastAudioClientGuid = string.Empty;
 
         private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
 
@@ -67,6 +72,11 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.Audio
                         //now read in from the jitterbuffer
                         if (_bufferedAudio.Count == 0)
                         {
+                            if (ShouldRecordPlaybackUnderrun(read, count))
+                            {
+                                IncomingAudioQualityMonitor.Instance.RecordPlaybackUnderrun(_lastAudioClientGuid, _lastAudioRadioId);
+                            }
+
                             //goes to a mixer so we just return what we've read which could be 0!
                             //Mixer Handles this OK
                             break;
@@ -98,6 +108,12 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.Audio
                                     if (missing <= 4)
                                     {
                                         var fill = Math.Min(missing, 4);
+                                        IncomingAudioQualityMonitor.Instance.RecordMissingPackets(
+                                            audio.ClientGuid,
+                                            audio.RadioId,
+                                            _lastRead,
+                                            audio.PacketNumber,
+                                            missing);
 
                                         for (var i = 0; i < (int)fill; i++)
                                         {
@@ -135,6 +151,8 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.Audio
                 if (_bufferedAudio.Count == 0)
                 {
                     _bufferedAudio.AddFirst(jitterBufferAudio);
+                    MarkAudioAdded(jitterBufferAudio);
+                    return;
                 }
                 else if (jitterBufferAudio.PacketNumber > _lastRead)
                 { 
@@ -143,6 +161,7 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.Audio
                     if (time > MAXIMUM_BUFFER_SIZE_MS)
                     {
                         _bufferedAudio.Clear();
+                        IncomingAudioQualityMonitor.Instance.RecordBufferClear(time);
                         Logger.Warn($"Cleared Audio buffer - length was {time} ms");
                     }
 
@@ -163,12 +182,17 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.Audio
                         if (it.Value.PacketNumber == jitterBufferAudio.PacketNumber)
                         {
                             //discard! Duplicate packet
+                            IncomingAudioQualityMonitor.Instance.RecordDuplicatePacket(
+                                jitterBufferAudio.ClientGuid,
+                                jitterBufferAudio.RadioId,
+                                jitterBufferAudio.PacketNumber);
                             return;
                         }
 
                         if (jitterBufferAudio.PacketNumber < it.Value.PacketNumber)
                         {
                             _bufferedAudio.AddBefore(it, jitterBufferAudio);
+                            MarkAudioAdded(jitterBufferAudio);
                             return;
                         }
 
@@ -176,13 +200,42 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.Audio
                             ((next == null) || (jitterBufferAudio.PacketNumber < next.Value.PacketNumber)))
                         {
                             _bufferedAudio.AddAfter(it, jitterBufferAudio);
+                            MarkAudioAdded(jitterBufferAudio);
                             return;
                         }
 
                         it = next;
                     }
                 }
+                else
+                {
+                    IncomingAudioQualityMonitor.Instance.RecordLatePacket(
+                        jitterBufferAudio.ClientGuid,
+                        jitterBufferAudio.RadioId,
+                        jitterBufferAudio.PacketNumber);
+                }
             }
+        }
+
+        private void MarkAudioAdded(JitterBufferAudio jitterBufferAudio)
+        {
+            _lastAudioAddedUtcTicks = DateTime.UtcNow.Ticks;
+            _lastAudioRadioId = jitterBufferAudio.RadioId;
+            _lastAudioClientGuid = jitterBufferAudio.ClientGuid ?? string.Empty;
+            if (_recentPacketCount < 1000)
+            {
+                _recentPacketCount++;
+            }
+        }
+
+        private bool ShouldRecordPlaybackUnderrun(int read, int count)
+        {
+            if (read >= count || _recentPacketCount < 5 || _lastAudioAddedUtcTicks <= 0)
+            {
+                return false;
+            }
+
+            return (DateTime.UtcNow - new DateTime(_lastAudioAddedUtcTicks, DateTimeKind.Utc)).TotalMilliseconds <= 200;
         }
     }
 }

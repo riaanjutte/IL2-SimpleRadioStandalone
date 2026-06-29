@@ -503,6 +503,7 @@
                                 <RowDefinition Height="Auto" />
                                 <RowDefinition Height="Auto" />
                                 <RowDefinition Height="Auto" />
+                                <RowDefinition Height="Auto" />
                             </Grid.RowDefinitions>
 
                             <Label x:Name="DeviceLabel"
@@ -684,6 +685,11 @@
                                                        Grid.ColumnSpan="5"
                                                        ControlInputBinding="{x:Static settings:InputBinding.Radio2ChannelDown}"
                                                        InputName="Radio 2 Channel Down" />
+                            <local:InputBindingControl x:Name="RestartSrs"
+                                                       Grid.Row="31"
+                                                       Grid.ColumnSpan="5"
+                                                       ControlInputBinding="{x:Static settings:InputBinding.RestartSrs}"
+                                                       InputName="Restart SRS" />
                         </Grid>
                     </StackPanel>
                 </ScrollViewer>

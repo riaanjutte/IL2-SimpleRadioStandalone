@@ -1,5 +1,17 @@
 # Changelog
 
+## IL2-SRS 1.0.4.7-beta.3 community update
+
+### Added
+
+- Added logging-only incoming audio quality diagnostics to help identify causes of choppy received audio without changing audio behavior.
+- Added a new `Restart SRS` keybinding on the Controls tab for quickly restarting the client when audio or device state gets stuck.
+
+### Validation
+
+- Built `IL2-SimpleRadioStandalone.sln` Release/x64 successfully.
+- Ran `IL2-SR-CommonTests` Release/x64: 99/99 passed.
+
 ## IL2-SRS 1.0.4.7-beta.2 community update
 
 ### Added

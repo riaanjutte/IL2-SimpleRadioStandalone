@@ -6,6 +6,7 @@ using NAudio.Dsp;
 using NAudio.Wave;
 using NAudio.Wave.SampleProviders;
 using Ciribob.IL2.SimpleRadio.Standalone.Client.Audio;
+using Ciribob.IL2.SimpleRadio.Standalone.Client.Audio.Diagnostics;
 using Ciribob.IL2.SimpleRadio.Standalone.Client.Audio.Managers;
 using Ciribob.IL2.SimpleRadio.Standalone.Client.DSP;
 using Ciribob.IL2.SimpleRadio.Standalone.Client.Settings;
@@ -83,17 +84,33 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client
 //            timer.Start();
 
             bool newTransmission = LikelyNewTransmission();
+            var previousUpdate = LastUpdate;
+            var monitorClientGuid = string.IsNullOrWhiteSpace(audio.OriginalClientGuid)
+                ? audio.ClientGuid
+                : audio.OriginalClientGuid;
 
             int decodedLength = 0;
 
-            var decoded = _decoder.Decode(audio.EncodedAudio,
-                audio.EncodedAudio.Length, out decodedLength, newTransmission);
+            byte[] decoded;
+            try
+            {
+                decoded = _decoder.Decode(audio.EncodedAudio,
+                    audio.EncodedAudio.Length, out decodedLength, newTransmission);
+            }
+            catch
+            {
+                IncomingAudioQualityMonitor.Instance.RecordDecodeFailure(monitorClientGuid, audio.ReceivedRadio, audio.PacketNumber);
+                throw;
+            }
 
             if (decodedLength <= 0)
             {
+                IncomingAudioQualityMonitor.Instance.RecordDecodeFailure(monitorClientGuid, audio.ReceivedRadio, audio.PacketNumber);
                 Logger.Info("Failed to decode audio from Packet for client");
                 return;
             }
+
+            IncomingAudioQualityMonitor.Instance.RecordDecodedPacket(monitorClientGuid, audio.ReceivedRadio, audio.PacketNumber, previousUpdate, newTransmission);
 
             // for some reason if this is removed then it lags?!
             //guess it makes a giant buffer and only uses a little?
@@ -139,7 +156,9 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client
                 Audio =
                     SeperateAudio(ConversionHelpers.ShortArrayToByteArray(audio.PcmAudioShort),
                         audio.ReceivedRadio),
-                PacketNumber = audio.PacketNumber
+                PacketNumber = audio.PacketNumber,
+                RadioId = audio.ReceivedRadio,
+                ClientGuid = monitorClientGuid
             });
 
             //timer.Stop();

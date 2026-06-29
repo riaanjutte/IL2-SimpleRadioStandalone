@@ -5,5 +5,9 @@
         public byte[] Audio { get; set; }
 
         public ulong PacketNumber { get; set; }
+
+        public int RadioId { get; set; }
+
+        public string ClientGuid { get; set; }
     }
 }

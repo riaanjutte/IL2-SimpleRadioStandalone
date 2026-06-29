@@ -9,6 +9,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Speech.Synthesis;
+using Ciribob.IL2.SimpleRadio.Standalone.Client.Audio.Diagnostics;
 using Ciribob.IL2.SimpleRadio.Standalone.Client.Audio.Models;
 using Ciribob.IL2.SimpleRadio.Standalone.Client.Audio.Utility;
 using Ciribob.IL2.SimpleRadio.Standalone.Client.DSP;
@@ -148,6 +149,7 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.Audio.Managers
                 _badMicFrameCount = 0;
                 _errorCount = 0;
                 _micInputQueue.Clear();
+                IncomingAudioQualityMonitor.Instance.Reset();
 
                 InitMixers();
 
@@ -911,6 +913,7 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.Audio.Managers
             MicMax = -100;
 
             _effectsOutputBuffer = null;
+            IncomingAudioQualityMonitor.Instance.Reset();
 
             foreach (var guid in _subs)
             {
@@ -931,15 +934,24 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.Audio.Managers
             //16bit PCM Audio
             //TODO: Clean  - remove if we havent received audio in a while?
             // If we have recieved audio, create a new buffered audio and read it
-            ClientAudioProvider client = null;
-            if (_clientsBufferedAudio.ContainsKey(audio.OriginalClientGuid))
+            var audioClientKey = string.IsNullOrWhiteSpace(audio.OriginalClientGuid)
+                ? audio.ClientGuid
+                : audio.OriginalClientGuid;
+
+            if (string.IsNullOrWhiteSpace(audioClientKey))
             {
-                client = _clientsBufferedAudio[audio.OriginalClientGuid];
+                audioClientKey = "unknown";
+            }
+
+            ClientAudioProvider client = null;
+            if (_clientsBufferedAudio.ContainsKey(audioClientKey))
+            {
+                client = _clientsBufferedAudio[audioClientKey];
             }
             else
             {
                 client = new ClientAudioProvider();
-                _clientsBufferedAudio[audio.OriginalClientGuid] = client;
+                _clientsBufferedAudio[audioClientKey] = client;
 
                 _clientAudioMixer.AddMixerInput(client.SampleProvider);
             }
