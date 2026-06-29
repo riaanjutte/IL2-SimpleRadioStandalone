@@ -543,6 +543,8 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI
 
         private void InitFlowDocument()
         {
+            WhatsNewLink.NavigateUri = new Uri(BuildCurrentReleaseNotesUrl());
+
             //make hyperlinks work
             var hyperlinks = WPFElementHelper.GetVisuals(AboutFlowDocument).OfType<Hyperlink>();
             foreach (var link in hyperlinks)
@@ -551,6 +553,22 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI
                     Process.Start(new ProcessStartInfo(args.Uri.AbsoluteUri));
                     args.Handled = true;
                 });
+        }
+
+        private static string BuildCurrentReleaseNotesUrl()
+        {
+            var releaseTag = ReleaseMetadata.ReleaseTag;
+            if (string.IsNullOrWhiteSpace(releaseTag))
+            {
+                return "https://github.com/riaanjutte/IL2-SimpleRadioStandalone/releases";
+            }
+
+            if (!releaseTag.StartsWith("v", StringComparison.OrdinalIgnoreCase))
+            {
+                releaseTag = "v" + releaseTag;
+            }
+
+            return "https://github.com/riaanjutte/IL2-SimpleRadioStandalone/releases/tag/" + Uri.EscapeDataString(releaseTag);
         }
 
         private void InitDefaultAddress()
@@ -1226,6 +1244,8 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI
 
                 try
                 {
+                    ClientState.IsConnectionErrored = false;
+
                     //process hostname
                     var resolvedAddresses = Dns.GetHostAddresses(GetAddressFromTextBox());
                     var ip = resolvedAddresses.FirstOrDefault(xa => xa.AddressFamily == AddressFamily.InterNetwork); // Ensure we get an IPv4 address in case the host resolves to both IPv6 and IPv4
@@ -1451,6 +1471,8 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI
 
             if (result)
             {
+                ClientState.IsConnectionErrored = false;
+
                 if (!ClientState.IsConnected)
                 {
                     try

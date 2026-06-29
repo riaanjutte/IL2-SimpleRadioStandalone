@@ -127,6 +127,64 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Common.Tests.UI
             Assert.IsTrue(roster[0].HasVehicle);
         }
 
+        [TestMethod]
+        public void BuildActiveSquadOpsSummaryGroupsFriendlySquadsByOperationalChannel()
+        {
+            var summary = PilotRosterBuilder.BuildActiveSquadOpsSummary(CreateState(FriendlyCoalition, 1, 2), new[]
+            {
+                CreateClient("friendly-1", "=TBAS=Mayhem", "", FriendlyCoalition, 3, 2),
+                CreateClient("friendly-2", "=TBAS=Haluter", "", FriendlyCoalition, 3, 4),
+                CreateClient("friendly-3", "-JG4-PilotOne", "", FriendlyCoalition, 5, 2),
+                CreateClient("friendly-4", "-JG4-PilotTwo", "", FriendlyCoalition, 5, 6),
+                CreateClient("friendly-5", "[EMS]PilotOne", "", FriendlyCoalition, 9, 2),
+                CreateClient("friendly-6", "[EMS]PilotTwo", "", FriendlyCoalition, 9, 2),
+                CreateClient("enemy-1", "=TBAS=Enemy", "", EnemyCoalition, 3, 2)
+            });
+
+            Assert.AreEqual("ACTIVE SQUAD OPS: CH3 TBAS(2) | CH5 JG4(2) | CH9 EMS(2)", summary);
+        }
+
+        [TestMethod]
+        public void BuildActiveSquadOpsSummaryRequiresAtLeastTwoPilotsPerSquadChannel()
+        {
+            var summary = PilotRosterBuilder.BuildActiveSquadOpsSummary(CreateState(FriendlyCoalition, 1, 2), new[]
+            {
+                CreateClient("friendly-1", "=TBAS=Solo", "", FriendlyCoalition, 3, 2),
+                CreateClient("friendly-2", "=DW=One", "", FriendlyCoalition, 4, 2),
+                CreateClient("friendly-3", "=DW=Two", "", FriendlyCoalition, 5, 2)
+            });
+
+            Assert.AreEqual(string.Empty, summary);
+        }
+
+        [TestMethod]
+        public void BuildActiveSquadOpsSummaryIgnoresLobbyChannelsAndUnrecognisedNames()
+        {
+            var summary = PilotRosterBuilder.BuildActiveSquadOpsSummary(CreateState(FriendlyCoalition, 1, 2), new[]
+            {
+                CreateClient("friendly-1", "=TBAS=One", "", FriendlyCoalition, 1, 2),
+                CreateClient("friendly-2", "=TBAS=Two", "", FriendlyCoalition, 1, 2),
+                CreateClient("friendly-3", "Broadway", "", FriendlyCoalition, 7, 2),
+                CreateClient("friendly-4", "Ginger", "", FriendlyCoalition, 7, 2)
+            });
+
+            Assert.AreEqual(string.Empty, summary);
+        }
+
+        [TestMethod]
+        public void BuildActiveSquadOpsSummaryDetectsCommonSquadTagFormats()
+        {
+            var summary = PilotRosterBuilder.BuildActiveSquadOpsSummary(CreateState(FriendlyCoalition, 1, 2), new[]
+            {
+                CreateClient("friendly-1", "JG27_PilotOne", "", FriendlyCoalition, 6, 2),
+                CreateClient("friendly-2", "JG27-PilotTwo", "", FriendlyCoalition, 6, 2),
+                CreateClient("friendly-3", "332FG.Gordon", "", FriendlyCoalition, 8, 2),
+                CreateClient("friendly-4", "332FG-Wingman", "", FriendlyCoalition, 8, 2)
+            });
+
+            Assert.AreEqual("ACTIVE SQUAD OPS: CH6 JG27(2) | CH8 332FG(2)", summary);
+        }
+
         private static SRClient CreateClient(
             string guid,
             string name,

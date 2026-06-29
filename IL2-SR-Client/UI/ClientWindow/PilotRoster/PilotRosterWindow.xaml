@@ -96,42 +96,61 @@
                 CornerRadius="5">
         <Grid Margin="18,14,18,14">
             <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
                 <RowDefinition Height="*" />
             </Grid.RowDefinitions>
 
             <Rectangle RadiusX="5"
                        RadiusY="5"
+                       Grid.RowSpan="2"
                        IsHitTestVisible="False"
                        Opacity="{DynamicResource WeatheringOpacity}"
                        utils:PanelWeathering.Enabled="True" />
             <Rectangle RadiusX="5"
                        RadiusY="5"
+                       Grid.RowSpan="2"
                        IsHitTestVisible="False"
                        Opacity="{DynamicResource WeatheringExtraOpacity}"
                        utils:PanelWeathering.Enabled="True" />
 
             <Control Template="{StaticResource PilotRosterPanelScrew}"
+                     Grid.RowSpan="2"
                      HorizontalAlignment="Left"
                      VerticalAlignment="Top"
                      Margin="-12,-8,0,0"
                      Opacity="{DynamicResource ThreeDScrewOpacity}" />
             <Control Template="{StaticResource PilotRosterPanelScrew}"
+                     Grid.RowSpan="2"
                      HorizontalAlignment="Right"
                      VerticalAlignment="Top"
                      Margin="0,-8,-12,0"
                      Opacity="{DynamicResource ThreeDScrewOpacity}" />
             <Control Template="{StaticResource PilotRosterPanelScrew}"
+                     Grid.RowSpan="2"
                      HorizontalAlignment="Left"
                      VerticalAlignment="Bottom"
                      Margin="-12,0,0,-8"
                      Opacity="{DynamicResource ThreeDScrewOpacity}" />
             <Control Template="{StaticResource PilotRosterPanelScrew}"
+                     Grid.RowSpan="2"
                      HorizontalAlignment="Right"
                      VerticalAlignment="Bottom"
                      Margin="0,0,-12,-8"
                      Opacity="{DynamicResource ThreeDScrewOpacity}" />
 
+            <TextBlock x:Name="ActiveSquadOpsText"
+                       Grid.Row="0"
+                       Margin="2,0,2,6"
+                       Foreground="#DC143C"
+                       FontFamily="{StaticResource MilFontMono}"
+                       FontSize="14"
+                       FontWeight="Bold"
+                       TextTrimming="CharacterEllipsis"
+                       TextWrapping="NoWrap"
+                       Visibility="Collapsed" />
+
             <DataGrid x:Name="PilotList"
+                      Grid.Row="1"
                       AutoGenerateColumns="False"
                       CanUserAddRows="False"
                       CanUserDeleteRows="False"
@@ -189,6 +208,7 @@
             </DataGrid>
 
             <TextBlock x:Name="UnavailableMessage"
+                       Grid.RowSpan="2"
                        HorizontalAlignment="Center"
                        VerticalAlignment="Center"
                        MaxWidth="420"

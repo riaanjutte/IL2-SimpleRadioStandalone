@@ -372,39 +372,32 @@ namespace IL2_SR_Client
 
             if (!hasAdministrativeRight && GlobalSettingsStore.Instance.GetClientSettingBool(GlobalSettingsKeys.RequireAdmin))
             {
-                Task.Factory.StartNew(() =>
+                var location = AppDomain.CurrentDomain.BaseDirectory;
+
+                ProcessStartInfo startInfo = new ProcessStartInfo
                 {
-                    var location = AppDomain.CurrentDomain.BaseDirectory;
+                    UseShellExecute = true,
+                    WorkingDirectory = location,
+                    FileName = "IL2-SR-ClientRadio.exe",
+                    Verb = "runas",
+                    Arguments = GetArgsString() + " -allowMultiple"
+                };
 
-                    ProcessStartInfo startInfo = new ProcessStartInfo
-                    {
-                        UseShellExecute = true,
-                        WorkingDirectory = "\"" + location + "\"",
-                        FileName = "IL2-SR-ClientRadio.exe",
-                        Verb = "runas",
-                        Arguments = GetArgsString() + " -allowMultiple"
-                    };
-                    try
-                    {
-                        Process p = Process.Start(startInfo);
+                try
+                {
+                    Process.Start(startInfo);
 
-                        //shutdown this process as another has started
-                        Dispatcher?.BeginInvoke(new Action(() =>
-                        {
-                            if (_notifyIcon != null)
-                                _notifyIcon.Visible = false;
+                    // Stop the non-elevated process before WPF continues startup and initializes audio/network state.
+                    Environment.Exit(0);
+                }
+                catch (System.ComponentModel.Win32Exception ex)
+                {
+                    Logger.Warn(ex, "User declined UAC elevation; continuing without admin rights");
+                    MessageBox.Show(
+                            "SRS Requires admin rights to be able to read keyboard input in the background. \n\nIf you do not use any keyboard binds for SRS and want to stop this message - Disable Require Admin Rights in SRS Settings\n\nSRS will continue without admin rights but keyboard binds will not work!",
+                            "UAC Error", MessageBoxButton.OK, MessageBoxImage.Warning);
 
-                            Environment.Exit(0);
-                        }));
-                    }
-                    catch (System.ComponentModel.Win32Exception ex)
-                    {
-                        MessageBox.Show(
-                                "SRS Requires admin rights to be able to read keyboard input in the background. \n\nIf you do not use any keyboard binds for SRS and want to stop this message - Disable Require Admin Rights in SRS Settings\n\nSRS will continue without admin rights but keyboard binds will not work!",
-                                "UAC Error", MessageBoxButton.OK, MessageBoxImage.Warning);
-
-                    }
-                });
+                }
 
                 return true;
             }

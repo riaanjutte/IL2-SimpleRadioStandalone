@@ -353,6 +353,7 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Server.Network
                     {
                         changed = !client.GameState.Equals(message.Client.GameState) ||
                                   client.Coalition != message.Client.Coalition ||
+                                  !string.Equals(client.Name, message.Client.Name, StringComparison.Ordinal) ||
                                   !string.Equals(client.AssignedCallsign, assignedCallsign, StringComparison.Ordinal) ||
                                   !string.Equals(client.AssignedVehicle, assignedVehicle, StringComparison.Ordinal);
                     }

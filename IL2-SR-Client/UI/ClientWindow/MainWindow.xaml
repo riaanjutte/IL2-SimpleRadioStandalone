@@ -1450,6 +1450,12 @@
                             </Hyperlink>
                             <Run Text="."/>
                         </Paragraph>
+                        <Paragraph>
+                            <Hyperlink x:Name="WhatsNewLink"
+                                       NavigateUri="https://github.com/riaanjutte/IL2-SimpleRadioStandalone/releases">
+                                <Run Text="What's New in this version"/>
+                            </Hyperlink>
+                        </Paragraph>
                         <Paragraph Style="{StaticResource HelpHeading}">
                             <Run Text="Input Device not detected?"/>
                         </Paragraph>

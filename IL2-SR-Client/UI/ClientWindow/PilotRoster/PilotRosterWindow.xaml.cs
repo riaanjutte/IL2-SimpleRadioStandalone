@@ -132,6 +132,7 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI.ClientWindow.PilotRoster
 
         private void ShowUnavailableMessage()
         {
+            ActiveSquadOpsText.Visibility = Visibility.Collapsed;
             PilotList.Visibility = Visibility.Collapsed;
             UnavailableMessage.Text =
                 LocalizationManager.Get("Pilot roster is currently only available when connected to Combat Box.")
@@ -156,15 +157,21 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI.ClientWindow.PilotRoster
 
         private void UpdateRoster()
         {
-            var entries = PilotRosterBuilder.Build(
-                ClientStateSingleton.Instance.PlayerGameState,
-                ConnectedClientsSingleton.Instance.Values);
+            var localState = ClientStateSingleton.Instance.PlayerGameState;
+            var connectedClients = ConnectedClientsSingleton.Instance.Values;
+            var entries = PilotRosterBuilder.Build(localState, connectedClients);
+            var activeSquadOps = PilotRosterBuilder.BuildActiveSquadOpsSummary(localState, connectedClients);
 
             _pilotRoster.Clear();
             foreach (var entry in entries)
             {
                 _pilotRoster.Add(entry);
             }
+
+            ActiveSquadOpsText.Text = activeSquadOps;
+            ActiveSquadOpsText.Visibility = string.IsNullOrWhiteSpace(activeSquadOps)
+                ? Visibility.Collapsed
+                : Visibility.Visible;
 
             Dispatcher.BeginInvoke(new Action(RefreshRosterLayout), DispatcherPriority.Loaded);
         }

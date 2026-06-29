@@ -42,7 +42,7 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Common.Setting
             { ServerSettingsKeys.GLOBAL_LOBBY_FREQUENCIES.ToString(), "248.22" },
             { ServerSettingsKeys.UPNP_ENABLED.ToString(), "false" },
             { ServerSettingsKeys.SHOW_TRANSMITTER_NAME.ToString(), "true" },
-            { ServerSettingsKeys.SECOND_RADIO_ENABLED.ToString(), "false" },
+            { ServerSettingsKeys.SECOND_RADIO_ENABLED.ToString(), "true" },
             { ServerSettingsKeys.CHANNEL_LIMIT.ToString(), "5" },
             { ServerSettingsKeys.ASSIGNED_CALLSIGNS_JSON_FILE.ToString(), @"\\tempest.combatbox.net\cb-radio-status\callsign-roster.json" },
         };

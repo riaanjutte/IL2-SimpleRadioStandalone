@@ -1,5 +1,27 @@
 # Changelog
 
+## IL2-SRS 1.0.4.7-beta.2 community update
+
+### Added
+
+- Added an Active Squad Ops summary at the top of the Combat Box Pilot Roster to highlight friendly squad groups operating on shared channels.
+- Added a Help tab "What's New in this version" link that opens the GitHub release notes for the running build.
+
+### Changed
+
+- New server configurations now enable the second radio by default.
+- The server now treats player name changes as roster-relevant updates so connected clients refresh roster data more reliably.
+
+### Fixed
+
+- Fixed stale connection-error state that could remain visible after a successful reconnect.
+- Fixed the admin relaunch path so the original non-admin client exits before initializing audio/network state, reducing the chance of duplicate local SRS instances and port conflicts.
+
+### Validation
+
+- Built `IL2-SimpleRadioStandalone.sln` Release/x64 successfully.
+- Ran `IL2-SR-CommonTests` Release/x64: 97/97 passed.
+
 ## IL2-SRS 1.0.4.7-beta.1 community update
 
 ### Added
