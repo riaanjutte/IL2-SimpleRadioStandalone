@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="SRSforIL2-CE.png" alt="IL2-SRS Community Edition" />
+  <img src="SRSforIL2CEv1047.png" alt="IL2-SRS Community Edition" />
 </p>
 
 ## Download
