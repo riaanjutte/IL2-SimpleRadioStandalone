@@ -6,9 +6,9 @@
 
 Download the latest stable Community Edition updater: [IL2-SRS-AutoUpdater.exe](https://github.com/riaanjutte/IL2-SimpleRadioStandalone/releases/latest/download/IL2-SRS-AutoUpdater.exe).
 
-## Beta testing
+## IL-2 Korea support
 
-The current beta adds preliminary support for IL-2 Korea. This is still early support, so expect bugs while players and server operators test it in real multiplayer use. Please report Korea-specific issues through the Help tab support buttons and include logs where possible.
+This release adds preliminary support for IL-2 Korea. Korea support is still new, so please report Korea-specific issues through the Help tab support buttons and include logs where possible.
 
 ## Community Edition highlights
 

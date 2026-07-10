@@ -1,5 +1,32 @@
 # Changelog
 
+## IL2-SRS 1.0.4.7 community update
+
+### Added
+
+- Added preliminary IL-2 Korea support for client-side game detection, overlay focus, telemetry setup, and Help tab telemetry diagnostics.
+- Added telemetry diagnostics for detecting third-party telemetry port conflicts, starting with IL2WinWing, across detected Great Battles and Korea installs.
+- Added an Active Squad Ops summary at the top of the Combat Box Pilot Roster to highlight friendly squad groups operating on shared channels.
+- Added a Help tab "What's New in this version" link that opens the GitHub release notes for the running build.
+- Added logging-only incoming audio quality diagnostics to help identify causes of choppy received audio without changing audio behavior.
+- Added a new `Restart SRS` keybinding on the Controls tab for quickly restarting the client when audio or device state gets stuck.
+
+### Changed
+
+- New server configurations now enable the second radio by default.
+- Improved startup telemetry repair warnings when IL-2 is already running and repaired settings require a game restart.
+- Added Help tab guidance for radio overlays and exclusive fullscreen limitations.
+- The server now treats player name changes as roster-relevant updates so connected clients refresh roster data more reliably.
+
+### Fixed
+
+- Fixed stale connection-error state that could remain visible after a successful reconnect.
+- Fixed the admin relaunch path so the original non-admin client exits before initializing audio/network state, reducing duplicate local SRS instances and port conflicts.
+
+### Notes
+
+- IL-2 Korea support is preliminary. It has been verified with Korea telemetry once spawned, but broader multiplayer, server, intercom, and Steam-version behavior may still need follow-up fixes.
+
 ## IL2-SRS 1.0.4.7-beta.3 community update
 
 ### Added

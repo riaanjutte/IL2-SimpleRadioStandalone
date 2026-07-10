@@ -17,6 +17,17 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI.ClientWindow.Diagnostics
     {
         private const string SrsAddress = "127.0.0.1";
         private const int DefaultSrsPort = 4322;
+        private const string GreatBattlesDisplayName = "IL-2 Sturmovik Great Battles";
+        private const string KoreaDisplayName = "IL-2 Korea";
+        private static readonly string[] IL2ProcessNames = { "Il-2", "IL2Series" };
+        private static readonly string[] KnownSteamFolderNames =
+        {
+            "IL-2 Sturmovik Battle of Stalingrad",
+            "IL-2 Sturmovik Great Battles",
+            "IL-2 Sturmovik Korea",
+            "IL-2 Korea"
+        };
+
         private readonly IList<ITelemetryDiagnosticProvider> _providers;
 
         private TelemetryDiagnosticsService(IEnumerable<ITelemetryDiagnosticProvider> providers)
@@ -34,54 +45,510 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI.ClientWindow.Diagnostics
 
         public string BuildReportText()
         {
-            TelemetryDiagnosticContext context = BuildContext();
-            TelemetryDiagnosticReport report = new TelemetryDiagnosticReport();
-
-            report.Add(TelemetryDiagnosticSeverity.Info,
-                "IL-2 startup.cfg",
-                string.IsNullOrWhiteSpace(context.StartupConfigPath)
-                    ? "No saved IL-2 path was found in the IL2-SRS installer registry key."
-                    : context.StartupConfigPath);
-
-            if (context.StartupConfig == null)
+            List<TelemetryDiagnosticContext> contexts = BuildContexts();
+            if (contexts.Count == 0)
             {
-                report.Add(TelemetryDiagnosticSeverity.Warning,
-                    "IL-2 telemetry config not found",
-                    "SRS could not read data\\startup.cfg, so third-party telemetry ports could not be compared against it.");
-            }
-            else
-            {
-                AddStartupConfigSummary(report, context);
+                contexts.Add(new TelemetryDiagnosticContext(
+                    "IL-2 install",
+                    "Not detected",
+                    SrsAddress,
+                    ReadSrsTelemetryPort(),
+                    string.Empty,
+                    string.Empty,
+                    null));
             }
 
-            foreach (ITelemetryDiagnosticProvider provider in _providers)
+            StringBuilder builder = new StringBuilder();
+            builder.AppendLine("Telemetry diagnostics");
+            builder.AppendLine("Generated: " + DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss", CultureInfo.InvariantCulture));
+            builder.AppendLine("SRS telemetry endpoint: " + SrsAddress + ":" + ReadSrsTelemetryPort());
+            builder.AppendLine("Detected IL-2 installs: " + (contexts.Any(context => !string.IsNullOrWhiteSpace(context.StartupConfigPath)) ? contexts.Count.ToString(CultureInfo.InvariantCulture) : "none"));
+
+            foreach (TelemetryDiagnosticContext context in contexts)
             {
-                report.AddRange(provider.Diagnose(context));
+                TelemetryDiagnosticReport report = new TelemetryDiagnosticReport();
+
+                report.Add(TelemetryDiagnosticSeverity.Info,
+                    "IL-2 startup.cfg",
+                    string.IsNullOrWhiteSpace(context.StartupConfigPath)
+                        ? "No IL-2 install with data\\startup.cfg was detected."
+                        : context.StartupConfigPath);
+
+                if (context.StartupConfig == null)
+                {
+                    report.Add(TelemetryDiagnosticSeverity.Warning,
+                        "IL-2 telemetry config not found",
+                        "SRS could not read data\\startup.cfg, so third-party telemetry ports could not be compared against it.");
+                }
+                else
+                {
+                    AddStartupConfigSummary(report, context);
+                }
+
+                foreach (ITelemetryDiagnosticProvider provider in _providers)
+                {
+                    report.AddRange(provider.Diagnose(context));
+                }
+
+                builder.AppendLine();
+                builder.AppendLine(context.DisplayName);
+                builder.AppendLine(new string('-', Math.Min(72, Math.Max(12, context.DisplayName.Length))));
+                builder.AppendLine("Detected from: " + context.DetectionSource);
+                builder.AppendLine(report.ToDisplayText());
             }
 
-            return report.ToDisplayText(context);
+            return builder.ToString().TrimEnd();
         }
 
-        private static TelemetryDiagnosticContext BuildContext()
+        private static List<TelemetryDiagnosticContext> BuildContexts()
         {
             int srsPort = ReadSrsTelemetryPort();
-            string il2Path = ReadInstallerPath("IL2Path");
-            string startupConfigPath = string.IsNullOrWhiteSpace(il2Path)
-                ? string.Empty
-                : Path.Combine(il2Path, "data", "startup.cfg");
+            List<Il2InstallCandidate> candidates = DiscoverIl2InstallCandidates();
+            List<TelemetryDiagnosticContext> contexts = new List<TelemetryDiagnosticContext>();
 
-            Il2TelemetryConfiguration startupConfig = null;
-            if (!string.IsNullOrWhiteSpace(startupConfigPath) && File.Exists(startupConfigPath))
+            foreach (Il2InstallCandidate candidate in candidates)
             {
-                startupConfig = Il2TelemetryConfigurationParser.Parse(startupConfigPath);
+                Il2TelemetryConfiguration startupConfig = null;
+                if (!string.IsNullOrWhiteSpace(candidate.StartupConfigPath) && File.Exists(candidate.StartupConfigPath))
+                {
+                    startupConfig = Il2TelemetryConfigurationParser.Parse(candidate.StartupConfigPath);
+                }
+
+                contexts.Add(new TelemetryDiagnosticContext(
+                    candidate.DisplayName,
+                    candidate.DetectionSource,
+                    SrsAddress,
+                    srsPort,
+                    candidate.InstallPath,
+                    candidate.StartupConfigPath,
+                    startupConfig));
             }
 
-            return new TelemetryDiagnosticContext(
-                SrsAddress,
-                srsPort,
-                il2Path,
+            return contexts
+                .OrderBy(context => GetGameSortOrder(context.DisplayName))
+                .ThenBy(context => context.Il2InstallPath, StringComparer.OrdinalIgnoreCase)
+                .ToList();
+        }
+
+        private static List<Il2InstallCandidate> DiscoverIl2InstallCandidates()
+        {
+            Dictionary<string, Il2InstallCandidate> candidates = new Dictionary<string, Il2InstallCandidate>(StringComparer.OrdinalIgnoreCase);
+
+            string savedIl2Path = ReadInstallerPath("IL2Path");
+            AddCandidate(candidates, "Saved IL-2 installer path", "IL2-SRS installer registry", savedIl2Path);
+            AddSiblingInstallCandidates(candidates, savedIl2Path, "near saved IL-2 installer path");
+            AddRunningProcessCandidates(candidates);
+            AddUninstallRegistryCandidates(candidates);
+            AddSteamCandidates(candidates);
+            AddCommonFolderCandidates(candidates);
+
+            return candidates.Values.ToList();
+        }
+
+        private static void AddRunningProcessCandidates(Dictionary<string, Il2InstallCandidate> candidates)
+        {
+            foreach (string processName in IL2ProcessNames)
+            {
+                foreach (Process process in Process.GetProcessesByName(processName))
+                {
+                    string processPath = SafeMainModulePath(process);
+                    if (!string.IsNullOrWhiteSpace(processPath))
+                    {
+                        AddCandidate(candidates,
+                            InferDisplayName(processPath, "Running IL-2 process"),
+                            "running process " + process.ProcessName,
+                            processPath);
+                        AddSiblingInstallCandidates(candidates, processPath, "near running process " + process.ProcessName);
+                    }
+                }
+            }
+        }
+
+        private static void AddUninstallRegistryCandidates(Dictionary<string, Il2InstallCandidate> candidates)
+        {
+            RegistryHive[] hives = { RegistryHive.CurrentUser, RegistryHive.LocalMachine };
+            RegistryView[] views = { RegistryView.Registry64, RegistryView.Registry32 };
+
+            foreach (RegistryHive hive in hives)
+            {
+                foreach (RegistryView view in views)
+                {
+                    try
+                    {
+                        using (RegistryKey baseKey = RegistryKey.OpenBaseKey(hive, view))
+                        using (RegistryKey uninstall = baseKey.OpenSubKey(@"SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall"))
+                        {
+                            if (uninstall == null)
+                            {
+                                continue;
+                            }
+
+                            foreach (string subKeyName in uninstall.GetSubKeyNames())
+                            {
+                                using (RegistryKey appKey = uninstall.OpenSubKey(subKeyName))
+                                {
+                                    if (appKey == null)
+                                    {
+                                        continue;
+                                    }
+
+                                    string displayName = Convert.ToString(appKey.GetValue("DisplayName"), CultureInfo.InvariantCulture);
+                                    if (!LooksLikeIl2Install(displayName))
+                                    {
+                                        continue;
+                                    }
+
+                                    AddCandidate(candidates, InferDisplayName(displayName, displayName), "Windows uninstall registry", Convert.ToString(appKey.GetValue("InstallLocation"), CultureInfo.InvariantCulture));
+                                    AddCandidate(candidates, InferDisplayName(displayName, displayName), "Windows uninstall registry", ExtractPathFromRegistryValue(Convert.ToString(appKey.GetValue("DisplayIcon"), CultureInfo.InvariantCulture)));
+                                    AddCandidate(candidates, InferDisplayName(displayName, displayName), "Windows uninstall registry", ExtractPathFromRegistryValue(Convert.ToString(appKey.GetValue("UninstallString"), CultureInfo.InvariantCulture)));
+                                }
+                            }
+                        }
+                    }
+                    catch
+                    {
+                    }
+                }
+            }
+        }
+
+        private static void AddSteamCandidates(Dictionary<string, Il2InstallCandidate> candidates)
+        {
+            foreach (string steamRoot in GetSteamLibraryRoots())
+            {
+                string commonPath = Path.Combine(steamRoot, "steamapps", "common");
+                if (!Directory.Exists(commonPath))
+                {
+                    continue;
+                }
+
+                foreach (string folderName in KnownSteamFolderNames)
+                {
+                    AddCandidate(candidates, InferDisplayName(folderName, folderName), "Steam library", Path.Combine(commonPath, folderName));
+                }
+
+                try
+                {
+                    foreach (string directory in Directory.GetDirectories(commonPath))
+                    {
+                        string name = Path.GetFileName(directory);
+                        if (LooksLikeIl2Install(name))
+                        {
+                            AddCandidate(candidates, InferDisplayName(directory, "Steam IL-2 install"), "Steam library", directory);
+                        }
+                    }
+                }
+                catch
+                {
+                }
+            }
+        }
+
+        private static void AddCommonFolderCandidates(Dictionary<string, Il2InstallCandidate> candidates)
+        {
+            string[] roots =
+            {
+                Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles),
+                Environment.GetFolderPath(Environment.SpecialFolder.ProgramFilesX86),
+                Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles), "1C Game Studios"),
+                Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ProgramFilesX86), "1C Game Studios")
+            };
+
+            foreach (string root in roots)
+            {
+                if (string.IsNullOrWhiteSpace(root) || !Directory.Exists(root))
+                {
+                    continue;
+                }
+
+                foreach (string folderName in KnownSteamFolderNames)
+                {
+                    AddCandidate(candidates, InferDisplayName(folderName, folderName), "common install location", Path.Combine(root, folderName));
+                }
+            }
+        }
+
+        private static void AddSiblingInstallCandidates(Dictionary<string, Il2InstallCandidate> candidates, string path, string source)
+        {
+            string root = FindValidIl2Root(path);
+            if (string.IsNullOrWhiteSpace(root))
+            {
+                return;
+            }
+
+            AddSiblingInstallCandidatesFromRoot(candidates, root, source);
+
+            try
+            {
+                DirectoryInfo parent = Directory.GetParent(root);
+                if (parent != null)
+                {
+                    AddSiblingInstallCandidatesFromRoot(candidates, parent.FullName, source);
+                }
+            }
+            catch
+            {
+            }
+        }
+
+        private static void AddSiblingInstallCandidatesFromRoot(Dictionary<string, Il2InstallCandidate> candidates, string root, string source)
+        {
+            if (string.IsNullOrWhiteSpace(root) || !Directory.Exists(root))
+            {
+                return;
+            }
+
+            foreach (string folderName in KnownSteamFolderNames)
+            {
+                AddCandidate(candidates, InferDisplayName(folderName, folderName), source, Path.Combine(root, folderName));
+            }
+
+            try
+            {
+                foreach (string directory in Directory.GetDirectories(root))
+                {
+                    string name = Path.GetFileName(directory);
+                    if (LooksLikeIl2Install(name))
+                    {
+                        AddCandidate(candidates, InferDisplayName(directory, "Nearby IL-2 install"), source, directory);
+                    }
+                }
+            }
+            catch
+            {
+            }
+        }
+
+        private static IEnumerable<string> GetSteamLibraryRoots()
+        {
+            HashSet<string> roots = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+            AddSteamRoot(roots, Convert.ToString(Registry.GetValue(@"HKEY_CURRENT_USER\SOFTWARE\Valve\Steam", "SteamPath", ""), CultureInfo.InvariantCulture));
+            AddSteamRoot(roots, Convert.ToString(Registry.GetValue(@"HKEY_CURRENT_USER\SOFTWARE\Valve\Steam", "InstallPath", ""), CultureInfo.InvariantCulture));
+            AddSteamRoot(roots, Convert.ToString(Registry.GetValue(@"HKEY_LOCAL_MACHINE\SOFTWARE\WOW6432Node\Valve\Steam", "InstallPath", ""), CultureInfo.InvariantCulture));
+            AddSteamRoot(roots, Convert.ToString(Registry.GetValue(@"HKEY_LOCAL_MACHINE\SOFTWARE\Valve\Steam", "InstallPath", ""), CultureInfo.InvariantCulture));
+
+            foreach (string root in roots.ToList())
+            {
+                string libraryFile = Path.Combine(root, "steamapps", "libraryfolders.vdf");
+                if (!File.Exists(libraryFile))
+                {
+                    continue;
+                }
+
+                try
+                {
+                    string text = File.ReadAllText(libraryFile);
+                    foreach (Match match in Regex.Matches(text, "\"(?:path|\\d+)\"\\s+\"(?<path>.*?)\"", RegexOptions.IgnoreCase))
+                    {
+                        AddSteamRoot(roots, match.Groups["path"].Value.Replace(@"\\", @"\"));
+                    }
+                }
+                catch
+                {
+                }
+            }
+
+            return roots;
+        }
+
+        private static void AddSteamRoot(HashSet<string> roots, string path)
+        {
+            if (!string.IsNullOrWhiteSpace(path) && Directory.Exists(path))
+            {
+                roots.Add(Path.GetFullPath(path));
+            }
+        }
+
+        private static void AddCandidate(Dictionary<string, Il2InstallCandidate> candidates, string displayName, string source, string path)
+        {
+            string installPath = FindValidIl2Root(path);
+            if (string.IsNullOrWhiteSpace(installPath))
+            {
+                return;
+            }
+
+            string startupConfigPath = Path.Combine(installPath, "data", "startup.cfg");
+            string key = Path.GetFullPath(startupConfigPath);
+            Il2InstallCandidate existing;
+            if (candidates.TryGetValue(key, out existing))
+            {
+                existing.AddSource(source);
+                if (IsMoreSpecificDisplayName(displayName, existing.DisplayName))
+                {
+                    existing.DisplayName = InferDisplayName(installPath + " " + displayName, displayName);
+                }
+                return;
+            }
+
+            candidates[key] = new Il2InstallCandidate(
+                InferDisplayName(installPath + " " + displayName, displayName),
+                installPath,
                 startupConfigPath,
-                startupConfig);
+                source);
+        }
+
+        private static string FindValidIl2Root(string path)
+        {
+            path = NormalizePath(path);
+            if (string.IsNullOrWhiteSpace(path))
+            {
+                return string.Empty;
+            }
+
+            if (File.Exists(path))
+            {
+                path = Path.GetDirectoryName(path);
+            }
+
+            List<string> candidates = new List<string>();
+            AddPathCandidate(candidates, path);
+            AddPathCandidate(candidates, Path.Combine(path, "Game"));
+
+            string current = path;
+            for (int i = 0; i < 6 && !string.IsNullOrWhiteSpace(current); i++)
+            {
+                AddPathCandidate(candidates, current);
+                AddPathCandidate(candidates, Path.Combine(current, "Game"));
+
+                try
+                {
+                    current = Directory.GetParent(current)?.FullName;
+                }
+                catch
+                {
+                    break;
+                }
+            }
+
+            foreach (string candidate in candidates)
+            {
+                try
+                {
+                    if (Directory.Exists(candidate)
+                        && Directory.Exists(Path.Combine(candidate, "data"))
+                        && File.Exists(Path.Combine(candidate, "data", "startup.cfg")))
+                    {
+                        return Path.GetFullPath(candidate);
+                    }
+                }
+                catch
+                {
+                }
+            }
+
+            return string.Empty;
+        }
+
+        private static void AddPathCandidate(List<string> candidates, string path)
+        {
+            if (!string.IsNullOrWhiteSpace(path) && !candidates.Contains(path, StringComparer.OrdinalIgnoreCase))
+            {
+                candidates.Add(path);
+            }
+        }
+
+        private static string NormalizePath(string path)
+        {
+            if (string.IsNullOrWhiteSpace(path))
+            {
+                return string.Empty;
+            }
+
+            return Environment.ExpandEnvironmentVariables(path.Trim().Trim('"'));
+        }
+
+        private static string ExtractPathFromRegistryValue(string value)
+        {
+            value = NormalizePath(value);
+            if (string.IsNullOrWhiteSpace(value))
+            {
+                return string.Empty;
+            }
+
+            if (value.StartsWith("\"", StringComparison.Ordinal))
+            {
+                int closingQuote = value.IndexOf('"', 1);
+                if (closingQuote > 1)
+                {
+                    return value.Substring(1, closingQuote - 1);
+                }
+            }
+
+            int exeIndex = value.IndexOf(".exe", StringComparison.OrdinalIgnoreCase);
+            if (exeIndex >= 0)
+            {
+                return value.Substring(0, exeIndex + 4);
+            }
+
+            int firstArgument = value.IndexOf(" -", StringComparison.Ordinal);
+            return firstArgument > 0 ? value.Substring(0, firstArgument) : value;
+        }
+
+        private static bool LooksLikeIl2Install(string value)
+        {
+            if (string.IsNullOrWhiteSpace(value))
+            {
+                return false;
+            }
+
+            string lower = value.ToLowerInvariant();
+            return (lower.Contains("il-2") || lower.Contains("il2") || lower.Contains("sturmovik"))
+                   && (lower.Contains("korea")
+                       || lower.Contains("great battles")
+                       || lower.Contains("battle of stalingrad")
+                       || lower.Contains("sturmovik"));
+        }
+
+        private static string InferDisplayName(string value, string fallback)
+        {
+            string lower = (value ?? string.Empty).ToLowerInvariant();
+            if (lower.Contains("korea"))
+            {
+                return KoreaDisplayName;
+            }
+
+            if (lower.Contains("great battles")
+                || lower.Contains("battle of stalingrad")
+                || lower.Contains("il-2 sturmovik"))
+            {
+                return GreatBattlesDisplayName;
+            }
+
+            return string.IsNullOrWhiteSpace(fallback) ? "IL-2 install" : fallback;
+        }
+
+        private static bool IsMoreSpecificDisplayName(string candidate, string existing)
+        {
+            return (string.Equals(candidate, GreatBattlesDisplayName, StringComparison.OrdinalIgnoreCase)
+                    || string.Equals(candidate, KoreaDisplayName, StringComparison.OrdinalIgnoreCase))
+                   && !string.Equals(existing, candidate, StringComparison.OrdinalIgnoreCase);
+        }
+
+        private static int GetGameSortOrder(string displayName)
+        {
+            if (string.Equals(displayName, GreatBattlesDisplayName, StringComparison.OrdinalIgnoreCase))
+            {
+                return 0;
+            }
+
+            if (string.Equals(displayName, KoreaDisplayName, StringComparison.OrdinalIgnoreCase))
+            {
+                return 1;
+            }
+
+            return 2;
+        }
+
+        private static string SafeMainModulePath(Process process)
+        {
+            try
+            {
+                return process.MainModule?.FileName;
+            }
+            catch
+            {
+                return string.Empty;
+            }
         }
 
         private static void AddStartupConfigSummary(TelemetryDiagnosticReport report, TelemetryDiagnosticContext context)
@@ -165,12 +632,16 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI.ClientWindow.Diagnostics
     internal sealed class TelemetryDiagnosticContext
     {
         public TelemetryDiagnosticContext(
+            string displayName,
+            string detectionSource,
             string srsAddress,
             int srsPort,
             string il2InstallPath,
             string startupConfigPath,
             Il2TelemetryConfiguration startupConfig)
         {
+            DisplayName = displayName;
+            DetectionSource = detectionSource;
             SrsAddress = srsAddress;
             SrsPort = srsPort;
             Il2InstallPath = il2InstallPath;
@@ -178,11 +649,43 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI.ClientWindow.Diagnostics
             StartupConfig = startupConfig;
         }
 
+        public string DisplayName { get; private set; }
+        public string DetectionSource { get; private set; }
         public string SrsAddress { get; private set; }
         public int SrsPort { get; private set; }
         public string Il2InstallPath { get; private set; }
         public string StartupConfigPath { get; private set; }
         public Il2TelemetryConfiguration StartupConfig { get; private set; }
+    }
+
+    internal sealed class Il2InstallCandidate
+    {
+        private readonly List<string> _sources = new List<string>();
+
+        public Il2InstallCandidate(string displayName, string installPath, string startupConfigPath, string source)
+        {
+            DisplayName = displayName;
+            InstallPath = installPath;
+            StartupConfigPath = startupConfigPath;
+            AddSource(source);
+        }
+
+        public string DisplayName { get; set; }
+        public string InstallPath { get; private set; }
+        public string StartupConfigPath { get; private set; }
+
+        public string DetectionSource
+        {
+            get { return string.Join(", ", _sources.ToArray()); }
+        }
+
+        public void AddSource(string source)
+        {
+            if (!string.IsNullOrWhiteSpace(source) && !_sources.Contains(source, StringComparer.OrdinalIgnoreCase))
+            {
+                _sources.Add(source);
+            }
+        }
     }
 
     internal sealed class IL2WinWingTelemetryDiagnosticProvider : ITelemetryDiagnosticProvider
@@ -432,14 +935,9 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI.ClientWindow.Diagnostics
             _items.AddRange(items);
         }
 
-        public string ToDisplayText(TelemetryDiagnosticContext context)
+        public string ToDisplayText()
         {
             StringBuilder builder = new StringBuilder();
-            builder.AppendLine("Telemetry diagnostics");
-            builder.AppendLine("Generated: " + DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss", CultureInfo.InvariantCulture));
-            builder.AppendLine("SRS telemetry endpoint: " + context.SrsAddress + ":" + context.SrsPort);
-            builder.AppendLine();
-
             foreach (TelemetryDiagnosticItem item in _items)
             {
                 builder.AppendLine("[" + item.SeverityLabel + "] " + item.Title);
