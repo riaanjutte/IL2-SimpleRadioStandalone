@@ -29,7 +29,7 @@
                         Margin="0,0,8,0"
                         Padding="10,4"
                         Click="RunTelemetryDiagnostics_OnClick"
-                        Content="Run Check" />
+                        Content="Check &amp; Repair" />
                 <Button MinWidth="90"
                         Padding="10,4"
                         Click="Close_OnClick"
@@ -42,7 +42,7 @@
                      FontFamily="{StaticResource MilFontMono}"
                      FontSize="12"
                      Foreground="{DynamicResource MilTextPrimaryBrush}"
-                     Text="Run the check to inspect IL-2 telemetry ports." />
+                     Text="Run the check to verify and repair IL-2 telemetry configuration." />
         </DockPanel>
     </GroupBox>
 </Window>

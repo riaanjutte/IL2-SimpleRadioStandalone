@@ -235,7 +235,7 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.Settings
 
         private void LoadWhiteList()
         {
-            var path = Environment.CurrentDirectory + "\\whitelist.txt";
+            var path = UserDataPaths.GetPath("whitelist.txt");
             Logger.Info("Attempt to Load Whitelist from " + path);
 
             LoadGuidFromPath(path, _whitelistDevices);
@@ -243,7 +243,7 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.Settings
 
         private void LoadBlackList()
         {
-            var path = Environment.CurrentDirectory + "\\blacklist.txt";
+            var path = UserDataPaths.GetPath("blacklist.txt");
             Logger.Info("Attempt to Load Blacklist from " + path);
 
             LoadGuidFromPath(path, _blacklistedDevices);

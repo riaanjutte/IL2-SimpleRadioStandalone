@@ -1,7 +1,9 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Globalization;
 using System.IO;
+using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
 using System.Security.Principal;
@@ -12,9 +14,9 @@ using System.Windows;
 using System.Windows.Media;
 using Ciribob.IL2.SimpleRadio.Standalone.Client.Localization;
 using Ciribob.IL2.SimpleRadio.Standalone.Client.Settings;
+using Ciribob.IL2.SimpleRadio.Standalone.Client.UI.ClientWindow.Diagnostics;
 using Ciribob.IL2.SimpleRadio.Standalone.Client.Utils;
 using MahApps.Metro.Controls;
-using Microsoft.Win32;
 using NLog;
 using NLog.Config;
 using NLog.Targets;
@@ -407,69 +409,67 @@ namespace IL2_SR_Client
 
         private void VerifyIL2StartupTelemetry()
         {
-            string il2Path = ReadInstallerPath("IL2Path");
-            if (string.IsNullOrWhiteSpace(il2Path))
+            List<TelemetryDiagnosticContext> contexts = TelemetryDiagnosticsService.BuildContexts();
+            if (contexts.Count == 0)
             {
-                Logger.Info("No saved IL-2 path found; skipping startup.cfg telemetry check");
+                Logger.Info("No detected IL-2 installs found; skipping startup.cfg telemetry check");
                 return;
             }
 
-            string cfgPath = Path.Combine(il2Path, "data", "startup.cfg");
-            if (!File.Exists(cfgPath))
-            {
-                Logger.Warn($"Saved IL-2 path does not contain data\\startup.cfg; skipping telemetry check. Path: {il2Path}");
-                return;
-            }
+            bool il2WasRunning = IsIL2Running();
+            bool repairedAny = false;
+            List<string> failedConfigs = new List<string>();
 
-            try
+            foreach (TelemetryDiagnosticContext context in contexts
+                         .Where(context => !string.IsNullOrWhiteSpace(context.StartupConfigPath))
+                         .GroupBy(context => context.StartupConfigPath, StringComparer.OrdinalIgnoreCase)
+                         .Select(group => group.First()))
             {
-                bool il2WasRunning = IsIL2Running();
-                bool repaired = StartupConfigTelemetry.EnsureEnabled(cfgPath, message => Logger.Info(message));
-                if (repaired)
+                string cfgPath = context.StartupConfigPath;
+                try
                 {
-                    Logger.Info($"Repaired IL-2 startup.cfg telemetry settings at {cfgPath}");
-                    if (il2WasRunning)
+                    bool repaired = StartupConfigTelemetry.EnsureEnabled(cfgPath, message => Logger.Info(message));
+                    if (repaired)
                     {
-                        Logger.Warn("IL-2 was running while startup.cfg telemetry settings were repaired; IL-2 must be restarted before telemetry changes take effect.");
-                        MessageBox.Show(
-                            "SRS repaired the IL-2 telemetry settings in startup.cfg, but IL-2 is currently running.\n\n" +
-                            "Close IL-2 completely and start it again before joining a server. Otherwise auto-connect and in-game radio data may not work.",
-                            "IL2-SRS Telemetry Check",
-                            MessageBoxButton.OK,
-                            MessageBoxImage.Information);
+                        repairedAny = true;
+                        Logger.Info($"Repaired {context.DisplayName} startup.cfg telemetry settings at {cfgPath}");
+                    }
+                    else
+                    {
+                        Logger.Info($"Verified {context.DisplayName} startup.cfg telemetry settings at {cfgPath}");
                     }
                 }
-                else
+                catch (Exception ex)
                 {
-                    Logger.Info($"Verified IL-2 startup.cfg telemetry settings at {cfgPath}");
+                    failedConfigs.Add(cfgPath + Environment.NewLine + ex.Message);
+                    Logger.Error(ex, $"Unable to verify or repair {context.DisplayName} startup.cfg telemetry settings at {cfgPath}");
                 }
             }
-            catch (Exception ex)
+
+            if (repairedAny && il2WasRunning)
             {
-                Logger.Error(ex, $"Unable to verify or repair IL-2 startup.cfg telemetry settings at {cfgPath}");
+                Logger.Warn("IL-2 was running while one or more startup.cfg telemetry settings were repaired; IL-2 must be restarted before telemetry changes take effect.");
                 MessageBox.Show(
-                    "SRS could not verify or repair the IL-2 telemetry settings in startup.cfg.\n\n" +
-                    "Auto-connect and in-game radio data may not work until startup.cfg contains an enabled telemetrydevice section for 127.0.0.1:4322.\n\n" +
-                    "Try running SRS as administrator, or reinstall/repair using the installer.",
+                    "SRS repaired telemetry settings in one or more IL-2 startup.cfg files, but IL-2 is currently running.\n\n" +
+                    "Close IL-2 completely and start it again before joining a server. Otherwise auto-connect and in-game radio data may not work.",
+                    "IL2-SRS Telemetry Check",
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Information);
+            }
+
+            if (failedConfigs.Count > 0)
+            {
+                MessageBox.Show(
+                    "SRS could not verify or repair telemetry settings in one or more IL-2 startup.cfg files.\n\n" +
+                    "Auto-connect and in-game radio data may not work until each startup.cfg contains an enabled telemetrydevice section for 127.0.0.1:4322.\n\n" +
+                    "Files that could not be updated:" + Environment.NewLine + Environment.NewLine +
+                    string.Join(Environment.NewLine + Environment.NewLine, failedConfigs) + Environment.NewLine + Environment.NewLine +
+                    "Try running SRS as administrator, then run Telemetry Diagnostics again.",
                     "IL2-SRS Telemetry Check",
                     MessageBoxButton.OK,
                     MessageBoxImage.Warning);
             }
         }
-
-        private string ReadInstallerPath(string key)
-        {
-            try
-            {
-                return (string)Registry.GetValue("HKEY_CURRENT_USER\\SOFTWARE\\IL2-SRS", key, "");
-            }
-            catch (Exception ex)
-            {
-                Logger.Error(ex, $"Unable to read installer registry path {key}");
-                return "";
-            }
-        }
-
         private static bool IsIL2Running()
         {
             foreach (string processName in IL2ProcessNames)

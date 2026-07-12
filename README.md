@@ -6,9 +6,17 @@
 
 Download the latest stable Community Edition updater: [IL2-SRS-AutoUpdater.exe](https://github.com/riaanjutte/IL2-SimpleRadioStandalone/releases/latest/download/IL2-SRS-AutoUpdater.exe).
 
+## Installation
+
+Install IL2-SRS only once. One installation supports both IL-2 Great Battles and IL-2 Korea.
+
+Use the recommended `C:\Program Files\IL2-SimpleRadio-Standalone` application folder. Do not install SRS inside either game folder. The installer detects both games and configures their telemetry independently.
+
+User settings, profiles, and key bindings are stored in `%AppData%\IL2-SRS`, so they remain available when SRS is updated or moved. The installer can consolidate older duplicate installations and creates a migration backup before retiring their program files.
+
 ## IL-2 Korea support
 
-This release adds preliminary support for IL-2 Korea. Korea support is still new, so please report Korea-specific issues through the Help tab support buttons and include logs where possible.
+IL2-SRS supports IL-2 Korea alongside IL-2 Great Battles. Please report Korea-specific issues through the Help tab support buttons and include logs where possible.
 
 ## Community Edition highlights
 

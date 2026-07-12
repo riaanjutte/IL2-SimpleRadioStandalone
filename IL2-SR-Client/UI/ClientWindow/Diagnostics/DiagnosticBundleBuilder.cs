@@ -98,6 +98,7 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI.ClientWindow.Diagnostics
             builder.AppendLine("Selected server name: " + EmptyIfNull(serverName));
             builder.AppendLine("Selected server address: " + EmptyIfNull(serverAddress));
             builder.AppendLine("Profile: " + EmptyIfNull(profileStore.CurrentProfileName));
+            builder.AppendLine("User data folder: " + settings.Path);
             builder.AppendLine("Language: " + EmptyIfNull(settings.GetClientSetting(GlobalSettingsKeys.Language).RawValue));
             builder.AppendLine("Theme: " + EmptyIfNull(settings.GetClientSetting(GlobalSettingsKeys.Theme).RawValue));
             builder.AppendLine("VU meter: " + EmptyIfNull(settings.GetClientSetting(GlobalSettingsKeys.VuMeterStyle).RawValue));

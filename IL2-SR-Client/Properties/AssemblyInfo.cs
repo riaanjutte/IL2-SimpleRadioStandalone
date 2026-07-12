@@ -1,4 +1,5 @@
 using System.Reflection;
+using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Windows;
 
@@ -20,6 +21,7 @@ using System.Windows;
 // COM, set the ComVisible attribute to true on that type.
 
 [assembly: ComVisible(false)]
+[assembly: InternalsVisibleTo("DCS-SR-CommonTests")]
 
 //In order to begin building localizable applications, set
 //<UICulture>CultureYouAreCodingWith</UICulture> in your .csproj file

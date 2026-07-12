@@ -33,6 +33,17 @@ namespace Installer
 
             RunWithRetries(delegate
             {
+                Encoding encoding;
+                string config = ReadAllText(cfgPath, out encoding);
+                bool changed;
+                string updatedConfig = EnsureEnabledInText(config, out changed);
+
+                if (!changed)
+                {
+                    Log(log, "startup.cfg already contains the IL2-SRS telemetry endpoint");
+                    return;
+                }
+
                 FileAttributes originalAttributes = File.GetAttributes(cfgPath);
                 bool wasReadOnly = (originalAttributes & FileAttributes.ReadOnly) == FileAttributes.ReadOnly;
 
@@ -44,20 +55,8 @@ namespace Installer
 
                 try
                 {
-                    Encoding encoding;
-                    string config = ReadAllText(cfgPath, out encoding);
-                    bool changed;
-                    string updatedConfig = EnsureEnabledInText(config, out changed);
-
-                    if (changed)
-                    {
-                        WriteAllText(cfgPath, updatedConfig, encoding);
-                        Log(log, "startup.cfg telemetrydevice section updated");
-                    }
-                    else
-                    {
-                        Log(log, "startup.cfg already contains the IL2-SRS telemetry endpoint");
-                    }
+                    WriteAllText(cfgPath, updatedConfig, encoding);
+                    Log(log, "startup.cfg telemetrydevice section updated");
 
                     string verifiedConfig = ReadAllText(cfgPath, out encoding);
                     if (!ContainsSrsTelemetryEndpoint(verifiedConfig))
@@ -67,11 +66,14 @@ namespace Installer
                 }
                 finally
                 {
-                    File.SetAttributes(cfgPath, originalAttributes);
+                    if (wasReadOnly)
+                    {
+                        File.SetAttributes(cfgPath, originalAttributes);
+                        Log(log, "startup.cfg read-only attribute restored");
+                    }
                 }
             });
         }
-
         internal static string EnsureEnabledInText(string config, out bool changed)
         {
             if (config == null)

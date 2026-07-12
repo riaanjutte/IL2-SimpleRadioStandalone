@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
@@ -232,30 +232,35 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.Settings
         private  ProfileSettingsStore _profileSettingsStore;
         public ProfileSettingsStore ProfileSettingsStore => _profileSettingsStore;
 
-        public string Path { get; } = "";
+        public string Path { get; private set; }
 
         private GlobalSettingsStore()
         {
 
-            //check commandline
-            var args = Environment.GetCommandLineArgs();
-            
-            foreach (var arg in args)
+            Path = UserDataPaths.ConfigDirectory.TrimEnd(
+                       System.IO.Path.DirectorySeparatorChar,
+                       System.IO.Path.AltDirectorySeparatorChar)
+                   + System.IO.Path.DirectorySeparatorChar;
+
+            try
             {
-                if (arg.Trim().StartsWith("-cfg="))
-                {
-                    Path = arg.Trim().Replace("-cfg=", "").Trim();
-                    if (!Path.EndsWith("\\"))
-                    {
-                        Path = Path + "\\";
-                    }
-                    Logger.Info($"Found -cfg loading: {Path +ConfigFileName}");
-                }
+                UserDataPaths.MigrateLegacyUserData(message => Logger.Info(message));
+            }
+            catch (Exception ex)
+            {
+                Logger.Error(ex, "Unable to initialise the IL2-SRS user data folder");
+                MessageBox.Show(
+                    "SRS could not create or migrate its user settings folder:\n" + Path +
+                    "\n\nYour existing settings have not been deleted. Check the folder permissions and try again.\n\n" + ex.Message,
+                    "IL2-SRS Settings Migration",
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Error);
+                throw;
             }
 
             try
             {
-                _configuration = Configuration.LoadFromFile(ConfigFileName);
+                _configuration = Configuration.LoadFromFile(Path + ConfigFileName);
             }
             catch (FileNotFoundException ex)
             {
@@ -273,7 +278,7 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.Settings
                 Logger.Error(ex, "Failed to parse client config, potentially corrupted. Creating backing and re-initialising with default config");
 
                 MessageBox.Show("Failed to read client config, it might have become corrupted.\n" +
-                    "SRS will create a backup of your current config file (client.cfg.bak) and initialise using default settings.",
+                    "SRS will create a backup of your current config file (global.cfg.bak) and initialise using default settings.",
                     "Config error",
                     MessageBoxButton.OK,
                     MessageBoxImage.Error);

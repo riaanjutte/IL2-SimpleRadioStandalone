@@ -1,5 +1,24 @@
 # Changelog
 
+## IL2-SRS 1.0.4.8-beta.1 community update
+
+### Added
+
+- Added a single-install setup flow that clearly explains one SRS installation supports both IL-2 Great Battles and IL-2 Korea.
+- Added detection and backup-first consolidation of older duplicate SRS installations while preserving profiles, key bindings, favourites, and radio presets.
+
+### Changed
+
+- Moved user settings, profiles, key bindings, favourites, and presets to %AppData%\IL2-SRS so updates and application-folder changes no longer separate the client from its configuration.
+- Expanded startup and Help-tab telemetry checks to verify and automatically repair every detected Great Battles and Korea installation.
+- Improved handling of read-only startup.cfg files by temporarily removing the read-only attribute when repair is required and restoring it afterwards.
+- Updated installer guidance to recommend one application copy in C:\Program Files\IL2-SimpleRadio-Standalone, outside the game folders.
+
+### Notes
+
+- Existing settings are migrated conservatively. Files already present in %AppData%\IL2-SRS are not overwritten, and conflicting legacy files are retained in migration backups.
+- This is a beta release intended to validate migration and installation behavior across varied existing setups before the stable 1.0.4.8 release.
+
 ## IL2-SRS 1.0.4.7 community update
 
 ### Added

@@ -62,7 +62,7 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.Settings.RadioChannels
 
         private string FindRadioFile(string radioName)
         {
-            var files = Directory.GetFiles(Environment.CurrentDirectory);
+            var files = Directory.GetFiles(UserDataPaths.ConfigDirectory);
 
             foreach (var fileAndPath in files)
             {

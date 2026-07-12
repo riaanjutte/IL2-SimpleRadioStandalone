@@ -322,6 +322,7 @@
       <DependentUpon>ServerSettingsWindow.xaml</DependentUpon>
     </Compile>
     <Compile Include="Settings\GlobalSettingsStore.cs" />
+    <Compile Include="Settings\UserDataPaths.cs" />
     <Compile Include="UI\RadioOverlayWindow\WindowHelper.cs" />
     <Compile Include="UI\Sounds.cs" />
     <Compile Include="UI\ToolTips.cs" />

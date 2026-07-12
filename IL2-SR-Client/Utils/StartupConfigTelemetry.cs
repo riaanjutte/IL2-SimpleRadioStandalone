@@ -35,6 +35,17 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.Utils
             bool changed = false;
             RunWithRetries(delegate
             {
+                Encoding encoding;
+                string config = ReadAllText(cfgPath, out encoding);
+                bool textChanged;
+                string updatedConfig = EnsureEnabledInText(config, out textChanged);
+
+                if (!textChanged)
+                {
+                    Log(log, "startup.cfg already contains the IL2-SRS telemetry endpoint");
+                    return;
+                }
+
                 FileAttributes originalAttributes = File.GetAttributes(cfgPath);
                 bool wasReadOnly = (originalAttributes & FileAttributes.ReadOnly) == FileAttributes.ReadOnly;
 
@@ -46,21 +57,9 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.Utils
 
                 try
                 {
-                    Encoding encoding;
-                    string config = ReadAllText(cfgPath, out encoding);
-                    bool textChanged;
-                    string updatedConfig = EnsureEnabledInText(config, out textChanged);
-
-                    if (textChanged)
-                    {
-                        WriteAllText(cfgPath, updatedConfig, encoding);
-                        changed = true;
-                        Log(log, "startup.cfg telemetrydevice section updated");
-                    }
-                    else
-                    {
-                        Log(log, "startup.cfg already contains the IL2-SRS telemetry endpoint");
-                    }
+                    WriteAllText(cfgPath, updatedConfig, encoding);
+                    changed = true;
+                    Log(log, "startup.cfg telemetrydevice section updated");
 
                     string verifiedConfig = ReadAllText(cfgPath, out encoding);
                     if (!ContainsSrsTelemetryEndpoint(verifiedConfig))
@@ -70,13 +69,16 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.Utils
                 }
                 finally
                 {
-                    File.SetAttributes(cfgPath, originalAttributes);
+                    if (wasReadOnly)
+                    {
+                        File.SetAttributes(cfgPath, originalAttributes);
+                        Log(log, "startup.cfg read-only attribute restored");
+                    }
                 }
             });
 
             return changed;
         }
-
         internal static string EnsureEnabledInText(string config, out bool changed)
         {
             if (config == null)

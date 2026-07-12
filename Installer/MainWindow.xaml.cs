@@ -10,7 +10,6 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
-using System.Windows.Documents;
 using System.Windows.Forms;
 using System.Windows.Input;
 using Ciribob.IL2.SimpleRadio.Standalone.Client.Utils;
@@ -39,6 +38,8 @@ namespace Installer
         private readonly bool _autoUpdateMode;
         private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
         private ProgressBarDialog _progressBarDialog = null;
+        private string _installFailureMessage = string.Empty;
+        private readonly string _registeredSrsPath;
 
         public MainWindow()
         {
@@ -57,21 +58,10 @@ namespace Installer
             //allows click and drag anywhere on the window
             containerPanel.MouseLeftButtonDown += GridPanel_MouseLeftButtonDown;
 
-            var srPathStr = ReadPath("SRSPath");
-            if (srPathStr != "")
-            {
-                srPath.Text = srPathStr;
-            }
-
-            var scriptsPath = ReadPath("IL2Path");
-            if (scriptsPath != "")
-            {
-                IL2ScriptsPath.Text = scriptsPath;
-            }
-            else
-            {
-                IL2ScriptsPath.Text = "";
-            }
+            _registeredSrsPath = ReadPath("SRSPath");
+            srPath.Text = RecommendedInstallPath;
+            IL2ScriptsPath.Text = string.Empty;
+            UpdateDetectedGamesSummary();
 
             //To get the location the assembly normally resides on disk or the install directory
             var currentPath = GetWorkingDirectory();
@@ -102,13 +92,6 @@ namespace Installer
                 return;
             }
 
-            var hyperlinks = WPFElementHelper.GetVisuals(HelpText).OfType<Hyperlink>();
-            foreach (var link in hyperlinks)
-                link.RequestNavigate += new System.Windows.Navigation.RequestNavigateEventHandler((sender, args) =>
-                {
-                    Process.Start(new ProcessStartInfo(args.Uri.AbsoluteUri));
-                    args.Handled = true;
-                });
 
         }
 
@@ -170,42 +153,72 @@ namespace Installer
 
         private async void  InstallReleaseButton(object sender, RoutedEventArgs e)
         {
-            var IL2criptsPath = IL2ScriptsPath.Text;
-            if ((bool)!InstallScriptsCheckbox.IsChecked)
-            {
-                IL2criptsPath = null;
-            }
-            else
-            {
-                var path = FindValidIL2Folder(IL2criptsPath);
+            string IL2criptsPath = string.IsNullOrWhiteSpace(IL2ScriptsPath.Text)
+                ? null
+                : IL2ScriptsPath.Text.Trim();
 
-                if (path.Length == 0)
-                {
-                    MessageBox.Show(
-                           "Unable to find IL2 Game - Please check the path to the game directory",
-                           "IL2-SRS Installer",
-                           MessageBoxButton.OK, MessageBoxImage.Error);
-                    return;
-                }
-                
+            if (IL2criptsPath != null && FindValidIL2Folder(IL2criptsPath).Length == 0)
+            {
+                MessageBox.Show(
+                    "The optional IL-2 folder is not valid. Select the game root (or its parent folder), or clear the field to use automatic detection.",
+                    "IL2-SRS Installer",
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Error);
+                return;
             }
 
+            _installFailureMessage = string.Empty;
             InstallButton.IsEnabled = false;
             RemoveButton.IsEnabled = false;
 
             InstallButton.Content = "Installing...";
 
+            var srsPath = srPath.Text.Trim();
+            if (SrsInstallConsolidator.IsInsideGameFolder(srsPath))
+            {
+                MessageBoxResult useRecommended = MessageBox.Show(
+                    "The selected SRS application folder is inside an IL-2 game installation. Only one SRS copy is required and it should not be installed in either game folder.\n\nUse the recommended location instead?\n" + RecommendedInstallPath,
+                    "Use One SRS Installation",
+                    MessageBoxButton.YesNo,
+                    MessageBoxImage.Warning);
+
+                if (useRecommended != MessageBoxResult.Yes)
+                {
+                    RestoreInstallButtons();
+                    return;
+                }
+
+                srsPath = RecommendedInstallPath;
+                srPath.Text = srsPath;
+            }
+
+            SrsConsolidationPlan consolidationPlan = SrsInstallConsolidator.CreatePlan(srsPath, _registeredSrsPath);
+            if (consolidationPlan.DuplicateInstallations.Count > 0)
+            {
+                string copies = string.Join(Environment.NewLine, consolidationPlan.DuplicateInstallations.Select(path => "  " + path));
+                MessageBoxResult consolidate = MessageBox.Show(
+                    "Additional SRS installations were found:\n\n" + copies +
+                    "\n\nTheir settings and key bindings will be backed up and consolidated into %AppData%\\IL2-SRS. Only known SRS program files will be removed from the duplicate locations. Continue?",
+                    "Consolidate SRS Installations",
+                    MessageBoxButton.OKCancel,
+                    MessageBoxImage.Information);
+
+                if (consolidate != MessageBoxResult.OK)
+                {
+                    RestoreInstallButtons();
+                    return;
+                }
+            }
+
             _progressBarDialog = new ProgressBarDialog();
             _progressBarDialog.Owner = this;
             _progressBarDialog.Show();
 
-            var srsPath = srPath.Text;
-           
             var shortcut = CreateStartMenuShortcut.IsChecked ?? true;
 
             new Action(async () =>
             {
-                int result = await Task.Run<int>(() => InstallRelease(srsPath,IL2criptsPath, shortcut));
+                int result = await Task.Run<int>(() => InstallRelease(srsPath, IL2criptsPath, shortcut, consolidationPlan));
                 if (result == 0)
                 {
                     Application.Current.Dispatcher.Invoke(() =>
@@ -242,17 +255,53 @@ namespace Installer
                 {
                     _progressBarDialog.UpdateProgress(true, "Error with Installation");
 
+                    string errorMessage = "Error with installation.";
+                    if (!string.IsNullOrWhiteSpace(_installFailureMessage))
+                    {
+                        errorMessage += "\n\n" + _installFailureMessage;
+                    }
+
+                    errorMessage += "\n\nPlease post your installer-log.txt on the SRS Discord under IL2-SRS support if the problem continues.";
+
                     MessageBox.Show(
-                        "Error with installation - please post your installer-log.txt on the SRS Discord for Support under IL2-SRS support",
+                        errorMessage,
                         "Installation Error",
                         MessageBoxButton.OK, MessageBoxImage.Error);
-                
+
                     Process.Start("https://discord.gg/vqxAw7H");
                     Process.Start("explorer.exe", GetWorkingDirectory());
                     Environment.Exit(0);
                 }
             }).Invoke();
 
+        }
+
+        private static string RecommendedInstallPath
+        {
+            get
+            {
+                return Path.Combine(
+                    Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles),
+                    "IL2-SimpleRadio-Standalone");
+            }
+        }
+
+        private void RestoreInstallButtons()
+        {
+            InstallButton.IsEnabled = true;
+            RemoveButton.IsEnabled = true;
+            InstallButton.Content = "Install / Update IL2-SRS";
+        }
+
+        private void UpdateDetectedGamesSummary()
+        {
+            List<Il2Install> games = Il2InstallDiscovery.FindInstalledGames(IL2ScriptsPath.Text);
+            bool greatBattles = games.Any(game => !Il2InstallDiscovery.IsKorea(game));
+            bool korea = games.Any(Il2InstallDiscovery.IsKorea);
+
+            DetectedGamesText.Text =
+                (greatBattles ? "Found: IL-2 Great Battles" : "Not detected: IL-2 Great Battles") + Environment.NewLine +
+                (korea ? "Found: IL-2 Korea" : "Not detected: IL-2 Korea");
         }
 
         private static bool HasCommandLineArgument(string expectedArgument)
@@ -286,11 +335,16 @@ namespace Installer
             }
         }
 
-        private int InstallRelease(string srPath, string IL2ScriptsPath, bool shortcut)
+        private int InstallRelease(string srPath, string IL2ScriptsPath, bool shortcut, SrsConsolidationPlan consolidationPlan)
         {
             try
             {
                 QuitSimpleRadio();
+
+                SrsConsolidationResult consolidation = SrsInstallConsolidator.MigrateUserData(
+                    consolidationPlan,
+                    _registeredSrsPath,
+                    logMessage => Logger.Info(logMessage));
 
                 var path = "";
                 if (IL2ScriptsPath != null)
@@ -312,12 +366,13 @@ namespace Installer
 
                     RemoveIL2Install(srPath, IL2ScriptsPath);
 
-                    EnableTelemetry(path);
                 }
                 else
                 {
                     Logger.Info($"Installing - Paths: \nProgram:{srPath} IL2: NO PATH - NO CONFIG");
                 }
+
+                List<Il2Install> configuredInstalls = ConfigureInstalledTelemetry(IL2ScriptsPath);
 
                 //install program
                 InstallProgram(srPath);
@@ -332,28 +387,42 @@ namespace Installer
                     InstallShortcuts(srPath);
                 }
 
+                consolidation.RetiredInstallationCount = SrsInstallConsolidator.RetireDuplicateInstallations(
+                    consolidationPlan,
+                    logMessage => Logger.Info(logMessage));
 
-                if (IL2ScriptsPath != null)
+
+                string message = "Installation / Update Completed Successfully!";
+                message += "\n\nOne SRS installation now supports all detected IL-2 games.";
+                message += "\nUser settings and key bindings: " + consolidation.UserDataPath;
+                if (consolidation.RetiredInstallationCount > 0)
                 {
-                    string message = "Installation / Update Completed Successfully!\nConfigured IL2 at: \n";
-
-                    message += ("\n" + path);
-                    
-                    MessageBox.Show(message, "IL2-SRS Installer",
-                        MessageBoxButton.OK, MessageBoxImage.Information);
+                    message += "\nConsolidated duplicate installations: " + consolidation.RetiredInstallationCount;
+                }
+                if (!string.IsNullOrWhiteSpace(consolidation.BackupPath))
+                {
+                    message += "\nMigration backup: " + consolidation.BackupPath;
+                }
+                if (configuredInstalls.Count > 0)
+                {
+                    message += "\n\nVerified SRS telemetry for:";
+                    foreach (Il2Install install in configuredInstalls)
+                    {
+                        message += "\n" + install.DisplayName + ": " + install.InstallPath;
+                    }
                 }
                 else
                 {
-                    string message = "Installation / Update Completed Successfully!";
-
-                    MessageBox.Show(message, "IL2-SRS Installer",
-                        MessageBoxButton.OK, MessageBoxImage.Information);
+                    message += "\n\nNo installed IL-2 Great Battles or IL-2 Korea startup.cfg was detected. SRS will check again whenever the client starts.";
                 }
-                
+
+                MessageBox.Show(message, "IL2-SRS Installer",
+                    MessageBoxButton.OK, MessageBoxImage.Information);
                 return 1;
             }
             catch (Exception ex)
             {
+                _installFailureMessage = ex.Message;
                 Logger.Error(ex, "Error Running IL2-SRS Installer");
 
                 return -1;
@@ -477,6 +546,12 @@ namespace Installer
             Logger.Info($"Closed SRS Client & Server");
         }
 
+        private void Hyperlink_RequestNavigate(object sender, System.Windows.Navigation.RequestNavigateEventArgs e)
+        {
+            Process.Start(new ProcessStartInfo(e.Uri.AbsoluteUri));
+            e.Handled = true;
+        }
+
         private void GridPanel_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
             DragMove();
@@ -491,12 +566,6 @@ namespace Installer
             {
                 // Open document
                 var filename = dlg.SelectedPath;
-
-                if (!filename.EndsWith("\\"))
-                {
-                    filename = filename + "\\";
-                }
-                filename = filename + "IL2-SRS\\";
 
                 srPath.Text = filename;
             }
@@ -517,6 +586,7 @@ namespace Installer
                 }
 
                 IL2ScriptsPath.Text = filename;
+                UpdateDetectedGamesSummary();
             }
         }
 
@@ -524,7 +594,7 @@ namespace Installer
         private static string FindValidIL2Folder(string path)
         {
             Logger.Info($"Finding IL2 Game Path");
-        
+
             if(path == null || path.Length == 0)
             {
                 return "";
@@ -615,6 +685,36 @@ namespace Installer
             shortcut.Save();
         }
 
+        private List<Il2Install> ConfigureInstalledTelemetry(string selectedPath)
+        {
+            List<Il2Install> installs = Il2InstallDiscovery.FindInstalledGames(selectedPath);
+            if (installs.Count == 0)
+            {
+                Logger.Warn("No installed IL-2 Great Battles or IL-2 Korea startup.cfg files were detected during installation");
+                return installs;
+            }
+
+            foreach (Il2Install install in installs)
+            {
+                try
+                {
+                    EnableTelemetry(install.InstallPath);
+                }
+                catch (Exception ex)
+                {
+                    throw new IOException(
+                        "SRS could not update telemetry settings in " + install.StartupConfigPath +
+                        ". Close IL-2, run the installer as administrator, and try again.", ex);
+                }
+                WritePath(install.InstallPath,
+                    Il2InstallDiscovery.IsKorea(install) ? "IL2KoreaPath" : "IL2GreatBattlesPath");
+            }
+
+            // Keep the legacy value populated for older clients and future nearby-install discovery.
+            WritePath(installs[0].InstallPath, "IL2Path");
+            return installs;
+        }
+
         private void EnableTelemetry(string path)
         {
             var cfgPath = path + "\\data\\startup.cfg";
@@ -622,7 +722,7 @@ namespace Installer
 
             _progressBarDialog.UpdateProgress(false, $"Enable SRS Telemetry @ {cfgPath}");
 
-            StartupConfigTelemetry.EnsureEnabled(cfgPath, message => Logger.Info(message));
+            StartupConfigTelemetry.EnsureEnabled(cfgPath, logMessage => Logger.Info(logMessage));
 
             Logger.Info($"Config installed to {cfgPath}");
 
@@ -670,7 +770,7 @@ namespace Installer
                 string temppath = Path.Combine(destDirName, subdir.Name);
                 DirectoryCopy(subdir.FullName, temppath);
             }
-            
+
         }
 
         private async Task<bool> UninstallSR(string srPath, string IL2ScriptsPath)
@@ -699,7 +799,7 @@ namespace Installer
                 return true;
 
             }
-            catch (Exception ex) 
+            catch (Exception ex)
             {
                 Logger.Error(ex, "Error Running Uninstaller");
             }
@@ -741,8 +841,8 @@ namespace Installer
             }
 
             //sometimes it says directory created and its not!
-            do 
-            { 
+            do
+            {
                 Task.Delay(TimeSpan.FromMilliseconds(50)).Wait();
             } while(!Directory.Exists(path));
             Task.Delay(TimeSpan.FromMilliseconds(100)).Wait();

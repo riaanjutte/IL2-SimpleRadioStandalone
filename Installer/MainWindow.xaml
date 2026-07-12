@@ -1,118 +1,155 @@
 ﻿<Window x:Class="Installer.MainWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-        xmlns:local="clr-namespace:Installer"
-        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         Title="IL2-SRS Installer"
-        Width="550"
-        Height="408.114"
-        ResizeMode="NoResize"
-        mc:Ignorable="d">
-    <Grid Name="containerPanel" Margin="0,0,4,0">
+        Width="620"
+        Height="535"
+        ResizeMode="NoResize">
+    <Grid Name="containerPanel" Margin="14">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+
         <Label x:Name="intro"
-               Margin="10,3,10,0"
-               VerticalAlignment="Top"
+               Grid.Row="0"
+               Padding="0"
                Content="IL2-SRS Installer -"
                FontSize="20" />
 
-        <Label x:Name="step2"
-               Margin="10,45,10,0"
-               VerticalAlignment="Top"
-               Content="Step 1: Pick Install Location"
-               FontSize="20" />
+        <Border Grid.Row="1"
+                Margin="0,10,0,14"
+                Padding="10"
+                BorderBrush="#777"
+                BorderThickness="1">
+            <TextBlock TextWrapping="Wrap">
+                <Run FontWeight="Bold" Text="Install IL2-SRS once." />
+                <LineBreak />
+                <Run Text="One SRS installation supports both IL-2 Great Battles and IL-2 Korea. Install the application in the recommended Program Files folder, not inside either game folder." />
+                <LineBreak />
+                <Run Text="All settings and key bindings are stored separately in %AppData%\IL2-SRS." />
+            </TextBlock>
+        </Border>
 
-        <TextBox x:Name="srPath"
-                 Width="409"
-                 Height="23"
-                 Margin="10,87,0,0"
-                 HorizontalAlignment="Left"
-                 VerticalAlignment="Top"
-                 Text="C:\Program Files\IL2-SimpleRadio-Standalone"
-                 TextWrapping="Wrap" />
-        <Button x:Name="srPathButton"
-                Width="75"
-                Margin="443,87,0,0"
-                HorizontalAlignment="Left"
-                VerticalAlignment="Top"
-                Click="Set_Install_Path"
-                Content="Locate" />
+        <Grid Grid.Row="2" Margin="0,0,0,14">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+            </Grid.RowDefinitions>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="86" />
+            </Grid.ColumnDefinitions>
 
-        <Label x:Name="step3"
-               Margin="10,120,10,0"
-               VerticalAlignment="Top"
-               Content="Step 2: Locate IL2 Game Directory"
-               FontSize="20" />
+            <TextBlock Grid.Row="0"
+                       Grid.ColumnSpan="2"
+                       Margin="0,0,0,5"
+                       FontSize="16"
+                       FontWeight="Bold"
+                       Text="SRS application folder (one copy)" />
+            <TextBox x:Name="srPath"
+                     Grid.Row="1"
+                     Grid.Column="0"
+                     Height="26"
+                     VerticalContentAlignment="Center"
+                     Text="C:\Program Files\IL2-SimpleRadio-Standalone" />
+            <Button x:Name="srPathButton"
+                    Grid.Row="1"
+                    Grid.Column="1"
+                    Height="26"
+                    Margin="8,0,0,0"
+                    Click="Set_Install_Path"
+                    Content="Browse..." />
+        </Grid>
 
+        <Grid Grid.Row="3" Margin="0,0,0,12">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+            </Grid.RowDefinitions>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="86" />
+            </Grid.ColumnDefinitions>
 
-        <TextBox x:Name="IL2ScriptsPath"
-                 Width="409"
-                 Height="23"
-                 Margin="10,197,0,0"
-                 HorizontalAlignment="Left"
-                 VerticalAlignment="Top"
-                 Text="Saved Games"
-                 TextWrapping="Wrap" />
-        <Button x:Name="IL2PathButton"
-                Width="75"
-                Margin="443,198,0,0"
-                HorizontalAlignment="Left"
-                VerticalAlignment="Top"
-                Click="Set_Scripts_Path"
-                Content="Locate" />
+            <TextBlock Grid.Row="0"
+                       Grid.ColumnSpan="2"
+                       Margin="0,0,0,5"
+                       FontSize="16"
+                       FontWeight="Bold"
+                       Text="Detected IL-2 games (telemetry setup only)" />
+            <TextBlock x:Name="DetectedGamesText"
+                       Grid.Row="1"
+                       Grid.ColumnSpan="2"
+                       Margin="10,0,0,8"
+                       Text="Checking for IL-2 Great Battles and IL-2 Korea..."
+                       TextWrapping="Wrap" />
+            <TextBox x:Name="IL2ScriptsPath"
+                     Grid.Row="2"
+                     Grid.Column="0"
+                     Height="26"
+                     VerticalContentAlignment="Center"
+                     ToolTip="Optional: select an IL-2 game folder only if it was not detected automatically." />
+            <Button x:Name="IL2PathButton"
+                    Grid.Row="2"
+                    Grid.Column="1"
+                    Height="26"
+                    Margin="8,0,0,0"
+                    Click="Set_Scripts_Path"
+                    Content="Add game..." />
+        </Grid>
 
-        <CheckBox x:Name="CreateStartMenuShortcut"
-                  Content="Create Start menu shortcut"
-                  HorizontalAlignment="Center"
-                  Width="165"
-                  Height="20"
-                  Margin="193,268,182,91"
-                  IsChecked="True" />
-
-        <Button x:Name="InstallButton"
-                Width="197"
-                Margin="53,293,0,0"
-                HorizontalAlignment="Left"
-                VerticalAlignment="Top"
-                Click="InstallReleaseButton"
-                Content="Install / Update IL2-SRS" />
-        <GridSplitter x:Name="gridSplitter"
-                      Width="5"
-                      Height="20"
-                      Margin="265,293,0,0"
-                      HorizontalAlignment="Left"
-                      VerticalAlignment="Top" />
-        <Button x:Name="RemoveButton"
-                Width="206"
-                Margin="287,293,0,0"
-                HorizontalAlignment="Left"
-                VerticalAlignment="Top"
-                Click="Remove_Plugin"
-                Content="Remove IL2-SRS" />
-        <Label Width="447"
-               Height="40"
-               Margin="10,223,0,0"
-               HorizontalAlignment="Left"
-               VerticalAlignment="Top"
-               Content="Step 3: Install Or Remove IL2-SRS"
-               FontSize="20" />
         <CheckBox x:Name="InstallScriptsCheckbox"
-            Content="Enable SRS IL2 Interface - not required for Server Installations"
-            Height="20"
-            Margin="10,162,17,197"
-            IsChecked="True"
-            Checked="EnableSRSConfig_OnChecked"
-            Unchecked="EnableSRSConfig_OnUnchecked"/>
-        <RichTextBox Name="HelpText" HorizontalAlignment="Left" Margin="53,330,0,0" VerticalAlignment="Top" Width="440" Height="29" IsReadOnly="True" IsDocumentEnabled="True" >
-            <FlowDocument>
-                <Paragraph>
-                    <Run Text=" For Support please go to the SRS Discord: " />
-                    <Hyperlink NavigateUri="https://discord.gg/baw7g3t">
-                        <Run Text="https://discord.gg/baw7g3t"/>
-                    </Hyperlink>
-                </Paragraph>
-            </FlowDocument>
-        </RichTextBox>
+                  Grid.Row="4"
+                  Margin="0,0,0,12"
+                  Content="Configure every detected IL-2 installation for SRS telemetry"
+                  IsChecked="True"
+                  IsEnabled="False" />
+
+        <TextBlock Grid.Row="5"
+                   Margin="0,0,0,12"
+                   Foreground="#777"
+                   TextWrapping="Wrap"
+                   Text="If older SRS copies are found, their settings and key bindings will be backed up and consolidated before duplicate program files are removed." />
+
+        <Grid Grid.Row="6" Margin="0,0,0,12">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="12" />
+                <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
+            <Button x:Name="InstallButton"
+                    Grid.Column="0"
+                    Height="34"
+                    Click="InstallReleaseButton"
+                    Content="Install / Update IL2-SRS" />
+            <Button x:Name="RemoveButton"
+                    Grid.Column="2"
+                    Height="34"
+                    Click="Remove_Plugin"
+                    Content="Remove IL2-SRS" />
+        </Grid>
+
+        <StackPanel Grid.Row="7" Orientation="Horizontal" HorizontalAlignment="Center">
+            <CheckBox x:Name="CreateStartMenuShortcut"
+                      Margin="0,0,16,0"
+                      VerticalAlignment="Center"
+                      Content="Create Start menu shortcut"
+                      IsChecked="True" />
+            <TextBlock VerticalAlignment="Center">
+                <Run Text="Support: " />
+                <Hyperlink NavigateUri="https://discord.gg/baw7g3t" RequestNavigate="Hyperlink_RequestNavigate">
+                    <Run Text="SRS Discord" />
+                </Hyperlink>
+            </TextBlock>
+        </StackPanel>
 
     </Grid>
 </Window>

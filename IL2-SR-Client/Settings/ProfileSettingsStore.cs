@@ -180,7 +180,7 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.Settings
                 var inputProfile = new Dictionary<InputBinding, InputDevice>();
                 InputProfiles[GetProfileName("default")] = inputProfile;
 
-                InputConfigs[GetProfileCfgFileName("default")].SaveToFile(GetProfileCfgFileName("default"));
+                InputConfigs[GetProfileCfgFileName("default")].SaveToFile(Path + GetProfileCfgFileName("default"));
             }
         }
 
@@ -189,7 +189,7 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.Settings
             try
             {
                 //combine global.cfg and input-default.cfg
-                if (File.Exists(Path+"input-default.cfg") && File.Exists(Path + "global.cfg") && !File.Exists("default.cfg"))
+                if (File.Exists(Path+"input-default.cfg") && File.Exists(Path + "global.cfg") && !File.Exists(Path + "default.cfg"))
                 {
                     //Copy the current GLOBAL settings - not all relevant but will be ignored
                     File.Copy(Path + "global.cfg", Path + "default.cfg");
@@ -478,7 +478,7 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.Settings
 
             CurrentProfileName = "default";
 
-            InputConfigs[GetProfileCfgFileName(newName)].SaveToFile(GetProfileCfgFileName(newName));
+            InputConfigs[GetProfileCfgFileName(newName)].SaveToFile(Path + GetProfileCfgFileName(newName));
 
             try
             {

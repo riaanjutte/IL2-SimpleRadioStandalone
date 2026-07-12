@@ -17,14 +17,7 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.Preferences
 
         public CsvFavouriteServerStore()
         {
-            // var path = GlobalSettingsStore.Instance.Path;
-            //
-            // if (path.Length == 0)
-            // {
-            var path = Environment.CurrentDirectory;
-            // }
-
-            _fileNameAndPath = Path.Combine(path, "FavouriteServers.csv");
+            _fileNameAndPath = UserDataPaths.GetPath("FavouriteServers.csv");
         }
 
         public IEnumerable<ServerAddress> LoadFromStore()

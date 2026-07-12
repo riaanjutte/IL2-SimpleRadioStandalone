@@ -9,6 +9,7 @@ using System.Text.RegularExpressions;
 using System.Xml.Linq;
 using Ciribob.IL2.SimpleRadio.Standalone.Client.Settings;
 using Ciribob.IL2.SimpleRadio.Standalone.Client.Singletons;
+using Ciribob.IL2.SimpleRadio.Standalone.Client.Utils;
 using Microsoft.Win32;
 
 namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI.ClientWindow.Diagnostics
@@ -46,6 +47,8 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI.ClientWindow.Diagnostics
         public string BuildReportText()
         {
             List<TelemetryDiagnosticContext> contexts = BuildContexts();
+            Dictionary<string, TelemetryRepairResult> repairResults = RepairStartupConfigs(contexts);
+            contexts = BuildContexts();
             if (contexts.Count == 0)
             {
                 contexts.Add(new TelemetryDiagnosticContext(
@@ -74,6 +77,19 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI.ClientWindow.Diagnostics
                         ? "No IL-2 install with data\\startup.cfg was detected."
                         : context.StartupConfigPath);
 
+                TelemetryRepairResult repairResult;
+                if (!string.IsNullOrWhiteSpace(context.StartupConfigPath)
+                    && repairResults.TryGetValue(context.StartupConfigPath, out repairResult))
+                {
+                    report.Add(repairResult.Error == null ? TelemetryDiagnosticSeverity.Ok : TelemetryDiagnosticSeverity.Warning,
+                        repairResult.Error == null ? "SRS telemetry auto-repair" : "SRS telemetry auto-repair failed",
+                        repairResult.Error == null
+                            ? (repairResult.Changed
+                                ? "startup.cfg was repaired and verified for 127.0.0.1:4322. Restart IL-2 if it was running."
+                                : "startup.cfg was already correctly configured and was verified.")
+                            : repairResult.Error.Message);
+                }
+
                 if (context.StartupConfig == null)
                 {
                     report.Add(TelemetryDiagnosticSeverity.Warning,
@@ -100,7 +116,31 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI.ClientWindow.Diagnostics
             return builder.ToString().TrimEnd();
         }
 
-        private static List<TelemetryDiagnosticContext> BuildContexts()
+        private static Dictionary<string, TelemetryRepairResult> RepairStartupConfigs(IEnumerable<TelemetryDiagnosticContext> contexts)
+        {
+            Dictionary<string, TelemetryRepairResult> results =
+                new Dictionary<string, TelemetryRepairResult>(StringComparer.OrdinalIgnoreCase);
+
+            foreach (TelemetryDiagnosticContext context in contexts
+                         .Where(context => !string.IsNullOrWhiteSpace(context.StartupConfigPath))
+                         .GroupBy(context => context.StartupConfigPath, StringComparer.OrdinalIgnoreCase)
+                         .Select(group => group.First()))
+            {
+                try
+                {
+                    bool changed = StartupConfigTelemetry.EnsureEnabled(context.StartupConfigPath, null);
+                    results[context.StartupConfigPath] = new TelemetryRepairResult(changed, null);
+                }
+                catch (Exception ex)
+                {
+                    results[context.StartupConfigPath] = new TelemetryRepairResult(false, ex);
+                }
+            }
+
+            return results;
+        }
+
+        internal static List<TelemetryDiagnosticContext> BuildContexts()
         {
             int srsPort = ReadSrsTelemetryPort();
             List<Il2InstallCandidate> candidates = DiscoverIl2InstallCandidates();
@@ -111,7 +151,15 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI.ClientWindow.Diagnostics
                 Il2TelemetryConfiguration startupConfig = null;
                 if (!string.IsNullOrWhiteSpace(candidate.StartupConfigPath) && File.Exists(candidate.StartupConfigPath))
                 {
-                    startupConfig = Il2TelemetryConfigurationParser.Parse(candidate.StartupConfigPath);
+                    try
+                    {
+                        startupConfig = Il2TelemetryConfigurationParser.Parse(candidate.StartupConfigPath);
+                    }
+                    catch
+                    {
+                        // Keep the install in the report so repair can still be attempted and any failure shown.
+                        startupConfig = null;
+                    }
                 }
 
                 contexts.Add(new TelemetryDiagnosticContext(
@@ -137,12 +185,21 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI.ClientWindow.Diagnostics
             string savedIl2Path = ReadInstallerPath("IL2Path");
             AddCandidate(candidates, "Saved IL-2 installer path", "IL2-SRS installer registry", savedIl2Path);
             AddSiblingInstallCandidates(candidates, savedIl2Path, "near saved IL-2 installer path");
+            AddSavedInstallCandidate(candidates, "IL2GreatBattlesPath", GreatBattlesDisplayName);
+            AddSavedInstallCandidate(candidates, "IL2KoreaPath", KoreaDisplayName);
             AddRunningProcessCandidates(candidates);
             AddUninstallRegistryCandidates(candidates);
             AddSteamCandidates(candidates);
             AddCommonFolderCandidates(candidates);
 
             return candidates.Values.ToList();
+        }
+
+        private static void AddSavedInstallCandidate(Dictionary<string, Il2InstallCandidate> candidates, string registryValue, string displayName)
+        {
+            string path = ReadInstallerPath(registryValue);
+            AddCandidate(candidates, displayName, "IL2-SRS installer registry", path);
+            AddSiblingInstallCandidates(candidates, path, "near saved " + displayName + " path");
         }
 
         private static void AddRunningProcessCandidates(Dictionary<string, Il2InstallCandidate> candidates)
@@ -264,6 +321,21 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI.ClientWindow.Diagnostics
                 foreach (string folderName in KnownSteamFolderNames)
                 {
                     AddCandidate(candidates, InferDisplayName(folderName, folderName), "common install location", Path.Combine(root, folderName));
+                }
+
+                try
+                {
+                    foreach (string directory in Directory.GetDirectories(root))
+                    {
+                        string name = Path.GetFileName(directory);
+                        if (LooksLikeIl2Install(name))
+                        {
+                            AddCandidate(candidates, InferDisplayName(directory, "Common IL-2 install"), "common install location", directory);
+                        }
+                    }
+                }
+                catch
+                {
                 }
             }
         }
@@ -622,6 +694,18 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI.ClientWindow.Diagnostics
                 return string.Empty;
             }
         }
+    }
+
+    internal sealed class TelemetryRepairResult
+    {
+        public TelemetryRepairResult(bool changed, Exception error)
+        {
+            Changed = changed;
+            Error = error;
+        }
+
+        public bool Changed { get; private set; }
+        public Exception Error { get; private set; }
     }
 
     internal interface ITelemetryDiagnosticProvider
