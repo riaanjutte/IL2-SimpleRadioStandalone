@@ -106,7 +106,10 @@ namespace AutoUpdater
             var updaterArguments = UpdaterArguments.Parse(Environment.GetCommandLineArgs());
             var targetTag = updaterArguments.ReleaseTag;
             var localRelease = GetLocalInstalledReleaseInfo();
-            bool allowBeta = updaterArguments.Beta || (localRelease != null && localRelease.IsPrerelease);
+            bool allowBeta = UpdateReleaseSelector.ShouldAllowBetaDownloads(
+                updaterArguments.Beta,
+                localRelease,
+                ReleaseMetadata.ReleaseTag);
 
             var releases = await githubClient.Repository.Release.GetAll(ReleaseMetadata.GithubUsername, ReleaseMetadata.GithubRepository);
             var releaseCandidates = releases.Select(ToUpdateReleaseCandidate).ToList();

@@ -132,6 +132,41 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Common.Tests.Network
         }
 
         [TestMethod]
+        public void BetaReleaseUpdaterAllowsStableClientToUpgradeToBeta()
+        {
+            var current = Current("1.0.4.7", "1.0.4.7");
+            var allowBeta = UpdateReleaseSelector.ShouldAllowBetaDownloads(
+                false,
+                current,
+                "1.0.4.8-beta.1");
+            var releases = Releases(
+                Stable("v1.0.4.7"),
+                Beta("v1.0.4.8-beta.1"));
+
+            var selected = UpdateReleaseSelector.SelectAutoUpdaterDownload(
+                releases,
+                current,
+                allowBeta,
+                null);
+
+            Assert.IsTrue(allowBeta);
+            Assert.AreEqual("v1.0.4.8-beta.1", selected.TagName);
+        }
+
+        [TestMethod]
+        public void StableReleaseUpdaterDoesNotEnableBetaChannel()
+        {
+            var current = Current("1.0.4.7", "1.0.4.7");
+
+            var allowBeta = UpdateReleaseSelector.ShouldAllowBetaDownloads(
+                false,
+                current,
+                "1.0.4.7");
+
+            Assert.IsFalse(allowBeta);
+        }
+
+        [TestMethod]
         public void DirectBetaUpdaterDownloadsLatestBeta()
         {
             var current = Current("1.0.4.5", "1.0.4.5-beta.1");

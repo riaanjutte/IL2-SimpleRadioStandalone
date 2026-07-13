@@ -60,6 +60,17 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Common.Network
                 : null;
         }
 
+        public static bool ShouldAllowBetaDownloads(
+            bool betaRequested,
+            UpdateReleaseInfo currentRelease,
+            string updaterReleaseTag)
+        {
+            return betaRequested ||
+                   (currentRelease != null && currentRelease.IsPrerelease) ||
+                   (!string.IsNullOrWhiteSpace(updaterReleaseTag) &&
+                    updaterReleaseTag.IndexOf("-", StringComparison.Ordinal) >= 0);
+        }
+
         public static UpdateReleaseInfo CreateCurrentReleaseInfo(string versionValue, string releaseTag)
         {
             Version version;
