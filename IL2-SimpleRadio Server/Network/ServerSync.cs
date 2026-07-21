@@ -29,6 +29,7 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Server.Network
         private readonly ServerSettingsStore _serverSettings;
         private readonly CombatBoxCallsignProvider _callsignProvider;
         private readonly object _callsignRefreshLock = new object();
+        private bool? _lastBroadcastPilotRosterAvailability;
         private Timer _callsignRefreshTimer;
         private NatHandler _natHandler;
 
@@ -241,11 +242,20 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Server.Network
             var replyMessage = new NetworkMessage
             {
                 MsgType = NetworkMessage.MessageType.SERVER_SETTINGS,
-                ServerSettings = _serverSettings.ToDictionary()
+                ServerSettings = GetSyncedServerSettings()
             };
 
             Multicast(replyMessage.Encode());
+            _lastBroadcastPilotRosterAvailability = _callsignProvider.IsAvailable;
 
+        }
+
+        private Dictionary<string, string> GetSyncedServerSettings()
+        {
+            var settings = _serverSettings.ToDictionary();
+            settings[ServerSettingsKeys.PILOT_ROSTER_DATA_AVAILABLE.ToString()] =
+                _callsignProvider.IsAvailable.ToString();
+            return settings;
         }
 
         private void HandleVersionMismatch(SRSClientSession session)
@@ -419,7 +429,7 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Server.Network
             {
                 MsgType = NetworkMessage.MessageType.SYNC,
                 Clients = new List<SRClient>(_clients.Values),
-                ServerSettings = _serverSettings.ToDictionary(),
+                ServerSettings = GetSyncedServerSettings(),
                 Version = UpdaterChecker.VERSION
             };
 
@@ -524,6 +534,11 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Server.Network
                         Logger.Info($"Broadcast assigned callsign updates for {changedClients.Count} client(s)");
                         _eventAggregator.PublishOnUIThread(new ServerStateMessage(true,
                             new List<SRClient>(_clients.Values)));
+                    }
+
+                    if (_lastBroadcastPilotRosterAvailability != _callsignProvider.IsAvailable)
+                    {
+                        HandleServerSettingsMessage();
                     }
                 }
             }

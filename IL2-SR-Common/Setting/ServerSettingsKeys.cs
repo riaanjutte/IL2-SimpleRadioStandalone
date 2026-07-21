@@ -22,6 +22,7 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Common.Setting
         SECOND_RADIO_ENABLED,
         CHANNEL_LIMIT,
         ASSIGNED_CALLSIGNS_JSON_FILE,
+        PILOT_ROSTER_DATA_AVAILABLE,
         DSERVER_RCON_ADDRESS,
         DSERVER_RCON_USERNAME,
         DSERVER_RCON_PASSWORD

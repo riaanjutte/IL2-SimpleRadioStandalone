@@ -12,6 +12,7 @@
                       WindowStyle="None"
                       AllowsTransparency="True"
                       ResizeMode="CanResizeWithGrip"
+                      Topmost="True"
                       Background="Transparent">
     <Window.Resources>
         <ControlTemplate x:Key="PilotRosterPanelScrew" TargetType="{x:Type Control}">

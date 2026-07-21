@@ -1,5 +1,28 @@
 # Changelog
 
+## IL2-SRS 1.0.4.8-beta.2 community update
+
+### Added
+
+- Added Pilot Roster support for any updated SRS server that provides compatible roster JSON data.
+- Added a Pilot Roster server guide covering configuration, JSON structure, updates, and troubleshooting.
+
+### Changed
+
+- The server now advertises Pilot Roster availability after successfully loading its configured roster data, and broadcasts changes when that availability changes.
+- The client now opens and auto-starts the Pilot Roster based on the server-advertised capability instead of restricting it to Combat Box.
+- Updated the unavailable message to explain that Pilot Roster data must be provided by the connected server.
+
+### Fixed
+
+- Fixed the Pilot Roster not remaining above IL-2 or disappearing with the main SRS window.
+- Fixed an Auto Updater downloaded from a beta release not following the beta release channel when updating a stable installation.
+
+### Validation
+
+- Built `IL2-SimpleRadioStandalone.sln` Release/x64 successfully.
+- Ran `IL2-SR-CommonTests` Release/x64: 107/107 passed.
+
 ## IL2-SRS 1.0.4.8-beta.1 community update
 
 ### Added

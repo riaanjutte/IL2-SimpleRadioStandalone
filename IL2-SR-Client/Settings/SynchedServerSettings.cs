@@ -64,8 +64,18 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.Settings
             return Convert.ToBoolean(GetSetting(key));
         }
 
+        public bool GetOptionalSettingAsBool(ServerSettingsKeys key)
+        {
+            return _settings.TryGetValue(key.ToString(), out var value) &&
+                   bool.TryParse(value, out var result) &&
+                   result;
+        }
+
         public void Decode(Dictionary<string, string> encoded)
         {
+            // Optional capabilities must not carry over when reconnecting to an older server.
+            _settings.TryRemove(ServerSettingsKeys.PILOT_ROSTER_DATA_AVAILABLE.ToString(), out _);
+
             foreach (KeyValuePair<string, string> kvp in encoded)
             {
                 _settings.AddOrUpdate(kvp.Key, kvp.Value, (key, oldVal) => kvp.Value);

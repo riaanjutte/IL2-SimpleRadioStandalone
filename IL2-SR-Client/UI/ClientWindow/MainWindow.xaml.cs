@@ -38,6 +38,7 @@ using Ciribob.IL2.SimpleRadio.Standalone.Client.Utils;
 using Ciribob.IL2.SimpleRadio.Standalone.Common;
 using Ciribob.IL2.SimpleRadio.Standalone.Common.Helpers;
 using Ciribob.IL2.SimpleRadio.Standalone.Common.Network;
+using Ciribob.IL2.SimpleRadio.Standalone.Common.Setting;
 using Ciribob.IL2.SimpleRadio.Standalone.Overlay;
 using Easy.MessageHub;
 using MahApps.Metro.Controls;
@@ -169,7 +170,7 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI
             InitializeComponent();
             LocalizationManager.LocalizeElement(this);
             RciStatusLabel.Text = LocalizationManager.Get("RCI");
-            UpdateCombatBoxFeatureVisibility(false);
+            UpdatePilotRosterAndRciVisibility(false, false);
             LocalizationManager.LocalizeFlowDocument(AboutFlowDocument);
             Loaded += MainWindow_Loaded;
 
@@ -1355,7 +1356,7 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI
             ClientState.IsConnected = false;
             ToggleServerSettings.IsEnabled = false;
             UpdateRciStatusIndicator();
-            UpdateCombatBoxFeatureVisibility(false);
+            UpdatePilotRosterAndRciVisibility(false, false);
             _radioOverlayWindow?.SetRciIndicatorEnabled(false);
 
             try
@@ -1488,7 +1489,7 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI
 
                         ClientState.IsConnected = true;
                         ClientState.IsVoipConnected = false;
-                        UpdateCombatBoxFeatureVisibility();
+                        UpdatePilotRosterAndRciVisibility();
 
                         if (_globalSettings.GetClientSettingBool(GlobalSettingsKeys.PlayConnectionSounds))
                         {
@@ -1653,35 +1654,42 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI
 
             var showRciStatus = ShouldShowRciStatus();
             UpdateRciStatusIndicator(showRciStatus);
-            UpdateCombatBoxFeatureVisibility(showRciStatus);
+            UpdatePilotRosterAndRciVisibility(IsPilotRosterAvailable(), showRciStatus);
             _radioOverlayWindow?.SetRciIndicatorEnabled(showRciStatus);
         }
 
-        private void UpdateCombatBoxFeatureVisibility()
+        private bool IsPilotRosterAvailable()
         {
-            UpdateCombatBoxFeatureVisibility(ShouldShowRciStatus());
+            return PilotRosterAccessPolicy.IsAvailable(
+                ClientState.IsConnected,
+                _serverSettings.GetOptionalSettingAsBool(ServerSettingsKeys.PILOT_ROSTER_DATA_AVAILABLE));
         }
 
-        private void UpdateCombatBoxFeatureVisibility(bool showCombatBoxFeatures)
+        private void UpdatePilotRosterAndRciVisibility()
+        {
+            UpdatePilotRosterAndRciVisibility(IsPilotRosterAvailable(), ShouldShowRciStatus());
+        }
+
+        private void UpdatePilotRosterAndRciVisibility(bool pilotRosterAvailable, bool showCombatBoxRci)
         {
             ShowPilotRoster.Visibility = Visibility.Visible;
-            CombatBoxRciPanel.Visibility = showCombatBoxFeatures ? Visibility.Visible : Visibility.Collapsed;
+            CombatBoxRciPanel.Visibility = showCombatBoxRci ? Visibility.Visible : Visibility.Collapsed;
 
-            if (!showCombatBoxFeatures && (_pilotRosterWindow?.IsUnavailableMode == false))
+            if (!pilotRosterAvailable && (_pilotRosterWindow?.IsUnavailableMode == false))
             {
                 _pilotRosterAutoStartedForCurrentConnection = false;
                 _pilotRosterWindow?.Close();
                 _pilotRosterWindow = null;
             }
-            else if (!showCombatBoxFeatures)
+            else if (!pilotRosterAvailable)
             {
                 _pilotRosterAutoStartedForCurrentConnection = false;
             }
-            else if (showCombatBoxFeatures && (_pilotRosterWindow?.IsUnavailableMode == true))
+            else if (_pilotRosterWindow?.IsUnavailableMode == true)
             {
                 EnsurePilotRosterWindow(showUnavailableMessage: false);
             }
-            else if (showCombatBoxFeatures)
+            else
             {
                 AutoStartPilotRoster();
             }
@@ -1823,14 +1831,17 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI
 
         private void AutoStartPilotRoster()
         {
-            if (_pilotRosterAutoStartedForCurrentConnection ||
-                !_globalSettings.GetClientSettingBool(GlobalSettingsKeys.AutoStartPilotRoster))
+            if (!PilotRosterAccessPolicy.ShouldAutoStart(
+                    ClientState.IsConnected,
+                    _serverSettings.GetOptionalSettingAsBool(ServerSettingsKeys.PILOT_ROSTER_DATA_AVAILABLE),
+                    _globalSettings.GetClientSettingBool(GlobalSettingsKeys.AutoStartPilotRoster),
+                    _pilotRosterAutoStartedForCurrentConnection))
             {
                 return;
             }
 
             _pilotRosterAutoStartedForCurrentConnection = true;
-            Dispatcher.BeginInvoke(new Action(() => EnsurePilotRosterWindow(showUnavailableMessage: !ShouldShowRciStatus())),
+            Dispatcher.BeginInvoke(new Action(() => EnsurePilotRosterWindow(showUnavailableMessage: false)),
                 DispatcherPriority.ContextIdle);
         }
 
@@ -2516,7 +2527,7 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI
 
         private void ShowPilotRoster_OnClick(object sender, RoutedEventArgs e)
         {
-            if (!ShouldShowRciStatus())
+            if (!IsPilotRosterAvailable())
             {
                 ShowPilotRosterWindow(showUnavailableMessage: true);
                 return;
@@ -2554,8 +2565,7 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI
 
             _pilotRosterWindow = new PilotRosterWindow(showUnavailableMessage)
             {
-                Opacity = GetOverlayOpacity(GlobalSettingsKeys.PilotRosterOpacity),
-                Owner = this
+                Opacity = GetOverlayOpacity(GlobalSettingsKeys.PilotRosterOpacity)
             };
             _pilotRosterWindow.WindowStartupLocation = WindowStartupLocation.Manual;
             _pilotRosterWindow.Closed += (closedSender, args) =>

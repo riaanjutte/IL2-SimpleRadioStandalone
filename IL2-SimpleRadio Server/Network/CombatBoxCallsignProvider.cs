@@ -20,6 +20,9 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Server.Network
         private DateTime _lastRefreshUtc = DateTime.MinValue;
         private DateTime _lastMissingFileLogUtc = DateTime.MinValue;
         private DateTime _lastReadErrorLogUtc = DateTime.MinValue;
+        private volatile bool _isAvailable;
+
+        public bool IsAvailable => _isAvailable;
 
         public CombatBoxCallsignProvider(ServerSettingsStore serverSettings)
         {
@@ -47,12 +50,15 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Server.Network
             var path = ResolveCurrentStatePath();
             if (string.IsNullOrWhiteSpace(path))
             {
+                _assignments = new Dictionary<CallsignRosterKey, CombatBoxRosterAssignment>();
+                _isAvailable = false;
                 return;
             }
 
             if (!File.Exists(path))
             {
                 _assignments = new Dictionary<CallsignRosterKey, CombatBoxRosterAssignment>();
+                _isAvailable = false;
                 LogMissingFile(path);
                 return;
             }
@@ -67,6 +73,7 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Server.Network
                 }
 
                 _assignments = CombatBoxCallsignRoster.ParseAssignments(text);
+                _isAvailable = true;
             }
             catch (Exception ex)
             {

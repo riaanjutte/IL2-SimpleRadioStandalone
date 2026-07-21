@@ -88,6 +88,7 @@
     <Compile Include="UI\RciDisplayStateTests.cs" />
     <Compile Include="UI\RciOverlayMessageDelayTests.cs" />
     <Compile Include="UI\RadioOverlaySpeakerNameScrollTests.cs" />
+    <Compile Include="UI\PilotRosterAccessPolicyTests.cs" />
     <Compile Include="UI\PilotRosterBuilderTests.cs" />
     <Compile Include="Utils\RadioHelperMuteTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

@@ -277,6 +277,7 @@
       <DependentUpon>TelemetryDiagnosticsWindow.xaml</DependentUpon>
     </Compile>
     <Compile Include="UI\ClientWindow\PilotRoster\PilotRosterBuilder.cs" />
+    <Compile Include="UI\ClientWindow\PilotRoster\PilotRosterAccessPolicy.cs" />
     <Compile Include="UI\ClientWindow\PilotRoster\PilotRosterEntry.cs" />
     <Compile Include="UI\ClientWindow\PilotRoster\PilotRosterWindow.xaml.cs">
       <DependentUpon>PilotRosterWindow.xaml</DependentUpon>

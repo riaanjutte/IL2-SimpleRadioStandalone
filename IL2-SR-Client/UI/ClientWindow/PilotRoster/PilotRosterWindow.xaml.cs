@@ -135,9 +135,9 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI.ClientWindow.PilotRoster
             ActiveSquadOpsText.Visibility = Visibility.Collapsed;
             PilotList.Visibility = Visibility.Collapsed;
             UnavailableMessage.Text =
-                LocalizationManager.Get("Pilot roster is currently only available when connected to Combat Box.")
+                LocalizationManager.Get(PilotRosterAccessPolicy.UnavailableSummary)
                 + "\r\n\r\n"
-                + LocalizationManager.Get("Connect to srs.combatbox.net and open Pilot Roster again.");
+                + LocalizationManager.Get(PilotRosterAccessPolicy.ReconnectInstruction);
             UnavailableMessage.Visibility = Visibility.Visible;
 
             Width = Math.Max(MinWidth, 500);

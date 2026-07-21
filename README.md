@@ -23,7 +23,7 @@ IL2-SRS supports IL-2 Korea alongside IL-2 Great Battles. Please report Korea-sp
 1. Localization support for English, German, French, Spanish, Italian, and Russian, with editable `.resx` translation files.
 2. Improved joystick reconnect handling so PTT can recover after device disconnect/reconnect.
 3. Expanded radio overlay with 12 channel buttons, channel up/down controls, pilot counts, mute support, and RCI status on Combat Box.
-4. Pilot Roster window for Combat Box showing friendly pilots, callsigns, and tuned radio channels.
+4. Pilot Roster window for participating servers showing friendly pilots, callsigns, and tuned radio channels.
 5. Community recommended settings prompt for existing users.
 6. Dark mode with Windows theme detection.
 
@@ -41,6 +41,10 @@ You can help in two ways:
 2. Edit the relevant `.resx` file and open a pull request.
 
 See `TRANSLATING.md` for the full workflow. Translation pull requests are automatically checked for missing keys, duplicate keys, invalid XML, blank values, and broken placeholders such as `{0}`.
+
+## Pilot Roster server support
+
+Server administrators can add Pilot Roster support by following [Pilot-Roster-Server-Guide.md](Pilot-Roster-Server-Guide.md).
 
 # IL2-SimpleRadio Standalone
 An open source Stand alone Radio for IL2
