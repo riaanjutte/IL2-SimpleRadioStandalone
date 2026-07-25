@@ -72,6 +72,7 @@
     </Otherwise>
   </Choose>
   <ItemGroup>
+    <Compile Include="Audio\RadioCollisionEffectProcessorTests.cs" />
     <Compile Include="DCSState\PlayerGameStateTests.cs" />
     <Compile Include="Helpers\ConversionHelpersTests.cs" />
     <Compile Include="Input\InputBindingLayoutTests.cs" />
@@ -79,6 +80,7 @@
     <Compile Include="Installer\SrsInstallConsolidatorTests.cs" />
     <Compile Include="Settings\UserDataPathsTests.cs" />
     <Compile Include="Network\CombatBoxCallsignRosterTests.cs" />
+    <Compile Include="Network\RadioCollisionDetectorTests.cs" />
     <Compile Include="Network\UpdaterArgumentsTests.cs" />
     <Compile Include="Network\UpdateReleaseSelectorTests.cs" />
     <Compile Include="Network\UDPVoicePacketTests.cs" />

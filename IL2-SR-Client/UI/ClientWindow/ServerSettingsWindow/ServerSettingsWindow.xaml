@@ -6,7 +6,7 @@
                       xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
                       Title="Server Settings"
                       Width="500"
-                      Height="360"
+                      Height="390"
                       ResizeMode="NoResize"
                       Background="{DynamicResource MilWindowBackgroundBrush}"
                       Foreground="{DynamicResource MilTextPrimaryBrush}"
@@ -43,6 +43,7 @@
 
             </Grid.ColumnDefinitions>
             <Grid.RowDefinitions>
+                <RowDefinition />
                 <RowDefinition />
                 <RowDefinition />
                 <RowDefinition />
@@ -174,7 +175,22 @@
                    Foreground="{DynamicResource MilAccentBrush}"
                    Content="Unknown" />
 
-            <Button Grid.Row="8"
+            <Label Grid.Row="8"
+                   Grid.Column="0"
+                   HorizontalContentAlignment="Right"
+                   VerticalContentAlignment="Center"
+                   Padding="4,2,14,2"
+                   Content="RX Collision Effects" />
+
+            <Label Name="RadioCollisionEffects"
+                   Grid.Row="8"
+                   Grid.Column="1"
+                   HorizontalContentAlignment="Center"
+                   VerticalContentAlignment="Center"
+                   Foreground="{DynamicResource MilAccentBrush}"
+                   Content="Unknown" />
+
+            <Button Grid.Row="9"
                     Grid.Column="0"
                     Grid.ColumnSpan="2"
                     Width="90"

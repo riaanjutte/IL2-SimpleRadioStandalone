@@ -255,6 +255,9 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Server.Network
             var settings = _serverSettings.ToDictionary();
             settings[ServerSettingsKeys.PILOT_ROSTER_DATA_AVAILABLE.ToString()] =
                 _callsignProvider.IsAvailable.ToString();
+            settings[ServerSettingsKeys.RADIO_COLLISION_EFFECTS.ToString()] = _serverSettings
+                .GetGeneralSetting(ServerSettingsKeys.RADIO_COLLISION_EFFECTS)
+                .StringValue;
             return settings;
         }
 

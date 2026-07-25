@@ -60,6 +60,11 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI
                     : LocalizationManager.Get("OFF");
 
                 ChannelLimit.Content = settings.GetSetting(ServerSettingsKeys.CHANNEL_LIMIT);
+
+                RadioCollisionEffects.Content =
+                    settings.GetSettingAsBool(ServerSettingsKeys.RADIO_COLLISION_EFFECTS)
+                        ? LocalizationManager.Get("ON")
+                        : LocalizationManager.Get("OFF");
             }
             catch (IndexOutOfRangeException ex)
             {

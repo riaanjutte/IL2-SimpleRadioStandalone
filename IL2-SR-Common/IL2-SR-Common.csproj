@@ -123,6 +123,7 @@
     <Compile Include="Network\CombatBoxCallsignRoster.cs" />
     <Compile Include="Network\ClientListExport.cs" />
     <Compile Include="Network\NetworkMessage.cs" />
+    <Compile Include="Network\RadioCollisionDetector.cs" />
     <Compile Include="Network\UDPInterfaceCommand.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="DCSState\PlayerGameState.cs" />

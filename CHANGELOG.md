@@ -1,5 +1,31 @@
 # Changelog
 
+## IL2-SRS 1.0.4.8-beta.3 community update
+
+### Added
+
+- Added an experimental radio collision effect for simultaneous transmissions on the same frequency and modulation.
+- Added server-side overlap detection and backward-compatible signaling so updated receiving clients can render collisions locally.
+- Added an `RX Collision Effects` server setting. It is disabled by default while the effect is tested and tuned.
+
+### Changed
+
+- Colliding transmissions now use flutter, brief dropouts, noise, and controlled distortion instead of mixing cleanly.
+- Intercom remains unaffected by radio collision processing.
+- Increased the server window height and placed `RX Collision Effects` directly below `Realistic TX Behaviour`.
+
+### Compatibility
+
+- Updated clients and servers remain compatible with older `1.0.4.8` installations.
+- Older clients can connect to updated servers but will continue to hear normally mixed audio.
+- The effect requires an updated server with `RX Collision Effects` enabled and an updated receiving client.
+
+### Validation
+
+- Built `IL2-SimpleRadioStandalone.sln` Release/x64 successfully.
+- Ran `IL2-SR-CommonTests` Release/x64: 114/114 passed.
+- Visually verified the updated server layout without a vertical scrollbar.
+
 ## IL2-SRS 1.0.4.8-beta.2 community update
 
 ### Added

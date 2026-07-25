@@ -16,5 +16,6 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client
         public RadioReceivingState RadioReceivingState { get; set; }
         public ulong PacketNumber { get; set; }
         public string OriginalClientGuid { get; internal set; }
+        public bool IsRadioCollision { get; set; }
     }
 }

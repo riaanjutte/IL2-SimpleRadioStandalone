@@ -216,5 +216,31 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Common.Tests
 
             Assert.AreEqual((byte)254, udpVoicePacket.RetransmissionCount);
         }
+
+        [TestMethod]
+        public void RadioCollisionFlagRoundTripsWithoutChangingPacketSize()
+        {
+            var udpVoicePacket = new UDPVoicePacket
+            {
+                GuidBytes = Encoding.ASCII.GetBytes("ufYS_WlLVkmFPjqCgxz6GA"),
+                AudioPart1Bytes = new byte[] { 0, 1, 2, 3 },
+                AudioPart1Length = 4,
+                Frequencies = new[] { 125000000.0 },
+                UnitId = 1,
+                Modulations = new[] { (byte)RadioInformation.Modulation.AM },
+                OriginalClientGuidBytes = Encoding.ASCII.GetBytes("ufYS_WlLVkmFPjqCgxz6GA"),
+                PacketNumber = 2,
+                IsRadioCollision = true
+            };
+
+            var encoded = udpVoicePacket.EncodePacket();
+            var decoded = UDPVoicePacket.DecodeVoicePacket(encoded);
+
+            Assert.IsTrue(decoded.IsRadioCollision);
+            Assert.AreEqual(encoded.Length, decoded.PacketLength);
+
+            Assert.IsTrue(UDPVoicePacket.SetRadioCollisionFlag(encoded, false));
+            Assert.IsFalse(UDPVoicePacket.DecodeVoicePacket(encoded).IsRadioCollision);
+        }
     }
 }

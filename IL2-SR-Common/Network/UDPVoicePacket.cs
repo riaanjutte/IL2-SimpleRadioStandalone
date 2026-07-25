@@ -31,6 +31,7 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Common.Network
         private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
 
         public static readonly int GuidLength = 22;
+        public const byte RadioCollisionFlag = 0x80;
 
         public static readonly int PacketHeaderLength =
             sizeof(ushort) // UInt16 Packet Length - 2 bytes
@@ -80,6 +81,7 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Common.Network
 
         //Number of times its been retransmitted - added to stop retransmission loop with sensible limit
         public byte RetransmissionCount { get; set; } = new byte();
+        public bool IsRadioCollision { get; set; }
 
         public byte[] EncodePacket()
         {
@@ -176,7 +178,10 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Common.Network
             combinedBytes[fixedSegmentOffset + 11] = packetNumber[7];
 
             // back before Transmission GUID
-            combinedBytes[totalPacketLength - (GuidLength + GuidLength + 1)] = RetransmissionCount;
+            combinedBytes[totalPacketLength - (GuidLength + GuidLength + 1)] =
+                IsRadioCollision
+                    ? (byte)(RetransmissionCount | RadioCollisionFlag)
+                    : RetransmissionCount;
 
             //Copy Transmission nearly at the end - just before the clientGUID
             Buffer.BlockCopy(OriginalClientGuidBytes, 0, combinedBytes, totalPacketLength - (GuidLength + GuidLength), GuidLength);
@@ -252,7 +257,8 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Common.Network
                     PacketLength = packetLength,
                     OriginalClientGuid = transmissionGuid,
                     OriginalClientGuidBytes =  transmissionBytes,
-                    RetransmissionCount = retransmissionCount
+                    RetransmissionCount = retransmissionCount,
+                    IsRadioCollision = (retransmissionCount & RadioCollisionFlag) != 0
                 };
             }
             catch (Exception ex)
@@ -261,6 +267,26 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Common.Network
             }
 
             return null;
+        }
+
+        public static bool SetRadioCollisionFlag(byte[] encodedPacket, bool enabled)
+        {
+            if (encodedPacket == null || encodedPacket.Length < PacketHeaderLength + FixedPacketLength)
+            {
+                return false;
+            }
+
+            var flagsOffset = encodedPacket.Length - (GuidLength + GuidLength + 1);
+            if (enabled)
+            {
+                encodedPacket[flagsOffset] |= RadioCollisionFlag;
+            }
+            else
+            {
+                encodedPacket[flagsOffset] &= unchecked((byte)~RadioCollisionFlag);
+            }
+
+            return true;
         }
     }
 }

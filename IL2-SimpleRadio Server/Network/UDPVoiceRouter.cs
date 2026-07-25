@@ -32,6 +32,7 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Server.Network
             new BlockingCollection<PendingPacket>();
 
         private readonly ServerSettingsStore _serverSettings = ServerSettingsStore.Instance;
+        private readonly RadioCollisionDetector _radioCollisionDetector = new RadioCollisionDetector();
         private UdpClient _listener;
 
         private volatile bool _stop;
@@ -212,6 +213,7 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Server.Network
                                         //magical ping ignore message 4 - its an empty voip packet to intialise VoIP if
                                         //someone doesnt transmit
                                     {
+                                        ApplyRadioCollisionState(udpVoicePacket, udpPacket.RawBytes, client);
                                         var outgoingVoice = GenerateOutgoingPacket(udpVoicePacket, udpPacket, client);
 
                                         if (outgoingVoice != null)
@@ -282,6 +284,35 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Server.Network
                 {
                     Logger.Info("Error processing Sending Queue UDP Packet: " + ex.Message);
                 }
+        }
+
+        private void ApplyRadioCollisionState(UDPVoicePacket voicePacket, byte[] rawPacket, SRClient fromClient)
+        {
+            var enabled = _serverSettings
+                .GetGeneralSetting(ServerSettingsKeys.RADIO_COLLISION_EFFECTS)
+                .BoolValue;
+
+            var collision = false;
+            if (enabled)
+            {
+                var isolateCoalitions = _serverSettings
+                    .GetGeneralSetting(ServerSettingsKeys.COALITION_AUDIO_SECURITY)
+                    .BoolValue;
+
+                collision = _radioCollisionDetector.RegisterPacket(
+                    fromClient.ClientGuid,
+                    fromClient.Coalition,
+                    voicePacket.Frequencies,
+                    voicePacket.Modulations,
+                    isolateCoalitions);
+            }
+            else
+            {
+                _radioCollisionDetector.Reset();
+            }
+
+            voicePacket.IsRadioCollision = collision;
+            UDPVoicePacket.SetRadioCollisionFlag(rawPacket, collision);
         }
 
         private OutgoingUDPPackets GenerateOutgoingPacket(UDPVoicePacket udpVoice, PendingPacket pendingPacket,

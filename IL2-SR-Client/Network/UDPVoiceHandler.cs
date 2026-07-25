@@ -546,7 +546,8 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.Network
                                             
                                                 RadioReceivingState = destinationRadio.ReceivingState,
                                                 PacketNumber = udpVoicePacket.PacketNumber,
-                                                OriginalClientGuid = udpVoicePacket.OriginalClientGuid
+                                                OriginalClientGuid = udpVoicePacket.OriginalClientGuid,
+                                                IsRadioCollision = udpVoicePacket.IsRadioCollision
                                             };
 
 

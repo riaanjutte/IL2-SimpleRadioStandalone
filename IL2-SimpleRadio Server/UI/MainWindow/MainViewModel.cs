@@ -106,6 +106,8 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Server.UI.MainWindow
 
         public string EnableSecondRadioText
             => ServerSettingsStore.Instance.GetGeneralSetting(ServerSettingsKeys.SECOND_RADIO_ENABLED).BoolValue ? "ON" : "OFF";
+        public string RadioCollisionEffectsText
+            => ServerSettingsStore.Instance.GetGeneralSetting(ServerSettingsKeys.RADIO_COLLISION_EFFECTS).BoolValue ? "ON" : "OFF";
         public int ChannelLimit
         {
             get => ServerSettingsStore.Instance.GetGeneralSetting(ServerSettingsKeys.CHANNEL_LIMIT).IntValue;
@@ -229,6 +231,15 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Server.UI.MainWindow
             var newSetting = EnableSecondRadioText != "ON";
             ServerSettingsStore.Instance.SetGeneralSetting(ServerSettingsKeys.SECOND_RADIO_ENABLED, newSetting);
             NotifyOfPropertyChange(() => EnableSecondRadioText);
+
+            _eventAggregator.PublishOnBackgroundThread(new ServerSettingsChangedMessage());
+        }
+
+        public void RadioCollisionEffectsToggle()
+        {
+            var newSetting = RadioCollisionEffectsText != "ON";
+            ServerSettingsStore.Instance.SetGeneralSetting(ServerSettingsKeys.RADIO_COLLISION_EFFECTS, newSetting);
+            NotifyOfPropertyChange(() => RadioCollisionEffectsText);
 
             _eventAggregator.PublishOnBackgroundThread(new ServerSettingsChangedMessage());
         }

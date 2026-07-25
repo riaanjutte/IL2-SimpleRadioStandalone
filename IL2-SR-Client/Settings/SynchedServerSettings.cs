@@ -75,6 +75,7 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.Settings
         {
             // Optional capabilities must not carry over when reconnecting to an older server.
             _settings.TryRemove(ServerSettingsKeys.PILOT_ROSTER_DATA_AVAILABLE.ToString(), out _);
+            _settings.TryRemove(ServerSettingsKeys.RADIO_COLLISION_EFFECTS.ToString(), out _);
 
             foreach (KeyValuePair<string, string> kvp in encoded)
             {

@@ -224,6 +224,7 @@
     <Compile Include="Audio\Managers\TextToSpeechManger.cs" />
     <Compile Include="Audio\Diagnostics\IncomingAudioQualityMonitor.cs" />
     <Compile Include="Audio\Models\SelectedRadioMuteCueMessage.cs" />
+    <Compile Include="Audio\DSP\RadioCollisionEffectProcessor.cs" />
     <Compile Include="Audio\Models\TextToSpeechMessage.cs" />
     <Compile Include="Audio\Providers\AudioProvider.cs" />
     <Compile Include="Audio\Models\CachedAudioEffect.cs" />

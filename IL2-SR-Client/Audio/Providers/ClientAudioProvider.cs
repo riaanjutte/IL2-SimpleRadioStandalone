@@ -30,6 +30,7 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client
         private readonly BiQuadFilter _lowPassFilter;
 
         private OpusDecoder _decoder;
+        private readonly RadioCollisionEffectProcessor _radioCollisionEffectProcessor;
 
         private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
 
@@ -38,8 +39,10 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client
         //used for comparison
         public static readonly short FM = Convert.ToInt16((int)RadioInformation.Modulation.FM);
 
-        public ClientAudioProvider()
+        public ClientAudioProvider(string clientGuid = null)
         {
+            _radioCollisionEffectProcessor = new RadioCollisionEffectProcessor(
+                RadioCollisionEffectProcessor.CreateSeed(clientGuid));
             _filters = new OnlineFilter[2];
             _filters[0] =
                 OnlineFilter.CreateBandpass(ImpulseResponse.Finite, AudioManager.INPUT_SAMPLE_RATE, 560, 3900);
@@ -122,6 +125,11 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client
 
             //adjust for LOS + Distance + Volume
             AdjustVolume(audio);
+
+            if (audio.IsRadioCollision && audio.ReceivedRadio > 0)
+            {
+                _radioCollisionEffectProcessor.Apply(audio.PcmAudioShort);
+            }
 
             if (globalSettings.GetClientSettingBool(ProfileSettingsKeys.RadioEffects))
             {

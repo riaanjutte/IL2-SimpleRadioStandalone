@@ -950,7 +950,7 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.Audio.Managers
             }
             else
             {
-                client = new ClientAudioProvider();
+                client = new ClientAudioProvider(audioClientKey);
                 _clientsBufferedAudio[audioClientKey] = client;
 
                 _clientAudioMixer.AddMixerInput(client.SampleProvider);
