@@ -1247,6 +1247,12 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI
             }
             else
             {
+                if (_client != null)
+                {
+                    Logger.Info("Connection attempt already in progress; ignoring duplicate connect request");
+                    return;
+                }
+
                 SaveSelectedInputAndOutput();
 
                 try
@@ -1262,8 +1268,12 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI
                         _resolvedIp = ip;
                         _port = GetPortFromTextBox();
 
-                        _client = new SRSClientSyncHandler(_guid, UpdateUICallback);
-                        _client.TryConnect(new IPEndPoint(_resolvedIp, _port), ConnectCallback);
+                        var connectingClient = new SRSClientSyncHandler(_guid, UpdateUICallback);
+                        _client = connectingClient;
+                        connectingClient.TryConnect(
+                            new IPEndPoint(_resolvedIp, _port),
+                            (result, connectionError, connection) =>
+                                ConnectCallback(connectingClient, result, connectionError, connection));
 
                         StartStop.Content = LocalizationManager.Get("Connecting...");
                         StartStop.IsEnabled = false;
@@ -1468,8 +1478,18 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI
             ConnectionStatusHint.Text = LocalizationManager.Get("Server link inactive");
         }
 
-        private void ConnectCallback(bool result, bool connectionError, string connection)
+        private void ConnectCallback(
+            SRSClientSyncHandler sourceClient,
+            bool result,
+            bool connectionError,
+            string connection)
         {
+            if (!ReferenceEquals(_client, sourceClient))
+            {
+                Logger.Info($"Ignoring callback from superseded connection attempt to {connection}");
+                return;
+            }
+
             string currentConnection = ServerIp.Text.Trim();
             if (!currentConnection.Contains(":"))
             {

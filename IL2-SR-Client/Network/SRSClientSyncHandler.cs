@@ -28,7 +28,7 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.Network
 
         private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
 
-        private volatile bool _stop = false;
+        private readonly SrsClientConnectionLifecycle _connectionLifecycle = new SrsClientConnectionLifecycle();
 
         public static string ServerVersion = "Unknown";
         private readonly string _guid;
@@ -64,9 +64,6 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.Network
       
         private void Connect()
         {
-
-            var sub = MessageHub.Instance.Subscribe<PlayerStateUpdate>(PlayerGameStateUpdate);
-
             bool connectionError = false;
 
             using (_tcpClient = new TcpClient())
@@ -79,14 +76,25 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.Network
                     // Wait for 10 seconds before aborting connection attempt - no SRS server running/port opened in that case
                     _tcpClient.ConnectAsync(_serverEndpoint.Address, _serverEndpoint.Port).Wait(TimeSpan.FromSeconds(10));
 
-                    if (_tcpClient.Connected)
+                    if (_tcpClient.Connected && _connectionLifecycle.TryMarkConnected())
                     {
                         _tcpClient.NoDelay = true;
 
                         CallOnMain(true);
-                        ClientSyncLoop();
+                        if (!_connectionLifecycle.IsStopping)
+                        {
+                            var sub = MessageHub.Instance.Subscribe<PlayerStateUpdate>(PlayerGameStateUpdate);
+                            try
+                            {
+                                ClientSyncLoop();
+                            }
+                            finally
+                            {
+                                MessageHub.Instance.UnSubscribe(sub);
+                            }
+                        }
                     }
-                    else
+                    else if (!_connectionLifecycle.IsStopping)
                     {
                         Logger.Error($"Failed to connect to server @ {_serverEndpoint.ToString()}");
 
@@ -96,12 +104,13 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.Network
                 }
                 catch (Exception ex)
                 {
-                    Logger.Error(ex, "Could not connect to server");
-                    connectionError = true;
+                    if (!_connectionLifecycle.IsStopping)
+                    {
+                        Logger.Error(ex, "Could not connect to server");
+                        connectionError = true;
+                    }
                 }
             }
-
-            MessageHub.Instance.UnSubscribe(sub);
 
             //disconnect callback
             CallOnMain(false, connectionError);
@@ -372,7 +381,7 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.Network
                         catch (Exception ex)
                         {
                             decodeErrors++;
-                            if (!_stop)
+                            if (!_connectionLifecycle.IsStopping)
                             {
                                 Logger.Error(ex, "Client exception reading from socket ");
                             }
@@ -390,7 +399,7 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.Network
                 }
                 catch (Exception ex)
                 {
-                    if (!_stop)
+                    if (!_connectionLifecycle.IsStopping)
                     {
                         Logger.Error(ex, "Client exception reading - Disconnecting ");
                     }
@@ -419,6 +428,10 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.Network
         {
             try
             {
+                if (!_connectionLifecycle.CanSend)
+                {
+                    return;
+                }
 
                 message.Version = UpdaterChecker.VERSION;
 
@@ -435,7 +448,7 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.Network
             }
             catch (Exception ex)
             {
-                if (!_stop)
+                if (!_connectionLifecycle.IsStopping)
                 {
                     Logger.Error(ex, "Client exception sending to server");
                 }
@@ -447,7 +460,7 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.Network
         //implement IDispose? To close stuff properly?
         public void Disconnect()
         {
-            _stop = true;
+            _connectionLifecycle.MarkStopping();
 
             try
             {
@@ -468,6 +481,28 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.Network
 
 
             //CallOnMain(false);
+        }
+    }
+
+    internal sealed class SrsClientConnectionLifecycle
+    {
+        private const int Connecting = 0;
+        private const int Connected = 1;
+        private const int Stopping = 2;
+        private int _state = Connecting;
+
+        public bool CanSend => Volatile.Read(ref _state) == Connected;
+
+        public bool IsStopping => Volatile.Read(ref _state) == Stopping;
+
+        public bool TryMarkConnected()
+        {
+            return Interlocked.CompareExchange(ref _state, Connected, Connecting) == Connecting;
+        }
+
+        public void MarkStopping()
+        {
+            Interlocked.Exchange(ref _state, Stopping);
         }
     }
 }

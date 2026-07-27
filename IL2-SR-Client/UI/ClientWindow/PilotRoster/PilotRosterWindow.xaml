@@ -47,6 +47,8 @@
             <Setter Property="HorizontalContentAlignment" Value="Left" />
             <Setter Property="BorderBrush" Value="{DynamicResource MilBorderBrush}" />
             <Setter Property="BorderThickness" Value="0,0,1,1" />
+            <Setter Property="ToolTip"
+                    Value="Click to sort this column. Click again to reverse the order." />
         </Style>
         <Style TargetType="{x:Type DataGridRow}">
             <Setter Property="Background" Value="{DynamicResource MilWellBrush}" />
@@ -157,7 +159,7 @@
                       CanUserDeleteRows="False"
                       CanUserReorderColumns="False"
                       CanUserResizeRows="False"
-                      CanUserSortColumns="False"
+                      CanUserSortColumns="True"
                       GridLinesVisibility="None"
                       HeadersVisibility="Column"
                       IsReadOnly="True"
@@ -173,22 +175,26 @@
                       Background="{DynamicResource MilWellBrush}"
                       BorderBrush="#15100A"
                       BorderThickness="1"
-                      AlternatingRowBackground="{DynamicResource MilRowAltBrush}">
+                      AlternatingRowBackground="{DynamicResource MilRowAltBrush}"
+                      Sorting="PilotList_Sorting">
                 <DataGrid.Columns>
                     <DataGridTextColumn x:Name="CallsignColumn"
                                         Header="CALLSIGN"
                                         Binding="{Binding Callsign}"
+                                        SortMemberPath="Callsign"
                                         Width="Auto"
                                         MinWidth="120"
                                         ElementStyle="{StaticResource RosterCellTextStyle}" />
                     <DataGridTextColumn x:Name="PilotColumn"
                                         Header="PILOT"
                                         Binding="{Binding PilotName}"
+                                        SortMemberPath="PilotName"
                                         Width="*"
                                         ElementStyle="{StaticResource RosterCellTextStyle}" />
                     <DataGridTextColumn x:Name="VehicleColumn"
                                         Header="VEHICLE"
                                         Binding="{Binding Vehicle}"
+                                        SortMemberPath="Vehicle"
                                         Width="Auto"
                                         MinWidth="96"
                                         Visibility="Collapsed"
@@ -196,12 +202,14 @@
                     <DataGridTextColumn x:Name="Radio1Column"
                                         Header="R1"
                                         Binding="{Binding Radio1Channel}"
+                                        SortMemberPath="Radio1ChannelNumber"
                                         Width="Auto"
                                         MinWidth="64"
                                         ElementStyle="{StaticResource RosterCellTextStyle}" />
                     <DataGridTextColumn x:Name="Radio2Column"
                                         Header="R2"
                                         Binding="{Binding Radio2Channel}"
+                                        SortMemberPath="Radio2ChannelNumber"
                                         Width="Auto"
                                         MinWidth="64"
                                         ElementStyle="{StaticResource RosterCellTextStyle}" />

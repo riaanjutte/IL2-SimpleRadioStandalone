@@ -22,6 +22,7 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Common.Setting
         SECOND_RADIO_ENABLED,
         CHANNEL_LIMIT,
         RADIO_COLLISION_EFFECTS,
+        PRIORITY_TRANSMITTER_NAMES,
         ASSIGNED_CALLSIGNS_JSON_FILE,
         PILOT_ROSTER_DATA_AVAILABLE,
         DSERVER_RCON_ADDRESS,
@@ -47,6 +48,7 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Common.Setting
             { ServerSettingsKeys.SECOND_RADIO_ENABLED.ToString(), "true" },
             { ServerSettingsKeys.CHANNEL_LIMIT.ToString(), "5" },
             { ServerSettingsKeys.RADIO_COLLISION_EFFECTS.ToString(), "false" },
+            { ServerSettingsKeys.PRIORITY_TRANSMITTER_NAMES.ToString(), "Axis Command,Allies Command,Axis Airfield,Allies Airfield" },
             { ServerSettingsKeys.ASSIGNED_CALLSIGNS_JSON_FILE.ToString(), @"\\tempest.combatbox.net\cb-radio-status\callsign-roster.json" },
         };
     }

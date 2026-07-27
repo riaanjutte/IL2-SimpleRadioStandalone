@@ -80,6 +80,44 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Common.Tests.UI
         }
 
         [TestMethod]
+        public void ColumnComparerSortsRadioChannelsNumerically()
+        {
+            var roster = PilotRosterBuilder.Build(CreateState(FriendlyCoalition, 1, 2), new[]
+            {
+                CreateClient("friendly-1", "Alpha", "", FriendlyCoalition, 10, 1),
+                CreateClient("friendly-2", "Bravo", "", FriendlyCoalition, 3, 9),
+                CreateClient("friendly-3", "Charlie", "", FriendlyCoalition, 3, 2)
+            }).ToList();
+
+            roster.Sort(new PilotRosterEntryComparer(
+                PilotRosterSortColumn.Radio1,
+                System.ComponentModel.ListSortDirection.Ascending));
+
+            CollectionAssert.AreEqual(
+                new[] { "BRAVO", "CHARLIE", "ALPHA" },
+                roster.Select(entry => entry.PilotName).ToArray());
+        }
+
+        [TestMethod]
+        public void ColumnComparerKeepsUnavailableValuesLastWhenDescending()
+        {
+            var roster = PilotRosterBuilder.Build(CreateState(FriendlyCoalition, 1, 2), new[]
+            {
+                CreateClient("friendly-1", "Unavailable", "", FriendlyCoalition, 0, 0),
+                CreateClient("friendly-2", "Lower", "", FriendlyCoalition, 3, 2),
+                CreateClient("friendly-3", "Higher", "", FriendlyCoalition, 12, 2)
+            }).ToList();
+
+            roster.Sort(new PilotRosterEntryComparer(
+                PilotRosterSortColumn.Radio1,
+                System.ComponentModel.ListSortDirection.Descending));
+
+            CollectionAssert.AreEqual(
+                new[] { "HIGHER", "LOWER", "UNAVAILABLE" },
+                roster.Select(entry => entry.PilotName).ToArray());
+        }
+
+        [TestMethod]
         public void BuildExcludesCombatBoxInfrastructureClients()
         {
             var roster = PilotRosterBuilder.Build(CreateState(FriendlyCoalition, 1, 2), new[]

@@ -4,6 +4,7 @@ using System.ComponentModel;
 using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Data;
 using System.Windows.Input;
 using System.Windows.Interop;
 using System.Windows.Media;
@@ -174,6 +175,53 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI.ClientWindow.PilotRoster
                 : Visibility.Visible;
 
             Dispatcher.BeginInvoke(new Action(RefreshRosterLayout), DispatcherPriority.Loaded);
+        }
+
+        private void PilotList_Sorting(object sender, DataGridSortingEventArgs e)
+        {
+            e.Handled = true;
+
+            var direction = e.Column.SortDirection == ListSortDirection.Ascending
+                ? ListSortDirection.Descending
+                : ListSortDirection.Ascending;
+
+            foreach (var column in PilotList.Columns)
+            {
+                column.SortDirection = null;
+            }
+
+            e.Column.SortDirection = direction;
+
+            var collectionView = CollectionViewSource.GetDefaultView(_pilotRoster) as ListCollectionView;
+            if (collectionView != null)
+            {
+                collectionView.CustomSort = new PilotRosterEntryComparer(GetSortColumn(e.Column), direction);
+            }
+        }
+
+        private PilotRosterSortColumn GetSortColumn(DataGridColumn column)
+        {
+            if (ReferenceEquals(column, CallsignColumn))
+            {
+                return PilotRosterSortColumn.Callsign;
+            }
+
+            if (ReferenceEquals(column, VehicleColumn))
+            {
+                return PilotRosterSortColumn.Vehicle;
+            }
+
+            if (ReferenceEquals(column, Radio1Column))
+            {
+                return PilotRosterSortColumn.Radio1;
+            }
+
+            if (ReferenceEquals(column, Radio2Column))
+            {
+                return PilotRosterSortColumn.Radio2;
+            }
+
+            return PilotRosterSortColumn.PilotName;
         }
 
         private void RefreshRosterLayout()

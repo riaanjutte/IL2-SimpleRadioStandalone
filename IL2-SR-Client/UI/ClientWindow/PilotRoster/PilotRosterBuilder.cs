@@ -17,7 +17,7 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI.ClientWindow.PilotRoster
                 return new List<PilotRosterEntry>();
             }
 
-            return (connectedClients ?? Enumerable.Empty<SRClient>())
+            var entries = (connectedClients ?? Enumerable.Empty<SRClient>())
                 .Where(client => client != null &&
                                  client.Coalition == ownCoalition &&
                                  IsRealPlayerClient(client.Name))
@@ -25,8 +25,10 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI.ClientWindow.PilotRoster
                     client.AssignedCallsign,
                     client.Name,
                     client.AssignedVehicle,
-                    FormatRadioChannel(client.GameState, 1),
-                    FormatRadioChannel(client.GameState, 2)))
+                    GetRadioChannel(client.GameState, 1),
+                    GetRadioChannel(client.GameState, 2)));
+
+            return entries
                 .OrderBy(entry => entry.Callsign == "--" ? 1 : 0)
                 .ThenBy(entry => entry.Callsign, System.StringComparer.OrdinalIgnoreCase)
                 .ThenBy(entry => entry.PilotName, System.StringComparer.OrdinalIgnoreCase)
@@ -76,20 +78,20 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI.ClientWindow.PilotRoster
                 : "ACTIVE SQUAD OPS: " + string.Join(" | ", activeSquads.ToArray());
         }
 
-        private static string FormatRadioChannel(PlayerGameState gameState, int radioIndex)
+        private static int GetRadioChannel(PlayerGameState gameState, int radioIndex)
         {
             if (gameState?.radios == null ||
                 gameState.radios.Length <= radioIndex ||
                 gameState.radios[radioIndex] == null)
             {
-                return "--";
+                return 0;
             }
 
             var radio = gameState.radios[radioIndex];
             if (radio.modulation == RadioInformation.Modulation.DISABLED ||
                 radio.modulation == RadioInformation.Modulation.INTERCOM)
             {
-                return "--";
+                return 0;
             }
 
             var channel = radio.Channel;
@@ -98,9 +100,7 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI.ClientWindow.PilotRoster
                 channel = radio.channel;
             }
 
-            return channel > 0
-                ? "CHN " + channel.ToString(CultureInfo.InvariantCulture)
-                : "--";
+            return channel > 0 ? channel : 0;
         }
 
         private static IEnumerable<int> GetOperationalChannels(PlayerGameState gameState)

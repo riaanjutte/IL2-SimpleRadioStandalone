@@ -33,6 +33,7 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Server.Network
 
         private readonly ServerSettingsStore _serverSettings = ServerSettingsStore.Instance;
         private readonly RadioCollisionDetector _radioCollisionDetector = new RadioCollisionDetector();
+        private readonly HashSet<string> _priorityTransmitterNames;
         private UdpClient _listener;
 
         private volatile bool _stop;
@@ -49,6 +50,19 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Server.Network
 
             var globalFreqString = _serverSettings.GetGeneralSetting(ServerSettingsKeys.GLOBAL_LOBBY_FREQUENCIES).StringValue;
             UpdateGlobalLobbyFrequencies(globalFreqString);
+
+            var priorityNames = _serverSettings
+                .GetGeneralSetting(ServerSettingsKeys.PRIORITY_TRANSMITTER_NAMES)
+                .StringValue;
+            _priorityTransmitterNames = new HashSet<string>(
+                priorityNames.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries)
+                    .Select(name => name.Trim())
+                    .Where(name => name.Length > 0),
+                StringComparer.OrdinalIgnoreCase);
+
+            Logger.Info(_priorityTransmitterNames.Count == 0
+                ? "No priority transmitters configured"
+                : $"Priority transmitters: {string.Join(", ", _priorityTransmitterNames)}");
         }
 
 
@@ -213,8 +227,11 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Server.Network
                                         //magical ping ignore message 4 - its an empty voip packet to intialise VoIP if
                                         //someone doesnt transmit
                                     {
-                                        ApplyRadioCollisionState(udpVoicePacket, udpPacket.RawBytes, client);
-                                        var outgoingVoice = GenerateOutgoingPacket(udpVoicePacket, udpPacket, client);
+                                        var collisionResult =
+                                            ApplyRadioCollisionState(udpVoicePacket, udpPacket.RawBytes, client);
+                                        var outgoingVoice = collisionResult == RadioCollisionResult.BlockedByPriority
+                                            ? null
+                                            : GenerateOutgoingPacket(udpVoicePacket, udpPacket, client);
 
                                         if (outgoingVoice != null)
                                         {
@@ -286,33 +303,37 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Server.Network
                 }
         }
 
-        private void ApplyRadioCollisionState(UDPVoicePacket voicePacket, byte[] rawPacket, SRClient fromClient)
+        private RadioCollisionResult ApplyRadioCollisionState(UDPVoicePacket voicePacket, byte[] rawPacket,
+            SRClient fromClient)
         {
             var enabled = _serverSettings
                 .GetGeneralSetting(ServerSettingsKeys.RADIO_COLLISION_EFFECTS)
                 .BoolValue;
 
-            var collision = false;
+            var result = RadioCollisionResult.Clear;
             if (enabled)
             {
                 var isolateCoalitions = _serverSettings
                     .GetGeneralSetting(ServerSettingsKeys.COALITION_AUDIO_SECURITY)
                     .BoolValue;
 
-                collision = _radioCollisionDetector.RegisterPacket(
+                result = _radioCollisionDetector.RegisterPacketWithPriority(
                     fromClient.ClientGuid,
                     fromClient.Coalition,
                     voicePacket.Frequencies,
                     voicePacket.Modulations,
-                    isolateCoalitions);
+                    isolateCoalitions,
+                    _priorityTransmitterNames.Contains((fromClient.Name ?? string.Empty).Trim()));
             }
             else
             {
                 _radioCollisionDetector.Reset();
             }
 
+            var collision = result == RadioCollisionResult.Collision;
             voicePacket.IsRadioCollision = collision;
             UDPVoicePacket.SetRadioCollisionFlag(rawPacket, collision);
+            return result;
         }
 
         private OutgoingUDPPackets GenerateOutgoingPacket(UDPVoicePacket udpVoice, PendingPacket pendingPacket,

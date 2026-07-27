@@ -1,5 +1,32 @@
 # Changelog
 
+## IL2-SRS 1.0.4.8-beta.4 community update
+
+### Added
+
+- Pilot Roster columns can now be sorted by clicking their headers. Clicking the same header again reverses the order.
+- Added a configurable priority-transmitter allowlist, initially containing the four Combat Box Radio bot names.
+
+### Changed
+
+- Radio channel columns in the Pilot Roster sort numerically, with unavailable values kept at the end.
+- Priority-transmitter audio remains clear while overlapping ordinary transmissions on the same channel are withheld by the server.
+
+### Fixed
+
+- Fixed an auto-connect race where an IL-2 telemetry update could try to use the SRS TCP connection before it had finished connecting.
+- Duplicate connection attempts and stale callbacks from cancelled attempts can no longer disrupt a newer connection.
+
+### Compatibility
+
+- The priority-transmitter feature is server-side and does not require changes to the Combat Box Radio bot.
+- Updated clients and servers remain compatible with older `1.0.4.8` installations.
+
+### Validation
+
+- Built `IL2-SimpleRadioStandalone.sln` Release/x64 successfully.
+- Ran `IL2-SR-CommonTests` Release/x64: 122/122 passed.
+
 ## IL2-SRS 1.0.4.8-beta.3 community update
 
 ### Added

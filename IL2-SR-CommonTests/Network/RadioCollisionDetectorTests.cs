@@ -60,5 +60,58 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Common.Tests.Network
             Assert.IsFalse(detector.RegisterPacket("two", 1, new[] { 100.0 }, intercom, false,
                 now.AddMilliseconds(20)));
         }
+
+        [TestMethod]
+        public void PriorityTransmitterRemainsClearAndBlocksOverlappingOrdinaryTransmitter()
+        {
+            var detector = new RadioCollisionDetector();
+            var now = DateTime.UtcNow;
+
+            Assert.AreEqual(
+                RadioCollisionResult.Clear,
+                detector.RegisterPacketWithPriority("player", 1, new[] { 125000000.0 }, Am, true, false, now));
+            Assert.AreEqual(
+                RadioCollisionResult.Clear,
+                detector.RegisterPacketWithPriority("bot", 1, new[] { 125000000.0 }, Am, true, true,
+                    now.AddMilliseconds(20)));
+            Assert.AreEqual(
+                RadioCollisionResult.BlockedByPriority,
+                detector.RegisterPacketWithPriority("player", 1, new[] { 125000000.0 }, Am, true, false,
+                    now.AddMilliseconds(40)));
+        }
+
+        [TestMethod]
+        public void PriorityTransmitterOnlyBlocksMatchingChannelAndCoalitionDomain()
+        {
+            var detector = new RadioCollisionDetector();
+            var now = DateTime.UtcNow;
+
+            Assert.AreEqual(
+                RadioCollisionResult.Clear,
+                detector.RegisterPacketWithPriority("bot", 1, new[] { 125000000.0 }, Am, true, true, now));
+            Assert.AreEqual(
+                RadioCollisionResult.Clear,
+                detector.RegisterPacketWithPriority("other-channel", 1, new[] { 126000000.0 }, Am, true, false,
+                    now.AddMilliseconds(20)));
+            Assert.AreEqual(
+                RadioCollisionResult.Clear,
+                detector.RegisterPacketWithPriority("other-coalition", 2, new[] { 125000000.0 }, Am, true, false,
+                    now.AddMilliseconds(40)));
+        }
+
+        [TestMethod]
+        public void PriorityProtectionExpiresWithTransmissionActivityWindow()
+        {
+            var detector = new RadioCollisionDetector(TimeSpan.FromMilliseconds(120));
+            var now = DateTime.UtcNow;
+
+            Assert.AreEqual(
+                RadioCollisionResult.Clear,
+                detector.RegisterPacketWithPriority("bot", 1, new[] { 125000000.0 }, Am, true, true, now));
+            Assert.AreEqual(
+                RadioCollisionResult.Clear,
+                detector.RegisterPacketWithPriority("player", 1, new[] { 125000000.0 }, Am, true, false,
+                    now.AddMilliseconds(150)));
+        }
     }
 }

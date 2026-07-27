@@ -4,6 +4,13 @@ using System.Linq;
 
 namespace Ciribob.IL2.SimpleRadio.Standalone.Common.Network
 {
+    public enum RadioCollisionResult
+    {
+        Clear,
+        Collision,
+        BlockedByPriority
+    }
+
     public sealed class RadioCollisionDetector
     {
         public static readonly TimeSpan DefaultActivityWindow = TimeSpan.FromMilliseconds(120);
@@ -36,9 +43,23 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Common.Network
         public bool RegisterPacket(string senderGuid, int coalition, double[] frequencies, byte[] modulations,
             bool isolateCoalitions, DateTime utcNow)
         {
+            return RegisterPacketWithPriority(senderGuid, coalition, frequencies, modulations, isolateCoalitions,
+                       false, utcNow) == RadioCollisionResult.Collision;
+        }
+
+        public RadioCollisionResult RegisterPacketWithPriority(string senderGuid, int coalition,
+            double[] frequencies, byte[] modulations, bool isolateCoalitions, bool isPriority)
+        {
+            return RegisterPacketWithPriority(senderGuid, coalition, frequencies, modulations, isolateCoalitions,
+                isPriority, DateTime.UtcNow);
+        }
+
+        public RadioCollisionResult RegisterPacketWithPriority(string senderGuid, int coalition,
+            double[] frequencies, byte[] modulations, bool isolateCoalitions, bool isPriority, DateTime utcNow)
+        {
             if (string.IsNullOrWhiteSpace(senderGuid))
             {
-                return false;
+                return RadioCollisionResult.Clear;
             }
 
             var channels = BuildChannels(frequencies, modulations);
@@ -48,21 +69,33 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Common.Network
                 _activeTransmissions.RemoveAll(active =>
                     utcNow - active.LastPacketAtUtc > _activityWindow);
 
-                var collision = channels.Count > 0 &&
-                                _activeTransmissions.Any(active =>
-                                    !string.Equals(active.SenderGuid, senderGuid, StringComparison.Ordinal) &&
-                                    (!isolateCoalitions || active.Coalition == coalition) &&
-                                    ChannelsOverlap(active.Channels, channels));
+                var overlappingTransmissions = _activeTransmissions
+                    .Where(active =>
+                        !string.Equals(active.SenderGuid, senderGuid, StringComparison.Ordinal) &&
+                        (!isolateCoalitions || active.Coalition == coalition) &&
+                        ChannelsOverlap(active.Channels, channels))
+                    .ToList();
+
+                var result = RadioCollisionResult.Clear;
+                if (!isPriority && overlappingTransmissions.Any(active => active.IsPriority))
+                {
+                    result = RadioCollisionResult.BlockedByPriority;
+                }
+                else if (!isPriority && overlappingTransmissions.Count > 0)
+                {
+                    result = RadioCollisionResult.Collision;
+                }
 
                 _activeTransmissions.RemoveAll(active =>
                     string.Equals(active.SenderGuid, senderGuid, StringComparison.Ordinal));
 
                 if (channels.Count > 0)
                 {
-                    _activeTransmissions.Add(new ActiveTransmission(senderGuid, coalition, channels, utcNow));
+                    _activeTransmissions.Add(
+                        new ActiveTransmission(senderGuid, coalition, channels, isPriority, utcNow));
                 }
 
-                return collision;
+                return result;
             }
         }
 
@@ -111,17 +144,19 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Common.Network
         private sealed class ActiveTransmission
         {
             public ActiveTransmission(string senderGuid, int coalition, List<RadioChannel> channels,
-                DateTime lastPacketAtUtc)
+                bool isPriority, DateTime lastPacketAtUtc)
             {
                 SenderGuid = senderGuid;
                 Coalition = coalition;
                 Channels = channels;
+                IsPriority = isPriority;
                 LastPacketAtUtc = lastPacketAtUtc;
             }
 
             public string SenderGuid { get; }
             public int Coalition { get; }
             public List<RadioChannel> Channels { get; }
+            public bool IsPriority { get; }
             public DateTime LastPacketAtUtc { get; }
         }
 
