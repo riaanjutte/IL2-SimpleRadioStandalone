@@ -274,6 +274,7 @@
     </Compile>
     <Compile Include="UI\ClientWindow\Diagnostics\DiagnosticBundleBuilder.cs" />
     <Compile Include="UI\ClientWindow\Diagnostics\TelemetryDiagnostics.cs" />
+    <Compile Include="UI\ClientWindow\Diagnostics\WindowsFirewallTelemetryDiagnostic.cs" />
     <Compile Include="UI\ClientWindow\Diagnostics\TelemetryDiagnosticsWindow.xaml.cs">
       <DependentUpon>TelemetryDiagnosticsWindow.xaml</DependentUpon>
     </Compile>

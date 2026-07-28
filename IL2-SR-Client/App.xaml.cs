@@ -416,9 +416,8 @@ namespace IL2_SR_Client
                 return;
             }
 
-            bool il2WasRunning = IsIL2Running();
-            bool repairedAny = false;
             List<string> failedConfigs = new List<string>();
+            List<string> deferredConfigs = new List<string>();
 
             foreach (TelemetryDiagnosticContext context in contexts
                          .Where(context => !string.IsNullOrWhiteSpace(context.StartupConfigPath))
@@ -428,16 +427,30 @@ namespace IL2_SR_Client
                 string cfgPath = context.StartupConfigPath;
                 try
                 {
-                    bool repaired = StartupConfigTelemetry.EnsureEnabled(cfgPath, message => Logger.Info(message));
+                    if (IsIL2Running() && !StartupConfigTelemetry.IsEnabled(cfgPath))
+                    {
+                        deferredConfigs.Add(cfgPath);
+                        Logger.Warn($"Deferred {context.DisplayName} startup.cfg telemetry repair because IL-2 is running: {cfgPath}");
+                        continue;
+                    }
+
+                    bool repaired = StartupConfigTelemetry.EnsureEnabled(
+                        cfgPath,
+                        message => Logger.Info(message),
+                        () => !IsIL2Running());
                     if (repaired)
                     {
-                        repairedAny = true;
                         Logger.Info($"Repaired {context.DisplayName} startup.cfg telemetry settings at {cfgPath}");
                     }
                     else
                     {
                         Logger.Info($"Verified {context.DisplayName} startup.cfg telemetry settings at {cfgPath}");
                     }
+                }
+                catch (InvalidOperationException ex)
+                {
+                    deferredConfigs.Add(cfgPath);
+                    Logger.Warn(ex, $"Deferred {context.DisplayName} startup.cfg telemetry repair because IL-2 started during the check: {cfgPath}");
                 }
                 catch (Exception ex)
                 {
@@ -446,15 +459,16 @@ namespace IL2_SR_Client
                 }
             }
 
-            if (repairedAny && il2WasRunning)
+            if (deferredConfigs.Count > 0)
             {
-                Logger.Warn("IL-2 was running while one or more startup.cfg telemetry settings were repaired; IL-2 must be restarted before telemetry changes take effect.");
                 MessageBox.Show(
-                    "SRS repaired telemetry settings in one or more IL-2 startup.cfg files, but IL-2 is currently running.\n\n" +
-                    "Close IL-2 completely and start it again before joining a server. Otherwise auto-connect and in-game radio data may not work.",
+                    "SRS needs to repair telemetry settings, but IL-2 is currently running.\n\n" +
+                    "To protect your game settings, SRS did not change startup.cfg. Close IL-2 completely, then restart SRS or run Telemetry Diagnostics again.\n\n" +
+                    "Files awaiting repair:" + Environment.NewLine + Environment.NewLine +
+                    string.Join(Environment.NewLine, deferredConfigs.Distinct(StringComparer.OrdinalIgnoreCase)),
                     "IL2-SRS Telemetry Check",
                     MessageBoxButton.OK,
-                    MessageBoxImage.Information);
+                    MessageBoxImage.Warning);
             }
 
             if (failedConfigs.Count > 0)

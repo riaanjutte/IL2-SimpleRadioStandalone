@@ -79,6 +79,7 @@
     <Compile Include="Input\InputPollingCycleCacheTests.cs" />
     <Compile Include="Installer\SrsInstallConsolidatorTests.cs" />
     <Compile Include="Settings\UserDataPathsTests.cs" />
+    <Compile Include="Settings\DefaultServerSettingsTests.cs" />
     <Compile Include="Network\CombatBoxCallsignRosterTests.cs" />
     <Compile Include="Network\RadioCollisionDetectorTests.cs" />
     <Compile Include="Network\SrsClientConnectionLifecycleTests.cs" />
@@ -93,7 +94,9 @@
     <Compile Include="UI\RadioOverlaySpeakerNameScrollTests.cs" />
     <Compile Include="UI\PilotRosterAccessPolicyTests.cs" />
     <Compile Include="UI\PilotRosterBuilderTests.cs" />
+    <Compile Include="UI\WindowsFirewallTelemetryDiagnosticTests.cs" />
     <Compile Include="Utils\RadioHelperMuteTests.cs" />
+    <Compile Include="Utils\StartupConfigTelemetryTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Properties\TestEnvironment.cs" />
   </ItemGroup>

@@ -722,11 +722,34 @@ namespace Installer
 
             _progressBarDialog.UpdateProgress(false, $"Enable SRS Telemetry @ {cfgPath}");
 
-            StartupConfigTelemetry.EnsureEnabled(cfgPath, logMessage => Logger.Info(logMessage));
+            StartupConfigTelemetry.EnsureEnabled(
+                cfgPath,
+                logMessage => Logger.Info(logMessage),
+                () => !IsIL2Running());
 
             Logger.Info($"Config installed to {cfgPath}");
 
             _progressBarDialog.UpdateProgress(false, $"Installed IL2-SRS Config @ {cfgPath}");
+        }
+
+        private static bool IsIL2Running()
+        {
+            foreach (string processName in new[] { "Il-2", "IL2Series" })
+            {
+                try
+                {
+                    if (Process.GetProcessesByName(processName).Length > 0)
+                    {
+                        return true;
+                    }
+                }
+                catch
+                {
+                    return true;
+                }
+            }
+
+            return false;
         }
 
         public static void DeleteDirectory(string target_dir)

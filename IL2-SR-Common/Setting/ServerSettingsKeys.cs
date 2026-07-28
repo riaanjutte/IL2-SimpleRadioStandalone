@@ -49,7 +49,7 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Common.Setting
             { ServerSettingsKeys.CHANNEL_LIMIT.ToString(), "5" },
             { ServerSettingsKeys.RADIO_COLLISION_EFFECTS.ToString(), "false" },
             { ServerSettingsKeys.PRIORITY_TRANSMITTER_NAMES.ToString(), "Axis Command,Allies Command,Axis Airfield,Allies Airfield" },
-            { ServerSettingsKeys.ASSIGNED_CALLSIGNS_JSON_FILE.ToString(), @"\\tempest.combatbox.net\cb-radio-status\callsign-roster.json" },
+            { ServerSettingsKeys.ASSIGNED_CALLSIGNS_JSON_FILE.ToString(), "" },
         };
     }
 }

@@ -1,5 +1,34 @@
 # Changelog
 
+## IL2-SRS 1.0.4.8-beta.5 community update
+
+### Added
+
+- Telemetry Diagnostics now checks whether Windows Firewall allows the SRS client to receive IL-2 telemetry on UDP port 4322.
+- SRS creates a byte-identical `startup.cfg.il2srs.bak` before its first telemetry configuration change.
+
+### Changed
+
+- Automatic telemetry repair is deferred while IL-2 Great Battles or IL-2 Korea is running, with clear instructions shown to the user.
+- Telemetry configuration updates now preserve the original file encoding, byte-order-mark state, and read-only attribute.
+- Server-side Pilot Roster JSON integration is disabled until a server administrator explicitly configures a data file path.
+
+### Fixed
+
+- Prevented SRS and IL-2 from writing `startup.cfg` concurrently during game startup.
+- Telemetry repair now aborts if `startup.cfg` changes during the operation and uses atomic file replacement to avoid partial files.
+- New server configurations no longer attempt to access an unintended remote Pilot Roster path, preventing delayed or timed-out client synchronization.
+
+### Compatibility
+
+- Updated clients and servers remain compatible with other `1.0.4.8` builds.
+- Existing server administrators can continue using Pilot Roster JSON by explicitly configuring `ASSIGNED_CALLSIGNS_JSON_FILE`.
+
+### Validation
+
+- Built `IL2-SimpleRadioStandalone.sln` Release/x64 successfully.
+- Ran `IL2-SR-CommonTests` Release/x64: 134/134 passed.
+
 ## IL2-SRS 1.0.4.8-beta.4 community update
 
 ### Added

@@ -22,6 +22,11 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.Utils
 
         public static bool EnsureEnabled(string cfgPath, Action<string> log)
         {
+            return EnsureEnabled(cfgPath, log, null);
+        }
+
+        public static bool EnsureEnabled(string cfgPath, Action<string> log, Func<bool> writeAllowed)
+        {
             if (string.IsNullOrWhiteSpace(cfgPath))
             {
                 throw new ArgumentException("startup.cfg path is required", "cfgPath");
@@ -35,15 +40,20 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.Utils
             bool changed = false;
             RunWithRetries(delegate
             {
-                Encoding encoding;
-                string config = ReadAllText(cfgPath, out encoding);
+                StartupConfigFile configFile = ReadConfigFile(cfgPath);
                 bool textChanged;
-                string updatedConfig = EnsureEnabledInText(config, out textChanged);
+                string updatedConfig = EnsureEnabledInText(configFile.Text, out textChanged);
 
                 if (!textChanged)
                 {
                     Log(log, "startup.cfg already contains the IL2-SRS telemetry endpoint");
                     return;
+                }
+
+                if (writeAllowed != null && !writeAllowed())
+                {
+                    throw new InvalidOperationException(
+                        "IL-2 is running. Close IL-2 before SRS repairs startup.cfg.");
                 }
 
                 FileAttributes originalAttributes = File.GetAttributes(cfgPath);
@@ -57,12 +67,13 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.Utils
 
                 try
                 {
-                    WriteAllText(cfgPath, updatedConfig, encoding);
+                    WriteBackupIfMissing(cfgPath, configFile.OriginalBytes, log);
+                    WriteAllText(cfgPath, updatedConfig, configFile, writeAllowed);
                     changed = true;
                     Log(log, "startup.cfg telemetrydevice section updated");
 
-                    string verifiedConfig = ReadAllText(cfgPath, out encoding);
-                    if (!ContainsSrsTelemetryEndpoint(verifiedConfig))
+                    StartupConfigFile verifiedConfig = ReadConfigFile(cfgPath);
+                    if (!ContainsSrsTelemetryEndpoint(verifiedConfig.Text))
                     {
                         throw new IOException("Failed to verify IL2-SRS telemetry endpoint in startup.cfg after writing.");
                     }
@@ -79,6 +90,17 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.Utils
 
             return changed;
         }
+
+        internal static bool IsEnabled(string cfgPath)
+        {
+            if (string.IsNullOrWhiteSpace(cfgPath) || !File.Exists(cfgPath))
+            {
+                return false;
+            }
+
+            return ContainsSrsTelemetryEndpoint(ReadConfigFile(cfgPath).Text);
+        }
+
         internal static string EnsureEnabledInText(string config, out bool changed)
         {
             if (config == null)
@@ -274,30 +296,123 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.Utils
             return EnsureEnabledInText(config, out changed) == config && !changed;
         }
 
-        private static string ReadAllText(string path, out Encoding encoding)
+        private static StartupConfigFile ReadConfigFile(string path)
         {
-            using (StreamReader reader = new StreamReader(path, true))
-            {
-                string text = reader.ReadToEnd();
-                encoding = reader.CurrentEncoding;
-                return text;
-            }
+            byte[] bytes = File.ReadAllBytes(path);
+            Encoding encoding;
+            int preambleLength;
+            DetectEncoding(bytes, out encoding, out preambleLength);
+
+            return new StartupConfigFile(
+                encoding.GetString(bytes, preambleLength, bytes.Length - preambleLength),
+                encoding,
+                preambleLength > 0,
+                bytes);
         }
 
-        private static void WriteAllText(string path, string text, Encoding encoding)
+        private static void DetectEncoding(byte[] bytes, out Encoding encoding, out int preambleLength)
         {
-            string tempPath = path + ".il2srs.tmp";
+            if (StartsWith(bytes, new byte[] { 0x00, 0x00, 0xFE, 0xFF }))
+            {
+                encoding = new UTF32Encoding(true, true);
+                preambleLength = 4;
+                return;
+            }
+
+            if (StartsWith(bytes, new byte[] { 0xFF, 0xFE, 0x00, 0x00 }))
+            {
+                encoding = new UTF32Encoding(false, true);
+                preambleLength = 4;
+                return;
+            }
+
+            if (StartsWith(bytes, new byte[] { 0xEF, 0xBB, 0xBF }))
+            {
+                encoding = new UTF8Encoding(true);
+                preambleLength = 3;
+                return;
+            }
+
+            if (StartsWith(bytes, new byte[] { 0xFE, 0xFF }))
+            {
+                encoding = new UnicodeEncoding(true, true);
+                preambleLength = 2;
+                return;
+            }
+
+            if (StartsWith(bytes, new byte[] { 0xFF, 0xFE }))
+            {
+                encoding = new UnicodeEncoding(false, true);
+                preambleLength = 2;
+                return;
+            }
+
             try
             {
-                using (FileStream stream = new FileStream(tempPath, FileMode.Create, FileAccess.Write, FileShare.Read))
-                using (StreamWriter writer = new StreamWriter(stream, encoding))
+                encoding = new UTF8Encoding(false, true);
+                encoding.GetString(bytes);
+            }
+            catch (DecoderFallbackException)
+            {
+                encoding = Encoding.Default;
+            }
+
+            preambleLength = 0;
+        }
+
+        private static void WriteBackupIfMissing(string path, byte[] originalBytes, Action<string> log)
+        {
+            string backupPath = path + ".il2srs.bak";
+            if (File.Exists(backupPath))
+            {
+                return;
+            }
+
+            using (FileStream stream = new FileStream(backupPath, FileMode.CreateNew, FileAccess.Write, FileShare.Read))
+            {
+                stream.Write(originalBytes, 0, originalBytes.Length);
+                stream.Flush(true);
+            }
+
+            Log(log, "Original startup.cfg backed up to " + backupPath);
+        }
+
+        private static void WriteAllText(
+            string path,
+            string text,
+            StartupConfigFile original,
+            Func<bool> writeAllowed)
+        {
+            string tempPath = path + ".il2srs." + Guid.NewGuid().ToString("N") + ".tmp";
+            try
+            {
+                byte[] body = original.Encoding.GetBytes(text);
+                byte[] preamble = original.HadPreamble ? original.Encoding.GetPreamble() : new byte[0];
+
+                using (FileStream stream = new FileStream(tempPath, FileMode.CreateNew, FileAccess.Write, FileShare.Read))
                 {
-                    writer.Write(text);
-                    writer.Flush();
+                    if (preamble.Length > 0)
+                    {
+                        stream.Write(preamble, 0, preamble.Length);
+                    }
+
+                    stream.Write(body, 0, body.Length);
                     stream.Flush(true);
                 }
 
-                File.Copy(tempPath, path, true);
+                if (writeAllowed != null && !writeAllowed())
+                {
+                    throw new InvalidOperationException(
+                        "IL-2 started while SRS was preparing a startup.cfg repair. No changes were made.");
+                }
+
+                if (!BytesEqual(File.ReadAllBytes(path), original.OriginalBytes))
+                {
+                    throw new IOException(
+                        "startup.cfg changed while SRS was preparing the telemetry repair. The repair was aborted.");
+                }
+
+                File.Replace(tempPath, path, null, true);
             }
             finally
             {
@@ -306,6 +421,42 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.Utils
                     File.Delete(tempPath);
                 }
             }
+        }
+
+        private static bool StartsWith(byte[] bytes, byte[] prefix)
+        {
+            if (bytes.Length < prefix.Length)
+            {
+                return false;
+            }
+
+            for (int i = 0; i < prefix.Length; i++)
+            {
+                if (bytes[i] != prefix[i])
+                {
+                    return false;
+                }
+            }
+
+            return true;
+        }
+
+        private static bool BytesEqual(byte[] left, byte[] right)
+        {
+            if (left.Length != right.Length)
+            {
+                return false;
+            }
+
+            for (int i = 0; i < left.Length; i++)
+            {
+                if (left[i] != right[i])
+                {
+                    return false;
+                }
+            }
+
+            return true;
         }
 
         private static string DetectNewline(string text)
@@ -382,6 +533,22 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.Utils
             {
                 log(message);
             }
+        }
+
+        private sealed class StartupConfigFile
+        {
+            public StartupConfigFile(string text, Encoding encoding, bool hadPreamble, byte[] originalBytes)
+            {
+                Text = text;
+                Encoding = encoding;
+                HadPreamble = hadPreamble;
+                OriginalBytes = originalBytes;
+            }
+
+            public string Text { get; private set; }
+            public Encoding Encoding { get; private set; }
+            public bool HadPreamble { get; private set; }
+            public byte[] OriginalBytes { get; private set; }
         }
     }
 }

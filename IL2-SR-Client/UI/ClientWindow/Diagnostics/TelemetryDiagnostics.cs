@@ -67,6 +67,14 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI.ClientWindow.Diagnostics
             builder.AppendLine("SRS telemetry endpoint: " + SrsAddress + ":" + ReadSrsTelemetryPort());
             builder.AppendLine("Detected IL-2 installs: " + (contexts.Any(context => !string.IsNullOrWhiteSpace(context.StartupConfigPath)) ? contexts.Count.ToString(CultureInfo.InvariantCulture) : "none"));
 
+            TelemetryDiagnosticReport environmentReport = new TelemetryDiagnosticReport();
+            environmentReport.AddRange(
+                WindowsFirewallTelemetryDiagnostic.DiagnoseCurrentProcess(ReadSrsTelemetryPort()));
+            builder.AppendLine();
+            builder.AppendLine("SRS environment");
+            builder.AppendLine("---------------");
+            builder.AppendLine(environmentReport.ToDisplayText());
+
             foreach (TelemetryDiagnosticContext context in contexts)
             {
                 TelemetryDiagnosticReport report = new TelemetryDiagnosticReport();
@@ -81,13 +89,19 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI.ClientWindow.Diagnostics
                 if (!string.IsNullOrWhiteSpace(context.StartupConfigPath)
                     && repairResults.TryGetValue(context.StartupConfigPath, out repairResult))
                 {
-                    report.Add(repairResult.Error == null ? TelemetryDiagnosticSeverity.Ok : TelemetryDiagnosticSeverity.Warning,
-                        repairResult.Error == null ? "SRS telemetry auto-repair" : "SRS telemetry auto-repair failed",
-                        repairResult.Error == null
+                    report.Add(repairResult.Error == null && !repairResult.Deferred
+                            ? TelemetryDiagnosticSeverity.Ok
+                            : TelemetryDiagnosticSeverity.Warning,
+                        repairResult.Deferred
+                            ? "SRS telemetry auto-repair deferred"
+                            : (repairResult.Error == null ? "SRS telemetry auto-repair" : "SRS telemetry auto-repair failed"),
+                        repairResult.Deferred
+                            ? "IL-2 is running. To protect your game settings, startup.cfg was not changed. Close IL-2 and run Telemetry Diagnostics again."
+                            : (repairResult.Error == null
                             ? (repairResult.Changed
-                                ? "startup.cfg was repaired and verified for 127.0.0.1:4322. Restart IL-2 if it was running."
+                                ? "startup.cfg was repaired and verified for 127.0.0.1:4322."
                                 : "startup.cfg was already correctly configured and was verified.")
-                            : repairResult.Error.Message);
+                            : repairResult.Error.Message));
                 }
 
                 if (context.StartupConfig == null)
@@ -128,8 +142,21 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI.ClientWindow.Diagnostics
             {
                 try
                 {
-                    bool changed = StartupConfigTelemetry.EnsureEnabled(context.StartupConfigPath, null);
+                    if (IsIL2Running() && !StartupConfigTelemetry.IsEnabled(context.StartupConfigPath))
+                    {
+                        results[context.StartupConfigPath] = new TelemetryRepairResult(false, null, true);
+                        continue;
+                    }
+
+                    bool changed = StartupConfigTelemetry.EnsureEnabled(
+                        context.StartupConfigPath,
+                        null,
+                        () => !IsIL2Running());
                     results[context.StartupConfigPath] = new TelemetryRepairResult(changed, null);
+                }
+                catch (InvalidOperationException)
+                {
+                    results[context.StartupConfigPath] = new TelemetryRepairResult(false, null, true);
                 }
                 catch (Exception ex)
                 {
@@ -138,6 +165,27 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI.ClientWindow.Diagnostics
             }
 
             return results;
+        }
+
+        internal static bool IsIL2Running()
+        {
+            foreach (string processName in IL2ProcessNames)
+            {
+                try
+                {
+                    if (Process.GetProcessesByName(processName).Length > 0)
+                    {
+                        return true;
+                    }
+                }
+                catch
+                {
+                    // A failed process query must not permit a potentially unsafe config write.
+                    return true;
+                }
+            }
+
+            return false;
         }
 
         internal static List<TelemetryDiagnosticContext> BuildContexts()
@@ -698,14 +746,16 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI.ClientWindow.Diagnostics
 
     internal sealed class TelemetryRepairResult
     {
-        public TelemetryRepairResult(bool changed, Exception error)
+        public TelemetryRepairResult(bool changed, Exception error, bool deferred = false)
         {
             Changed = changed;
             Error = error;
+            Deferred = deferred;
         }
 
         public bool Changed { get; private set; }
         public Exception Error { get; private set; }
+        public bool Deferred { get; private set; }
     }
 
     internal interface ITelemetryDiagnosticProvider
