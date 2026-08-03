@@ -15,9 +15,6 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Common.Setting
             settings.Remove(ServerSettingsKeys.DSERVER_RCON_ADDRESS.ToString());
             settings.Remove(ServerSettingsKeys.DSERVER_RCON_USERNAME.ToString());
             settings.Remove(ServerSettingsKeys.DSERVER_RCON_PASSWORD.ToString());
-            settings.Remove(ServerSettingsKeys.LOBBY_MUSIC_ENABLED.ToString());
-            settings.Remove(ServerSettingsKeys.LOBBY_MUSIC_DIRECTORY.ToString());
-            settings.Remove(ServerSettingsKeys.LOBBY_MUSIC_VOLUME.ToString());
         }
     }
 }

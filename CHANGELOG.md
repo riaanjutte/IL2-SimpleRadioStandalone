@@ -2,35 +2,28 @@
 
 ## IL2-SRS 1.0.4.8-beta.6 community update
 
-### Added
-
-- Server owners can optionally play `.ogg` music to players in the neutral lobby.
-- Added server controls for enabling neutral-lobby music and setting its volume.
-- Added a client setting that allows each player to enable or disable neutral-lobby music.
-- Added a server administrator guide for configuring the lobby music directory and playlist.
-
 ### Changed
 
-- Neutral-lobby music is delivered independently of the client's selected radio channel and is centred in both stereo channels.
-- Neutral-lobby music is excluded from radio collision interference.
-- The installer creates the `LobbyMusic` directory, but no music files are bundled.
 - The server now adds every missing persistent setting to `server.cfg` during startup while preserving existing values.
 
 ### Fixed
 
 - Returning to spectator or the neutral lobby now clears the previous coalition and vehicle state, preventing Pilot Roster data from carrying over from the previous mission.
-- Server-only file paths, RCon credentials, and lobby-music configuration are no longer synchronized to clients.
-- The server window is tall enough to show the new lobby-music controls without requiring its scrollbar.
+- Server-only Pilot Roster paths and RCon credentials are no longer synchronized to clients.
+
+### Removed
+
+- Removed the experimental neutral-lobby music feature after beta testing showed that continuous streaming did not fit SRS's short-transmission audio pipeline reliably.
 
 ### Compatibility
 
 - Updated clients and servers remain compatible with other `1.0.4.8` builds.
-- Lobby music requires a Beta 6 client. Older clients ignore the reserved server music stream.
+- Users who installed the original Beta 6 build must reinstall this replacement because both builds use the same version number.
 
 ### Validation
 
 - Built `IL2-SimpleRadioStandalone.sln` Release/x64 successfully.
-- Ran `IL2-SR-CommonTests` Release/x64: 146/146 passed.
+- Ran `IL2-SR-CommonTests` Release/x64: 140/140 passed.
 
 ## IL2-SRS 1.0.4.8-beta.5 community update
 

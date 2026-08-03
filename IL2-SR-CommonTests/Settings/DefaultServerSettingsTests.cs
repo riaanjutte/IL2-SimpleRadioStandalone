@@ -18,17 +18,6 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Common.Tests.Settings
         }
 
         [TestMethod]
-        public void LobbyMusicIsOptInWithConservativeDefaultVolume()
-        {
-            Assert.AreEqual("false",
-                DefaultServerSettings.Defaults[ServerSettingsKeys.LOBBY_MUSIC_ENABLED.ToString()]);
-            Assert.AreEqual("LobbyMusic",
-                DefaultServerSettings.Defaults[ServerSettingsKeys.LOBBY_MUSIC_DIRECTORY.ToString()]);
-            Assert.AreEqual("0.25",
-                DefaultServerSettings.Defaults[ServerSettingsKeys.LOBBY_MUSIC_VOLUME.ToString()]);
-        }
-
-        [TestMethod]
         public void EveryPersistentServerSettingHasADefault()
         {
             foreach (ServerSettingsKeys key in Enum.GetValues(typeof(ServerSettingsKeys)))
@@ -54,7 +43,7 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Common.Tests.Settings
         }
 
         [TestMethod]
-        public void ServerOnlyPathsCredentialsAndMusicSettingsAreNotSyncedToClients()
+        public void ServerOnlyPathsAndCredentialsAreNotSyncedToClients()
         {
             var settings = new Dictionary<string, string>
             {
@@ -62,10 +51,7 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Common.Tests.Settings
                 { ServerSettingsKeys.ASSIGNED_CALLSIGNS_JSON_FILE.ToString(), @"C:\private\roster.json" },
                 { ServerSettingsKeys.DSERVER_RCON_ADDRESS.ToString(), "127.0.0.1:8991" },
                 { ServerSettingsKeys.DSERVER_RCON_USERNAME.ToString(), "admin" },
-                { ServerSettingsKeys.DSERVER_RCON_PASSWORD.ToString(), "secret" },
-                { ServerSettingsKeys.LOBBY_MUSIC_ENABLED.ToString(), "true" },
-                { ServerSettingsKeys.LOBBY_MUSIC_DIRECTORY.ToString(), @"C:\private\music" },
-                { ServerSettingsKeys.LOBBY_MUSIC_VOLUME.ToString(), "0.25" }
+                { ServerSettingsKeys.DSERVER_RCON_PASSWORD.ToString(), "secret" }
             };
 
             SyncedServerSettingsFilter.RemoveServerOnlySettings(settings);

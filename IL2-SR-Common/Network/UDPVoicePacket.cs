@@ -32,7 +32,6 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Common.Network
 
         public static readonly int GuidLength = 22;
         public const byte RadioCollisionFlag = 0x80;
-        public const string LobbyMusicGuid = "SRS_LOBBY_MUSIC_000001";
 
         public static readonly int PacketHeaderLength =
             sizeof(ushort) // UInt16 Packet Length - 2 bytes
@@ -83,9 +82,6 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Common.Network
         //Number of times its been retransmitted - added to stop retransmission loop with sensible limit
         public byte RetransmissionCount { get; set; } = new byte();
         public bool IsRadioCollision { get; set; }
-        public bool IsLobbyMusic =>
-            string.Equals(Guid, LobbyMusicGuid, StringComparison.Ordinal) ||
-            string.Equals(OriginalClientGuid, LobbyMusicGuid, StringComparison.Ordinal);
 
         public byte[] EncodePacket()
         {

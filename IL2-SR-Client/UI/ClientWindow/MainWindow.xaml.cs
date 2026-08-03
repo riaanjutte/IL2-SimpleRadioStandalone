@@ -909,8 +909,6 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI
 
             CheckForBetaUpdates.IsChecked = _globalSettings.GetClientSettingBool(GlobalSettingsKeys.CheckForBetaUpdates);
             PlayConnectionSounds.IsChecked = _globalSettings.GetClientSettingBool(GlobalSettingsKeys.PlayConnectionSounds);
-            NeutralLobbyMusicToggle.IsChecked =
-                _globalSettings.GetClientSettingBool(GlobalSettingsKeys.NeutralLobbyMusicEnabled);
 
             RequireAdminToggle.IsChecked = _globalSettings.GetClientSettingBool(GlobalSettingsKeys.RequireAdmin);
 
@@ -1211,7 +1209,6 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI
             yield return MicDenoise;
             yield return CheckForBetaUpdates;
             yield return PlayConnectionSounds;
-            yield return NeutralLobbyMusicToggle;
             yield return RequireAdminToggle;
             yield return ShowTransmitterName;
             yield return ThreeDEffectsToggle;
@@ -2266,12 +2263,6 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI
         private void PlayConnectionSounds_OnClick(object sender, RoutedEventArgs e)
         {
             _globalSettings.SetClientSetting(GlobalSettingsKeys.PlayConnectionSounds, (bool)PlayConnectionSounds.IsChecked);
-        }
-
-        private void NeutralLobbyMusicToggle_Click(object sender, RoutedEventArgs e)
-        {
-            _globalSettings.SetClientSetting(GlobalSettingsKeys.NeutralLobbyMusicEnabled,
-                (bool)NeutralLobbyMusicToggle.IsChecked);
         }
 
     

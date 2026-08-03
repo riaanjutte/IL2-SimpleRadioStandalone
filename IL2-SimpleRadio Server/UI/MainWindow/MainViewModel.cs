@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Globalization;
 using System.Windows;
 using System.Windows.Media.Imaging;
 using System.Windows.Threading;
@@ -109,32 +108,6 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Server.UI.MainWindow
             => ServerSettingsStore.Instance.GetGeneralSetting(ServerSettingsKeys.SECOND_RADIO_ENABLED).BoolValue ? "ON" : "OFF";
         public string RadioCollisionEffectsText
             => ServerSettingsStore.Instance.GetGeneralSetting(ServerSettingsKeys.RADIO_COLLISION_EFFECTS).BoolValue ? "ON" : "OFF";
-        public string LobbyMusicText
-            => ServerSettingsStore.Instance.GetGeneralSetting(ServerSettingsKeys.LOBBY_MUSIC_ENABLED).BoolValue ? "ON" : "OFF";
-        public string LobbyMusicVolumeText => $"Lobby Music Volume ({LobbyMusicVolumePercent}%)";
-        public int LobbyMusicVolumePercent
-        {
-            get
-            {
-                double volume;
-                var configured = ServerSettingsStore.Instance
-                    .GetGeneralSetting(ServerSettingsKeys.LOBBY_MUSIC_VOLUME).StringValue;
-                if (!double.TryParse(configured, NumberStyles.Float, CultureInfo.InvariantCulture, out volume))
-                {
-                    volume = 0.25;
-                }
-
-                return (int)Math.Round(Math.Max(0.0, Math.Min(1.0, volume)) * 100.0);
-            }
-            set
-            {
-                var bounded = Math.Max(0, Math.Min(100, value));
-                ServerSettingsStore.Instance.SetGeneralSetting(ServerSettingsKeys.LOBBY_MUSIC_VOLUME,
-                    (bounded / 100.0).ToString("0.00", CultureInfo.InvariantCulture));
-                NotifyOfPropertyChange(() => LobbyMusicVolumePercent);
-                NotifyOfPropertyChange(() => LobbyMusicVolumeText);
-            }
-        }
         public int ChannelLimit
         {
             get => ServerSettingsStore.Instance.GetGeneralSetting(ServerSettingsKeys.CHANNEL_LIMIT).IntValue;
@@ -271,13 +244,5 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Server.UI.MainWindow
             _eventAggregator.PublishOnBackgroundThread(new ServerSettingsChangedMessage());
         }
 
-        public void LobbyMusicToggle()
-        {
-            var newSetting = LobbyMusicText != "ON";
-            ServerSettingsStore.Instance.SetGeneralSetting(ServerSettingsKeys.LOBBY_MUSIC_ENABLED, newSetting);
-            NotifyOfPropertyChange(() => LobbyMusicText);
-
-            _eventAggregator.PublishOnBackgroundThread(new ServerSettingsChangedMessage());
-        }
     }
 }

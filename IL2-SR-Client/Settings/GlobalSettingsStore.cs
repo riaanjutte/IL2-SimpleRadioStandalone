@@ -74,7 +74,6 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.Settings
 
         DisableWindowVisibilityCheck ,
         PlayConnectionSounds,
-        NeutralLobbyMusicEnabled,
 
         RequireAdmin,
 
@@ -396,7 +395,6 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.Settings
 
             {GlobalSettingsKeys.DisableWindowVisibilityCheck.ToString(), "true"},
             {GlobalSettingsKeys.PlayConnectionSounds.ToString(), "true"},
-            {GlobalSettingsKeys.NeutralLobbyMusicEnabled.ToString(), "true"},
 
             {GlobalSettingsKeys.RequireAdmin.ToString(),"true" },
 

@@ -126,7 +126,7 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client
             //adjust for LOS + Distance + Volume
             AdjustVolume(audio);
 
-            if (audio.ShouldApplyRadioCollisionEffect)
+            if (audio.IsRadioCollision && audio.ReceivedRadio > 0)
             {
                 _radioCollisionEffectProcessor.Apply(audio.PcmAudioShort);
             }
@@ -159,23 +159,17 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client
             _lastReceivedOn = audio.ReceivedRadio;
             LastUpdate = DateTime.Now.Ticks;
 
-            var pcmAudio = ConversionHelpers.ShortArrayToByteArray(audio.PcmAudioShort);
             JitterBufferProviderInterface.AddSamples(new JitterBufferAudio
             {
-                Audio = audio.IsLobbyMusic
-                    ? CreateBalancedLobbyMusicMix(pcmAudio)
-                    : SeperateAudio(pcmAudio, audio.ReceivedRadio),
+                Audio =
+                    SeperateAudio(ConversionHelpers.ShortArrayToByteArray(audio.PcmAudioShort),
+                        audio.ReceivedRadio),
                 PacketNumber = audio.PacketNumber,
                 RadioId = audio.ReceivedRadio,
                 ClientGuid = monitorClientGuid
             });
 
             //timer.Stop();
-        }
-
-        internal static byte[] CreateBalancedLobbyMusicMix(byte[] pcmAudio)
-        {
-            return CreateBalancedMix(pcmAudio, 0f);
         }
 
         private void AddRadioEffectIntercom(ClientAudio clientAudio)

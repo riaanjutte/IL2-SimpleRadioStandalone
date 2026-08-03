@@ -5,7 +5,7 @@
              xmlns:local="clr-namespace:Ciribob.IL2.SimpleRadio.Standalone.Server.UI"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              Width="330"
-             Height="455"
+             Height="430"
              mc:Ignorable="d">
     <ScrollViewer VerticalScrollBarVisibility="Auto"  Margin="0,0,0,0" >
         <StackPanel Orientation="Vertical" Margin="5" >
@@ -166,45 +166,6 @@
                         Height="20"
                         VerticalAlignment="Center"
                         HorizontalAlignment="Center"/>
-
-                <Label Content="Neutral Lobby Music"
-                       Grid.Row="8"
-                       Grid.Column="0"
-                       Grid.ColumnSpan="2"
-                       HorizontalAlignment="Left"
-                       VerticalAlignment="Center"
-                       ToolTip="Loops .ogg files from the configured LobbyMusic directory for neutral clients only."/>
-
-                <Button x:Name="LobbyMusicToggle"
-                        Content="{Binding LobbyMusicText}"
-                        Grid.Row="8"
-                        Grid.Column="2"
-                        Width="75"
-                        Height="20"
-                        VerticalAlignment="Center"
-                        HorizontalAlignment="Center"
-                        ToolTip="Enable or disable server-provided music in the neutral lobby."/>
-
-                <Label Content="{Binding LobbyMusicVolumeText}"
-                       Grid.Row="9"
-                       Grid.Column="0"
-                       Grid.ColumnSpan="2"
-                       HorizontalAlignment="Left"
-                       VerticalAlignment="Center"/>
-
-                <Slider Value="{Binding LobbyMusicVolumePercent}"
-                        Grid.Row="9"
-                        Grid.Column="2"
-                        Width="75"
-                        Height="20"
-                        Minimum="0"
-                        Maximum="100"
-                        TickFrequency="5"
-                        IsSnapToTickEnabled="True"
-                        IsMoveToPointEnabled="True"
-                        HorizontalAlignment="Center"
-                        VerticalAlignment="Center"
-                        ToolTip="Set the server output level for neutral lobby music."/>
 
 
                 <Label Content="Check for beta updates" 

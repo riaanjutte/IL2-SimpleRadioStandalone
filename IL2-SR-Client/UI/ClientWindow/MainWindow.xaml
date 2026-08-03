@@ -1001,7 +1001,6 @@
                                 <RowDefinition />
                                 <RowDefinition />
                                 <RowDefinition />
-                                <RowDefinition />
                             </Grid.RowDefinitions>
 
                             <Label Grid.Row="0"
@@ -1056,19 +1055,6 @@
                                           Click="PlayConnectionSounds_OnClick">
                             </ToggleButton>
 
-                            <Label Grid.Row="4"
-                                   Grid.Column="0"
-                                   HorizontalContentAlignment="Center"
-                                   VerticalContentAlignment="Center"
-                                   Content="Neutral Lobby Music" />
-                            <ToggleButton Name="NeutralLobbyMusicToggle"
-                                          Grid.Row="4"
-                                          Grid.Column="1"
-                                          HorizontalContentAlignment="Center"
-                                          VerticalContentAlignment="Center"
-                                          Click="NeutralLobbyMusicToggle_Click"
-                                          ToolTip="Enable or disable music supplied by the SRS server while you are in the neutral lobby.">
-                            </ToggleButton>
                         </Grid>
                     </GroupBox>
                     <GroupBox Header="Profile">
