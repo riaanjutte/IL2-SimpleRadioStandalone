@@ -478,6 +478,7 @@ namespace Installer
               //  DeleteFileIfExists(programPath + "\\global.cfg");
 
                 DeleteDirectory(programPath + "\\AudioEffects");
+                DeleteDirectory(programPath + "\\LobbyMusic");
                 DeleteDirectory(programPath + "\\Localization");
             }
             Logger.Info($"Finished clearing config and program ");
@@ -647,6 +648,7 @@ namespace Installer
             Logger.Info($"Creating Directories");
             CreateDirectory(path);
             CreateDirectory(path + "\\AudioEffects");
+            CreateDirectory(path + "\\LobbyMusic");
             CreateDirectory(path + "\\Localization");
 
             //sleep! WTF directory is lagging behind state here...

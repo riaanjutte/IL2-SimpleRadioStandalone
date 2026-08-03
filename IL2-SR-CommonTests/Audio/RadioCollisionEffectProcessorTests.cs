@@ -1,6 +1,7 @@
 using System;
 using System.Linq;
 using Ciribob.IL2.SimpleRadio.Standalone.Client.DSP;
+using Ciribob.IL2.SimpleRadio.Standalone.Client;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace Ciribob.IL2.SimpleRadio.Standalone.Common.Tests.Audio
@@ -31,6 +32,25 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Common.Tests.Audio
             new RadioCollisionEffectProcessor(42).Apply(second);
 
             CollectionAssert.AreEqual(first, second);
+        }
+
+        [TestMethod]
+        public void LobbyMusicNeverUsesRadioCollisionEffect()
+        {
+            var lobbyMusic = new ClientAudio
+            {
+                IsLobbyMusic = true,
+                IsRadioCollision = true,
+                ReceivedRadio = 1
+            };
+            var normalRadio = new ClientAudio
+            {
+                IsRadioCollision = true,
+                ReceivedRadio = 1
+            };
+
+            Assert.IsFalse(lobbyMusic.ShouldApplyRadioCollisionEffect);
+            Assert.IsTrue(normalRadio.ShouldApplyRadioCollisionEffect);
         }
     }
 }

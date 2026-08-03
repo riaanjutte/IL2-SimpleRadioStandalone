@@ -131,6 +131,7 @@
     <Compile Include="DCSState\RadioInformation.cs" />
     <Compile Include="DCSState\RadioTransmit.cs" />
     <Compile Include="Setting\ServerSettingsKeys.cs" />
+    <Compile Include="Setting\SyncedServerSettingsFilter.cs" />
     <Compile Include="Network\ShortGuid.cs" />
     <Compile Include="Network\SRClient.cs" />
     <Compile Include="Timers\ITimer.cs" />

@@ -76,6 +76,8 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Server.Settings
 
                 Save();
             }
+
+            InitializePersistentSettings();
         }
 
         public static ServerSettingsStore Instance
@@ -179,6 +181,44 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Server.Settings
             }
 
             Save();
+        }
+
+        private void InitializePersistentSettings()
+        {
+            bool changed = EnsureSection("General Settings") |
+                           EnsureSection("Server Settings") |
+                           EnsureSection("External AWACS Mode Settings");
+
+            foreach (KeyValuePair<string, string> defaultSetting in DefaultServerSettings.Defaults)
+            {
+                string sectionName = DefaultServerSettings.ServerSectionSettings.Contains(defaultSetting.Key)
+                    ? "Server Settings"
+                    : "General Settings";
+
+                if (_configuration[sectionName].Contains(defaultSetting.Key))
+                {
+                    continue;
+                }
+
+                _configuration[sectionName].Add(new Setting(defaultSetting.Key, defaultSetting.Value));
+                changed = true;
+            }
+
+            if (changed)
+            {
+                Save();
+            }
+        }
+
+        private bool EnsureSection(string sectionName)
+        {
+            if (_configuration.Contains(sectionName))
+            {
+                return false;
+            }
+
+            _configuration.Add(sectionName);
+            return true;
         }
 
         public void Save()

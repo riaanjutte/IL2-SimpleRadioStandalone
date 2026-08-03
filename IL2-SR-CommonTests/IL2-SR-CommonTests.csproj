@@ -81,6 +81,8 @@
     <Compile Include="Settings\UserDataPathsTests.cs" />
     <Compile Include="Settings\DefaultServerSettingsTests.cs" />
     <Compile Include="Network\CombatBoxCallsignRosterTests.cs" />
+    <Compile Include="Network\IL2RadioSyncHandlerTests.cs" />
+    <Compile Include="Network\LobbyMusicReceptionTests.cs" />
     <Compile Include="Network\RadioCollisionDetectorTests.cs" />
     <Compile Include="Network\SrsClientConnectionLifecycleTests.cs" />
     <Compile Include="Network\UpdaterArgumentsTests.cs" />

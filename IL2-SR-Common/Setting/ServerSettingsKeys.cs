@@ -17,6 +17,9 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Common.Setting
         CHECK_FOR_BETA_UPDATES,
         SHOW_TUNED_COUNT,
         GLOBAL_LOBBY_FREQUENCIES,
+        LOBBY_MUSIC_ENABLED,
+        LOBBY_MUSIC_DIRECTORY,
+        LOBBY_MUSIC_VOLUME,
         SHOW_TRANSMITTER_NAME,
         UPNP_ENABLED,
         SECOND_RADIO_ENABLED,
@@ -32,6 +35,14 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Common.Setting
 
     public class DefaultServerSettings
     {
+        public static readonly HashSet<string> ServerSectionSettings = new HashSet<string>()
+        {
+            ServerSettingsKeys.SERVER_PORT.ToString(),
+            ServerSettingsKeys.CLIENT_EXPORT_FILE_PATH.ToString(),
+            ServerSettingsKeys.CHECK_FOR_BETA_UPDATES.ToString(),
+            ServerSettingsKeys.UPNP_ENABLED.ToString()
+        };
+
         public static readonly Dictionary<string, string> Defaults = new Dictionary<string, string>()
         {
             { ServerSettingsKeys.CLIENT_EXPORT_ENABLED.ToString(), "false" },
@@ -43,6 +54,9 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Common.Setting
             { ServerSettingsKeys.CHECK_FOR_BETA_UPDATES.ToString(), "false" },
             { ServerSettingsKeys.SHOW_TUNED_COUNT.ToString(), "true" },
             { ServerSettingsKeys.GLOBAL_LOBBY_FREQUENCIES.ToString(), "248.22" },
+            { ServerSettingsKeys.LOBBY_MUSIC_ENABLED.ToString(), "false" },
+            { ServerSettingsKeys.LOBBY_MUSIC_DIRECTORY.ToString(), "LobbyMusic" },
+            { ServerSettingsKeys.LOBBY_MUSIC_VOLUME.ToString(), "0.25" },
             { ServerSettingsKeys.UPNP_ENABLED.ToString(), "false" },
             { ServerSettingsKeys.SHOW_TRANSMITTER_NAME.ToString(), "true" },
             { ServerSettingsKeys.SECOND_RADIO_ENABLED.ToString(), "true" },
@@ -50,6 +64,9 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Common.Setting
             { ServerSettingsKeys.RADIO_COLLISION_EFFECTS.ToString(), "false" },
             { ServerSettingsKeys.PRIORITY_TRANSMITTER_NAMES.ToString(), "Axis Command,Allies Command,Axis Airfield,Allies Airfield" },
             { ServerSettingsKeys.ASSIGNED_CALLSIGNS_JSON_FILE.ToString(), "" },
+            { ServerSettingsKeys.DSERVER_RCON_ADDRESS.ToString(), "" },
+            { ServerSettingsKeys.DSERVER_RCON_USERNAME.ToString(), "" },
+            { ServerSettingsKeys.DSERVER_RCON_PASSWORD.ToString(), "" },
         };
     }
 }

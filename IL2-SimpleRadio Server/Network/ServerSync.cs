@@ -253,6 +253,7 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Server.Network
         private Dictionary<string, string> GetSyncedServerSettings()
         {
             var settings = _serverSettings.ToDictionary();
+            SyncedServerSettingsFilter.RemoveServerOnlySettings(settings);
             settings[ServerSettingsKeys.PILOT_ROSTER_DATA_AVAILABLE.ToString()] =
                 _callsignProvider.IsAvailable.ToString();
             settings[ServerSettingsKeys.RADIO_COLLISION_EFFECTS.ToString()] = _serverSettings

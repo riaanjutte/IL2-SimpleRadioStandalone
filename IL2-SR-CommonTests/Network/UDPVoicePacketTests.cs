@@ -242,5 +242,28 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Common.Tests
             Assert.IsTrue(UDPVoicePacket.SetRadioCollisionFlag(encoded, false));
             Assert.IsFalse(UDPVoicePacket.DecodeVoicePacket(encoded).IsRadioCollision);
         }
+
+        [TestMethod]
+        public void LobbyMusicIdentityRoundTripsUsingProtocolGuidLength()
+        {
+            Assert.AreEqual(UDPVoicePacket.GuidLength, UDPVoicePacket.LobbyMusicGuid.Length);
+
+            var guid = Encoding.ASCII.GetBytes(UDPVoicePacket.LobbyMusicGuid);
+            var packet = new UDPVoicePacket
+            {
+                GuidBytes = guid,
+                OriginalClientGuidBytes = guid,
+                AudioPart1Bytes = new byte[] { 1, 2, 3 },
+                AudioPart1Length = 3,
+                Frequencies = new[] { 248220000.0 },
+                Modulations = new[] { (byte)RadioInformation.Modulation.AM },
+                PacketNumber = 1
+            };
+
+            var decoded = UDPVoicePacket.DecodeVoicePacket(packet.EncodePacket());
+
+            Assert.IsTrue(decoded.IsLobbyMusic);
+            Assert.IsFalse(decoded.IsRadioCollision);
+        }
     }
 }

@@ -11,6 +11,7 @@ using Caliburn.Micro;
 using Ciribob.IL2.SimpleRadio.Standalone.Common;
 using Ciribob.IL2.SimpleRadio.Standalone.Common.Network;
 using Ciribob.IL2.SimpleRadio.Standalone.Common.Setting;
+using Ciribob.IL2.SimpleRadio.Standalone.Server.Audio;
 using Ciribob.IL2.SimpleRadio.Standalone.Server.Settings;
 using NLog;
 using LogManager = NLog.LogManager;
@@ -34,6 +35,7 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Server.Network
         private readonly ServerSettingsStore _serverSettings = ServerSettingsStore.Instance;
         private readonly RadioCollisionDetector _radioCollisionDetector = new RadioCollisionDetector();
         private readonly HashSet<string> _priorityTransmitterNames;
+        private readonly LobbyMusicBroadcaster _lobbyMusicBroadcaster;
         private UdpClient _listener;
 
         private volatile bool _stop;
@@ -63,6 +65,9 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Server.Network
             Logger.Info(_priorityTransmitterNames.Count == 0
                 ? "No priority transmitters configured"
                 : $"Priority transmitters: {string.Join(", ", _priorityTransmitterNames)}");
+
+            _lobbyMusicBroadcaster = new LobbyMusicBroadcaster(_clientsList, _outGoing,
+                () => _globalFrequencies.ToArray(), _serverSettings);
         }
 
 
@@ -124,6 +129,7 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Server.Network
             _listener.DontFragment = true;
             _listener.Client.DontFragment = true;
             _listener.Client.Bind(new IPEndPoint(IPAddress.Any, port));
+            _lobbyMusicBroadcaster.Start();
             while (!_stop)
                 try
                 {
@@ -178,6 +184,7 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Server.Network
         public void RequestStop()
         {
             _stop = true;
+            _lobbyMusicBroadcaster.Stop();
             try
             {
                 _listener.Close();

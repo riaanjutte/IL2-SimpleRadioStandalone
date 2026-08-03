@@ -456,6 +456,13 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.Network
 
                                 if (udpVoicePacket != null)
                                 {
+                                    var isLobbyMusic = udpVoicePacket.IsLobbyMusic;
+                                    if (isLobbyMusic && !_globalSettings.GetClientSettingBool(
+                                            GlobalSettingsKeys.NeutralLobbyMusicEnabled))
+                                    {
+                                        continue;
+                                    }
+
                                     var vehicleId = -1;
                                     if (_clients.TryGetValue(udpVoicePacket.Guid, out var transmittingClient))
                                     {
@@ -476,44 +483,50 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.Network
                                         new List<RadioReceivingPriority>(frequencyCount);
                                     List<int> blockedRadios = CurrentlyBlockedRadios();
 
-                                    // Parse frequencies into receiving radio priority for selection below
-                                    for (var i = 0; i < frequencyCount; i++)
+                                    if (isLobbyMusic)
                                     {
-                                        RadioReceivingState state = null;
-                                        bool decryptable;
-
-                                        //Check if Global
-                                        bool globalFrequency = globalFrequencies.Contains(udpVoicePacket.Frequencies[i]);
-
-
-                                        var radio = _clientStateSingleton.PlayerGameState.CanHearTransmission(
-                                            udpVoicePacket.Frequencies[i],
-                                            (RadioInformation.Modulation) udpVoicePacket.Modulations[i],
-                                            udpVoicePacket.UnitId,
-                                            vehicleId,
-                                            blockedRadios,
-                                            out state);
-
-                                        float losLoss = 0.0f;
-                                        double receivPowerLossPercent = 0.0;
-
-                                        if (radio != null && state != null)
+                                        var lobbyMusicPriority = GetLobbyMusicReceivingPriority(myClient.Coalition,
+                                            _clientStateSingleton.PlayerGameState, udpVoicePacket);
+                                        if (lobbyMusicPriority != null)
                                         {
-                                            if (
-                                                radio.modulation == RadioInformation.Modulation.INTERCOM
-                                                || globalFrequency
-                                                || (!blockedRadios.Contains(state.ReceivedOn)
-                                                )
-                                            )
-                                            {
+                                            radioReceivingPriorities.Add(lobbyMusicPriority);
+                                        }
+                                    }
+                                    else
+                                    {
+                                        // Parse frequencies into receiving radio priority for selection below
+                                        for (var i = 0; i < frequencyCount; i++)
+                                        {
+                                            RadioReceivingState state = null;
 
-                                                radioReceivingPriorities.Add(new RadioReceivingPriority()
+                                            //Check if Global
+                                            bool globalFrequency = globalFrequencies.Contains(udpVoicePacket.Frequencies[i]);
+
+                                            var radio = _clientStateSingleton.PlayerGameState.CanHearTransmission(
+                                                udpVoicePacket.Frequencies[i],
+                                                (RadioInformation.Modulation) udpVoicePacket.Modulations[i],
+                                                udpVoicePacket.UnitId,
+                                                vehicleId,
+                                                blockedRadios,
+                                                out state);
+
+                                            if (radio != null && state != null)
+                                            {
+                                                if (
+                                                    radio.modulation == RadioInformation.Modulation.INTERCOM
+                                                    || globalFrequency
+                                                    || (!blockedRadios.Contains(state.ReceivedOn)
+                                                    )
+                                                )
                                                 {
-                                                    Frequency = udpVoicePacket.Frequencies[i],
-                                                    Modulation = udpVoicePacket.Modulations[i],
-                                                    ReceivingRadio = radio,
-                                                    ReceivingState = state
-                                                });
+                                                    radioReceivingPriorities.Add(new RadioReceivingPriority()
+                                                    {
+                                                        Frequency = udpVoicePacket.Frequencies[i],
+                                                        Modulation = udpVoicePacket.Modulations[i],
+                                                        ReceivingRadio = radio,
+                                                        ReceivingState = state
+                                                    });
+                                                }
                                             }
                                         }
                                     }
@@ -540,14 +553,17 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.Network
                                                 ReceiveTime = DateTime.Now.Ticks,
                                                 Frequency = destinationRadio.Frequency,
                                                 Modulation = destinationRadio.Modulation,
-                                                Volume = RadioHelper.GetEffectiveReceiveVolume(destinationRadio.ReceivingState.ReceivedOn, destinationRadio.ReceivingRadio),
+                                                Volume = isLobbyMusic
+                                                    ? 1.0f
+                                                    : RadioHelper.GetEffectiveReceiveVolume(destinationRadio.ReceivingState.ReceivedOn, destinationRadio.ReceivingRadio),
                                                 ReceivedRadio = destinationRadio.ReceivingState.ReceivedOn,
                                                 UnitId = udpVoicePacket.UnitId,
                                             
                                                 RadioReceivingState = destinationRadio.ReceivingState,
                                                 PacketNumber = udpVoicePacket.PacketNumber,
                                                 OriginalClientGuid = udpVoicePacket.OriginalClientGuid,
-                                                IsRadioCollision = udpVoicePacket.IsRadioCollision
+                                                IsRadioCollision = udpVoicePacket.IsRadioCollision && !isLobbyMusic,
+                                                IsLobbyMusic = isLobbyMusic
                                             };
 
 
@@ -641,6 +657,41 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.Network
             }
 
             return transmitting;
+        }
+
+        internal static RadioReceivingPriority GetLobbyMusicReceivingPriority(int coalition,
+            PlayerGameState playerGameState, UDPVoicePacket packet)
+        {
+            if (coalition != 0 || playerGameState?.radios == null || packet?.Frequencies == null ||
+                packet.Frequencies.Length == 0 || packet.Modulations == null || packet.Modulations.Length == 0)
+            {
+                return null;
+            }
+
+            for (var radioIndex = 1; radioIndex < playerGameState.radios.Length; radioIndex++)
+            {
+                var radio = playerGameState.radios[radioIndex];
+                if (radio == null || radio.modulation == RadioInformation.Modulation.DISABLED ||
+                    radio.modulation == RadioInformation.Modulation.INTERCOM)
+                {
+                    continue;
+                }
+
+                return new RadioReceivingPriority
+                {
+                    Frequency = packet.Frequencies[0],
+                    Modulation = packet.Modulations[0],
+                    ReceivingRadio = radio,
+                    ReceivingState = new RadioReceivingState
+                    {
+                        IsSecondary = false,
+                        LastReceivedAt = DateTime.Now.Ticks,
+                        ReceivedOn = radioIndex
+                    }
+                };
+            }
+
+            return null;
         }
 
 

@@ -148,29 +148,10 @@ So if someone on Server has ParentID!=-1 but ParentID=12345 - this means that in
             }
             else if (message is ControlDataMessage controlDataMessage)
             {
-                update =playerRadioInfo.vehicleId!=controlDataMessage.ParentVehicleClientID || playerRadioInfo.coalition != controlDataMessage.Coalition;
-
                 Logger.Info($"Coalition Update {controlDataMessage.Coalition}");
                 Logger.Info($"ParentVehicleClientID {controlDataMessage.ParentVehicleClientID}");
-
-                if (controlDataMessage.Coalition == 0)
-                {
-                    //WE SOMETIMES RECEIVE AND INCORRECT COALITION MESSAGE - Just kept it for now?>
-                    // playerRadioInfo.vehicleId = controlDataMessage.ParentVehicleClientID;
-                    // playerRadioInfo.coalition = controlDataMessage.Coalition;
-                    Logger.Info($"Ignore Coalition Update for Spectator");
-                }
-                else if (controlDataMessage.Coalition > 2)
-                {
-                    // Modifying WW1 coalitions to just behave as their WW2 counterparts
-                    playerRadioInfo.vehicleId = controlDataMessage.ParentVehicleClientID;
-                    playerRadioInfo.coalition = (short)(controlDataMessage.Coalition - 2);
-                }
-                else
-                {
-                    playerRadioInfo.vehicleId = controlDataMessage.ParentVehicleClientID;
-                    playerRadioInfo.coalition = controlDataMessage.Coalition;
-                }
+                update = ApplyControlData(playerRadioInfo, controlDataMessage.ParentVehicleClientID,
+                    controlDataMessage.Coalition);
             }
             else if (message is SRSAddressMessage srs)
             {
@@ -193,6 +174,21 @@ So if someone on Server has ParentID!=-1 but ParentID=12345 - this means that in
 
                 MessageHub.Instance.Publish(new PlayerStateUpdate());
             }
+        }
+
+        internal static bool ApplyControlData(PlayerGameState playerRadioInfo, int parentVehicleClientId,
+            short reportedCoalition)
+        {
+            var coalition = reportedCoalition > 2
+                ? (short)(reportedCoalition - 2)
+                : reportedCoalition;
+            var vehicleId = coalition == 0 ? -1 : parentVehicleClientId;
+            var changed = playerRadioInfo.vehicleId != vehicleId || playerRadioInfo.coalition != coalition;
+
+            playerRadioInfo.vehicleId = vehicleId;
+            playerRadioInfo.coalition = coalition;
+
+            return changed;
         }
 
         public void Stop()
