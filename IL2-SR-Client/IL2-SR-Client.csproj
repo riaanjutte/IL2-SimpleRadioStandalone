@@ -329,6 +329,7 @@
     <Compile Include="UI\RadioOverlayWindow\WindowHelper.cs" />
     <Compile Include="UI\Sounds.cs" />
     <Compile Include="UI\ToolTips.cs" />
+    <Compile Include="Utils\AudioDeviceHelper.cs" />
     <Compile Include="Utils\DelegateCommand.cs" />
     <Compile Include="Utils\PanelWeathering.cs" />
     <Compile Include="Utils\RadioHelper.cs" />

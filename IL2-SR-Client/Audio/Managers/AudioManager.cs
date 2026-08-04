@@ -17,6 +17,7 @@ using Ciribob.IL2.SimpleRadio.Standalone.Client.Network;
 using Ciribob.IL2.SimpleRadio.Standalone.Client.Settings;
 using Ciribob.IL2.SimpleRadio.Standalone.Client.Singletons;
 using Ciribob.IL2.SimpleRadio.Standalone.Client.UI.ClientWindow;
+using Ciribob.IL2.SimpleRadio.Standalone.Client.Utils;
 using Ciribob.IL2.SimpleRadio.Standalone.Common;
 using Ciribob.IL2.SimpleRadio.Standalone.Common.Helpers;
 using Ciribob.IL2.SimpleRadio.Standalone.Common.Network;
@@ -277,7 +278,7 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.Audio.Managers
                 try
                 {
                     var device = ResolveCaptureDevice();
-                    device.AudioEndpointVolume.Mute = false;
+                    AudioDeviceHelper.TryUnmute(device);
 
                     Logger.Info($"Starting microphone capture on {device.FriendlyName} {device.ID} CHN:{device.AudioClient.MixFormat.Channels} Rate:{device.AudioClient.MixFormat.SampleRate}");
                     _wasapiCapture = new WasapiCapture(device, true);
@@ -618,7 +619,7 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.Audio.Managers
                         ResetMicProcessingPipeline(reason);
 
                         var device = ResolveCaptureDevice();
-                        device.AudioEndpointVolume.Mute = false;
+                        AudioDeviceHelper.TryUnmute(device);
 
                         Logger.Info($"Restarting microphone capture on {device.FriendlyName} {device.ID} after {reason}");
                         _wasapiCapture = new WasapiCapture(device, true);
