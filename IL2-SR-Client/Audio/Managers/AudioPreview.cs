@@ -9,6 +9,7 @@ using Ciribob.IL2.SimpleRadio.Standalone.Client.Audio.Providers;
 using Ciribob.IL2.SimpleRadio.Standalone.Client.Audio.Utility;
 using Ciribob.IL2.SimpleRadio.Standalone.Client.DSP;
 using Ciribob.IL2.SimpleRadio.Standalone.Client.Singletons;
+using Ciribob.IL2.SimpleRadio.Standalone.Client.Utils;
 using Ciribob.IL2.SimpleRadio.Standalone.Common.Helpers;
 using FragLabs.Audio.Codecs;
 using NAudio.CoreAudioApi;
@@ -151,7 +152,7 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.Audio
                     device = WasapiCapture.GetDefaultCaptureDevice();
                 }
 
-                device.AudioEndpointVolume.Mute = false;
+                AudioDeviceHelper.TryUnmute(device);
 
                 _wasapiCapture = new WasapiCapture(device, true);
                 _wasapiCapture.ShareMode = AudioClientShareMode.Shared;
