@@ -824,8 +824,10 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI.ClientWindow.Diagnostics
 
     internal sealed class IL2WinWingTelemetryDiagnosticProvider : ITelemetryDiagnosticProvider
     {
-        private const string ProcessName = "IL2WinWing";
-        private const string ConfigFileName = "IL2WinWing.dll.config";
+        internal const string ProcessName = "IL2WinWing";
+        internal const string ConfigFileName = "IL2WinWing.dll.config";
+        internal const int PreferredTelemetryPort = 29373;
+        internal const int DefaultWinWingPort = 16536;
         private const int SearchDirectoryLimit = 2500;
         private const int SearchMatchLimit = 6;
 
@@ -856,7 +858,8 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI.ClientWindow.Diagnostics
 
             foreach (string configPath in searchResult.ConfigPaths)
             {
-                int? telemetryPort = ReadTelemetryPort(configPath);
+                int? telemetryPort = ReadPort(configPath, "IL2TelemetryPort");
+                int? winWingPort = ReadPort(configPath, "WWPort");
                 if (!telemetryPort.HasValue)
                 {
                     items.Add(new TelemetryDiagnosticItem(
@@ -871,14 +874,14 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI.ClientWindow.Diagnostics
                     items.Add(new TelemetryDiagnosticItem(
                         TelemetryDiagnosticSeverity.Warning,
                         "IL2WinWing port conflicts with SRS",
-                        "IL2WinWing is configured for IL-2 telemetry port " + telemetryPort.Value + ", which is also the SRS telemetry port. Change IL2WinWing's IL2TelemetryPort to another port and add a matching addrN endpoint in startup.cfg."));
+                        "IL2WinWing is configured for IL-2 telemetry port " + telemetryPort.Value + ", which is also the SRS telemetry port. Select Configure IL2WinWing to assign separate ports safely."));
                 }
                 else if (context.StartupConfig != null && !context.StartupConfig.ContainsEndpoint(context.SrsAddress, telemetryPort.Value))
                 {
                     items.Add(new TelemetryDiagnosticItem(
                         TelemetryDiagnosticSeverity.Warning,
                         "IL2WinWing port missing from startup.cfg",
-                        "IL2WinWing uses IL-2 telemetry port " + telemetryPort.Value + ", but startup.cfg does not contain " + context.SrsAddress + ":" + telemetryPort.Value + "."));
+                        "IL2WinWing uses IL-2 telemetry port " + telemetryPort.Value + ", but startup.cfg does not contain " + context.SrsAddress + ":" + telemetryPort.Value + ". Select Configure IL2WinWing to repair it."));
                 }
                 else
                 {
@@ -886,6 +889,28 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI.ClientWindow.Diagnostics
                         TelemetryDiagnosticSeverity.Ok,
                         "IL2WinWing telemetry port",
                         "IL2WinWing uses IL-2 telemetry port " + telemetryPort.Value + " at " + configPath + "."));
+                }
+
+                if (!winWingPort.HasValue)
+                {
+                    items.Add(new TelemetryDiagnosticItem(
+                        TelemetryDiagnosticSeverity.Warning,
+                        "IL2WinWing SimApp Pro port unreadable",
+                        configPath + " was found, but WWPort could not be read."));
+                }
+                else if (winWingPort.Value != DefaultWinWingPort)
+                {
+                    items.Add(new TelemetryDiagnosticItem(
+                        TelemetryDiagnosticSeverity.Warning,
+                        "IL2WinWing SimApp Pro port differs from the default",
+                        "IL2WinWing WWPort is " + winWingPort.Value + ". The standard SimApp Pro port is " + DefaultWinWingPort + "."));
+                }
+                else
+                {
+                    items.Add(new TelemetryDiagnosticItem(
+                        TelemetryDiagnosticSeverity.Ok,
+                        "IL2WinWing SimApp Pro port",
+                        "IL2WinWing forwards vibration data to SimApp Pro on port " + winWingPort.Value + "."));
                 }
             }
 
@@ -900,14 +925,14 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI.ClientWindow.Diagnostics
             return items;
         }
 
-        private static int? ReadTelemetryPort(string configPath)
+        internal static int? ReadPort(string configPath, string settingName)
         {
             try
             {
                 XDocument document = XDocument.Load(configPath);
                 XElement setting = document.Descendants("setting")
                     .FirstOrDefault(element =>
-                        string.Equals((string)element.Attribute("name"), "IL2TelemetryPort", StringComparison.OrdinalIgnoreCase));
+                        string.Equals((string)element.Attribute("name"), settingName, StringComparison.OrdinalIgnoreCase));
                 string value = setting?.Element("value")?.Value;
                 int port;
                 if (int.TryParse(value, NumberStyles.Integer, CultureInfo.InvariantCulture, out port)
@@ -924,7 +949,7 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI.ClientWindow.Diagnostics
             return null;
         }
 
-        private static IL2WinWingConfigSearchResult FindConfigFiles(TelemetryDiagnosticContext context)
+        internal static IL2WinWingConfigSearchResult FindConfigFiles(TelemetryDiagnosticContext context)
         {
             IL2WinWingConfigSearchResult result = new IL2WinWingConfigSearchResult();
             HashSet<string> paths = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
@@ -1039,6 +1064,280 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI.ClientWindow.Diagnostics
             {
                 roots.Add(Path.GetFullPath(path));
             }
+        }
+    }
+
+    internal static class IL2WinWingCompatibilityRepair
+    {
+        internal static IL2WinWingCompatibilityRepairResult Repair(
+            IEnumerable<TelemetryDiagnosticContext> contexts,
+            Func<bool> writeAllowed,
+            Action<string> log)
+        {
+            List<TelemetryDiagnosticContext> contextList = contexts == null
+                ? new List<TelemetryDiagnosticContext>()
+                : contexts.ToList();
+
+            if (contextList.Count == 0)
+            {
+                contextList.Add(new TelemetryDiagnosticContext(
+                    "IL-2 install",
+                    "Not detected",
+                    "127.0.0.1",
+                    4322,
+                    string.Empty,
+                    string.Empty,
+                    null));
+            }
+
+            HashSet<string> configPaths = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+            List<string> runningConfigPaths = FindRunningConfigPaths();
+            foreach (string path in runningConfigPaths)
+            {
+                configPaths.Add(path);
+            }
+
+            foreach (TelemetryDiagnosticContext context in contextList)
+            {
+                IL2WinWingConfigSearchResult searchResult =
+                    IL2WinWingTelemetryDiagnosticProvider.FindConfigFiles(context);
+                foreach (string path in searchResult.ConfigPaths)
+                {
+                    configPaths.Add(path);
+                }
+            }
+
+            if (runningConfigPaths.Count > 0)
+            {
+                configPaths.IntersectWith(runningConfigPaths);
+            }
+
+            if (configPaths.Count == 0)
+            {
+                return IL2WinWingCompatibilityRepairResult.Failure(
+                    "IL2WinWing.dll.config could not be found. Start IL2WinWing, then try again so SRS can locate its installation folder.");
+            }
+
+            if (configPaths.Count > 1)
+            {
+                return IL2WinWingCompatibilityRepairResult.Failure(
+                    "More than one IL2WinWing configuration was found. Start the IL2WinWing copy you use, then run this repair again. No files were changed.\n\n" +
+                    string.Join("\n", configPaths));
+            }
+
+            if (writeAllowed != null && !writeAllowed())
+            {
+                return IL2WinWingCompatibilityRepairResult.Failure(
+                    "IL-2 is running. Close IL-2 before configuring IL2WinWing compatibility.");
+            }
+
+            List<string> updatedFiles = new List<string>();
+            try
+            {
+                foreach (string configPath in configPaths)
+                {
+                    if (RepairConfigFile(configPath, log))
+                    {
+                        updatedFiles.Add(configPath);
+                    }
+                }
+
+                foreach (TelemetryDiagnosticContext context in contextList
+                             .Where(item => !string.IsNullOrWhiteSpace(item.StartupConfigPath))
+                             .GroupBy(item => item.StartupConfigPath, StringComparer.OrdinalIgnoreCase)
+                             .Select(group => group.First()))
+                {
+                    bool changed = StartupConfigTelemetry.EnsureEndpoint(
+                        context.StartupConfigPath,
+                        context.SrsAddress,
+                        IL2WinWingTelemetryDiagnosticProvider.PreferredTelemetryPort,
+                        log,
+                        writeAllowed);
+                    if (changed)
+                    {
+                        updatedFiles.Add(context.StartupConfigPath);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                return IL2WinWingCompatibilityRepairResult.Failure(
+                    "IL2WinWing compatibility repair failed: " + ex.Message);
+            }
+
+            string summary = updatedFiles.Count == 0
+                ? "IL2WinWing compatibility was already configured correctly."
+                : "IL2WinWing compatibility configured. Restart IL2WinWing before launching IL-2. Backups ending in .il2srs.bak were retained for changed files.";
+            return IL2WinWingCompatibilityRepairResult.Success(summary, updatedFiles);
+        }
+
+        internal static bool RepairConfigFile(string configPath, Action<string> log)
+        {
+            byte[] originalBytes = File.ReadAllBytes(configPath);
+            XDocument document = XDocument.Load(configPath, LoadOptions.PreserveWhitespace);
+            XElement telemetryValue = FindSettingValue(document, "IL2TelemetryPort");
+            XElement winWingValue = FindSettingValue(document, "WWPort");
+            if (telemetryValue == null || winWingValue == null)
+            {
+                throw new InvalidDataException(
+                    "IL2WinWing.dll.config must contain IL2TelemetryPort and WWPort settings: " + configPath);
+            }
+
+            string telemetryPort = IL2WinWingTelemetryDiagnosticProvider.PreferredTelemetryPort
+                .ToString(CultureInfo.InvariantCulture);
+            string winWingPort = IL2WinWingTelemetryDiagnosticProvider.DefaultWinWingPort
+                .ToString(CultureInfo.InvariantCulture);
+            if (telemetryValue.Value == telemetryPort && winWingValue.Value == winWingPort)
+            {
+                return false;
+            }
+
+            FileAttributes originalAttributes = File.GetAttributes(configPath);
+            bool wasReadOnly = (originalAttributes & FileAttributes.ReadOnly) == FileAttributes.ReadOnly;
+            string backupPath = configPath + ".il2srs.bak";
+            string temporaryPath = configPath + ".il2srs.tmp";
+
+            if (wasReadOnly)
+            {
+                File.SetAttributes(configPath, originalAttributes & ~FileAttributes.ReadOnly);
+            }
+
+            try
+            {
+                if (!File.Exists(backupPath))
+                {
+                    File.Copy(configPath, backupPath, false);
+                }
+
+                telemetryValue.Value = telemetryPort;
+                winWingValue.Value = winWingPort;
+                document.Save(temporaryPath, SaveOptions.DisableFormatting);
+                File.Copy(temporaryPath, configPath, true);
+
+                if (IL2WinWingTelemetryDiagnosticProvider.ReadPort(configPath, "IL2TelemetryPort")
+                        != IL2WinWingTelemetryDiagnosticProvider.PreferredTelemetryPort
+                    || IL2WinWingTelemetryDiagnosticProvider.ReadPort(configPath, "WWPort")
+                        != IL2WinWingTelemetryDiagnosticProvider.DefaultWinWingPort)
+                {
+                    throw new IOException("Failed to verify IL2WinWing port settings after writing " + configPath);
+                }
+
+                if (log != null)
+                {
+                    log("Configured IL2WinWing ports at " + configPath);
+                }
+                return true;
+            }
+            catch
+            {
+                File.WriteAllBytes(configPath, originalBytes);
+                throw;
+            }
+            finally
+            {
+                try
+                {
+                    if (File.Exists(temporaryPath))
+                    {
+                        File.Delete(temporaryPath);
+                    }
+                }
+                finally
+                {
+                    if (wasReadOnly)
+                    {
+                        File.SetAttributes(configPath, originalAttributes);
+                    }
+                }
+            }
+        }
+
+        internal static List<string> FindRunningIncompatibleConfigPaths()
+        {
+            return FindRunningConfigPaths()
+                .Where(configPath => IsIncompatibleConfiguration(configPath))
+                .ToList();
+        }
+
+        private static bool IsIncompatibleConfiguration(string configPath)
+        {
+            int? telemetryPort = IL2WinWingTelemetryDiagnosticProvider.ReadPort(
+                configPath,
+                "IL2TelemetryPort");
+            int? winWingPort = IL2WinWingTelemetryDiagnosticProvider.ReadPort(configPath, "WWPort");
+            return telemetryPort == 4322
+                   || !telemetryPort.HasValue
+                   || winWingPort != IL2WinWingTelemetryDiagnosticProvider.DefaultWinWingPort;
+        }
+
+        private static List<string> FindRunningConfigPaths()
+        {
+            HashSet<string> paths = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+            foreach (Process process in Process.GetProcessesByName(
+                         IL2WinWingTelemetryDiagnosticProvider.ProcessName))
+            {
+                string processPath = SafeMainModulePath(process);
+                if (string.IsNullOrWhiteSpace(processPath))
+                {
+                    continue;
+                }
+
+                string configPath = Path.Combine(
+                    Path.GetDirectoryName(processPath),
+                    IL2WinWingTelemetryDiagnosticProvider.ConfigFileName);
+                if (File.Exists(configPath))
+                {
+                    paths.Add(configPath);
+                }
+            }
+
+            return paths.ToList();
+        }
+
+        private static XElement FindSettingValue(XDocument document, string settingName)
+        {
+            XElement setting = document.Descendants("setting")
+                .FirstOrDefault(element => string.Equals(
+                    (string)element.Attribute("name"),
+                    settingName,
+                    StringComparison.OrdinalIgnoreCase));
+            return setting == null ? null : setting.Element("value");
+        }
+
+        private static string SafeMainModulePath(Process process)
+        {
+            try
+            {
+                return process.MainModule == null ? string.Empty : process.MainModule.FileName;
+            }
+            catch
+            {
+                return string.Empty;
+            }
+        }
+    }
+
+    internal sealed class IL2WinWingCompatibilityRepairResult
+    {
+        private IL2WinWingCompatibilityRepairResult(bool succeeded, string message, IEnumerable<string> updatedFiles)
+        {
+            Succeeded = succeeded;
+            Message = message;
+            UpdatedFiles = new List<string>(updatedFiles ?? Enumerable.Empty<string>());
+        }
+
+        public bool Succeeded { get; private set; }
+        public string Message { get; private set; }
+        public List<string> UpdatedFiles { get; private set; }
+
+        public static IL2WinWingCompatibilityRepairResult Success(string message, IEnumerable<string> updatedFiles)
+        {
+            return new IL2WinWingCompatibilityRepairResult(true, message, updatedFiles);
+        }
+
+        public static IL2WinWingCompatibilityRepairResult Failure(string message)
+        {
+            return new IL2WinWingCompatibilityRepairResult(false, message, null);
         }
     }
 

@@ -27,9 +27,29 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.Utils
 
         public static bool EnsureEnabled(string cfgPath, Action<string> log, Func<bool> writeAllowed)
         {
+            return EnsureEndpoint(cfgPath, SrsAddress, SrsPort, log, writeAllowed);
+        }
+
+        internal static bool EnsureEndpoint(
+            string cfgPath,
+            string address,
+            int port,
+            Action<string> log,
+            Func<bool> writeAllowed)
+        {
             if (string.IsNullOrWhiteSpace(cfgPath))
             {
                 throw new ArgumentException("startup.cfg path is required", "cfgPath");
+            }
+
+            if (string.IsNullOrWhiteSpace(address))
+            {
+                throw new ArgumentException("Telemetry address is required", "address");
+            }
+
+            if (port <= 0 || port > 65535)
+            {
+                throw new ArgumentOutOfRangeException("port", "Telemetry port must be between 1 and 65535.");
             }
 
             if (!File.Exists(cfgPath))
@@ -42,11 +62,11 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.Utils
             {
                 StartupConfigFile configFile = ReadConfigFile(cfgPath);
                 bool textChanged;
-                string updatedConfig = EnsureEnabledInText(configFile.Text, out textChanged);
+                string updatedConfig = EnsureEndpointInText(configFile.Text, address, port, out textChanged);
 
                 if (!textChanged)
                 {
-                    Log(log, "startup.cfg already contains the IL2-SRS telemetry endpoint");
+                    Log(log, "startup.cfg already contains telemetry endpoint " + address + ":" + port);
                     return;
                 }
 
@@ -70,12 +90,12 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.Utils
                     WriteBackupIfMissing(cfgPath, configFile.OriginalBytes, log);
                     WriteAllText(cfgPath, updatedConfig, configFile, writeAllowed);
                     changed = true;
-                    Log(log, "startup.cfg telemetrydevice section updated");
+                    Log(log, "startup.cfg telemetrydevice section updated for " + address + ":" + port);
 
                     StartupConfigFile verifiedConfig = ReadConfigFile(cfgPath);
-                    if (!ContainsSrsTelemetryEndpoint(verifiedConfig.Text))
+                    if (!ContainsTelemetryEndpoint(verifiedConfig.Text, address, port))
                     {
-                        throw new IOException("Failed to verify IL2-SRS telemetry endpoint in startup.cfg after writing.");
+                        throw new IOException("Failed to verify telemetry endpoint " + address + ":" + port + " in startup.cfg after writing.");
                     }
                 }
                 finally
@@ -103,6 +123,11 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.Utils
 
         internal static string EnsureEnabledInText(string config, out bool changed)
         {
+            return EnsureEndpointInText(config, SrsAddress, SrsPort, out changed);
+        }
+
+        internal static string EnsureEndpointInText(string config, string address, int port, out bool changed)
+        {
             if (config == null)
             {
                 config = string.Empty;
@@ -114,10 +139,10 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.Utils
             if (!match.Success)
             {
                 changed = true;
-                return AppendTelemetrySection(config, newline);
+                return AppendTelemetrySection(config, newline, address, port);
             }
 
-            string replacement = BuildUpdatedSection(match.Value, match.Groups["body"].Value, newline);
+            string replacement = BuildUpdatedSection(match.Value, match.Groups["body"].Value, newline, address, port);
             changed = replacement != match.Value;
 
             if (!changed)
@@ -128,7 +153,12 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.Utils
             return config.Substring(0, match.Index) + replacement + config.Substring(match.Index + match.Length);
         }
 
-        private static string BuildUpdatedSection(string originalSection, string body, string newline)
+        private static string BuildUpdatedSection(
+            string originalSection,
+            string body,
+            string newline,
+            string requiredAddress,
+            int requiredPort)
         {
             string normalizedBody = NormalizeNewlines(body, newline);
             List<string> lines = new List<string>(normalizedBody.Split(new[] { newline }, StringSplitOptions.None));
@@ -171,11 +201,11 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.Utils
                 else if (lowerKey == "addr")
                 {
                     usedAddressIndexes.Add(0);
-                    if (value.Equals(SrsAddress, StringComparison.OrdinalIgnoreCase))
+                    if (value.Equals(requiredAddress, StringComparison.OrdinalIgnoreCase))
                     {
                         hasPrimaryAddress = true;
                     }
-                    else if (value.Equals(SrsAddress + ":" + SrsPort, StringComparison.OrdinalIgnoreCase))
+                    else if (value.Equals(requiredAddress + ":" + requiredPort, StringComparison.OrdinalIgnoreCase))
                     {
                         hasSrsEndpoint = true;
                     }
@@ -183,7 +213,7 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.Utils
                 else if (lowerKey == "port")
                 {
                     int parsedPort;
-                    if (int.TryParse(value, out parsedPort) && parsedPort == SrsPort)
+                    if (int.TryParse(value, out parsedPort) && parsedPort == requiredPort)
                     {
                         hasPrimaryPort = true;
                     }
@@ -196,7 +226,7 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.Utils
                         usedAddressIndexes.Add(addressIndex);
                     }
 
-                    if (value.Equals(SrsAddress + ":" + SrsPort, StringComparison.OrdinalIgnoreCase))
+                    if (value.Equals(requiredAddress + ":" + requiredPort, StringComparison.OrdinalIgnoreCase))
                     {
                         hasSrsEndpoint = true;
                     }
@@ -222,8 +252,8 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.Utils
             {
                 if (!ContainsSetting(lines, "addr") && !ContainsSetting(lines, "port"))
                 {
-                    lines.Add("\taddr = \"" + SrsAddress + "\"");
-                    lines.Add("\tport = " + SrsPort);
+                    lines.Add("\taddr = \"" + requiredAddress + "\"");
+                    lines.Add("\tport = " + requiredPort);
                 }
                 else
                 {
@@ -233,7 +263,7 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.Utils
                         addressIndex++;
                     }
 
-                    lines.Add("\taddr" + addressIndex + " = \"" + SrsAddress + ":" + SrsPort + "\"");
+                    lines.Add("\taddr" + addressIndex + " = \"" + requiredAddress + ":" + requiredPort + "\"");
                 }
             }
 
@@ -265,7 +295,7 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.Utils
                    + setting.Groups["tail"].Value;
         }
 
-        private static string AppendTelemetrySection(string config, string newline)
+        private static string AppendTelemetrySection(string config, string newline, string address, int port)
         {
             StringBuilder builder = new StringBuilder(config);
             if (builder.Length > 0 && !config.EndsWith("\r\n", StringComparison.Ordinal)
@@ -281,10 +311,10 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.Utils
             }
 
             builder.Append("[KEY = telemetrydevice]").Append(newline);
-            builder.Append("\taddr = \"").Append(SrsAddress).Append("\"").Append(newline);
+            builder.Append("\taddr = \"").Append(address).Append("\"").Append(newline);
             builder.Append("\tdecimation = 2").Append(newline);
             builder.Append("\tenable = true").Append(newline);
-            builder.Append("\tport = ").Append(SrsPort).Append(newline);
+            builder.Append("\tport = ").Append(port).Append(newline);
             builder.Append("[END]");
 
             return builder.ToString();
@@ -292,8 +322,13 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.Utils
 
         private static bool ContainsSrsTelemetryEndpoint(string config)
         {
+            return ContainsTelemetryEndpoint(config, SrsAddress, SrsPort);
+        }
+
+        private static bool ContainsTelemetryEndpoint(string config, string address, int port)
+        {
             bool changed;
-            return EnsureEnabledInText(config, out changed) == config && !changed;
+            return EnsureEndpointInText(config, address, port, out changed) == config && !changed;
         }
 
         private static StartupConfigFile ReadConfigFile(string path)

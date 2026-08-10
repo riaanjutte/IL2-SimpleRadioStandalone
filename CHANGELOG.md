@@ -1,5 +1,33 @@
 # Changelog
 
+## IL2-SRS 1.0.4.8-beta.7 community update
+
+### Added
+
+- Telemetry Diagnostics can now configure IL2WinWing for reliable use alongside SRS with one explicit repair action.
+- SRS warns when a running IL2WinWing installation has conflicting telemetry or SimApp Pro port settings.
+
+### Changed
+
+- IL2WinWing compatibility repair assigns separate telemetry ports to SRS and IL2WinWing, restores the standard SimApp Pro forwarding port, and updates every detected IL-2 Great Battles and IL-2 Korea `startup.cfg`.
+- Compatibility repairs create `.il2srs.bak` backups, preserve read-only attributes and unrelated settings, and refuse to guess when multiple inactive IL2WinWing installations are found.
+- SRS now owns UDP telemetry port 4322 exclusively instead of allowing unreliable shared-port delivery.
+
+### Fixed
+
+- Prevented intermittent IL-2 telemetry loss when SRS and IL2WinWing were both configured to listen on UDP port 4322.
+- Detects the separate case where IL2WinWing receives IL-2 telemetry but forwards vibration data to the wrong SimApp Pro port.
+
+### Compatibility
+
+- Updated clients and servers remain compatible with other `1.0.4.8` builds.
+- No server configuration changes are required for this update.
+
+### Validation
+
+- Built `IL2-SimpleRadioStandalone.sln` Release/x64 successfully.
+- Ran `IL2-SR-CommonTests` Release/x64: 146/146 passed.
+
 ## IL2-SRS 1.0.4.8-beta.6 community update
 
 ### Changed

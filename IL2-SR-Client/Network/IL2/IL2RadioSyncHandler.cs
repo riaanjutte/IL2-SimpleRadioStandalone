@@ -55,15 +55,13 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.Network.IL2
                     var localEp = new IPEndPoint(IPAddress.Any, _globalSettings.GetNetworkSetting(GlobalSettingsKeys.IL2IncomingUDP));
                     try
                     {
-                        _il2UdpListener = new UdpClient();
-                        _il2UdpListener.ExclusiveAddressUse = false;
-                        _il2UdpListener.Client.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.ReuseAddress, true);
-                        _il2UdpListener.Client.Bind(localEp);
+                        _il2UdpListener = BindExclusiveListener(localEp);
                         break;
                     }
                     catch (Exception ex)
                     {
                         Logger.Warn(ex, $"Unable to bind to the IL2 Export Listener Socket Port: {localEp.Port}");
+                        TelemetryConfigurationWarning.ShowPortConflictOnce(localEp.Port);
                         Thread.Sleep(500);
                     }
                 }
@@ -116,6 +114,22 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.Network.IL2
                 }
                 
             });
+        }
+
+        internal static UdpClient BindExclusiveListener(IPEndPoint localEndpoint)
+        {
+            UdpClient listener = new UdpClient();
+            try
+            {
+                listener.ExclusiveAddressUse = true;
+                listener.Client.Bind(localEndpoint);
+                return listener;
+            }
+            catch
+            {
+                listener.Close();
+                throw;
+            }
         }
 
         public void ProcessUDPMessage(IL2UDPMessage message)

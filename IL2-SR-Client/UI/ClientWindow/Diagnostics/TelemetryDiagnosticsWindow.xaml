@@ -25,6 +25,12 @@
                         Margin="0,8,0,0"
                         HorizontalAlignment="Right"
                         Orientation="Horizontal">
+                <Button MinWidth="175"
+                        Margin="0,0,8,0"
+                        Padding="10,4"
+                        Click="ConfigureIL2WinWing_OnClick"
+                        ToolTip="Back up and configure IL2WinWing to use separate telemetry and SimApp Pro ports"
+                        Content="Configure IL2WinWing" />
                 <Button MinWidth="120"
                         Margin="0,0,8,0"
                         Padding="10,4"

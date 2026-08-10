@@ -96,6 +96,53 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Common.Tests.Utils
         }
 
         [TestMethod]
+        public void ClientRepairAddsSeparateThirdPartyEndpointWithoutReplacingSrs()
+        {
+            const string config =
+                "[KEY = telemetrydevice]\r\n" +
+                "\taddr = \"127.0.0.1\"\r\n" +
+                "\tdecimation = 2\r\n" +
+                "\tenable = true\r\n" +
+                "\tport = 4322\r\n" +
+                "[END]\r\n";
+
+            bool changed;
+            string updated = ClientStartupConfigTelemetry.EnsureEndpointInText(
+                config,
+                "127.0.0.1",
+                29373,
+                out changed);
+
+            Assert.IsTrue(changed);
+            StringAssert.Contains(updated, "addr = \"127.0.0.1\"");
+            StringAssert.Contains(updated, "port = 4322");
+            StringAssert.Contains(updated, "addr1 = \"127.0.0.1:29373\"");
+        }
+
+        [TestMethod]
+        public void ClientRepairDoesNotDuplicateSeparateThirdPartyEndpoint()
+        {
+            const string config =
+                "[KEY = telemetrydevice]\r\n" +
+                "\taddr = \"127.0.0.1\"\r\n" +
+                "\taddr1 = \"127.0.0.1:29373\"\r\n" +
+                "\tdecimation = 2\r\n" +
+                "\tenable = true\r\n" +
+                "\tport = 4322\r\n" +
+                "[END]\r\n";
+
+            bool changed;
+            string updated = ClientStartupConfigTelemetry.EnsureEndpointInText(
+                config,
+                "127.0.0.1",
+                29373,
+                out changed);
+
+            Assert.IsFalse(changed);
+            Assert.AreEqual(config, updated);
+        }
+
+        [TestMethod]
         public void InstallerRepairAlsoPreservesNoBomAndBackup()
         {
             byte[] original = new UTF8Encoding(false).GetBytes(OriginalConfig);

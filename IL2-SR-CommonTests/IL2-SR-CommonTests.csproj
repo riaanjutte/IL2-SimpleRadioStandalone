@@ -90,6 +90,7 @@
     <Compile Include="Singletons\ConnectedClientsSingletonTests.cs" />
     <Compile Include="UI\MemoryLeakGuardTests.cs" />
     <Compile Include="UI\FavouriteServersViewModelTests.cs" />
+    <Compile Include="UI\IL2WinWingCompatibilityTests.cs" />
     <Compile Include="UI\RciDisplayStateTests.cs" />
     <Compile Include="UI\RciOverlayMessageDelayTests.cs" />
     <Compile Include="UI\RadioOverlaySpeakerNameScrollTests.cs" />
