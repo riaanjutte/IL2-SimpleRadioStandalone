@@ -207,7 +207,7 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.Network
 
                             }
                         }
-                        else if (inputBindState.MainDevice.InputBind == InputBinding.Ptt)
+                        else if (IsCommonPttBinding(inputBindState.MainDevice.InputBind))
                         {
                             _lastPTTPress = DateTime.Now.Ticks;
                             ptt = true;
@@ -635,6 +635,13 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.Network
             }
 
             return transmitting;
+        }
+
+        internal static bool IsCommonPttBinding(InputBinding binding)
+        {
+            return binding == InputBinding.Ptt ||
+                   binding == InputBinding.Ptt2 ||
+                   binding == InputBinding.Ptt3;
         }
 
 

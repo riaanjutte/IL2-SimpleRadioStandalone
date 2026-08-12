@@ -1271,7 +1271,7 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.Settings
 
             //REMEMBER TO UPDATE THIS WHEN NEW BINDINGS ARE ADDED
             //MIN + MAX bind numbers
-            for (int i = (int)InputBinding.Intercom; i <= (int)InputBinding.RestartSrs; i++)
+            for (int i = (int)InputBinding.Intercom; i <= (int)InputBinding.Ptt3; i++)
             {
                 if (!currentInputProfile.ContainsKey((InputBinding)i))
                 {

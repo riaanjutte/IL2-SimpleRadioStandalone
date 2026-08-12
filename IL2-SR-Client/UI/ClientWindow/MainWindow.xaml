@@ -531,11 +531,18 @@
                                                        Grid.ColumnSpan="5"
                                                        ControlInputBinding="{x:Static settings:InputBinding.Switch2}"
                                                        InputName="Select Second Radio" />
-                            <local:InputBindingControl x:Name="PTT"
-                                                   Grid.Row="3"
-                                                   Grid.ColumnSpan="5"
-                                                   ControlInputBinding="{x:Static settings:InputBinding.Ptt}"
-                                                   InputName="Common PTT" />
+                            <StackPanel Grid.Row="3"
+                                        Grid.ColumnSpan="5">
+                                <local:InputBindingControl x:Name="PTT"
+                                                           ControlInputBinding="{x:Static settings:InputBinding.Ptt}"
+                                                           InputName="Common PTT 1" />
+                                <local:InputBindingControl x:Name="PTT2"
+                                                           ControlInputBinding="{x:Static settings:InputBinding.Ptt2}"
+                                                           InputName="Common PTT 2" />
+                                <local:InputBindingControl x:Name="PTT3"
+                                                           ControlInputBinding="{x:Static settings:InputBinding.Ptt3}"
+                                                           InputName="Common PTT 3" />
+                            </StackPanel>
                             <local:InputBindingControl x:Name="Intercom"
                                                    Grid.Row="4"
                                                    Grid.ColumnSpan="5"

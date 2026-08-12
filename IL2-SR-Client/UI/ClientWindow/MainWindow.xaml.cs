@@ -631,9 +631,17 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI
             Radio2.ControlInputBinding = InputBinding.Switch2;
             Radio2.InputDeviceManager = InputManager;
 
-            PTT.InputName = LocalizationManager.Get("Push To Talk - PTT");
+            PTT.InputName = LocalizationManager.Get("Push To Talk - PTT") + " 1";
             PTT.ControlInputBinding = InputBinding.Ptt;
             PTT.InputDeviceManager = InputManager;
+
+            PTT2.InputName = LocalizationManager.Get("Push To Talk - PTT") + " 2";
+            PTT2.ControlInputBinding = InputBinding.Ptt2;
+            PTT2.InputDeviceManager = InputManager;
+
+            PTT3.InputName = LocalizationManager.Get("Push To Talk - PTT") + " 3";
+            PTT3.ControlInputBinding = InputBinding.Ptt3;
+            PTT3.InputDeviceManager = InputManager;
 
             Intercom.InputName = LocalizationManager.Get("Select Intercom");
             Intercom.ControlInputBinding = InputBinding.Intercom;
@@ -752,7 +760,9 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI
         {
             Radio1.InputName = LocalizationManager.Get("Select First Radio");
             Radio2.InputName = LocalizationManager.Get("Select Second Radio");
-            PTT.InputName = LocalizationManager.Get("Push To Talk - PTT");
+            PTT.InputName = LocalizationManager.Get("Push To Talk - PTT") + " 1";
+            PTT2.InputName = LocalizationManager.Get("Push To Talk - PTT") + " 2";
+            PTT3.InputName = LocalizationManager.Get("Push To Talk - PTT") + " 3";
             Intercom.InputName = LocalizationManager.Get("Select Intercom");
             RadioOverlay.InputName = LocalizationManager.Get("Overlay Toggle");
             RadioChannelUp.InputName = LocalizationManager.Get("Radio Channel Up");
@@ -796,6 +806,8 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI
             Radio1.LoadInputSettings();
             Radio2.LoadInputSettings();
             PTT.LoadInputSettings();
+            PTT2.LoadInputSettings();
+            PTT3.LoadInputSettings();
             Intercom.LoadInputSettings();
             RadioOverlay.LoadInputSettings();
             RadioChannelUp.LoadInputSettings();

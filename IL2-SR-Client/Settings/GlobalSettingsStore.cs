@@ -213,6 +213,12 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.Settings
         RestartSrs = 141,
         ModifierRestartSrs = 241,
 
+        Ptt2 = 142,
+        ModifierPtt2 = 242,
+
+        Ptt3 = 143,
+        ModifierPtt3 = 243,
+
     }
 
 

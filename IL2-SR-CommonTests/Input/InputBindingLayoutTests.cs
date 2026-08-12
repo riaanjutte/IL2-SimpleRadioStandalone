@@ -1,4 +1,5 @@
 using Ciribob.IL2.SimpleRadio.Standalone.Client.Settings;
+using Ciribob.IL2.SimpleRadio.Standalone.Client.Network;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace Ciribob.IL2.SimpleRadio.Standalone.Common.Tests.Input
@@ -40,6 +41,30 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Common.Tests.Input
         public void RestartSrsModifierUsesStandardOffset()
         {
             Assert.AreEqual((int)InputBinding.RestartSrs + 100, (int)InputBinding.ModifierRestartSrs);
+        }
+
+        [TestMethod]
+        public void AdditionalPttBindingsAreInsideScannedInputRange()
+        {
+            Assert.IsTrue(InputBinding.Ptt2 >= InputBinding.Intercom);
+            Assert.IsTrue(InputBinding.Ptt2 <= InputBinding.Ptt3);
+            Assert.IsTrue(InputBinding.Ptt3 >= InputBinding.RestartSrs);
+        }
+
+        [TestMethod]
+        public void AdditionalPttModifiersUseStandardOffset()
+        {
+            Assert.AreEqual((int)InputBinding.Ptt2 + 100, (int)InputBinding.ModifierPtt2);
+            Assert.AreEqual((int)InputBinding.Ptt3 + 100, (int)InputBinding.ModifierPtt3);
+        }
+
+        [TestMethod]
+        public void AllCommonPttSlotsAreRecognizedAsTransmitBindings()
+        {
+            Assert.IsTrue(UdpVoiceHandler.IsCommonPttBinding(InputBinding.Ptt));
+            Assert.IsTrue(UdpVoiceHandler.IsCommonPttBinding(InputBinding.Ptt2));
+            Assert.IsTrue(UdpVoiceHandler.IsCommonPttBinding(InputBinding.Ptt3));
+            Assert.IsFalse(UdpVoiceHandler.IsCommonPttBinding(InputBinding.Intercom));
         }
     }
 }

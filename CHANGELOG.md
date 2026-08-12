@@ -1,5 +1,26 @@
 # Changelog
 
+## IL2-SRS 1.0.4.8-beta.8 community update
+
+### Added
+
+- Added three independently configurable Common PTT input slots, each with its own optional modifier.
+
+### Changed
+
+- Pressing any configured Common PTT input now transmits through the currently selected radio.
+- Existing Common PTT bindings are preserved automatically as the first PTT input.
+
+### Compatibility
+
+- Updated clients and servers remain compatible with other `1.0.4.8` builds.
+- No server configuration changes are required for this update.
+
+### Validation
+
+- Built `IL2-SimpleRadioStandalone.sln` Release/x64 successfully.
+- Ran `IL2-SR-CommonTests` Release/x64: 149/149 passed.
+
 ## IL2-SRS 1.0.4.8-beta.7 community update
 
 ### Added
