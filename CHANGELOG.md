@@ -1,6 +1,6 @@
 # Changelog
 
-## IL2-SRS 1.0.4.8-beta.8 community update
+## IL2-SRS 1.0.4.8-beta.9 community update
 
 ### Added
 
@@ -10,6 +10,10 @@
 
 - Pressing any configured Common PTT input now transmits through the currently selected radio.
 - Existing Common PTT bindings are preserved automatically as the first PTT input.
+
+### Fixed
+
+- Prevented microphone capture and Audio Preview from closing the client under Wine when per-channel endpoint-volume APIs are unavailable.
 
 ### Compatibility
 
