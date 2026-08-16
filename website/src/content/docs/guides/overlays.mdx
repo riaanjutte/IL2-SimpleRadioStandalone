@@ -1,0 +1,42 @@
+---
+title: Overlays
+description: Use and troubleshoot the Radio Overlay, Client List, and Pilot Roster.
+---
+
+import { Image } from 'astro:assets';
+import OverlayGallery from '../../../components/OverlayGallery.astro';
+import channelLimit from '../../../assets/radio-overlay-channel-limit.png';
+
+<OverlayGallery />
+
+## Radio Overlay
+
+The Radio Overlay shows Radio 1, Radio 2 when enabled by the server, and crew intercom. It provides direct channel selection, channel up/down controls, volume, tuned pilot counts, active-radio state, and TX/RX indicators.
+
+Drag the overlay to move it and use its resize handle to scale it. Position, size, and transparency are retained between sessions. **Reset Radio Overlay** restores the saved overlay geometry to a known visible position and size.
+
+When a server limits its channel range, unavailable numbered buttons are visibly disabled:
+
+<a href={channelLimit.src} target="_blank" rel="noreferrer">
+	<Image src={channelLimit} alt="SRS Radio Overlay with channels above the server limit disabled" quality="high" />
+</a>
+
+## Windowed display mode
+
+Windows overlays cannot remain above an exclusive-fullscreen DirectX game. If an overlay appears when you Alt+Tab but vanishes after returning to IL-2, use **Borderless** or **Windowed** display mode in IL-2.
+
+Run SRS and IL-2 at the same elevation level. Normally, neither application needs to run as administrator.
+
+## Mouse interaction
+
+When overlay refocus is enabled, SRS returns focus to IL-2 after overlay interaction. Move, resize, or operate the overlay while it is focused, then return to the game.
+
+## Client List
+
+The Client List shows connected SRS users and their radio state. Server coalition-security settings can restrict which information is available.
+
+## Pilot Roster
+
+The Pilot Roster shows friendly pilots, assigned callsigns and vehicles when supplied by the server, and tuned Radio 1 and Radio 2 channels. Select a column header to sort the roster by that column.
+
+If the connected server does not provide Pilot Roster data, the window asks users to contact that server's owners. Server administrators can follow the [Pilot Roster integration](../../server-admin/pilot-roster/) guide.

@@ -1,0 +1,44 @@
+---
+title: Controls and PTT
+description: Configure common PTT, radio-specific controls, channel selection, mute controls, and recovery bindings.
+---
+
+import { Image } from 'astro:assets';
+import controls from '../../../assets/client-controls.png';
+
+<a href={controls.src} target="_blank" rel="noreferrer">
+	<Image src={controls} alt="SRS Controls tab showing joystick and push-to-talk assignments" quality="high" />
+</a>
+
+## Push-To-Talk choices
+
+Use **Common PTT** when one physical control should transmit on whichever radio is currently active. Use radio-specific PTT bindings when you want a dedicated control for Radio 1 or Radio 2.
+
+Current beta builds support multiple Common PTT slots. Any configured slot transmits on the selected radio, and each slot can use its own optional modifier.
+
+## Radio selection and channels
+
+Available bindings include:
+
+- select the next or previous radio
+- channel up and channel down on the active radio
+- Radio 1 channel up and down
+- Radio 2 channel up and down
+- mute the selected radio, the other radio, or all radios
+
+The radio overlay also provides direct numbered channel buttons. Servers can limit the available channel range.
+
+## Restart SRS binding
+
+The **Restart SRS** binding restarts the client when an audio device or input state becomes stuck. It is a recovery tool, not a substitute for investigating recurring audio or telemetry failures.
+
+## Device reconnects
+
+SRS periodically rediscovers input devices so PTT can recover after a joystick or throttle disconnect. If a device remains missing:
+
+1. Reconnect the device.
+2. Wait for Windows to finish detecting it.
+3. Reopen the Controls tab and confirm the binding.
+4. Use the Restart SRS binding if the device still does not respond.
+
+The Help tab explains the **Allow more input devices** option for hardware that is not included in the normal device scan.

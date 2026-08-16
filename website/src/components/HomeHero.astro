@@ -1,0 +1,54 @@
+---
+import { Image } from 'astro:assets';
+import screenshot from '../assets/srs-community-edition.png';
+
+const base = import.meta.env.BASE_URL.replace(/\/?$/, '/');
+---
+
+<section class="home-showcase">
+	<p class="install-note">One SRS installation supports both games.</p>
+	<a class="hero-media" href={`${base}screenshots/`} aria-label="View SRS screenshots">
+		<Image
+			src={screenshot}
+			alt="SRS for IL-2 Community Edition client, radio overlay, light theme, and telemetry diagnostics"
+			width={1900}
+			quality="high"
+			loading="eager"
+		/>
+	</a>
+</section>
+
+<style>
+	.home-showcase {
+		margin-inline: calc(-1 * var(--sl-content-pad-x));
+		padding: 0 max(1.25rem, calc((100% - 76rem) / 2)) 3.5rem;
+		background: #171a19;
+		border-bottom: 1px solid #3d403a;
+		text-align: center;
+	}
+	.install-note {
+		margin: 0 auto 1.25rem;
+		color: #a6aaa4;
+		font-size: 0.85rem;
+	}
+	.hero-media {
+		display: block;
+		max-width: 76rem;
+		margin: 0 auto;
+		border: 1px solid #4c5049;
+		border-radius: 6px;
+		background: #111311;
+		box-shadow: 0 1.5rem 3rem rgba(0, 0, 0, 0.28);
+		overflow: hidden;
+	}
+	.hero-media img {
+		display: block;
+		width: 100%;
+		height: auto;
+	}
+	@media (max-width: 50rem) {
+		.home-showcase {
+			padding-bottom: 2.5rem;
+		}
+	}
+</style>

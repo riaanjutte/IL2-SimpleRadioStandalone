@@ -1,0 +1,68 @@
+---
+title: Telemetry and auto-connect
+description: Diagnose a gray IL-2 indicator, failed auto-connect, firewall rules, and telemetry port conflicts.
+---
+
+import { Image } from 'astro:assets';
+import diagnostics from '../../../assets/telemetry-diagnostics.png';
+import diagnosticResults from '../../../assets/telemetry-diagnostics-results.png';
+import il2WinWing from '../../../assets/il2winwing-compatibility.png';
+
+SRS needs current IL-2 telemetry to identify the player, coalition, aircraft, and multiplayer SRS server. The game sends this data to the SRS client on UDP port `4322`.
+
+## Read the status indicators
+
+If **Server** and **VOIP** are green but **IL-2** is gray, SRS has reached the radio server but is not receiving fresh game telemetry. This is not an SRS server outage.
+
+If all connection indicators remain gray, first verify that SRS has a valid server address and that your network can reach it.
+
+## Run Telemetry Diagnostics
+
+1. Close IL-2.
+2. Start SRS.
+3. Open **Help → Telemetry Diagnostics**.
+4. Run the check and use the offered repair action if a problem is found.
+5. Restart IL-2 after a repair.
+
+<a href={diagnostics.src} target="_blank" rel="noreferrer">
+	<Image src={diagnostics} alt="SRS Telemetry Diagnostics window ready to run a check" quality="high" />
+</a>
+
+The diagnostics inspect both Great Battles and Korea when they are installed. They verify the telemetry section in each `startup.cfg`, check port ownership, inspect known third-party telemetry applications such as IL2WinWing, and report relevant Windows Firewall state.
+
+The completed report identifies each detected game installation and clearly marks successful checks, warnings, and repairs:
+
+<a href={diagnosticResults.src} target="_blank" rel="noreferrer">
+	<Image src={diagnosticResults} alt="Completed SRS telemetry report for Great Battles and Korea" quality="high" />
+</a>
+
+## Expected startup.cfg endpoint
+
+SRS needs an enabled telemetry target using port `4322`. Additional telemetry applications must use separate endpoints when they cannot reliably share the same UDP listener.
+
+Do not replace unrelated `startup.cfg` settings. The built-in repair preserves unrelated content, encoding, backups the original before its first change, and restores a read-only attribute after updating the telemetry section.
+
+## Windows Firewall
+
+Allow `IL2-SR-ClientRadio.exe` on both **Private** and **Public** Windows Firewall profiles. Multiplayer networks can be classified differently from a user's normal home network.
+
+If Windows previously displayed a firewall prompt and only one network type was selected, use Telemetry Diagnostics or Windows Defender Firewall settings to correct the application rule.
+
+## Third-party telemetry tools
+
+Force-feedback and hardware tools can also consume IL-2 telemetry. SRS and IL2WinWing should not both attempt to own UDP port `4322`. Use Telemetry Diagnostics to apply the supported split-port configuration instead of manually guessing port values.
+
+<a href={il2WinWing.src} target="_blank" rel="noreferrer">
+	<Image src={il2WinWing} alt="SRS confirmation for configuring IL2WinWing compatibility" quality="high" />
+</a>
+
+## Collect support information
+
+If the IL-2 indicator remains gray, send support:
+
+- a screenshot of the complete Telemetry Diagnostics result
+- the relevant game's `startup.cfg`
+- `%AppData%\IL2-SRS\clientlog.txt` captured while IL-2 is running
+- the game edition and whether it is Steam or standalone
+
+Use the **Report a Problem** button on the Help tab so the report includes the correct project and support destination.

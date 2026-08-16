@@ -1,0 +1,310 @@
+---
+import { Icon } from '@astrojs/starlight/components';
+
+const base = import.meta.env.BASE_URL.replace(/\/?$/, '/');
+const entryPoints = [
+	{
+		title: 'Install SRS',
+		description: 'Install one copy for Great Battles and Korea, then preserve it through future updates.',
+		href: `${base}guides/installation/`,
+		icon: 'download',
+	},
+	{
+		title: 'Configure controls',
+		description: 'Choose audio devices and bind common or radio-specific push-to-talk controls.',
+		href: `${base}guides/controls/`,
+		icon: 'setting',
+	},
+	{
+		title: 'Troubleshoot telemetry',
+		description: 'Check startup.cfg, UDP port 4322, Windows Firewall, and third-party telemetry tools.',
+		href: `${base}troubleshooting/telemetry/`,
+		icon: 'warning',
+	},
+];
+---
+
+<section class="video-band" aria-labelledby="video-heading">
+	<div class="band-inner video-layout">
+		<div class="video-copy">
+			<p class="section-label">Video guide</p>
+			<h2 id="video-heading">See SRS radio in action</h2>
+			<p>
+				ThunderBat demonstrates how to use SRS radio while flying with Combat Box in IL-2 Great
+				Battles.
+			</p>
+		</div>
+		<div class="video-frame">
+			<iframe
+				src="https://www.youtube-nocookie.com/embed/MQaA5YE5tmo"
+				title="How to use SRS Radio in IL-2 Great Battles"
+				loading="lazy"
+				allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+				allowfullscreen
+			></iframe>
+		</div>
+	</div>
+</section>
+
+<section class="entry-band" aria-labelledby="start-heading">
+	<div class="band-inner">
+		<h2 id="start-heading">Start here</h2>
+		<div class="entry-grid">
+			{
+				entryPoints.map((item) => (
+					<a href={item.href} class="entry-link">
+						<Icon name={item.icon} size="1.45rem" />
+						<span>
+							<strong>{item.title}</strong>
+							<small>{item.description}</small>
+						</span>
+					</a>
+				))
+			}
+		</div>
+	</div>
+</section>
+
+<section class="compatibility-band" aria-labelledby="compatibility-heading">
+	<div class="band-inner">
+		<div class="section-heading">
+			<h2 id="compatibility-heading">One client, both IL-2 generations</h2>
+			<a href={`${base}compatibility/`}>Compatibility details</a>
+		</div>
+		<div class="compatibility-grid">
+			<div>
+				<span class="status-dot" aria-hidden="true"></span>
+				<h3>IL-2 Great Battles</h3>
+				<p>Telemetry setup, automatic server connection, overlays, radio controls, and diagnostics.</p>
+			</div>
+			<div>
+				<span class="status-dot" aria-hidden="true"></span>
+				<h3>IL-2 Korea</h3>
+				<p>The same SRS installation detects and configures Korea independently from Great Battles.</p>
+			</div>
+		</div>
+	</div>
+</section>
+
+<section class="community-band" aria-labelledby="community-heading">
+	<div class="band-inner community-layout">
+		<div>
+			<h2 id="community-heading">Built for pilots and server operators</h2>
+			<p>
+				Use the user guides for normal setup and support, or follow the server documentation to host
+				SRS and provide Pilot Roster data.
+			</p>
+		</div>
+		<div class="community-links">
+			<a href={`${base}guides/quick-start/`}>User quick start</a>
+			<a href={`${base}server-admin/server-setup/`}>Server administrator guide</a>
+			<a href="https://github.com/riaanjutte/IL2-SimpleRadioStandalone/issues">Report an issue</a>
+		</div>
+	</div>
+</section>
+
+<style>
+	.entry-band,
+	.video-band,
+	.compatibility-band,
+	.community-band {
+		margin-inline: calc(-1 * var(--sl-content-pad-x));
+		border-bottom: 1px solid var(--sl-color-hairline);
+	}
+	.entry-band,
+	.community-band {
+		background: var(--sl-color-bg);
+	}
+	.video-band {
+		background: var(--sl-color-bg-nav);
+	}
+	.compatibility-band {
+		background: var(--sl-color-bg-nav);
+	}
+	.band-inner {
+		max-width: 76rem;
+		margin: 0 auto;
+		padding: 3.5rem 1.25rem;
+	}
+	h2 {
+		margin: 0 0 1.6rem;
+		font-size: 1.65rem;
+		letter-spacing: 0;
+	}
+	.video-layout {
+		display: grid;
+		grid-template-columns: minmax(15rem, 0.7fr) minmax(0, 1.3fr);
+		gap: 4rem;
+		align-items: center;
+	}
+	.video-copy h2 {
+		margin-bottom: 0.75rem;
+	}
+	.video-copy > p:last-child {
+		margin: 0;
+		color: var(--sl-color-gray-3);
+		line-height: 1.65;
+	}
+	.section-label {
+		margin: 0 0 0.65rem;
+		color: var(--sl-color-text-accent);
+		font-size: 0.8rem;
+		font-weight: 700;
+		text-transform: uppercase;
+	}
+	.video-frame {
+		aspect-ratio: 16 / 9;
+		border: 1px solid var(--sl-color-hairline);
+		border-radius: 5px;
+		background: #111;
+		overflow: hidden;
+	}
+	.video-frame iframe {
+		display: block;
+		width: 100%;
+		height: 100%;
+		border: 0;
+	}
+	.entry-grid,
+	.compatibility-grid {
+		display: grid;
+		grid-template-columns: repeat(3, minmax(0, 1fr));
+	}
+	.entry-link {
+		display: grid;
+		grid-template-columns: 1.8rem 1fr;
+		gap: 0.9rem;
+		padding: 0.5rem 1.8rem;
+		color: var(--sl-color-text);
+		text-decoration: none;
+	}
+	.entry-link:first-child {
+		padding-inline-start: 0;
+	}
+	.entry-link + .entry-link {
+		border-inline-start: 1px solid var(--sl-color-hairline);
+	}
+	.entry-link :global(svg) {
+		color: var(--sl-color-accent-high);
+	}
+	.entry-link strong,
+	.entry-link small {
+		display: block;
+	}
+	.entry-link strong {
+		margin-bottom: 0.35rem;
+		font-size: 1rem;
+	}
+	.entry-link small {
+		color: var(--sl-color-gray-3);
+		font-size: 0.85rem;
+		line-height: 1.55;
+	}
+	.entry-link:hover strong {
+		color: var(--sl-color-text-accent);
+	}
+	.section-heading {
+		display: flex;
+		align-items: baseline;
+		justify-content: space-between;
+		gap: 1rem;
+	}
+	.section-heading a {
+		font-size: 0.9rem;
+	}
+	.compatibility-grid {
+		grid-template-columns: repeat(2, minmax(0, 1fr));
+		gap: 4rem;
+	}
+	.compatibility-grid > div {
+		position: relative;
+		padding-inline-start: 1.5rem;
+	}
+	.compatibility-grid > div + div {
+		border-inline-start: 1px solid var(--sl-color-hairline);
+		padding-inline-start: 4rem;
+	}
+	.status-dot {
+		position: absolute;
+		top: 0.45rem;
+		left: 0;
+		width: 0.55rem;
+		height: 0.55rem;
+		border-radius: 50%;
+		background: #6da842;
+		box-shadow: 0 0 0 3px rgba(109, 168, 66, 0.15);
+	}
+	.compatibility-grid > div + div .status-dot {
+		left: 2.5rem;
+	}
+	.compatibility-grid h3 {
+		margin: 0 0 0.5rem;
+		font-size: 1.2rem;
+	}
+	.compatibility-grid p,
+	.community-layout p {
+		margin: 0;
+		color: var(--sl-color-gray-3);
+		line-height: 1.65;
+	}
+	.community-layout {
+		display: grid;
+		grid-template-columns: minmax(0, 1.4fr) minmax(16rem, 0.6fr);
+		gap: 4rem;
+		align-items: start;
+	}
+	.community-layout h2 {
+		margin-bottom: 0.8rem;
+	}
+	.community-links {
+		display: grid;
+		gap: 0.75rem;
+	}
+	.community-links a {
+		padding-bottom: 0.75rem;
+		border-bottom: 1px solid var(--sl-color-hairline);
+		font-weight: 650;
+		text-decoration: none;
+	}
+	@media (max-width: 50rem) {
+		.entry-grid,
+		.video-layout,
+		.compatibility-grid,
+		.community-layout {
+			grid-template-columns: 1fr;
+			gap: 0;
+		}
+		.video-layout {
+			gap: 1.75rem;
+		}
+		.entry-link,
+		.entry-link:first-child {
+			padding: 1.1rem 0;
+		}
+		.entry-link + .entry-link {
+			border-inline-start: 0;
+			border-top: 1px solid var(--sl-color-hairline);
+		}
+		.compatibility-grid {
+			gap: 2rem;
+		}
+		.compatibility-grid > div + div {
+			border-inline-start: 0;
+			padding-inline-start: 1.5rem;
+		}
+		.compatibility-grid > div + div .status-dot {
+			left: 0;
+		}
+		.community-layout {
+			gap: 2rem;
+		}
+		.section-heading {
+			align-items: flex-start;
+			flex-direction: column;
+			margin-bottom: 1.8rem;
+		}
+		.section-heading h2 {
+			margin-bottom: 0;
+		}
+	}
+</style>

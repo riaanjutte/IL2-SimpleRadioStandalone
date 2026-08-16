@@ -1,0 +1,155 @@
+@layer starlight.base {
+	:root {
+		--sl-font: "Segoe UI", Inter, system-ui, sans-serif;
+		--sl-font-mono: "Cascadia Mono", Consolas, monospace;
+		--sl-color-accent-low: #dce8d4;
+		--sl-color-accent: #5f963d;
+		--sl-color-accent-high: #31511f;
+		--sl-color-white: #151714;
+		--sl-color-gray-1: #292c29;
+		--sl-color-gray-2: #424640;
+		--sl-color-gray-3: #626861;
+		--sl-color-gray-4: #969b94;
+		--sl-color-gray-5: #c8cbc6;
+		--sl-color-gray-6: #e5e6e3;
+		--sl-color-black: #f7f7f5;
+		--sl-color-text-accent: #486f30;
+		--sl-color-bg-nav: #eff0ed;
+		--sl-color-bg-sidebar: #f5f5f2;
+		--sl-color-hairline: #d4d6d0;
+		--sl-content-width: 50rem;
+	}
+	:root[data-theme='dark'] {
+		--sl-color-accent-low: #26331f;
+		--sl-color-accent: #77b64c;
+		--sl-color-accent-high: #a4d47e;
+		--sl-color-white: #f0e7cf;
+		--sl-color-gray-1: #d8d8d1;
+		--sl-color-gray-2: #c3c5bf;
+		--sl-color-gray-3: #a4a8a1;
+		--sl-color-gray-4: #737972;
+		--sl-color-gray-5: #4c504b;
+		--sl-color-gray-6: #30332f;
+		--sl-color-black: #171a19;
+		--sl-color-text-accent: #d8c58d;
+		--sl-color-bg-nav: #1d201e;
+		--sl-color-bg-sidebar: #1a1d1b;
+		--sl-color-hairline: #3b3f3a;
+	}
+	h1,
+	h2,
+	h3,
+	h4 {
+		letter-spacing: 0;
+	}
+	::selection {
+		background: rgba(109, 168, 66, 0.35);
+	}
+}
+
+@layer starlight.core {
+	header.header {
+		border-bottom: 1px solid var(--sl-color-hairline);
+		background: color-mix(in srgb, var(--sl-color-bg-nav) 96%, transparent);
+		backdrop-filter: blur(12px);
+	}
+	.site-title {
+		font-weight: 700;
+	}
+	.sidebar-pane {
+		border-inline-end: 1px solid var(--sl-color-hairline);
+	}
+	.right-sidebar {
+		border-inline-start: 1px solid var(--sl-color-hairline);
+	}
+}
+
+@layer starlight.content {
+	.sl-markdown-content :is(table, pre, .expressive-code),
+	.sl-markdown-content img {
+		border-radius: 5px;
+	}
+}
+
+/* Homepage layout overrides must follow Starlight's layered component styles. */
+:root[data-has-hero] main .content-panel {
+	padding-top: 0;
+	padding-bottom: 0;
+}
+:root[data-has-hero] main .content-panel > .sl-container {
+	max-width: none;
+}
+:root[data-has-hero] main .hero {
+	grid-template-columns: 1fr;
+	padding-block: 4.5rem 2rem;
+	text-align: center;
+}
+:root[data-has-hero] main .hero .stack,
+:root[data-has-hero] main .hero .copy {
+	align-items: center;
+	text-align: center;
+}
+:root[data-has-hero] main .hero .actions {
+	justify-content: center;
+}
+:root[data-has-hero] main .hero .tagline > span:first-child {
+	display: block;
+}
+:root[data-has-hero] main .hero .game-logos {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	gap: 1.25rem;
+	width: fit-content;
+	margin: 1.5rem auto 0;
+	padding: 0.75rem 1rem;
+	border: 1px solid #3b3f3a;
+	border-radius: 4px;
+	background: #171a19;
+}
+:root[data-has-hero] main .hero .game-logos img {
+	display: block;
+	width: auto;
+	height: 2rem;
+}
+:root[data-has-hero] main .hero h1 {
+	max-width: 60rem;
+	font-size: 3.5rem;
+	font-weight: 750;
+}
+:root[data-has-hero] main .hero .primary {
+	border-color: #77b64c;
+	background: #5f963d;
+	color: #fff;
+}
+:root[data-has-hero] main .hero .primary:hover {
+	background: #6da842;
+}
+@media (max-width: 50rem) {
+	:root[data-has-hero] main .hero {
+		padding-block: 3rem 1.75rem;
+	}
+	:root[data-has-hero] main .hero h1 {
+		font-size: 2.55rem;
+	}
+}
+@media (max-width: 30rem) {
+	:root[data-has-hero] main .hero h1 {
+		font-size: 2.1rem;
+	}
+	:root[data-has-hero] main .hero .game-logos {
+		gap: 1rem;
+		padding: 0.65rem 0.75rem;
+	}
+	:root[data-has-hero] main .hero .game-logos img {
+		height: 1.75rem;
+	}
+	:root[data-has-hero] main .hero .actions {
+		align-items: stretch;
+		flex-direction: column;
+		width: 100%;
+	}
+	:root[data-has-hero] main .hero .actions a {
+		justify-content: center;
+	}
+}

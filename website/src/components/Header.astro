@@ -1,0 +1,126 @@
+---
+import config from 'virtual:starlight/user-config';
+import LanguageSelect from 'virtual:starlight/components/LanguageSelect';
+import Search from 'virtual:starlight/components/Search';
+import SocialIcons from 'virtual:starlight/components/SocialIcons';
+import ThemeSelect from 'virtual:starlight/components/ThemeSelect';
+
+const shouldRenderSearch =
+	config.pagefind || config.components.Search !== '@astrojs/starlight/components/Search.astro';
+const base = Astro.locals.starlightRoute.siteTitleHref;
+---
+
+<div class="header">
+	<div class="title-wrapper sl-flex">
+		<a class="project-title" href={base} aria-label="SRS for IL-2 Community Edition home">
+			<span class="desktop-title">SRS for IL-2 Community Edition</span>
+			<span class="mobile-title">SRS for IL-2</span>
+		</a>
+	</div>
+	<nav class="project-nav print:hidden" aria-label="Project navigation">
+		<a href={`${base}guides/installation/`}>Guides</a>
+		<a href={`${base}server-admin/server-setup/`}>Server admins</a>
+		<a href={`${base}releases/`}>Releases</a>
+		<a
+			class="support-link"
+			href="https://www.buymeacoffee.com/haluter"
+			target="_blank"
+			rel="noopener noreferrer"
+		>
+			<img
+				src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png"
+				alt="Buy Me a Coffee"
+				width="217"
+				height="60"
+			/>
+		</a>
+	</nav>
+	<div class="search-wrapper sl-flex print:hidden">{shouldRenderSearch && <Search />}</div>
+	<div class="sl-hidden md:sl-flex print:hidden right-group">
+		<div class="sl-flex social-icons"><SocialIcons /></div>
+		<ThemeSelect />
+		<LanguageSelect />
+	</div>
+</div>
+
+<style>
+	@layer starlight.core {
+		.header {
+			display: flex;
+			gap: 1.25rem;
+			justify-content: space-between;
+			align-items: center;
+			height: 100%;
+		}
+		.title-wrapper {
+			overflow: clip;
+			padding: 0.25rem;
+			margin: -0.25rem;
+			min-width: 0;
+		}
+		.project-title {
+			color: var(--sl-color-text-accent);
+			font-size: var(--sl-text-lg);
+			font-weight: 700;
+			line-height: var(--sl-line-height-headings);
+			text-decoration: none;
+			white-space: nowrap;
+		}
+		.mobile-title {
+			display: none;
+		}
+		.project-nav {
+			display: none;
+			align-items: center;
+			gap: 1.35rem;
+			white-space: nowrap;
+		}
+		.project-nav a {
+			color: var(--sl-color-gray-2);
+			font-size: var(--sl-text-sm);
+			font-weight: 600;
+			text-decoration: none;
+		}
+		.project-nav a:hover,
+		.project-nav a:focus-visible {
+			color: var(--sl-color-text-accent);
+		}
+		.project-nav .support-link {
+			display: flex;
+			align-items: center;
+		}
+		.project-nav .support-link img {
+			display: block;
+			width: auto;
+			height: 2rem;
+		}
+		.search-wrapper {
+			flex: 1;
+			justify-content: center;
+			min-width: 8rem;
+		}
+		.right-group,
+		.social-icons {
+			gap: 1rem;
+			align-items: center;
+		}
+		.social-icons::after {
+			content: '';
+			height: 2rem;
+			border-inline-end: 1px solid var(--sl-color-gray-5);
+		}
+		@media (min-width: 72rem) {
+			.project-nav {
+				display: flex;
+			}
+		}
+		@media (max-width: 40rem) {
+			.desktop-title {
+				display: none;
+			}
+			.mobile-title {
+				display: inline;
+			}
+		}
+	}
+</style>

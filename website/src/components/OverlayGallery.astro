@@ -1,0 +1,126 @@
+---
+import { Image } from 'astro:assets';
+import clientList from '../assets/client-list.png';
+import overlayShowcase from '../assets/overlay-showcase.png';
+import radioOverlay from '../assets/radio-overlay.png';
+
+const overlays = [
+	{
+		name: 'Radio Overlay',
+		description: 'Switch channels, monitor radio activity, adjust volume, and use the crew intercom.',
+		image: radioOverlay,
+		alt: 'SRS radio overlay with two radios and crew intercom',
+	},
+	{
+		name: 'Client List',
+		description: 'See connected clients, their selected channels, coalition, and current activity.',
+		image: clientList,
+		alt: 'SRS client list showing connected pilots and their radio channels',
+	},
+	{
+		name: 'Pilot Roster',
+		description: 'Match in-game pilots to assigned callsigns and their Radio 1 and Radio 2 channels.',
+		crop: 'pilot-roster-crop',
+		alt: 'SRS Pilot Roster showing callsigns, pilot names, and radio channels',
+	},
+];
+---
+
+<div class="overlay-gallery">
+	{
+		overlays.map((overlay) => (
+			<article class:list={['overlay-item', overlay.crop, { direct: overlay.image }]}>
+				<a
+					class="overlay-image"
+					href={overlay.image?.src ?? overlayShowcase.src}
+					target="_blank"
+					rel="noreferrer"
+					aria-label={`Open the full interface screenshot for ${overlay.name}`}
+				>
+					{overlay.image ? (
+						<Image src={overlay.image} alt={overlay.alt} quality="high" />
+					) : (
+						<Image src={overlayShowcase} alt={overlay.alt} width={2425} quality="high" />
+					)}
+				</a>
+				<div class="overlay-copy">
+					<h3>{overlay.name}</h3>
+					<p>{overlay.description}</p>
+				</div>
+			</article>
+		))
+	}
+</div>
+
+<style>
+	.overlay-gallery {
+		display: grid;
+		grid-template-columns: repeat(2, minmax(0, 1fr));
+		gap: 1rem;
+		margin-top: 1.5rem;
+		align-items: start;
+	}
+	.overlay-item {
+		overflow: hidden;
+		border: 1px solid var(--sl-color-hairline);
+		border-radius: 6px;
+		background: var(--sl-color-bg-nav);
+	}
+	.overlay-item:last-child {
+		grid-column: 1 / -1;
+	}
+	.overlay-image {
+		position: relative;
+		display: block;
+		overflow: hidden;
+		border-bottom: 1px solid var(--sl-color-hairline);
+		background: #111513;
+	}
+	.overlay-image :global(img) {
+		position: absolute;
+		max-width: none;
+		height: auto;
+	}
+	.direct .overlay-image {
+		display: grid;
+		place-items: center;
+		aspect-ratio: 2 / 3;
+		padding: 0.5rem;
+	}
+	.direct .overlay-image :global(img) {
+		position: static;
+		width: 100%;
+		height: 100%;
+		max-width: 100%;
+		object-fit: contain;
+	}
+	.pilot-roster-crop .overlay-image {
+		aspect-ratio: 635 / 278;
+	}
+	.pilot-roster-crop .overlay-image :global(img) {
+		top: -299.5%;
+		left: -274.2%;
+		width: 381.9%;
+	}
+	.overlay-copy {
+		padding: 1rem;
+	}
+	.overlay-copy h3 {
+		margin: 0;
+		font-size: 1.05rem;
+	}
+	.overlay-copy p {
+		margin: 0.45rem 0 0;
+		color: var(--sl-color-gray-3);
+		font-size: 0.9rem;
+		line-height: 1.55;
+	}
+	@media (max-width: 42rem) {
+		.overlay-gallery {
+			grid-template-columns: 1fr;
+		}
+		.overlay-item:last-child {
+			grid-column: auto;
+		}
+	}
+</style>

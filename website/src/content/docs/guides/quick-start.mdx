@@ -1,0 +1,65 @@
+---
+title: Quick start
+description: Configure audio, PTT, server connection, and overlays for your first SRS session.
+---
+
+import { Image } from 'astro:assets';
+import clientGeneral from '../../../assets/client-general.png';
+import clientHelp from '../../../assets/client-help.png';
+import clientSettings from '../../../assets/client-settings.png';
+
+## 1. Select audio devices
+
+On the **General** tab:
+
+1. Choose the microphone you will use in IL-2.
+2. Choose your normal speaker or headset output.
+3. Leave optional microphone output set to **No Mic Output / Passthrough** unless you specifically need sidetone.
+4. Use **Audio Preview** to verify input level and output before joining a server.
+
+<a href={clientGeneral.src} target="_blank" rel="noreferrer">
+	<Image src={clientGeneral} alt="SRS General tab showing audio, server, overlay, and favourite controls" quality="high" />
+</a>
+
+## 2. Bind Push-To-Talk
+
+Open **Controls** and assign a Common PTT or a radio-specific PTT. Common PTT transmits on the selected radio. Current beta builds can provide multiple independent Common PTT inputs, each with an optional modifier.
+
+See [Controls and PTT](../controls/) for the full control overview.
+
+## 3. Start IL-2
+
+SRS listens for telemetry on UDP port `4322`. When IL-2 telemetry is active, the **IL-2** status indicator at the bottom of the client turns green.
+
+If the multiplayer server provides SRS connection information, the client connects automatically. You can also select a favourite or enter an SRS address manually.
+
+## 4. Check connection status
+
+The client status indicators separate four states:
+
+- **Mic**: microphone capture is available.
+- **Server**: the TCP server link is established.
+- **VOIP**: the UDP voice path is responding.
+- **IL-2**: current game telemetry is being received.
+
+A green Server and VOIP status with a gray IL-2 status means SRS reached the radio server but is not receiving game telemetry.
+
+## 5. Review useful settings
+
+The **Settings** tab controls automatic connection prompts, overlay startup, audio processing, language, theme, 3D effects, and weathering. Defaults suit most users; review microphone processing and overlay startup if your setup needs different behavior.
+
+<a href={clientSettings.src} target="_blank" rel="noreferrer">
+	<Image src={clientSettings} alt="SRS Settings tab showing connection, overlay, audio, and theme options" quality="high" />
+</a>
+
+## 6. Open overlays
+
+Use the General tab to show the Radio Overlay, Client List, or Pilot Roster. The Pilot Roster is available only when the connected server provides compatible roster data.
+
+## Need help?
+
+Run **Help → Telemetry Diagnostics** for game-link or auto-connect problems. Use the Help tab support buttons to report an issue or suggest an improvement, and include `clientlog.txt` when reporting connection or audio failures.
+
+<a href={clientHelp.src} target="_blank" rel="noreferrer">
+	<Image src={clientHelp} alt="SRS Help tab with diagnostics and support controls" quality="high" />
+</a>

@@ -1,0 +1,59 @@
+---
+title: Server setup
+description: Run the Community Edition SRS server and configure its persistent settings.
+---
+
+import { Image } from 'astro:assets';
+import serverSettings from '../../../assets/server-settings.png';
+
+## Download the server
+
+Download the current release ZIP from [GitHub Releases](https://github.com/riaanjutte/IL2-SimpleRadioStandalone/releases). The package contains `IL2-SR-Server.exe` and the required server files.
+
+Use a separate folder for each SRS server instance. A client installation is not required on the dedicated server unless that machine also needs to run the client.
+
+## Start an instance
+
+Run the server executable normally, or supply a specific configuration file:
+
+```powershell
+IL2-SR-Server.exe -cfg="C:\IL2-SRS\instances\combatbox-main.cfg"
+```
+
+Set a unique server port for each instance. Ensure the corresponding TCP and UDP traffic is allowed through Windows Firewall and any upstream router or hosting-provider firewall.
+
+## server.cfg
+
+The server creates missing persistent settings in `server.cfg` during startup while preserving existing values. Use the server UI for normal changes, then retain the generated configuration with your instance backups.
+
+Important settings include:
+
+- server port
+- coalition radio security
+- spectator audio
+- realistic TX behaviour
+- second-radio availability
+- channel limit
+- tuned/client count display
+- optional collision effects
+- optional Pilot Roster JSON path
+
+Connected clients can inspect the capabilities currently advertised by the server:
+
+<a href={serverSettings.src} target="_blank" rel="noreferrer">
+	<Image src={serverSettings} alt="SRS Server Settings window showing advertised capabilities" quality="high" />
+</a>
+
+Do not place credentials or private filesystem paths in release packages. RCon credentials and server-only roster paths are not synchronized to clients by current builds.
+
+## Client compatibility
+
+Read each release's compatibility notes before deploying experimental features. Updated clients can normally communicate with older Community Edition servers, but a server-controlled capability is available only when the server advertises or signals it.
+
+## Logs
+
+The server writes `serverlog.txt` in its application directory. Include this log when reporting synchronization, configuration, roster-file, or voice-routing problems.
+
+## Pilot Roster
+
+To provide assigned callsigns and aircraft names to connected clients, continue with [Pilot Roster integration](../pilot-roster/).
