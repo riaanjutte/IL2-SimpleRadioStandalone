@@ -5,6 +5,8 @@ description: Run the Community Edition SRS server and configure its persistent s
 
 import { Image } from 'astro:assets';
 import serverSettings from '../../../assets/server-settings.png';
+import serverWhiteTheme from '../../../assets/server-white-theme.png';
+import serverClientAdminDark from '../../../assets/server-client-admin-dark.png';
 
 ## Download the server
 
@@ -34,6 +36,8 @@ Important settings include:
 - realistic TX behaviour
 - second-radio availability
 - channel limit
+- optional channel names
+- optional majority squad channel labels
 - tuned/client count display
 - optional collision effects
 - optional Pilot Roster JSON path
@@ -45,6 +49,52 @@ Connected clients can inspect the capabilities currently advertised by the serve
 </a>
 
 Do not place credentials or private filesystem paths in release packages. RCon credentials and server-only roster paths are not synchronized to clients by current builds.
+
+### Channel names
+
+Server owners can assign optional names that appear on updated clients. Select **EDIT** beside **Channel Names** in the server app, or add a dedicated section to `server.cfg`:
+
+```ini
+[Channel Names]
+1=Command
+2=Tower/ATC
+```
+
+Use one setting per channel. Channels that are omitted or left blank continue to appear as `CHN 1`, `CHN 2`, and so on. Channel names affect only the client display and spoken channel announcements; channel numbers and radio frequencies remain unchanged. Experimental `CHANNEL_NAMES` values from earlier beta builds are migrated automatically when the server starts.
+
+### Majority squad channel labels
+
+Server owners can allow clients to append a squad tag to channel names above channel 2. Enable **Squad Channel Labels** in the server window, or set:
+
+```ini
+[General Settings]
+SHOW_SQUAD_CHANNEL_LABELS=true
+```
+
+The feature is disabled by default. A tag is shown only when at least two friendly pilots are on the channel and one recognized squad holds a strict majority. Ties, solo pilots, and channels 1 and 2 retain their normal channel names.
+
+### Server theme
+
+Use **Server Theme** in the server window to switch immediately between the persistent **White** and **Dark** themes. White is the default. The local preference is stored under `[Server Settings]` and is not sent to connected clients:
+
+```ini
+[Server Settings]
+SERVER_UI_THEME=Dark
+```
+
+The Server Health header remains visible at the top of the main window. Its service state verifies both the TCP control listener and UDP voice listener, and can report `STARTING`, `RUNNING`, `DEGRADED`, or `STOPPED`. It also shows the listening port, server uptime, connected clients, established UDP voice links, recent transmitters, and process memory use. These values are calculated locally and do not add network traffic. **Start/Stop Server** and **Client Admin** remain available in the fixed footer.
+
+<a href={serverWhiteTheme.src} target="_blank" rel="noreferrer">
+	<Image src={serverWhiteTheme} alt="IL2-SRS server main window using the White theme" quality="high" />
+</a>
+
+### Client administration
+
+Select **Client Admin** to expand the live client table from the right side of the main server window. Search across pilot names, assigned callsigns, coalition, and radio channels, or filter the table by coalition. Click a column header to sort it; radio channels are sorted numerically. Active filters and sorting update as live radio and voice-link data changes. The table shows each client's Radio 1 and Radio 2 channels, UDP voice-link state, and server-side mute state. Kick, ban, mute, and unmute actions remain available per client.
+
+<a href={serverClientAdminDark.src} target="_blank" rel="noreferrer">
+	<Image src={serverClientAdminDark} alt="IL2-SRS server with the Dark theme and Client Admin panel expanded" quality="high" />
+</a>
 
 ## Client compatibility
 
