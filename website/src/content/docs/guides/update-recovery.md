@@ -102,4 +102,4 @@ The removal process leaves `%AppData%\IL2-SRS` available for a future reinstall.
 
 ## If recovery still fails
 
-Use **Help → Report a Problem** and include `%AppData%\IL2-SRS\clientlog.txt`. For installation failures, also include `installer-log.txt` from the folder where the installer was run.
+Use **Help → Report a Problem** and include `clientlog.txt` from the SRS application folder. For installation failures, also include `installer-log.txt` from the folder where the installer was run.

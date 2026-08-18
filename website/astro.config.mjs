@@ -31,6 +31,7 @@ export default defineConfig({
 			sidebar: [
 				{ label: 'Overview', slug: 'index' },
 				{ label: 'Downloads & releases', slug: 'releases' },
+				{ label: 'Support', slug: 'support' },
 				{ label: 'Compatibility', slug: 'compatibility' },
 				{ label: 'Screenshots', slug: 'screenshots' },
 				{

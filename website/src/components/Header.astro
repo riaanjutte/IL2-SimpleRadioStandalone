@@ -20,9 +20,10 @@ const base = Astro.locals.starlightRoute.siteTitleHref;
 	<nav class="project-nav print:hidden" aria-label="Project navigation">
 		<a href={`${base}guides/installation/`}>Guides</a>
 		<a href={`${base}server-admin/server-setup/`}>Server admins</a>
+		<a href={`${base}support/`}>Support</a>
 		<a href={`${base}releases/`}>Releases</a>
 		<a
-			class="support-link"
+			class="coffee-link"
 			href="https://www.buymeacoffee.com/haluter"
 			target="_blank"
 			rel="noopener noreferrer"
@@ -85,11 +86,11 @@ const base = Astro.locals.starlightRoute.siteTitleHref;
 		.project-nav a:focus-visible {
 			color: var(--sl-color-text-accent);
 		}
-		.project-nav .support-link {
+		.project-nav .coffee-link {
 			display: flex;
 			align-items: center;
 		}
-		.project-nav .support-link img {
+		.project-nav .coffee-link img {
 			display: block;
 			width: auto;
 			height: 2rem;

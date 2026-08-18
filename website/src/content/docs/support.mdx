@@ -1,0 +1,56 @@
+---
+title: Support
+description: Find the right SRS troubleshooting guide, collect diagnostics, and report a problem or suggestion.
+---
+
+import SupportTopics from '../../components/SupportTopics.astro';
+
+Start with the symptom that best matches the problem. Most connection, telemetry, overlay, audio, and installation issues can be resolved without changing game files manually.
+
+<SupportTopics />
+
+## Fast checks
+
+- **Server and VOIP are green, but IL-2 is gray:** run **Help → Telemetry Diagnostics** with IL-2 closed.
+- **An overlay appears after Alt+Tab but disappears in IL-2:** use Borderless or Windowed display mode instead of exclusive fullscreen.
+- **You hear your own voice:** set microphone output to **No Mic Output / Passthrough**.
+- **PTT stopped responding after reconnecting hardware:** rescan input devices or use the **Restart SRS** binding.
+- **Updating or reinstalling did not reset a bad setting:** follow the [configuration reset](./guides/update-recovery/#reset-srs-configuration) procedure.
+
+## Report a problem
+
+The preferred reporting route is built into the client:
+
+1. Open the **Help** tab.
+2. Leave **Redact personal details in diagnostics** enabled unless support specifically needs unredacted data and you agree to share it.
+3. Select **Report a Problem**.
+4. Review the generated ZIP, complete the GitHub issue form that opens, and attach the ZIP.
+
+SRS creates the bundle under `Documents\IL2-SRS Diagnostics`. It contains a system and client summary plus the current and previous client logs when available. The button also opens the bundle's folder so it is easy to attach.
+
+:::caution[Review diagnostics before sharing]
+Diagnostics can contain device names, server details, player names, paths, and recent connection or audio events. Redaction is enabled by default, but you should still review the ZIP before posting it publicly.
+:::
+
+If the client cannot start, attach `clientlog.txt` manually from the SRS application folder to a [new GitHub issue](https://github.com/riaanjutte/IL2-SimpleRadioStandalone/issues/new?labels=bug). The default location is `C:\Program Files\IL2-SimpleRadio-Standalone`.
+
+## What to include
+
+Describe the problem in normal language and include:
+
+- the exact SRS version shown in the client title or status bar
+- IL-2 Great Battles or IL-2 Korea, and Steam or standalone
+- whether the installed release is stable or beta
+- the server being used and which status indicators are green or gray
+- what happened, what you expected, and repeatable steps
+- whether restarting SRS, changing display mode, or using another audio device changes the result
+
+For telemetry problems, include a screenshot of the completed Telemetry Diagnostics report and the affected game's `startup.cfg`. For installer problems, include `installer-log.txt`. Server administrators should include `serverlog.txt` and a copy of `server.cfg` with passwords and private paths removed.
+
+## Support channels
+
+- [SRS Discord](https://discord.gg/baw7g3t) is best for live troubleshooting with the community.
+- [GitHub Issues](https://github.com/riaanjutte/IL2-SimpleRadioStandalone/issues) is best for reproducible bugs that need code changes or tracking.
+- The client **Help → Suggest an Improvement** button opens a prepared feature-request form.
+
+Please use the IL-2 SRS support area on Discord rather than the DCS SRS support channel.

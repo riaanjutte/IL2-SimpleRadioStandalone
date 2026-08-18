@@ -1,0 +1,85 @@
+---
+const topics = [
+	{
+		title: 'Installation and updates',
+		description: 'Install one copy, update safely, return from beta, repair files, or recover settings.',
+		href: '/guides/update-recovery/',
+	},
+	{
+		title: 'IL-2 link and auto-connect',
+		description: 'Fix a gray IL-2 indicator, startup.cfg, firewall rules, port 4322, or telemetry conflicts.',
+		href: '/troubleshooting/telemetry/',
+	},
+	{
+		title: 'Missing or disappearing overlays',
+		description: 'Restore overlay positions and correct exclusive-fullscreen or focus problems.',
+		href: '/guides/overlays/',
+	},
+	{
+		title: 'Audio problems',
+		description: 'Diagnose echo, muffled sound, missing microphone input, clipping, or choppy reception.',
+		href: '/troubleshooting/audio/',
+	},
+	{
+		title: 'PTT and input devices',
+		description: 'Configure radio controls and recover a disconnected joystick, throttle, or button box.',
+		href: '/guides/controls/',
+	},
+	{
+		title: 'Server administration',
+		description: 'Configure the SRS server, channel behavior, client administration, and Pilot Roster data.',
+		href: '/server-admin/server-setup/',
+	},
+];
+---
+
+<nav class="support-topic-grid" aria-label="Support topics">
+	{
+		topics.map((topic) => (
+			<a href={topic.href} class="support-topic">
+				<strong>{topic.title}</strong>
+				<span>{topic.description}</span>
+			</a>
+		))
+	}
+</nav>
+
+<style>
+	.support-topic-grid {
+		display: grid;
+		grid-template-columns: repeat(2, minmax(0, 1fr));
+		gap: 0.8rem;
+		margin: 1.5rem 0 2.5rem;
+	}
+	.support-topic {
+		display: block;
+		padding: 1rem 1.1rem;
+		border: 1px solid var(--sl-color-hairline);
+		border-radius: 5px;
+		background: var(--sl-color-bg-nav);
+		color: var(--sl-color-text);
+		text-decoration: none;
+	}
+	.support-topic:hover,
+	.support-topic:focus-visible {
+		border-color: var(--sl-color-accent);
+	}
+	.support-topic strong,
+	.support-topic span {
+		display: block;
+	}
+	.support-topic strong {
+		margin-bottom: 0.35rem;
+		color: var(--sl-color-white);
+	}
+	.support-topic span {
+		color: var(--sl-color-gray-3);
+		font-size: 0.88rem;
+		line-height: 1.55;
+	}
+	@media (max-width: 36rem) {
+		.support-topic-grid {
+			grid-template-columns: 1fr;
+		}
+	}
+</style>
