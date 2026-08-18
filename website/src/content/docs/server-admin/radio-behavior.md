@@ -59,7 +59,7 @@ Select **EDIT** beside **Channel Names**, or add entries under `[Channel Names]`
 
 Names are available for all 25 channels and do not change radio frequencies. Current clients use them in the overlay, tooltips, and spoken channel announcements.
 
-Channel 1 has one dynamic exception: while a friendly RCI is on duty, it displays `RCI Radar Control`. The configured name is restored when the RCI becomes inactive.
+Channel 1 has one dynamic exception: while a friendly RCI is on duty, it displays `RCI Control`. The configured name is restored when the RCI becomes inactive.
 
 ## Majority squad labels
 
