@@ -1892,6 +1892,7 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI
                 ShowInTaskbar = !_globalSettings.GetClientSettingBool(GlobalSettingsKeys.RadioOverlayTaskbarHide),
                 Opacity = GetOverlayOpacity(GlobalSettingsKeys.RadioOpacity)
             };
+            _radioOverlayWindow.ConnectRequested += RadioOverlayWindow_ConnectRequested;
             _radioOverlayWindow.Closed += (sender, args) =>
             {
                 if (ReferenceEquals(_radioOverlayWindow, sender))
@@ -1903,6 +1904,14 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI
             _radioOverlayWindow.SetRciIndicatorEnabled(ShouldShowRciStatus());
             _radioOverlayWindow.Show();
             UpdateWindowButtonLabels();
+        }
+
+        private void RadioOverlayWindow_ConnectRequested(object sender, EventArgs e)
+        {
+            if (!ClientState.IsConnected && _connectCommand.CanExecute(null))
+            {
+                _connectCommand.Execute(null);
+            }
         }
 
         private void InitOverlayOpacitySliders()

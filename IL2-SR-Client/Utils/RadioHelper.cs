@@ -18,6 +18,7 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.Utils
 {
     public static class RadioHelper
     {
+        internal const string RciChannelName = "RCI Control";
         private const float MinimumMutedVolume = 0.05f;
         private const float MaximumMutedVolume = 0.50f;
         private const float DefaultMutedVolume = 0.25f;
@@ -101,14 +102,14 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.Utils
             {
                 MessageHub.Instance.Publish(new TextToSpeechMessage()
                 {
-                    Message = "Channel " + channel+" Radio "+radioId
+                    Message = GetChannelAnnouncement(channel) + " Radio " + radioId
                 });
             }
             else
             {
                 MessageHub.Instance.Publish(new TextToSpeechMessage()
                 {
-                    Message = "Channel " + channel
+                    Message = GetChannelAnnouncement(channel)
                 });
             }
             
@@ -153,14 +154,14 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.Utils
                     {
                         MessageHub.Instance.Publish(new TextToSpeechMessage()
                         {
-                            Message = "Channel " + chan + " Radio " + radioId
+                            Message = GetChannelAnnouncement(chan) + " Radio " + radioId
                         });
                     }
                     else
                     {
                         MessageHub.Instance.Publish(new TextToSpeechMessage()
                         {
-                            Message = "Channel " + chan
+                            Message = GetChannelAnnouncement(chan)
                         });
                     }
                 }
@@ -205,14 +206,14 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.Utils
                     {
                         MessageHub.Instance.Publish(new TextToSpeechMessage()
                         {
-                            Message = "Channel " + chan + " Radio " + radioId
+                            Message = GetChannelAnnouncement(chan) + " Radio " + radioId
                         });
                     }
                     else
                     {
                         MessageHub.Instance.Publish(new TextToSpeechMessage()
                         {
-                            Message = "Channel " + chan
+                            Message = GetChannelAnnouncement(chan)
                         });
                     }
 
@@ -534,7 +535,7 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.Utils
             else
             {
                 builder.Append($"Radio {radio} ");
-                builder.Append($" - Channel {radio1.Channel}.");
+                builder.Append(" - " + GetChannelAnnouncement(radio1.Channel) + ".");
             }
 
             builder.Append($", {radio1Count} Connected.");
@@ -542,6 +543,46 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.Utils
             builder.Append(".\n");
 
             return builder.ToString();
+        }
+
+        private static string GetChannelAnnouncement(int channel)
+        {
+            return GetEffectiveChannelName(channel, "Channel " + channel);
+        }
+
+        internal static string GetEffectiveChannelName(int channel, string fallbackName)
+        {
+            return ResolveChannelName(
+                channel,
+                SyncedServerSettings.Instance.GetChannelName(channel),
+                IsFriendlyRciActive(),
+                fallbackName);
+        }
+
+        internal static string ResolveChannelName(
+            int channel,
+            string configuredName,
+            bool friendlyRciActive,
+            string fallbackName)
+        {
+            if (channel == 1 && friendlyRciActive)
+            {
+                return RciChannelName;
+            }
+
+            return string.IsNullOrWhiteSpace(configuredName) ? fallbackName : configuredName;
+        }
+
+        internal static bool IsFriendlyRciActive()
+        {
+            var gameState = ClientStateSingleton.Instance.PlayerGameState;
+            if (gameState == null)
+            {
+                return false;
+            }
+
+            var status = ConnectedClientsSingleton.Instance.GetRciStatus(gameState.coalition);
+            return status == RciStatus.FriendlyOnly || status == RciStatus.Both;
         }
 
         public static void ReadStatus()

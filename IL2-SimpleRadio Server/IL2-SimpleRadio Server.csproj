@@ -257,18 +257,24 @@
     <Compile Include="Network\NetCoreServer\TcpSession.cs" />
     <Compile Include="Network\SRSClientSession.cs" />
     <Compile Include="Network\UDPVoiceRouter.cs" />
+    <Compile Include="UI\ChannelNames\ChannelNameRowViewModel.cs" />
+    <Compile Include="UI\ChannelNames\ChannelNamesViewModel.cs" />
     <Compile Include="UI\ClientAdmin\ClientAdminViewModel.cs" />
+    <Compile Include="UI\ClientAdmin\ClientAdminPresentation.cs" />
     <Compile Include="UI\ClientAdmin\ClientViewModel.cs" />
     <Compile Include="UI\MainWindow\MainViewModel.cs" />
+    <Compile Include="UI\MainWindow\ServerWindowLayout.cs" />
+    <Compile Include="UI\MainWindow\ServerHealthSnapshot.cs" />
     <Compile Include="Network\Models\ServerLifecycleMessage.cs" />
     <Compile Include="Settings\ServerSettingsStore.cs" />
+    <Compile Include="Settings\ServerThemeManager.cs" />
     <Compile Include="Network\ServerState.cs" />
     <Compile Include="Network\ServerSync.cs" />
     <Page Include="UI\ClientAdmin\ClientAdminView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="UI\ClientAdmin\ClientView.xaml">
+    <Page Include="UI\ChannelNames\ChannelNamesView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

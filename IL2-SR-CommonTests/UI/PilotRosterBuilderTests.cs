@@ -223,6 +223,48 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Common.Tests.UI
             Assert.AreEqual("ACTIVE SQUAD OPS: CH6 JG27(2) | CH8 332FG(2)", summary);
         }
 
+        [TestMethod]
+        public void MajoritySquadTagRequiresStrictMajorityOnOperationalChannel()
+        {
+            var clients = new[]
+            {
+                CreateClient("friendly-1", "=TBAS=One", "", FriendlyCoalition, 5, 2),
+                CreateClient("friendly-2", "=TBAS=Two", "", FriendlyCoalition, 5, 3),
+                CreateClient("friendly-3", "Independent", "", FriendlyCoalition, 5, 4)
+            };
+
+            Assert.AreEqual("TBAS",
+                PilotRosterBuilder.GetMajoritySquadTag(CreateState(FriendlyCoalition, 1, 2), clients, 5));
+        }
+
+        [TestMethod]
+        public void MajoritySquadTagIgnoresChannelsOneAndTwoAndRejectsTies()
+        {
+            var clients = new[]
+            {
+                CreateClient("friendly-1", "=TBAS=One", "", FriendlyCoalition, 3, 2),
+                CreateClient("friendly-2", "=JG4=Two", "", FriendlyCoalition, 3, 2)
+            };
+
+            var state = CreateState(FriendlyCoalition, 1, 2);
+            Assert.AreEqual(string.Empty, PilotRosterBuilder.GetMajoritySquadTag(state, clients, 1));
+            Assert.AreEqual(string.Empty, PilotRosterBuilder.GetMajoritySquadTag(state, clients, 2));
+            Assert.AreEqual(string.Empty, PilotRosterBuilder.GetMajoritySquadTag(state, clients, 3));
+        }
+
+        [TestMethod]
+        public void MajoritySquadTagCountsPilotOnceWhenBothRadiosUseSameChannel()
+        {
+            var clients = new[]
+            {
+                CreateClient("friendly-1", "=TBAS=One", "", FriendlyCoalition, 6, 6),
+                CreateClient("friendly-2", "Independent", "", FriendlyCoalition, 6, 2)
+            };
+
+            Assert.AreEqual(string.Empty,
+                PilotRosterBuilder.GetMajoritySquadTag(CreateState(FriendlyCoalition, 1, 2), clients, 6));
+        }
+
         private static SRClient CreateClient(
             string guid,
             string name,

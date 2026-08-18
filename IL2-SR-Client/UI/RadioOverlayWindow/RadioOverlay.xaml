@@ -3,6 +3,7 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:local="clr-namespace:Ciribob.IL2.SimpleRadio.Standalone.Overlay"
         xmlns:radioOverlayWindow="clr-namespace:Ciribob.IL2.SimpleRadio.Standalone.Client.UI.RadioOverlayWindow"
+        xmlns:utils="clr-namespace:Ciribob.IL2.SimpleRadio.Standalone.Client.Utils"
         Name="RadioOverlayWin"
         Title="IL2-SimpleRadio"
         Width="152"
@@ -36,9 +37,55 @@
                     Background="Transparent">
 
         <!-- Plate 1: Radio 1 -->
-        <ContentControl Style="{StaticResource OverlayPlate}">
-            <radioOverlayWindow:RadioControlGroup x:Name="Radio1" RadioId="1" />
-        </ContentControl>
+        <Grid>
+            <ContentControl Style="{StaticResource OverlayPlate}">
+                <radioOverlayWindow:RadioControlGroup x:Name="Radio1" RadioId="1" />
+            </ContentControl>
+            <Button x:Name="ConnectionScrewButton"
+                    Width="11"
+                    Height="11"
+                    Margin="2.25,0.75,0,0"
+                    Padding="0"
+                    HorizontalAlignment="Left"
+                    VerticalAlignment="Top"
+                    AutomationProperties.Name="Connect"
+                    Click="ConnectionScrewButton_Click"
+                    Cursor="Hand"
+                    Style="{x:Null}"
+                    ToolTip="Connect to the selected SRS server.">
+                <Button.Template>
+                    <ControlTemplate TargetType="{x:Type Button}">
+                        <ContentPresenter HorizontalAlignment="Center"
+                                          VerticalAlignment="Center" />
+                    </ControlTemplate>
+                </Button.Template>
+                <Grid Width="6.5" Height="6.5">
+                    <Ellipse Stroke="#15170F"
+                             StrokeThickness="0.6"
+                             Style="{x:Null}">
+                        <Ellipse.Fill>
+                            <RadialGradientBrush GradientOrigin="0.35,0.3">
+                                <GradientStop Color="#8C8F86" Offset="0" />
+                                <GradientStop Color="#54574F" Offset="0.65" />
+                                <GradientStop Color="#26281F" Offset="1" />
+                            </RadialGradientBrush>
+                        </Ellipse.Fill>
+                    </Ellipse>
+                    <Ellipse x:Name="ConnectionScrewFeedback"
+                             Opacity="0"
+                             Stroke="#15170F"
+                             StrokeThickness="0.6"
+                             Style="{x:Null}" />
+                    <Rectangle Width="4.7"
+                               Height="0.9"
+                               Fill="#1B1E18"
+                               IsHitTestVisible="False"
+                               RenderTransformOrigin="0.5,0.5"
+                               Style="{x:Null}"
+                               utils:ScrewSlotRandomizer.RandomAngle="True" />
+                </Grid>
+            </Button>
+        </Grid>
 
         <!-- Plate 2: Radio 2 (shown when a second radio is available) -->
         <ContentControl x:Name="Radio2Plate"

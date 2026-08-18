@@ -1,5 +1,6 @@
 ﻿using System;
 using System.ComponentModel;
+using System.Linq;
 using System.Windows;
 using System.Windows.Threading;
 using Ciribob.IL2.SimpleRadio.Standalone.Client.Localization;
@@ -60,6 +61,20 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI
                     : LocalizationManager.Get("OFF");
 
                 ChannelLimit.Content = settings.GetSetting(ServerSettingsKeys.CHANNEL_LIMIT);
+
+                var channelNames = settings.GetChannelNames();
+                ChannelNames.Content = channelNames.Count == 0
+                    ? "-"
+                    : channelNames.Count + " configured";
+                ChannelNames.ToolTip = channelNames.Count == 0
+                    ? null
+                    : string.Join(", ", channelNames.OrderBy(pair => pair.Key)
+                        .Select(pair => pair.Key + ": " + pair.Value));
+
+                SquadChannelLabels.Content = settings.GetOptionalSettingAsBool(
+                    ServerSettingsKeys.SHOW_SQUAD_CHANNEL_LABELS)
+                    ? LocalizationManager.Get("ON")
+                    : LocalizationManager.Get("OFF");
 
                 RadioCollisionEffects.Content =
                     settings.GetSettingAsBool(ServerSettingsKeys.RADIO_COLLISION_EFFECTS)

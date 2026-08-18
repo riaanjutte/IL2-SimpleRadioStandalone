@@ -268,3 +268,12 @@ Roadmap.md
 # Client runtime config written when launching from repo
 default.cfg
 global.cfg
+
+# Local release preparation and Codex workspace files
+/release-artifacts/
+/AGENTS.md
+/SRSforIL2CE.af
+/SRSforIL2CE.png
+
+# Source audio retained locally from the cancelled neutral-lobby music experiment
+/Resources/*.ogg

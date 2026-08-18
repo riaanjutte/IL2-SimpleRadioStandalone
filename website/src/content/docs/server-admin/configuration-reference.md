@@ -93,7 +93,6 @@ Define one optional name per channel under `[Channel Names]`:
 - Names are trimmed and limited to 32 characters.
 - Blank entries are ignored and fall back to `CHN n`.
 - Names change the client display and spoken announcement, not the underlying channel or frequency.
-- A legacy one-line `CHANNEL_NAMES` value from earlier beta builds is migrated automatically.
 
 When a friendly RCI is active, current clients temporarily show channel 1 as `RCI Control`. The configured channel 1 name returns when the RCI is no longer active.
 

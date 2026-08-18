@@ -38,6 +38,21 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Server.Network
 
         private volatile bool _stop;
 
+        public bool IsListening
+        {
+            get
+            {
+                try
+                {
+                    return !_stop && _listener?.Client?.IsBound == true;
+                }
+                catch (ObjectDisposedException)
+                {
+                    return false;
+                }
+            }
+        }
+
         private static readonly List<int> _emptyBlockedRadios = new List<int>(); // Used in radio reachability check below, server does not track blocked radios, so forward all
         private List<double> _testFrequencies = new List<double>();
         private List<double> _globalFrequencies = new List<double>();
@@ -403,13 +418,6 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Server.Network
                             }
                         }
                     }
-                }
-                else
-                {
-#if DEBUG
-                    //TODO - test
-                    outgoingList.Add(client.Value.VoipPort);
-#endif
                 }
             }
 

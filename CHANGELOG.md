@@ -1,5 +1,105 @@
 # Changelog
 
+## IL2-SRS 1.0.4.8 community update
+
+### Highlights
+
+- One SRS installation now supports both IL-2 Great Battles and IL-2 Korea, with user configuration stored safely under `%AppData%\IL2-SRS` and conservative migration of older installations.
+- Telemetry setup and repair now checks every detected Great Battles and Korea installation, preserves read-only files and unrelated settings, and includes firewall and IL2WinWing compatibility diagnostics.
+- Added three independently configurable Common PTT inputs, improved auto-connect reliability, and disabled radio channel buttons that exceed the server's configured channel limit.
+- Pilot Roster support is now available to any server that supplies compatible roster data, with sortable columns and improved in-game overlay behavior.
+- Servers can provide names for all 25 radio channels and optionally append majority squad tags to channels above channel 2.
+- Added optional receive-collision effects for overlapping transmissions and server-side priority transmitters, while retaining compatibility with clients that do not support the effect.
+- Redesigned the server application with White and Dark themes, live Server Health information, and an integrated searchable Client Administration view.
+
+### Added
+
+- Added backup-first detection and consolidation of duplicate SRS installations while preserving profiles, bindings, favourites, and presets.
+- Added safe telemetry backup, repair, and Windows Firewall diagnostics for UDP port 4322.
+- Added guided IL2WinWing compatibility repair using separate telemetry and SimApp Pro forwarding ports.
+- Added Pilot Roster server capability detection and a server-administrator integration guide.
+- Added click-to-sort Pilot Roster columns.
+- Added configurable server channel names for channels 1-25 and optional squad channel labels.
+- Added opt-in radio collision effects for simultaneous transmissions and configurable priority-transmitter names.
+- Added persistent White and Dark server themes, a verified Server Health panel, and integrated Client Administration with search, coalition filtering, sorting, mute, kick, and ban controls.
+
+### Changed
+
+- Moved user settings to `%AppData%\IL2-SRS` so application updates and install-folder changes do not separate users from their configuration.
+- Expanded startup telemetry checks to cover all detected Great Battles and Korea installations.
+- SRS now owns UDP telemetry port 4322 exclusively and warns when a running IL2WinWing configuration conflicts with it.
+- Pilot Roster availability is now advertised by the connected server instead of being restricted to Combat Box.
+- Radio overlay channel labels, tooltips, spoken announcements, and Server Settings use server-provided names when available.
+- Channel 1 keeps its server-provided name unless a friendly RCI is on duty, when it displays `RCI Control`.
+- The radio overlay's top-left screw now connects to the selected server and briefly shows green action feedback.
+- Server settings are completed automatically in `server.cfg` while preserving existing values.
+- Replaced server ON/OFF buttons with compact switches and moved service controls into a fixed footer.
+- Server Health excludes configured automated radio accounts from the human client count.
+
+### Fixed
+
+- Fixed an auto-connect race when IL-2 telemetry arrived while the SRS server connection was still being established.
+- Prevented unsafe `startup.cfg` changes while IL-2 is running, partial writes, and loss of unrelated settings or file encoding.
+- Fixed stale coalition and vehicle state after returning to the neutral lobby or changing missions.
+- Prevented unconfigured Pilot Roster sources from delaying server synchronization and stopped server-only paths and RCon credentials from being sent to clients.
+- Fixed the Pilot Roster losing its in-game topmost state and retaining stale callsign data across missions.
+- Fixed microphone capture and Audio Preview failures under Wine when unsupported endpoint-volume APIs are encountered.
+- Removed a development-only server loopback that could return a sender's own transmission.
+- Improved live Client Administration filtering and numeric radio-channel sorting.
+
+### Compatibility
+
+- Existing IL2-SRS clients remain able to connect to a `1.0.4.8` server.
+- Updated clients are required to display channel names and locally render receive-collision effects.
+- Receive-collision effects and squad channel labels are disabled by default and can be enabled by server owners.
+
+### Validation
+
+- Built `IL2-SimpleRadioStandalone.sln` Release/x64 successfully.
+- Ran `IL2-SR-CommonTests` Release/x64: 181/181 passed.
+
+## IL2-SRS 1.0.4.8-beta.10 community update
+
+### Added
+
+- Server owners can assign optional radio channel names in a dedicated per-channel editor or `[Channel Names]` section.
+- Named channels appear on the radio overlay, in channel-button tooltips, spoken channel announcements, and the client Server Settings window.
+- Server owners can optionally enable majority squad tags on channel names above channel 2.
+- The server application now has persistent White and Dark themes with an immediate theme toggle.
+- Added a live Server Health panel showing service state, uptime, clients, UDP voice links, recent transmitters, and process memory.
+- Added a searchable, coalition-filtered Client Administration table with sortable pilot, callsign, radio, voice-link, and mute columns.
+
+### Changed
+
+- Radio overlay buttons above the server's configured channel limit are now disabled and greyed out.
+- The server window includes a Channel Names editor with one field per channel.
+- Majority squad channel labels are opt-in and controlled by the server.
+- Moved Server Health to an always-visible header, including the server port, and moved the server and client-administration commands into a fixed footer.
+- The footer server action is now red for **Stop Server** and green for **Start Server**, with white text for clear state recognition.
+- Replaced binary server-setting buttons with compact ON/OFF sliders.
+- Client Administration now updates rows in place so sorting, selection, and scroll position remain stable as clients update.
+- Client Administration now expands from the right side of the main server window instead of opening a separate window.
+- Stopping the server or closing the server application now requires explicit confirmation, with **No** selected by default.
+
+### Fixed
+
+- The server window title and startup log now include the full beta tag instead of showing only the base protocol version.
+- Channel names are stored as independent numbered settings so one malformed name cannot affect other channels or older clients.
+- Removed a development-only server loopback that could return a sender's own transmission when a Debug server executable was deployed.
+- Server Health now verifies both the TCP control listener and UDP voice listener, with distinct startup and degraded states.
+- Client Administration now reapplies active filters and sorting when live radio or voice-link data changes.
+- Client Administration radio columns now sort channels numerically instead of alphabetically.
+
+### Compatibility
+
+- Updated clients and servers remain compatible with other `1.0.4.8` builds.
+- Older clients can connect to an updated server but continue to display numeric channel labels.
+
+### Validation
+
+- Built `IL2-SimpleRadioStandalone.sln` Release/x64 successfully.
+- Ran `IL2-SR-CommonTests` Release/x64: 175/175 passed.
+
 ## IL2-SRS 1.0.4.8-beta.9 community update
 
 ### Added

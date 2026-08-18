@@ -78,6 +78,41 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI.ClientWindow.PilotRoster
                 : "ACTIVE SQUAD OPS: " + string.Join(" | ", activeSquads.ToArray());
         }
 
+        public static string GetMajoritySquadTag(PlayerGameState localState,
+            IEnumerable<SRClient> connectedClients, int channel)
+        {
+            var ownCoalition = localState?.coalition ?? 0;
+            if (ownCoalition <= 0 || channel <= 2)
+            {
+                return string.Empty;
+            }
+
+            var squadTags = (connectedClients ?? Enumerable.Empty<SRClient>())
+                .Where(client => client != null &&
+                                 client.Coalition == ownCoalition &&
+                                 IsRealPlayerClient(client.Name) &&
+                                 GetOperationalChannels(client.GameState).Contains(channel))
+                .Select(client => ExtractSquadTag(client.Name))
+                .ToList();
+
+            if (squadTags.Count < 2)
+            {
+                return string.Empty;
+            }
+
+            var majority = squadTags
+                .Where(tag => !string.IsNullOrWhiteSpace(tag))
+                .GroupBy(tag => tag, System.StringComparer.OrdinalIgnoreCase)
+                .Select(group => new { Tag = group.Key, Count = group.Count() })
+                .OrderByDescending(group => group.Count)
+                .ThenBy(group => group.Tag, System.StringComparer.OrdinalIgnoreCase)
+                .FirstOrDefault();
+
+            return majority != null && majority.Count >= 2 && majority.Count * 2 > squadTags.Count
+                ? majority.Tag
+                : string.Empty;
+        }
+
         private static int GetRadioChannel(PlayerGameState gameState, int radioIndex)
         {
             if (gameState?.radios == null ||

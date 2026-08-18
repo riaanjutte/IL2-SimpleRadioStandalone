@@ -9,6 +9,7 @@ using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Interop;
 using System.Windows.Media;
+using System.Windows.Media.Animation;
 using System.Windows.Threading;
 using Ciribob.IL2.SimpleRadio.Standalone.Client.Localization;
 using NLog;
@@ -49,6 +50,8 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Overlay
         private const double AssignedCallsignScrollPixelsPerSecond = 18.0;
         private const double AssignedCallsignInitialScrollPauseMilliseconds = 700.0;
         private const double AssignedCallsignRepeatScrollPauseMilliseconds = 2000.0;
+        private const double ConnectionScrewFeedbackSeconds = 3.0;
+        private const double ConnectionScrewFadeMilliseconds = 500.0;
         private readonly RciOverlayMessageDelay _rciOverlayMessageDelay = new RciOverlayMessageDelay();
         private const double DefaultOverlayX = 300.0;
         private const double DefaultOverlayY = 300.0;
@@ -68,6 +71,9 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Overlay
         private DateTime _assignedCallsignScrollStartedAt = DateTime.MinValue;
         private string _currentAssignedCallsignText = string.Empty;
         private DispatcherTimer _overlayTestTimer;
+        private readonly DispatcherTimer _connectionScrewFeedbackTimer;
+
+        public event EventHandler ConnectRequested;
     
         public RadioOverlayWindow()
         {
@@ -76,6 +82,12 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Overlay
             InitializeComponent();
             LocalizationManager.LocalizeElement(this);
             RciStatusLabel.Text = LocalizationManager.Get("RCI");
+
+            _connectionScrewFeedbackTimer = new DispatcherTimer
+            {
+                Interval = TimeSpan.FromSeconds(ConnectionScrewFeedbackSeconds)
+            };
+            _connectionScrewFeedbackTimer.Tick += ConnectionScrewFeedbackTimer_Tick;
 
             this.WindowStartupLocation = WindowStartupLocation.Manual;
 
@@ -127,6 +139,61 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Overlay
             };
             _focusTimer.Tick += FocusRefresh;
             _focusTimer.Start();
+        }
+
+        private void ConnectionScrewButton_Click(object sender, RoutedEventArgs e)
+        {
+            if (!ShouldRequestConnection(_clientStateSingleton.IsConnected))
+            {
+                return;
+            }
+
+            ShowConnectionScrewFeedback(Colors.LimeGreen);
+            ConnectRequested?.Invoke(this, EventArgs.Empty);
+        }
+
+        internal static bool ShouldRequestConnection(bool isConnected)
+        {
+            return !isConnected;
+        }
+
+        private void ShowConnectionScrewFeedback(Color color)
+        {
+            _connectionScrewFeedbackTimer.Stop();
+            ConnectionScrewFeedback.BeginAnimation(OpacityProperty, null);
+            ConnectionScrewFeedback.Fill = CreateConnectionScrewFeedbackBrush(color);
+            ConnectionScrewFeedback.Opacity = 1.0;
+            _connectionScrewFeedbackTimer.Start();
+        }
+
+        private void ConnectionScrewFeedbackTimer_Tick(object sender, EventArgs e)
+        {
+            _connectionScrewFeedbackTimer.Stop();
+            ConnectionScrewFeedback.BeginAnimation(
+                OpacityProperty,
+                new DoubleAnimation(0.0, TimeSpan.FromMilliseconds(ConnectionScrewFadeMilliseconds))
+                {
+                    FillBehavior = FillBehavior.HoldEnd
+                });
+        }
+
+        private static Brush CreateConnectionScrewFeedbackBrush(Color color)
+        {
+            var brush = new RadialGradientBrush
+            {
+                GradientOrigin = new Point(0.35, 0.3),
+                GradientStops =
+                {
+                    new GradientStop(Color.FromArgb(color.A, 255, 255, 255), 0.0),
+                    new GradientStop(color, 0.6),
+                    new GradientStop(Color.FromArgb(color.A,
+                        (byte)(color.R / 4),
+                        (byte)(color.G / 4),
+                        (byte)(color.B / 4)), 1.0)
+                }
+            };
+            brush.Freeze();
+            return brush;
         }
 
         public void RefreshLocalization()
@@ -742,6 +809,7 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Overlay
             _telemetryUpdateTimer.Stop();
             _focusTimer.Stop();
             _overlayTestTimer?.Stop();
+            _connectionScrewFeedbackTimer.Stop();
         }
 
         private void CalculateScale()

@@ -1,3 +1,4 @@
+using Ciribob.IL2.SimpleRadio.Standalone.Client.Settings;
 using Ciribob.IL2.SimpleRadio.Standalone.Common.Setting;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
@@ -15,6 +16,80 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Common.Tests.Settings
 
             Assert.IsTrue(DefaultServerSettings.Defaults.ContainsKey(settingName));
             Assert.AreEqual(string.Empty, DefaultServerSettings.Defaults[settingName]);
+        }
+
+        [TestMethod]
+        public void ChannelNameSettingsBuildAndParseIndependentKeys()
+        {
+            var settingName = ChannelNameSettings.GetSyncedSettingName(2);
+
+            Assert.AreEqual("CHANNEL_NAME_2", settingName);
+            Assert.IsTrue(ChannelNameSettings.TryParseSyncedSettingName(settingName, out var channel));
+            Assert.AreEqual(2, channel);
+            Assert.IsFalse(ChannelNameSettings.TryParseSyncedSettingName("CHANNEL_NAME_26", out _));
+            Assert.IsFalse(ChannelNameSettings.TryParseSyncedSettingName("CHANNEL_NAME_INVALID", out _));
+        }
+
+        [TestMethod]
+        public void SquadChannelLabelsAreOptInByDefault()
+        {
+            Assert.AreEqual("false",
+                DefaultServerSettings.Defaults[ServerSettingsKeys.SHOW_SQUAD_CHANNEL_LABELS.ToString()]);
+        }
+
+        [TestMethod]
+        public void ServerUiThemeDefaultsToWhiteAndIsServerOnly()
+        {
+            var settingName = ServerSettingsKeys.SERVER_UI_THEME.ToString();
+
+            Assert.AreEqual("White", DefaultServerSettings.Defaults[settingName]);
+            Assert.IsTrue(DefaultServerSettings.ServerSectionSettings.Contains(settingName));
+        }
+
+        [TestMethod]
+        public void ChannelNamesAreNormalizedAndLimited()
+        {
+            var name = ChannelNameSettings.NormalizeName(
+                "  Command\r\n" + new string('A', ChannelNameSettings.MaximumNameLength + 10));
+
+            Assert.AreEqual(ChannelNameSettings.MaximumNameLength, name.Length);
+            Assert.IsFalse(name.Contains("\r"));
+            Assert.IsFalse(name.Contains("\n"));
+        }
+
+        [TestMethod]
+        public void SyncedChannelNamesAreIndependentAndDoNotCarryAcrossServers()
+        {
+            var settings = new SyncedServerSettings();
+            settings.Decode(new Dictionary<string, string>
+            {
+                {ChannelNameSettings.GetSyncedSettingName(1), "Command"},
+                {ChannelNameSettings.GetSyncedSettingName(2), "Tower/ATC"}
+            });
+
+            Assert.AreEqual("Command", settings.GetChannelName(1));
+            Assert.AreEqual("Tower/ATC", settings.GetChannelName(2));
+
+            settings.Decode(new Dictionary<string, string>());
+
+            Assert.IsNull(settings.GetChannelName(1));
+            Assert.IsNull(settings.GetChannelName(2));
+        }
+
+        [TestMethod]
+        public void SquadChannelLabelCapabilityDoesNotCarryAcrossServers()
+        {
+            var settings = new SyncedServerSettings();
+            settings.Decode(new Dictionary<string, string>
+            {
+                {ServerSettingsKeys.SHOW_SQUAD_CHANNEL_LABELS.ToString(), "true"}
+            });
+
+            Assert.IsTrue(settings.GetOptionalSettingAsBool(ServerSettingsKeys.SHOW_SQUAD_CHANNEL_LABELS));
+
+            settings.Decode(new Dictionary<string, string>());
+
+            Assert.IsFalse(settings.GetOptionalSettingAsBool(ServerSettingsKeys.SHOW_SQUAD_CHANNEL_LABELS));
         }
 
         [TestMethod]

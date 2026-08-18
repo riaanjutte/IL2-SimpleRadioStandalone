@@ -33,8 +33,8 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Server.Network
             new ConcurrentDictionary<string, SRClient>();
 
         private readonly IEventAggregator _eventAggregator;
-        private UDPVoiceRouter _serverListener;
-        private ServerSync _serverSync;
+        private volatile UDPVoiceRouter _serverListener;
+        private volatile ServerSync _serverSync;
         private volatile bool _stop = true;
 
         public ServerState(IEventAggregator eventAggregator)
@@ -44,6 +44,9 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Server.Network
 
             StartServer();
         }
+
+        public bool IsTcpListenerRunning => _serverSync?.IsStarted == true;
+        public bool IsUdpListenerRunning => _serverListener?.IsListening == true;
 
         public void Handle(BanClientMessage message)
         {

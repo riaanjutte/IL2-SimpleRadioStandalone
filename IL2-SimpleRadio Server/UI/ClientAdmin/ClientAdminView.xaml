@@ -1,18 +1,172 @@
-﻿<UserControl x:Class="Ciribob.IL2.SimpleRadio.Standalone.Server.UI.ClientAdmin.ClientAdminView"
+<UserControl x:Class="Ciribob.IL2.SimpleRadio.Standalone.Server.UI.ClientAdmin.ClientAdminView"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:cal="http://www.caliburnproject.org"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-             xmlns:local="clr-namespace:Ciribob.IL2.SimpleRadio.Standalone.Server.UI"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-             Width="450"
-             Height="600"
              mc:Ignorable="d">
-    <Grid>
-        <!--  Defines a context menu  -->
+    <Grid Margin="10" Background="{DynamicResource ServerWindowBackgroundBrush}">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="10" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
 
+        <Grid Grid.Row="0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="180" />
+                <ColumnDefinition Width="18" />
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="110" />
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
 
-        <ListBox Name="Clients" />
+            <TextBlock Grid.Column="0"
+                       Margin="0,0,8,0"
+                       VerticalAlignment="Center"
+                       FontWeight="Bold"
+                       Text="Search" />
+            <TextBox Grid.Column="1"
+                     Height="25"
+                     Padding="6,2"
+                     VerticalContentAlignment="Center"
+                     Text="{Binding SearchText, UpdateSourceTrigger=PropertyChanged}" />
 
+            <TextBlock Grid.Column="3"
+                       Margin="0,0,8,0"
+                       VerticalAlignment="Center"
+                       FontWeight="Bold"
+                       Text="Coalition" />
+            <ComboBox Grid.Column="4"
+                      Height="25"
+                      ItemsSource="{Binding CoalitionFilters}"
+                      SelectedItem="{Binding SelectedCoalitionFilter, Mode=TwoWay}" />
+
+            <TextBlock Grid.Column="6"
+                       VerticalAlignment="Center"
+                       Foreground="{DynamicResource ServerMutedTextBrush}"
+                       FontWeight="Bold"
+                       Text="{Binding ClientSummary}" />
+        </Grid>
+
+        <DataGrid x:Name="Clients"
+                  Grid.Row="2"
+                  ItemsSource="{Binding Clients}"
+                  AutoGenerateColumns="False"
+                  CanUserAddRows="False"
+                  CanUserDeleteRows="False"
+                  CanUserReorderColumns="True"
+                  CanUserResizeColumns="True"
+                  CanUserSortColumns="True"
+                  EnableColumnVirtualization="True"
+                  EnableRowVirtualization="True"
+                  FrozenColumnCount="2"
+                  GridLinesVisibility="Horizontal"
+                  HeadersVisibility="Column"
+                  IsReadOnly="True"
+                  RowHeaderWidth="0"
+                  SelectionMode="Single"
+                  SelectionUnit="FullRow">
+            <DataGrid.Columns>
+                <DataGridTemplateColumn Width="80" SortMemberPath="CoalitionText">
+                    <DataGridTemplateColumn.Header>
+                        <TextBlock Text="SIDE" ToolTip="Sort by coalition." />
+                    </DataGridTemplateColumn.Header>
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <StackPanel Margin="5,0" VerticalAlignment="Center" Orientation="Horizontal">
+                                <Ellipse Width="10"
+                                         Height="10"
+                                         Margin="0,0,6,0"
+                                         Fill="{Binding ClientCoalitionColour}"
+                                         Stroke="{DynamicResource ServerBorderBrush}" />
+                                <TextBlock VerticalAlignment="Center" Text="{Binding CoalitionText}" />
+                            </StackPanel>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
+
+                <DataGridTextColumn Width="150"
+                                    Binding="{Binding ClientName}"
+                                    Header="PILOT"
+                                    SortMemberPath="ClientName" />
+                <DataGridTextColumn Width="90"
+                                    Binding="{Binding AssignedCallsign}"
+                                    Header="CALLSIGN"
+                                    SortMemberPath="AssignedCallsign" />
+                <DataGridTextColumn Width="38"
+                                    Binding="{Binding Radio1Channel}"
+                                    Header="R1"
+                                    SortMemberPath="Radio1SortChannel" />
+                <DataGridTextColumn Width="38"
+                                    Binding="{Binding Radio2Channel}"
+                                    Header="R2"
+                                    SortMemberPath="Radio2SortChannel" />
+
+                <DataGridTemplateColumn Width="76" SortMemberPath="VoiceLinkStatus">
+                    <DataGridTemplateColumn.Header>
+                        <TextBlock Text="VOICE" ToolTip="Sort by UDP voice-link status." />
+                    </DataGridTemplateColumn.Header>
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center" Orientation="Horizontal">
+                                <Ellipse x:Name="VoiceIndicator"
+                                         Width="8"
+                                         Height="8"
+                                         Margin="0,0,5,0"
+                                         Fill="{DynamicResource ServerErrorBrush}" />
+                                <TextBlock x:Name="VoiceStatus"
+                                           FontSize="10"
+                                           Text="{Binding VoiceLinkStatus}" />
+                            </StackPanel>
+                            <DataTemplate.Triggers>
+                                <DataTrigger Binding="{Binding HasVoiceLink}" Value="True">
+                                    <Setter TargetName="VoiceIndicator" Property="Fill" Value="{DynamicResource ServerHealthyBrush}" />
+                                    <Setter TargetName="VoiceStatus" Property="Foreground" Value="{DynamicResource ServerHealthyBrush}" />
+                                </DataTrigger>
+                            </DataTemplate.Triggers>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
+
+                <DataGridTemplateColumn Width="67" SortMemberPath="ClientMuted">
+                    <DataGridTemplateColumn.Header>
+                        <TextBlock Text="MUTED" ToolTip="Sort by server-side mute state." />
+                    </DataGridTemplateColumn.Header>
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <ToggleButton Width="48"
+                                          Height="20"
+                                          IsChecked="{Binding ClientMuted, Mode=OneWay}"
+                                          Style="{StaticResource ServerSwitchStyle}"
+                                          ToolTip="Mute or unmute this client on the server."
+                                          cal:Message.Attach="[Event Click] = [Action ToggleClientMute()]" />
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
+
+                <DataGridTemplateColumn Width="104" CanUserSort="False" Header="ACTIONS">
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <StackPanel HorizontalAlignment="Center" Orientation="Horizontal">
+                                <Button Width="44"
+                                        Height="22"
+                                        Margin="0,0,4,0"
+                                        Content="KICK"
+                                        ToolTip="Disconnect this client."
+                                        cal:Message.Attach="[Event Click] = [Action KickClient()]" />
+                                <Button Width="44"
+                                        Height="22"
+                                        Content="BAN"
+                                        ToolTip="Ban and disconnect this client."
+                                        cal:Message.Attach="[Event Click] = [Action BanClient()]" />
+                            </StackPanel>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
+            </DataGrid.Columns>
+        </DataGrid>
     </Grid>
 </UserControl>

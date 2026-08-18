@@ -259,6 +259,10 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Server.Network
             settings[ServerSettingsKeys.RADIO_COLLISION_EFFECTS.ToString()] = _serverSettings
                 .GetGeneralSetting(ServerSettingsKeys.RADIO_COLLISION_EFFECTS)
                 .StringValue;
+            foreach (var channelName in _serverSettings.GetChannelNames())
+            {
+                settings[ChannelNameSettings.GetSyncedSettingName(channelName.Key)] = channelName.Value;
+            }
             return settings;
         }
 

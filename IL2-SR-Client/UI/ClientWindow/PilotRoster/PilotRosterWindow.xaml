@@ -144,7 +144,7 @@
             <TextBlock x:Name="ActiveSquadOpsText"
                        Grid.Row="0"
                        Margin="2,0,2,6"
-                       Foreground="#DC143C"
+                       Foreground="White"
                        FontFamily="{StaticResource MilFontMono}"
                        FontSize="14"
                        FontWeight="Bold"

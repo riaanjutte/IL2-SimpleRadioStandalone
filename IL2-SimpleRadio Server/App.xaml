@@ -9,6 +9,170 @@
                     <local:Bootstrapper x:Key="Bootstrapper" />
                 </ResourceDictionary>
             </ResourceDictionary.MergedDictionaries>
+
+            <SolidColorBrush x:Key="ServerWindowBackgroundBrush" Color="#FFF4F4F4" />
+            <SolidColorBrush x:Key="ServerSurfaceBrush" Color="#FFFFFFFF" />
+            <SolidColorBrush x:Key="ServerControlBackgroundBrush" Color="#FFE6E6E6" />
+            <SolidColorBrush x:Key="ServerInputBackgroundBrush" Color="#FFFFFFFF" />
+            <SolidColorBrush x:Key="ServerTextBrush" Color="#FF171717" />
+            <SolidColorBrush x:Key="ServerMutedTextBrush" Color="#FF4F565C" />
+            <SolidColorBrush x:Key="ServerBorderBrush" Color="#FF8A8A8A" />
+            <SolidColorBrush x:Key="ServerAccentBrush" Color="#FF2D6FA3" />
+            <SolidColorBrush x:Key="ServerSelectionBrush" Color="#FFD7EAF8" />
+            <SolidColorBrush x:Key="ServerHealthyBrush" Color="#FF247A37" />
+            <SolidColorBrush x:Key="ServerErrorBrush" Color="#FFB3261E" />
+            <SolidColorBrush x:Key="ServerStartActionBrush" Color="#FF247A37" />
+            <SolidColorBrush x:Key="ServerStopActionBrush" Color="#FFB3261E" />
+
+            <Style TargetType="{x:Type Window}">
+                <Setter Property="Background" Value="{DynamicResource ServerWindowBackgroundBrush}" />
+                <Setter Property="Foreground" Value="{DynamicResource ServerTextBrush}" />
+            </Style>
+            <Style TargetType="{x:Type UserControl}">
+                <Setter Property="Background" Value="{DynamicResource ServerWindowBackgroundBrush}" />
+                <Setter Property="Foreground" Value="{DynamicResource ServerTextBrush}" />
+            </Style>
+            <Style TargetType="{x:Type Label}">
+                <Setter Property="Foreground" Value="{DynamicResource ServerTextBrush}" />
+            </Style>
+            <Style TargetType="{x:Type TextBlock}">
+                <Setter Property="Foreground" Value="{DynamicResource ServerTextBrush}" />
+            </Style>
+            <Style TargetType="{x:Type Button}">
+                <Setter Property="Background" Value="{DynamicResource ServerControlBackgroundBrush}" />
+                <Setter Property="Foreground" Value="{DynamicResource ServerTextBrush}" />
+                <Setter Property="BorderBrush" Value="{DynamicResource ServerBorderBrush}" />
+            </Style>
+            <Style TargetType="{x:Type ToggleButton}">
+                <Setter Property="Background" Value="{DynamicResource ServerControlBackgroundBrush}" />
+                <Setter Property="Foreground" Value="{DynamicResource ServerTextBrush}" />
+                <Setter Property="BorderBrush" Value="{DynamicResource ServerBorderBrush}" />
+            </Style>
+            <Style x:Key="ServerSwitchStyle"
+                   TargetType="{x:Type ToggleButton}"
+                   BasedOn="{StaticResource {x:Type ToggleButton}}">
+                <Setter Property="Width" Value="58" />
+                <Setter Property="Height" Value="22" />
+                <Setter Property="HorizontalAlignment" Value="Center" />
+                <Setter Property="VerticalAlignment" Value="Center" />
+                <Setter Property="Cursor" Value="Hand" />
+                <Setter Property="Template">
+                    <Setter.Value>
+                        <ControlTemplate TargetType="{x:Type ToggleButton}">
+                            <Grid SnapsToDevicePixels="True">
+                                <Border x:Name="Track"
+                                        Background="{DynamicResource ServerControlBackgroundBrush}"
+                                        BorderBrush="{DynamicResource ServerBorderBrush}"
+                                        BorderThickness="1"
+                                        CornerRadius="11" />
+                                <TextBlock x:Name="StateText"
+                                           Margin="0,0,7,0"
+                                           HorizontalAlignment="Right"
+                                           VerticalAlignment="Center"
+                                           FontSize="9"
+                                           FontWeight="Bold"
+                                           Foreground="{DynamicResource ServerMutedTextBrush}"
+                                           IsHitTestVisible="False"
+                                           Text="OFF" />
+                                <Ellipse x:Name="Thumb"
+                                         Width="16"
+                                         Height="16"
+                                         Margin="2"
+                                         HorizontalAlignment="Left"
+                                         Fill="White"
+                                         IsHitTestVisible="False" />
+                            </Grid>
+                            <ControlTemplate.Triggers>
+                                <Trigger Property="IsChecked" Value="True">
+                                    <Setter TargetName="Track" Property="Background" Value="{DynamicResource ServerAccentBrush}" />
+                                    <Setter TargetName="Track" Property="BorderBrush" Value="{DynamicResource ServerAccentBrush}" />
+                                    <Setter TargetName="Thumb" Property="HorizontalAlignment" Value="Right" />
+                                    <Setter TargetName="StateText" Property="HorizontalAlignment" Value="Left" />
+                                    <Setter TargetName="StateText" Property="Margin" Value="7,0,0,0" />
+                                    <Setter TargetName="StateText" Property="Foreground" Value="White" />
+                                    <Setter TargetName="StateText" Property="Text" Value="ON" />
+                                </Trigger>
+                                <Trigger Property="IsMouseOver" Value="True">
+                                    <Setter TargetName="Track" Property="Opacity" Value="0.86" />
+                                </Trigger>
+                                <Trigger Property="IsKeyboardFocused" Value="True">
+                                    <Setter TargetName="Track" Property="BorderBrush" Value="{DynamicResource ServerAccentBrush}" />
+                                    <Setter TargetName="Track" Property="BorderThickness" Value="2" />
+                                </Trigger>
+                                <Trigger Property="IsEnabled" Value="False">
+                                    <Setter Property="Opacity" Value="0.45" />
+                                </Trigger>
+                            </ControlTemplate.Triggers>
+                        </ControlTemplate>
+                    </Setter.Value>
+                </Setter>
+            </Style>
+            <Style TargetType="{x:Type TextBox}">
+                <Setter Property="Background" Value="{DynamicResource ServerInputBackgroundBrush}" />
+                <Setter Property="Foreground" Value="{DynamicResource ServerTextBrush}" />
+                <Setter Property="BorderBrush" Value="{DynamicResource ServerBorderBrush}" />
+                <Setter Property="CaretBrush" Value="{DynamicResource ServerAccentBrush}" />
+            </Style>
+            <Style TargetType="{x:Type ComboBox}">
+                <Setter Property="Background" Value="{DynamicResource ServerInputBackgroundBrush}" />
+                <Setter Property="Foreground" Value="{DynamicResource ServerTextBrush}" />
+                <Setter Property="BorderBrush" Value="{DynamicResource ServerBorderBrush}" />
+            </Style>
+            <Style TargetType="{x:Type ComboBoxItem}">
+                <Setter Property="Background" Value="{DynamicResource ServerSurfaceBrush}" />
+                <Setter Property="Foreground" Value="{DynamicResource ServerTextBrush}" />
+            </Style>
+            <Style TargetType="{x:Type ListBox}">
+                <Setter Property="Background" Value="{DynamicResource ServerSurfaceBrush}" />
+                <Setter Property="Foreground" Value="{DynamicResource ServerTextBrush}" />
+                <Setter Property="BorderBrush" Value="{DynamicResource ServerBorderBrush}" />
+            </Style>
+            <Style TargetType="{x:Type ListBoxItem}">
+                <Setter Property="Foreground" Value="{DynamicResource ServerTextBrush}" />
+                <Setter Property="Background" Value="Transparent" />
+            </Style>
+            <Style TargetType="{x:Type DataGrid}">
+                <Setter Property="Background" Value="{DynamicResource ServerSurfaceBrush}" />
+                <Setter Property="Foreground" Value="{DynamicResource ServerTextBrush}" />
+                <Setter Property="BorderBrush" Value="{DynamicResource ServerBorderBrush}" />
+                <Setter Property="HorizontalGridLinesBrush" Value="{DynamicResource ServerBorderBrush}" />
+                <Setter Property="VerticalGridLinesBrush" Value="{DynamicResource ServerBorderBrush}" />
+            </Style>
+            <Style TargetType="{x:Type DataGridColumnHeader}">
+                <Setter Property="Background" Value="{DynamicResource ServerControlBackgroundBrush}" />
+                <Setter Property="Foreground" Value="{DynamicResource ServerTextBrush}" />
+                <Setter Property="BorderBrush" Value="{DynamicResource ServerBorderBrush}" />
+                <Setter Property="FontWeight" Value="Bold" />
+            </Style>
+            <Style TargetType="{x:Type DataGridRow}">
+                <Setter Property="Background" Value="{DynamicResource ServerSurfaceBrush}" />
+                <Setter Property="Foreground" Value="{DynamicResource ServerTextBrush}" />
+                <Setter Property="BorderBrush" Value="{DynamicResource ServerBorderBrush}" />
+                <Style.Triggers>
+                    <Trigger Property="IsSelected" Value="True">
+                        <Setter Property="Background" Value="{DynamicResource ServerSelectionBrush}" />
+                    </Trigger>
+                </Style.Triggers>
+            </Style>
+            <Style TargetType="{x:Type DataGridCell}">
+                <Setter Property="Foreground" Value="{DynamicResource ServerTextBrush}" />
+                <Setter Property="BorderBrush" Value="{DynamicResource ServerBorderBrush}" />
+            </Style>
+            <Style TargetType="{x:Type ScrollBar}">
+                <Setter Property="Background" Value="{DynamicResource ServerControlBackgroundBrush}" />
+                <Setter Property="Foreground" Value="{DynamicResource ServerAccentBrush}" />
+            </Style>
+            <Style TargetType="{x:Type Slider}">
+                <Setter Property="Foreground" Value="{DynamicResource ServerAccentBrush}" />
+            </Style>
+            <Style TargetType="{x:Type CheckBox}">
+                <Setter Property="Foreground" Value="{DynamicResource ServerTextBrush}" />
+            </Style>
+            <Style TargetType="{x:Type ToolTip}">
+                <Setter Property="Background" Value="{DynamicResource ServerSurfaceBrush}" />
+                <Setter Property="Foreground" Value="{DynamicResource ServerTextBrush}" />
+                <Setter Property="BorderBrush" Value="{DynamicResource ServerBorderBrush}" />
+            </Style>
         </ResourceDictionary>
     </Application.Resources>
 </Application>

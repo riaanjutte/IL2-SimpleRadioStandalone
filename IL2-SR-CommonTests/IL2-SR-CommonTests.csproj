@@ -56,6 +56,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="PresentationCore" />
+    <Reference Include="PresentationFramework" />
     <Reference Include="System" />
     <Reference Include="WindowsBase" />
   </ItemGroup>
@@ -93,11 +94,16 @@
     <Compile Include="UI\IL2WinWingCompatibilityTests.cs" />
     <Compile Include="UI\RciDisplayStateTests.cs" />
     <Compile Include="UI\RciOverlayMessageDelayTests.cs" />
+    <Compile Include="UI\RadioOverlayChannelLimitTests.cs" />
+    <Compile Include="UI\ServerWindowLayoutTests.cs" />
+    <Compile Include="UI\ServerHealthSnapshotTests.cs" />
+    <Compile Include="UI\ClientAdminPresentationTests.cs" />
     <Compile Include="UI\RadioOverlaySpeakerNameScrollTests.cs" />
     <Compile Include="UI\PilotRosterAccessPolicyTests.cs" />
     <Compile Include="UI\PilotRosterBuilderTests.cs" />
     <Compile Include="UI\WindowsFirewallTelemetryDiagnosticTests.cs" />
     <Compile Include="Utils\RadioHelperMuteTests.cs" />
+    <Compile Include="Utils\RadioHelperChannelNameTests.cs" />
     <Compile Include="Utils\StartupConfigTelemetryTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Properties\TestEnvironment.cs" />
@@ -114,6 +120,10 @@
     <ProjectReference Include="..\IL2-SR-Common\IL2-SR-Common.csproj">
       <Project>{CF8DA5C1-0105-4486-9E28-CB2321D8F122}</Project>
       <Name>IL2-SR-Common</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\IL2-SimpleRadio Server\IL2-SimpleRadio Server.csproj">
+      <Project>{8579C7DA-206F-4705-B073-D3CC946DC8EC}</Project>
+      <Name>IL2-SimpleRadio Server</Name>
     </ProjectReference>
   </ItemGroup>
   <Choose>

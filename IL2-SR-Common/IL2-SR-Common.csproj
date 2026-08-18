@@ -130,6 +130,7 @@
     <Compile Include="Helpers\RadioCalculator.cs" />
     <Compile Include="DCSState\RadioInformation.cs" />
     <Compile Include="DCSState\RadioTransmit.cs" />
+    <Compile Include="Setting\ChannelNameSettings.cs" />
     <Compile Include="Setting\ServerSettingsKeys.cs" />
     <Compile Include="Setting\SyncedServerSettingsFilter.cs" />
     <Compile Include="Network\ShortGuid.cs" />

@@ -125,6 +125,11 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Server.Settings
             SetSetting("Server Settings", key.ToString(), value.ToString(CultureInfo.InvariantCulture));
         }
 
+        public void SetServerSetting(ServerSettingsKeys key, string value)
+        {
+            SetSetting("Server Settings", key.ToString(), value?.Trim());
+        }
+
         public Setting GetExternalAWACSModeSetting(ServerSettingsKeys key)
         {
             return GetSetting("External AWACS Mode Settings", key.ToString());
@@ -183,11 +188,73 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Server.Settings
             Save();
         }
 
+        public Dictionary<int, string> GetChannelNames()
+        {
+            lock (_lock)
+            {
+                var channelNames = new Dictionary<int, string>();
+                if (!_configuration.Contains(ChannelNameSettings.SectionName))
+                {
+                    return channelNames;
+                }
+
+                for (var channel = 1; channel <= ChannelNameSettings.MaximumChannel; channel++)
+                {
+                    var settingName = channel.ToString(CultureInfo.InvariantCulture);
+                    if (!_configuration[ChannelNameSettings.SectionName].Contains(settingName))
+                    {
+                        continue;
+                    }
+
+                    var name = ChannelNameSettings.NormalizeName(
+                        _configuration[ChannelNameSettings.SectionName][settingName].StringValue);
+                    if (!string.IsNullOrWhiteSpace(name))
+                    {
+                        channelNames[channel] = name;
+                    }
+                }
+
+                return channelNames;
+            }
+        }
+
+        public void SetChannelNames(IDictionary<int, string> channelNames)
+        {
+            lock (_lock)
+            {
+                EnsureSection(ChannelNameSettings.SectionName);
+                var section = _configuration[ChannelNameSettings.SectionName];
+
+                for (var channel = 1; channel <= ChannelNameSettings.MaximumChannel; channel++)
+                {
+                    var settingName = channel.ToString(CultureInfo.InvariantCulture);
+                    if (section.Contains(settingName))
+                    {
+                        section.Remove(section[settingName]);
+                    }
+
+                    if (channelNames == null || !channelNames.TryGetValue(channel, out var configuredName))
+                    {
+                        continue;
+                    }
+
+                    var normalizedName = ChannelNameSettings.NormalizeName(configuredName);
+                    if (!string.IsNullOrWhiteSpace(normalizedName))
+                    {
+                        section.Add(new Setting(settingName, normalizedName));
+                    }
+                }
+
+                Save();
+            }
+        }
+
         private void InitializePersistentSettings()
         {
             bool changed = EnsureSection("General Settings") |
                            EnsureSection("Server Settings") |
-                           EnsureSection("External AWACS Mode Settings");
+                           EnsureSection("External AWACS Mode Settings") |
+                           EnsureSection(ChannelNameSettings.SectionName);
 
             foreach (KeyValuePair<string, string> defaultSetting in DefaultServerSettings.Defaults)
             {

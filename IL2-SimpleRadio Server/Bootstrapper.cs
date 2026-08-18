@@ -11,6 +11,7 @@ using Caliburn.Micro;
 using Ciribob.IL2.SimpleRadio.Standalone.Common;
 using Ciribob.IL2.SimpleRadio.Standalone.Common.Network;
 using Ciribob.IL2.SimpleRadio.Standalone.Server.Network;
+using Ciribob.IL2.SimpleRadio.Standalone.Server.Settings;
 using Ciribob.IL2.SimpleRadio.Standalone.Server.UI.ClientAdmin;
 using Ciribob.IL2.SimpleRadio.Standalone.Server.UI.MainWindow;
 using NLog;
@@ -94,6 +95,10 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Server
 
         protected override void OnStartup(object sender, StartupEventArgs e)
         {
+            ServerThemeManager.Apply(ServerSettingsStore.Instance
+                .GetServerSetting(Common.Setting.ServerSettingsKeys.SERVER_UI_THEME)
+                .StringValue);
+
             IDictionary<string, object> settings = new Dictionary<string, object>
             {
                 {"Icon", new BitmapImage(new Uri("pack://application:,,,/IL2-SR-Server;component/server-10.ico"))},

@@ -24,6 +24,9 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Common
 
         public static readonly string VERSION = ReleaseMetadata.Version;
         public static readonly string RELEASE_TAG = ReleaseMetadata.ReleaseTag;
+        public static readonly string DISPLAY_VERSION = string.IsNullOrWhiteSpace(RELEASE_TAG)
+            ? VERSION
+            : RELEASE_TAG;
 
         private static readonly Logger _logger = LogManager.GetCurrentClassLogger();
 

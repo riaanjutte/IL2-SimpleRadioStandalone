@@ -11,8 +11,10 @@ using Ciribob.IL2.SimpleRadio.Standalone.Client.Settings.RadioChannels;
 using Ciribob.IL2.SimpleRadio.Standalone.Common.Network;
 using Ciribob.IL2.SimpleRadio.Standalone.Client.Settings;
 using Ciribob.IL2.SimpleRadio.Standalone.Client.Singletons;
+using Ciribob.IL2.SimpleRadio.Standalone.Client.UI.ClientWindow.PilotRoster;
 using Ciribob.IL2.SimpleRadio.Standalone.Client.Utils;
 using Ciribob.IL2.SimpleRadio.Standalone.Common;
+using Ciribob.IL2.SimpleRadio.Standalone.Common.Setting;
 
 namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI.RadioOverlayWindow
 {
@@ -26,9 +28,11 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI.RadioOverlayWindow
         private const double SpeakerNameScrollPauseMilliseconds = 700.0;
         private const double ReceiveIndicatorHoldMilliseconds = 500.0;
         private const double TransmitIndicatorHoldMilliseconds = 250.0;
+        private const double SquadLabelRefreshMilliseconds = 1000.0;
         private const double RadioDisplayViewportFallbackWidth = 74.0;
         private const double RadioDisplayViewportFallbackHeight = 12.0;
         private const double InactiveRadioControlOpacity = 0.5;
+        private const int MaximumOverlayChannels = 12;
         private static readonly Color ActiveGreen = (Color)ColorConverter.ConvertFromString("#96FF6D");
         private static readonly Color ActiveAmber = (Color)ColorConverter.ConvertFromString("#FFB000");
         private static readonly Color TxRed = (Color)ColorConverter.ConvertFromString("#FF3B30");
@@ -66,6 +70,12 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI.RadioOverlayWindow
         private bool? _lastSelectedActive;
         private bool? _lastChannelButtonsSelectedActive;
         private bool? _lastDisconnected;
+        private int _lastChannelLimit = -1;
+        private int _lastChannelNamesRevision = -1;
+        private bool? _lastFriendlyRciActiveForChannelNames;
+        private int _lastSquadLabelChannel = -1;
+        private string _lastMajoritySquadTag = string.Empty;
+        private DateTime _lastSquadLabelRefresh = DateTime.MinValue;
         private string _scrollMeasuredText = string.Empty;
         private double _scrollMeasuredViewportWidth = -1.0;
         private double _scrollTextWidth;
@@ -86,10 +96,7 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI.RadioOverlayWindow
         public void RefreshLocalization()
         {
             LocalizationManager.LocalizeElement(this);
-            foreach (var button in _channelButtons)
-            {
-                button.Value.ToolTip = LocalizationManager.Format("Channel {0}", button.Key);
-            }
+            UpdateChannelButtonToolTips(true);
 
             RepaintRadioStatus();
         }
@@ -121,7 +128,7 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI.RadioOverlayWindow
             _channelButtons.Clear();
             _channelOccupancyStates.Clear();
 
-            for (var channel = 1; channel <= 12; channel++)
+            for (var channel = 1; channel <= MaximumOverlayChannels; channel++)
             {
                 var button = new Button
                 {
@@ -243,10 +250,10 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI.RadioOverlayWindow
 
             if (!_speakerDisplayActive)
             {
-                SetDisplayText(LocalizationManager.Format("CHN {0}", state.Channel),
+                SetDisplayText(GetChannelDisplayText(state.Channel),
                     RadioDisplayGreenBrush,
                     1.0,
-                    false);
+                    true);
             }
 
             UpdateChannelButtonState(state.Channel);
@@ -326,10 +333,10 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI.RadioOverlayWindow
 
                 if (!_speakerDisplayActive)
                 {
-                    SetDisplayText(LocalizationManager.Format("CHN {0}", currentRadio.channel),
+                    SetDisplayText(GetChannelDisplayText(currentRadio.channel),
                         RadioDisplayGreenBrush,
                         1.0,
-                        false);
+                        true);
                 }
                 UpdateChannelButtonState(currentRadio.channel);
                 if (includeTelemetry)
@@ -471,6 +478,8 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI.RadioOverlayWindow
 
         private void UpdateChannelButtonState(int selectedChannel)
         {
+            var availabilityChanged = UpdateChannelButtonAvailability();
+            var toolTipsChanged = UpdateChannelButtonToolTips(false);
             var selectedRadioActive = _lastSelectedActive == true;
             var activeStateChanged = _lastChannelButtonsSelectedActive != selectedRadioActive;
             var hasVisualStateChange = false;
@@ -485,7 +494,7 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI.RadioOverlayWindow
                 }
             }
 
-            if (!hasVisualStateChange && !activeStateChanged)
+            if (!hasVisualStateChange && !activeStateChanged && !availabilityChanged && !toolTipsChanged)
             {
                 return;
             }
@@ -498,7 +507,9 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI.RadioOverlayWindow
 
                 if (_channelButtonVisualStates.TryGetValue(pair.Key, out var previousVisualState) &&
                     previousVisualState == visualState &&
-                    !activeStateChanged)
+                    !activeStateChanged &&
+                    !availabilityChanged &&
+                    !toolTipsChanged)
                 {
                     continue;
                 }
@@ -526,8 +537,104 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI.RadioOverlayWindow
             }
         }
 
+        private string GetChannelDisplayText(int channel)
+        {
+            var displayName = RadioHelper.GetEffectiveChannelName(
+                channel,
+                LocalizationManager.Format("CHN {0}", channel));
+
+            var squadTag = GetMajoritySquadTag(channel);
+            return string.IsNullOrWhiteSpace(squadTag)
+                ? displayName
+                : displayName + " - " + squadTag;
+        }
+
+        private string GetMajoritySquadTag(int channel)
+        {
+            if (channel <= 2 ||
+                !SyncedServerSettings.Instance.GetOptionalSettingAsBool(
+                    ServerSettingsKeys.SHOW_SQUAD_CHANNEL_LABELS))
+            {
+                _lastMajoritySquadTag = string.Empty;
+                return string.Empty;
+            }
+
+            var now = DateTime.UtcNow;
+            if (_lastSquadLabelChannel != channel ||
+                (now - _lastSquadLabelRefresh).TotalMilliseconds >= SquadLabelRefreshMilliseconds)
+            {
+                _lastSquadLabelChannel = channel;
+                _lastSquadLabelRefresh = now;
+                _lastMajoritySquadTag = PilotRosterBuilder.GetMajoritySquadTag(
+                    _clientStateSingleton.PlayerGameState,
+                    _connectClientsSingleton.Values,
+                    channel);
+            }
+
+            return _lastMajoritySquadTag;
+        }
+
+        private bool UpdateChannelButtonToolTips(bool force)
+        {
+            var channelNamesRevision = SyncedServerSettings.Instance.ChannelNamesRevision;
+            var friendlyRciActive = RadioHelper.IsFriendlyRciActive();
+            if (!force &&
+                _lastChannelNamesRevision == channelNamesRevision &&
+                _lastFriendlyRciActiveForChannelNames == friendlyRciActive)
+            {
+                return false;
+            }
+
+            _lastChannelNamesRevision = channelNamesRevision;
+            _lastFriendlyRciActiveForChannelNames = friendlyRciActive;
+            foreach (var pair in _channelButtons)
+            {
+                var channelName = RadioHelper.GetEffectiveChannelName(pair.Key, null);
+                pair.Value.ToolTip = string.IsNullOrWhiteSpace(channelName)
+                    ? LocalizationManager.Format("Channel {0}", pair.Key)
+                    : LocalizationManager.Format("Channel {0}", pair.Key) + " - " + channelName;
+            }
+
+            return true;
+        }
+
+        private bool UpdateChannelButtonAvailability()
+        {
+            var channelLimit = GetOverlayChannelLimit(
+                _clientStateSingleton.IsConnected,
+                SyncedServerSettings.Instance.GetSetting(ServerSettingsKeys.CHANNEL_LIMIT));
+
+            if (_lastChannelLimit == channelLimit)
+            {
+                return false;
+            }
+
+            _lastChannelLimit = channelLimit;
+            foreach (var pair in _channelButtons)
+            {
+                pair.Value.IsEnabled = pair.Key <= channelLimit;
+            }
+
+            return true;
+        }
+
+        internal static int GetOverlayChannelLimit(bool isConnected, string configuredLimit)
+        {
+            if (!isConnected || !int.TryParse(configuredLimit, out var channelLimit))
+            {
+                return MaximumOverlayChannels;
+            }
+
+            return Math.Max(0, Math.Min(MaximumOverlayChannels, channelLimit));
+        }
+
         private int GetChannelVisualState(int channel, int selectedChannel)
         {
+            if (channel > _lastChannelLimit)
+            {
+                return 0;
+            }
+
             if (channel == selectedChannel)
             {
                 return 2;

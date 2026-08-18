@@ -11,6 +11,8 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Common.Network
     public class SRClient : INotifyPropertyChanged
     {
         private int _coalition;
+        private PlayerGameState _gameState;
+        private IPEndPoint _voipPort;
 
         public string ClientGuid { get; set; }
         private string _name= "";
@@ -77,12 +79,38 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Common.Network
         public long LastUpdate { get; set; }
 
         [JsonIgnore]
-        public IPEndPoint VoipPort { get; set; }
+        public IPEndPoint VoipPort
+        {
+            get { return _voipPort; }
+            set
+            {
+                if (Equals(_voipPort, value))
+                {
+                    return;
+                }
+
+                _voipPort = value;
+                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs("VoipPort"));
+            }
+        }
 
         [JsonIgnore]
         public long LastRadioUpdateSent { get; set; }
 
-        public PlayerGameState GameState { get; set; }
+        public PlayerGameState GameState
+        {
+            get { return _gameState; }
+            set
+            {
+                if (ReferenceEquals(_gameState, value))
+                {
+                    return;
+                }
+
+                _gameState = value;
+                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs("GameState"));
+            }
+        }
 
         // Used by server client list to display last frequency client transmitted on
         private string _transmittingFrequency;
