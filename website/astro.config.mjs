@@ -37,6 +37,7 @@ export default defineConfig({
 					label: 'User guides',
 					items: [
 						{ label: 'Installation', slug: 'guides/installation' },
+						{ label: 'Updates and recovery', slug: 'guides/update-recovery' },
 						{ label: 'Quick start', slug: 'guides/quick-start' },
 						{ label: 'Controls and PTT', slug: 'guides/controls' },
 						{ label: 'Overlays', slug: 'guides/overlays' },

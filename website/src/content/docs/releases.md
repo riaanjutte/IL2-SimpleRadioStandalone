@@ -26,3 +26,5 @@ The client Help tab includes a **What's New in this version** link that opens th
 :::note[Stable and beta channels]
 GitHub's `releases/latest` address always selects the newest stable release. To find the newest beta, use the Releases page and choose the most recent entry marked **Pre-release**.
 :::
+
+For beta-to-stable changes, manual installation, configuration backups, and repair steps, see [Updates and recovery](../guides/update-recovery/).

@@ -46,6 +46,8 @@ If IL-2 is already running, close the game before applying telemetry repairs. IL
 
 Open the [Releases page](https://github.com/riaanjutte/IL2-SimpleRadioStandalone/releases), choose the newest release marked **Pre-release**, and use the updater attached to that release. Review the release notes before installing.
 
+For later upgrades, beta-to-stable changes, reinstallations, backups, and clean resets, see [Updates and recovery](../update-recovery/).
+
 ## Next step
 
 Continue with the [Quick start](../quick-start/) guide.
