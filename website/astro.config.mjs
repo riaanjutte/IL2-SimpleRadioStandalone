@@ -4,8 +4,8 @@ import starlight from '@astrojs/starlight';
 
 // https://astro.build/config
 export default defineConfig({
-	site: 'https://riaanjutte.github.io',
-	base: '/IL2-SimpleRadioStandalone',
+	site: 'https://srsforil2.com',
+	base: '/',
 	integrations: [
 		starlight({
 			title: 'IL2-SRS Documentation',
