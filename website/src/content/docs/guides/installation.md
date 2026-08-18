@@ -7,6 +7,10 @@ description: Install one copy of SRS for IL-2 Great Battles and IL-2 Korea.
 
 You need Windows, IL-2 Great Battles and/or IL-2 Korea, and access to an SRS server used by your multiplayer server.
 
+:::caution[Close IL-2 before installing]
+Close IL-2 Great Battles and IL-2 Korea before running the SRS installer, including any dedicated server instance. The installer may need to update each game's `startup.cfg`; a running game can prevent the repair or overwrite the changes when it exits. You can restart IL-2 after installation is complete.
+:::
+
 :::tip[Install SRS only once]
 One SRS installation supports both games. Do not install SRS inside either game folder and do not create separate Great Battles and Korea copies.
 :::
