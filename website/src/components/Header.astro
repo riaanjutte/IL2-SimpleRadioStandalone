@@ -22,19 +22,6 @@ const base = Astro.locals.starlightRoute.siteTitleHref;
 		<a href={`${base}server-admin/server-setup/`}>Server admins</a>
 		<a href={`${base}support/`}>Support</a>
 		<a href={`${base}releases/`}>Releases</a>
-		<a
-			class="coffee-link"
-			href="https://www.buymeacoffee.com/haluter"
-			target="_blank"
-			rel="noopener noreferrer"
-		>
-			<img
-				src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png"
-				alt="Buy Me a Coffee"
-				width="217"
-				height="60"
-			/>
-		</a>
 	</nav>
 	<div class="search-wrapper sl-flex print:hidden">{shouldRenderSearch && <Search />}</div>
 	<div class="sl-hidden md:sl-flex print:hidden right-group">
@@ -85,15 +72,6 @@ const base = Astro.locals.starlightRoute.siteTitleHref;
 		.project-nav a:hover,
 		.project-nav a:focus-visible {
 			color: var(--sl-color-text-accent);
-		}
-		.project-nav .coffee-link {
-			display: flex;
-			align-items: center;
-		}
-		.project-nav .coffee-link img {
-			display: block;
-			width: auto;
-			height: 2rem;
 		}
 		.search-wrapper {
 			flex: 1;

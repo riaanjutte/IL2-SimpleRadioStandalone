@@ -6,7 +6,13 @@ const base = import.meta.env.BASE_URL.replace(/\/?$/, '/');
 ---
 
 <section class="home-showcase">
-	<p class="install-note">One SRS installation supports both games.</p>
+	<p class="confidence-line">
+		<span>Free and open source</span>
+		<span aria-hidden="true">•</span>
+		<span>Windows</span>
+		<span aria-hidden="true">•</span>
+		<span>One installation supports both games</span>
+	</p>
 	<a class="hero-media" href={`${base}screenshots/`} aria-label="View SRS screenshots">
 		<Image
 			src={screenshot}
@@ -26,7 +32,12 @@ const base = import.meta.env.BASE_URL.replace(/\/?$/, '/');
 		border-bottom: 1px solid #3d403a;
 		text-align: center;
 	}
-	.install-note {
+	.confidence-line {
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		gap: 0.65rem;
+		flex-wrap: wrap;
 		margin: 0 auto 1.25rem;
 		color: #a6aaa4;
 		font-size: 0.85rem;
@@ -49,6 +60,9 @@ const base = import.meta.env.BASE_URL.replace(/\/?$/, '/');
 	@media (max-width: 50rem) {
 		.home-showcase {
 			padding-bottom: 2.5rem;
+		}
+		.confidence-line {
+			padding-inline: 1rem;
 		}
 	}
 </style>

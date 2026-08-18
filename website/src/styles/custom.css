@@ -114,12 +114,20 @@
 }
 :root[data-has-hero] main .hero .download-meta {
 	display: block;
-	margin-top: 1rem;
+	margin-top: 0.8rem;
 	color: var(--sl-color-gray-3);
 	font-size: 0.9rem;
 }
-:root[data-has-hero] main .hero .download-meta strong {
-	color: var(--sl-color-white);
+:root[data-has-hero] main .hero .hero-benefits {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	gap: 0.55rem;
+	flex-wrap: wrap;
+	margin-top: 1.25rem;
+	color: var(--sl-color-gray-2);
+	font-size: 0.95rem;
+	font-weight: 600;
 }
 :root[data-has-hero] main .hero h1 {
 	max-width: 60rem;
@@ -160,5 +168,9 @@
 	}
 	:root[data-has-hero] main .hero .actions a {
 		justify-content: center;
+	}
+	:root[data-has-hero] main .hero .hero-benefits {
+		gap: 0.4rem;
+		font-size: 0.86rem;
 	}
 }
