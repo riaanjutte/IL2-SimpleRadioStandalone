@@ -112,6 +112,15 @@
 	width: auto;
 	height: 2rem;
 }
+:root[data-has-hero] main .hero .download-meta {
+	display: block;
+	margin-top: 1rem;
+	color: var(--sl-color-gray-3);
+	font-size: 0.9rem;
+}
+:root[data-has-hero] main .hero .download-meta strong {
+	color: var(--sl-color-white);
+}
 :root[data-has-hero] main .hero h1 {
 	max-width: 60rem;
 	font-size: 3.5rem;
