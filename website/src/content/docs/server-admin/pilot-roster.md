@@ -60,12 +60,26 @@ The server checks the file approximately once per second. Generate a complete te
 | Missing file | Clears assignments and marks the roster unavailable |
 | Invalid JSON or read error | Keeps the previous valid assignments and logs a warning |
 
+### Clear data between missions
+
+At mission rollover, publish a valid document with an empty `players` array before publishing assignments for the new mission:
+
+```json
+{
+  "generatedAtUtc": "2026-08-18T12:00:00Z",
+  "players": []
+}
+```
+
+This explicitly clears the previous assignment map. Do not leave the old file in place while the next mission is loading, or clients can continue to see stale callsigns until fresh data arrives.
+
 ## Validate
 
 1. Inspect `serverlog.txt` for roster-file warnings.
 2. Connect a client whose player name and coalition appear in the JSON.
 3. Open **Show Pilot Roster**.
 4. Change a callsign, publish the file, and confirm the client updates without restarting SRS.
+5. Publish an empty `players` array and confirm previous-mission assignments disappear.
 
 The complete reference guide remains available as [Pilot-Roster-Server-Guide.md](https://github.com/riaanjutte/IL2-SimpleRadioStandalone/blob/master/Pilot-Roster-Server-Guide.md).
 

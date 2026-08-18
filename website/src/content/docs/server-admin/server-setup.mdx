@@ -1,109 +1,114 @@
 ---
 title: Server setup
-description: Run the Community Edition SRS server and configure its persistent settings.
+description: Install, publish, and operate one or more Community Edition SRS server instances.
 ---
 
 import { Image } from 'astro:assets';
-import serverSettings from '../../../assets/server-settings.png';
 import serverWhiteTheme from '../../../assets/server-white-theme.png';
-import serverClientAdminDark from '../../../assets/server-client-admin-dark.png';
 
-## Download the server
+## What the server needs
 
-Download the current release ZIP from [GitHub Releases](https://github.com/riaanjutte/IL2-SimpleRadioStandalone/releases). The package contains `IL2-SR-Server.exe` and the required server files.
+The SRS server is a standalone Windows application. It does not need to be installed inside an IL-2 game directory, and a client installation is not required on a dedicated host.
 
-Use a separate folder for each SRS server instance. A client installation is not required on the dedicated server unless that machine also needs to run the client.
+For each public instance you need:
 
-## Start an instance
+- the current server files from the release ZIP;
+- one unused port, reachable over both TCP and UDP;
+- permission to write `server.cfg`, `serverlog.txt`, and `banned.txt` in the instance folder;
+- an optional Pilot Roster JSON producer if you want assigned callsigns and aircraft data.
 
-Run the server executable normally, or supply a specific configuration file:
+:::tip[One port, two protocols]
+SRS uses the same port number for its TCP control connection and UDP voice traffic. Allow and forward **both TCP and UDP**. The default is `6002`.
+:::
+
+## Install one instance
+
+1. Download the current package from [GitHub Releases](https://github.com/riaanjutte/IL2-SimpleRadioStandalone/releases).
+2. Extract it to a dedicated folder such as `C:\IL2-SRS\main`.
+3. Allow `IL2-SR-Server.exe` through the host firewall for both TCP and UDP.
+4. Run `IL2-SR-Server.exe`. The service starts automatically and creates any missing settings in `server.cfg`.
+5. Confirm that **Server Health** reaches `RUNNING` and that **Voice Links** increases when a client connects.
+
+`RUNNING` means both the TCP control listener and UDP voice listener are active. `DEGRADED` means at least one listener is unavailable after the startup grace period; check `serverlog.txt` and verify that the configured port is not already in use.
+
+## Run multiple instances
+
+Use a separate folder and unique port for every instance. This keeps logs, bans, exports, roster files, and supporting files from colliding.
+
+You can also pass a specific configuration file with `-cfg=`:
 
 ```powershell
-IL2-SR-Server.exe -cfg="C:\IL2-SRS\instances\combatbox-main.cfg"
+IL2-SR-Server.exe -cfg="C:\IL2-SRS\instances\main\server.cfg"
 ```
 
-Set a unique server port for each instance. Ensure the corresponding TCP and UDP traffic is allowed through Windows Firewall and any upstream router or hosting-provider firewall.
+Use the exact lowercase argument shown above. Relative file paths inside `server.cfg`, including the Pilot Roster path, are resolved from the folder containing `IL2-SR-Server.exe`, not from the folder containing a custom configuration file.
 
-## server.cfg
+Example instance layout:
 
-The server creates missing persistent settings in `server.cfg` during startup while preserving existing values. Use the server UI for normal changes, then retain the generated configuration with your instance backups.
-
-Important settings include:
-
-- server port
-- coalition radio security
-- spectator audio
-- realistic TX behaviour
-- second-radio availability
-- channel limit
-- optional channel names
-- optional majority squad channel labels
-- tuned/client count display
-- optional collision effects
-- optional Pilot Roster JSON path
-
-Connected clients can inspect the capabilities currently advertised by the server:
-
-<a href={serverSettings.src} target="_blank" rel="noreferrer">
-	<Image src={serverSettings} alt="SRS Server Settings window showing advertised capabilities" quality="high" />
-</a>
-
-Do not place credentials or private filesystem paths in release packages. RCon credentials and server-only roster paths are not synchronized to clients by current builds.
-
-### Channel names
-
-Server owners can assign optional names that appear on updated clients. Select **EDIT** beside **Channel Names** in the server app, or add a dedicated section to `server.cfg`:
-
-```ini
-[Channel Names]
-1=Command
-2=Tower/ATC
+```text
+C:\IL2-SRS\
+  main\
+    IL2-SR-Server.exe
+    server.cfg
+    banned.txt
+    serverlog.txt
+  training\
+    IL2-SR-Server.exe
+    server.cfg
+    banned.txt
+    serverlog.txt
 ```
 
-Use one setting per channel. Channels that are omitted or left blank continue to appear as `CHN 1`, `CHN 2`, and so on. Channel names affect only the client display and spoken channel announcements; channel numbers and radio frequencies remain unchanged. Experimental `CHANNEL_NAMES` values from earlier beta builds are migrated automatically when the server starts.
+## Configure the instance
 
-### Majority squad channel labels
+Use the server window for normal changes. UI changes are saved immediately, and most radio settings are sent to connected clients without a restart. For every key, default, and restart requirement, see the [configuration reference](../configuration-reference/).
 
-Server owners can allow clients to append a squad tag to channel names above channel 2. Enable **Squad Channel Labels** in the server window, or set:
+The server window also provides:
 
-```ini
-[General Settings]
-SHOW_SQUAD_CHANNEL_LABELS=true
-```
-
-The feature is disabled by default. A tag is shown only when at least two friendly pilots are on the channel and one recognized squad holds a strict majority. Ties, solo pilots, and channels 1 and 2 retain their normal channel names.
-
-### Server theme
-
-Use **Server Theme** in the server window to switch immediately between the persistent **White** and **Dark** themes. White is the default. The local preference is stored under `[Server Settings]` and is not sent to connected clients:
-
-```ini
-[Server Settings]
-SERVER_UI_THEME=Dark
-```
-
-The Server Health header remains visible at the top of the main window. Its service state verifies both the TCP control listener and UDP voice listener, and can report `STARTING`, `RUNNING`, `DEGRADED`, or `STOPPED`. It also shows the listening port, server uptime, connected clients, established UDP voice links, recent transmitters, and process memory use. These values are calculated locally and do not add network traffic. **Start/Stop Server** and **Client Admin** remain available in the fixed footer.
+- a persistent White or Dark theme;
+- listener state, uptime, voice-link count, recent transmitters, and memory use;
+- direct access to [Client Admin](../client-administration/);
+- channel names, limits, and radio behavior controls.
 
 <a href={serverWhiteTheme.src} target="_blank" rel="noreferrer">
 	<Image src={serverWhiteTheme} alt="IL2-SRS server main window using the White theme" quality="high" />
 </a>
 
-### Client administration
+## Update safely
 
-Select **Client Admin** to expand the live client table from the right side of the main server window. Search across pilot names, assigned callsigns, coalition, and radio channels, or filter the table by coalition. Click a column header to sort it; radio channels are sorted numerically. Active filters and sorting update as live radio and voice-link data changes. The table shows each client's Radio 1 and Radio 2 channels, UDP voice-link state, and server-side mute state. Kick, ban, mute, and unmute actions remain available per client.
+1. Stop the SRS server and confirm the process has exited.
+2. Back up `server.cfg` and `banned.txt` for each instance. Also preserve any local Pilot Roster source or custom integration files.
+3. Extract the new release to a temporary folder.
+4. Replace the application files while retaining each instance's configuration and ban list.
+5. Start one instance and confirm `RUNNING`, a successful client connection, and a ready UDP voice link before updating the remaining instances.
 
-<a href={serverClientAdminDark.src} target="_blank" rel="noreferrer">
-	<Image src={serverClientAdminDark} alt="IL2-SRS server with the Dark theme and Client Admin panel expanded" quality="high" />
-</a>
+Do not distribute a production `server.cfg` in a release or support bundle without reviewing it first. It can contain private filesystem paths and reserved integration values.
 
-## Client compatibility
+## Files to know
 
-Read each release's compatibility notes before deploying experimental features. Updated clients can normally communicate with older Community Edition servers, but a server-controlled capability is available only when the server advertises or signals it.
+| File | Purpose |
+| --- | --- |
+| `server.cfg` | Persistent server and radio settings |
+| `serverlog.txt` | Startup, synchronization, roster, network, and voice-routing diagnostics |
+| `banned.txt` | IP addresses blocked by Client Admin |
+| `clients-list.json` | Optional generated client export; created only when enabled |
 
-## Logs
+The default files are written beside the server executable. Include `serverlog.txt` when reporting server startup, synchronization, or routing problems.
 
-The server writes `serverlog.txt` in its application directory. Include this log when reporting synchronization, configuration, roster-file, or voice-routing problems.
+## Quick fault checks
 
-## Pilot Roster
+| Symptom | Check |
+| --- | --- |
+| Server immediately exits | Another process may already be using the configured port |
+| Clients cannot connect | Allow inbound TCP and UDP on the server port and verify NAT forwarding |
+| Client shows connected but voice is unavailable | Confirm UDP is allowed; Client Admin will show `WAITING` until the voice endpoint is established |
+| Settings appear to revert | Stop the server before manually editing `server.cfg`, then restart it |
+| Custom configuration is ignored | Use the exact `-cfg="..."` argument and verify the service account can read and write the file |
+| Pilot Roster is unavailable | Check the configured JSON path and roster warnings in `serverlog.txt` |
 
-To provide assigned callsigns and aircraft names to connected clients, continue with [Pilot Roster integration](../pilot-roster/).
+## Next guides
+
+- [Configuration reference](../configuration-reference/) for every supported `server.cfg` key.
+- [Radio behavior](../radio-behavior/) for security, channels, collisions, and priority transmitters.
+- [Client administration](../client-administration/) for health monitoring, mute, kick, ban, and exports.
+- [Pilot Roster integration](../pilot-roster/) for assigned callsigns and aircraft.

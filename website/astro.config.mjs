@@ -55,6 +55,9 @@ export default defineConfig({
 					label: 'Server administrators',
 					items: [
 						{ label: 'Server setup', slug: 'server-admin/server-setup' },
+						{ label: 'Configuration reference', slug: 'server-admin/configuration-reference' },
+						{ label: 'Radio behavior', slug: 'server-admin/radio-behavior' },
+						{ label: 'Client administration', slug: 'server-admin/client-administration' },
 						{ label: 'Pilot Roster integration', slug: 'server-admin/pilot-roster' },
 					],
 				},

@@ -8,7 +8,7 @@ Pilot Roster support is intended to be available on every SRS server that provid
 
 The SRS server advertises Pilot Roster availability after it successfully reads the configured JSON file. This includes a valid file with an empty `players` array. Clients connected to an older server build, an unconfigured server, or a server whose roster file has never been read successfully will show a message asking users to contact the server owners.
 
-Public clients through `1.0.4.8-beta.1` still show "Pilot roster is currently only available when connected to Combat Box" on other servers. The next client release will remove that restriction and enable the Pilot Roster for any SRS server that supplies the data documented here. Server administrators can implement and validate the server-side integration now in preparation for that release.
+Use a current Community Edition client that supports server-advertised roster availability. These clients enable the Pilot Roster for any SRS server that supplies the data documented here; no Combat Box hostname check or server-specific approval is required.
 
 ## How it works
 
@@ -150,7 +150,7 @@ Then verify the complete path:
 3. Connect an SRS client using a player name and coalition present in the JSON.
 4. Change that player's callsign in the JSON and publish the file again.
 5. Confirm the server logs that assigned callsign updates were broadcast.
-6. Using the next client release or later, open **Show Pilot Roster** and confirm the callsign, vehicle, and radio channels.
+6. Using a current Community Edition client, open **Show Pilot Roster** and confirm the callsign, vehicle, and radio channels.
 
 ## Troubleshooting
 
@@ -181,5 +181,5 @@ The Active Squad Ops summary does not require additional JSON fields. It is deri
 - [ ] SRS server account can read the configured path
 - [ ] Producer publishes with atomic replacement
 - [ ] `serverlog.txt` contains no roster file errors
-- [ ] Clients updated to the release after `1.0.4.8-beta.1` or later
+- [ ] Clients updated to a build that supports server-advertised Pilot Roster availability
 - [ ] Callsign and vehicle updates tested with connected clients
