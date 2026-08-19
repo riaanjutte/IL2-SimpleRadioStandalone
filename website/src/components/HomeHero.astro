@@ -1,23 +1,26 @@
 ---
 import { Image } from 'astro:assets';
-import screenshot from '../assets/srs-community-edition.png';
+import darkClient from '../assets/client-main.png';
+import lightClient from '../assets/client-main-light.png';
 
 const base = import.meta.env.BASE_URL.replace(/\/?$/, '/');
 ---
 
-<section class="home-showcase">
-	<p class="confidence-line">
-		<span>Free and open source</span>
-		<span aria-hidden="true">•</span>
-		<span>Windows</span>
-		<span aria-hidden="true">•</span>
-		<span>One installation supports both games</span>
-	</p>
-	<a class="hero-media" href={`${base}screenshots/`} aria-label="View SRS screenshots">
+<section class="client-showcase" aria-label="SRS client themes">
+	<a class="client-preview dark-client" href={`${base}screenshots/`} aria-label="View the dark client screenshot">
 		<Image
-			src={screenshot}
-			alt="SRS for IL-2 Community Edition client, radio overlay, light theme, and telemetry diagnostics"
-			width={1900}
+			src={darkClient}
+			alt="SRS for IL-2 client using the dark theme"
+			width={1182}
+			quality="high"
+			loading="eager"
+		/>
+	</a>
+	<a class="client-preview light-client" href={`${base}screenshots/`} aria-label="View the light client screenshot">
+		<Image
+			src={lightClient}
+			alt="SRS for IL-2 client using the light theme"
+			width={1182}
 			quality="high"
 			loading="eager"
 		/>
@@ -25,44 +28,31 @@ const base = import.meta.env.BASE_URL.replace(/\/?$/, '/');
 </section>
 
 <style>
-	.home-showcase {
-		margin-inline: calc(-1 * var(--sl-content-pad-x));
-		padding: 0 max(1.25rem, calc((100% - 76rem) / 2)) 3.5rem;
-		background: #171a19;
-		border-bottom: 1px solid #3d403a;
-		text-align: center;
-	}
-	.confidence-line {
-		display: flex;
-		align-items: center;
-		justify-content: center;
-		gap: 0.65rem;
-		flex-wrap: wrap;
-		margin: 0 auto 1.25rem;
-		color: #a6aaa4;
-		font-size: 0.85rem;
-	}
-	.hero-media {
-		display: block;
-		max-width: 76rem;
+	.client-showcase {
+		max-width: 40rem;
 		margin: 0 auto;
-		border: 1px solid #4c5049;
-		border-radius: 6px;
-		background: #111311;
-		box-shadow: 0 1.5rem 3rem rgba(0, 0, 0, 0.28);
+		padding: 0 1.5rem 3.5rem;
+	}
+	.client-preview {
+		display: block;
+		border: 1px solid var(--sl-color-gray-5);
+		border-radius: 5px;
+		background: var(--sl-color-black);
+		box-shadow: 0 1.25rem 2.75rem rgba(0, 0, 0, 0.22);
 		overflow: hidden;
 	}
-	.hero-media img {
+	.client-preview img {
 		display: block;
 		width: 100%;
 		height: auto;
 	}
+	:global(html[data-theme='dark']) .light-client,
+	:global(html[data-theme='light']) .dark-client {
+		display: none;
+	}
 	@media (max-width: 50rem) {
-		.home-showcase {
-			padding-bottom: 2.5rem;
-		}
-		.confidence-line {
-			padding-inline: 1rem;
+		.client-showcase {
+			padding: 0 1rem 2.5rem;
 		}
 	}
 </style>

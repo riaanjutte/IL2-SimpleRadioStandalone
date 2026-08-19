@@ -81,7 +81,7 @@
 }
 :root[data-has-hero] main .hero {
 	grid-template-columns: 1fr;
-	padding-block: 4.5rem 2rem;
+	padding-block: 2.25rem 2rem;
 	text-align: center;
 }
 :root[data-has-hero] main .hero .stack,
@@ -94,6 +94,14 @@
 }
 :root[data-has-hero] main .hero .tagline > span:first-child {
 	display: block;
+}
+@media (min-width: 50rem) {
+	:root[data-has-hero] main .hero .tagline {
+		max-width: none;
+	}
+	:root[data-has-hero] main .hero .tagline > span:first-child {
+		white-space: nowrap;
+	}
 }
 :root[data-has-hero] main .hero .game-logos {
 	display: flex;
@@ -144,7 +152,7 @@
 }
 @media (max-width: 50rem) {
 	:root[data-has-hero] main .hero {
-		padding-block: 3rem 1.75rem;
+		padding-block: 2rem 1.75rem;
 	}
 	:root[data-has-hero] main .hero h1 {
 		font-size: 2.55rem;
