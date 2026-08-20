@@ -427,6 +427,46 @@ namespace IL2_SR_Client
                 string cfgPath = context.StartupConfigPath;
                 try
                 {
+                    if (StartupConfigTelemetry.NeedsRecovery(cfgPath))
+                    {
+                        if (IsIL2Running())
+                        {
+                            deferredConfigs.Add(cfgPath);
+                            Logger.Warn($"Deferred {context.DisplayName} startup.cfg recovery because IL-2 is running: {cfgPath}");
+                            continue;
+                        }
+
+                        string recoveryBackupPath;
+                        if (!StartupConfigTelemetry.TryGetRecoveryBackupPath(cfgPath, out recoveryBackupPath))
+                        {
+                            failedConfigs.Add(
+                                cfgPath + Environment.NewLine
+                                + "startup.cfg is missing, empty, or incomplete, and no usable IL2-SRS recovery backup was found.");
+                            continue;
+                        }
+
+                        MessageBoxResult restore = MessageBox.Show(
+                            "SRS detected that " + context.DisplayName + " startup.cfg is missing, empty, or incomplete.\n\n"
+                            + "This can make IL-2 lose graphics settings or start in an unexpected mode. A known-good backup is available:\n\n"
+                            + recoveryBackupPath + "\n\n"
+                            + "Restore this backup now? The current damaged file will be preserved. IL-2 must remain closed.",
+                            "IL2-SRS startup.cfg Recovery",
+                            MessageBoxButton.YesNo,
+                            MessageBoxImage.Warning);
+                        if (restore != MessageBoxResult.Yes)
+                        {
+                            failedConfigs.Add(
+                                cfgPath + Environment.NewLine
+                                + "startup.cfg recovery was offered but not performed.");
+                            continue;
+                        }
+
+                        StartupConfigTelemetry.RestoreRecoveryBackup(
+                            cfgPath,
+                            message => Logger.Info(message),
+                            () => !IsIL2Running());
+                    }
+
                     if (IsIL2Running() && !StartupConfigTelemetry.IsEnabled(cfgPath))
                     {
                         deferredConfigs.Add(cfgPath);
@@ -478,7 +518,7 @@ namespace IL2_SR_Client
                     "Auto-connect and in-game radio data may not work until each startup.cfg contains an enabled telemetrydevice section for 127.0.0.1:4322.\n\n" +
                     "Files that could not be updated:" + Environment.NewLine + Environment.NewLine +
                     string.Join(Environment.NewLine + Environment.NewLine, failedConfigs) + Environment.NewLine + Environment.NewLine +
-                    "Try running SRS as administrator, then run Telemetry Diagnostics again.",
+                    "If a file is missing or damaged and no backup is available, close IL-2, move the damaged file aside, start and close IL-2 once to recreate it, then run Telemetry Diagnostics. For permission errors, try running SRS as administrator.",
                     "IL2-SRS Telemetry Check",
                     MessageBoxButton.OK,
                     MessageBoxImage.Warning);

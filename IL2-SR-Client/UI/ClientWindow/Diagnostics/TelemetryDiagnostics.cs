@@ -546,7 +546,7 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI.ClientWindow.Diagnostics
                 {
                     if (Directory.Exists(candidate)
                         && Directory.Exists(Path.Combine(candidate, "data"))
-                        && File.Exists(Path.Combine(candidate, "data", "startup.cfg")))
+                        && HasStartupConfigOrRecoveryBackup(Path.Combine(candidate, "data", "startup.cfg")))
                     {
                         return Path.GetFullPath(candidate);
                     }
@@ -557,6 +557,13 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI.ClientWindow.Diagnostics
             }
 
             return string.Empty;
+        }
+
+        private static bool HasStartupConfigOrRecoveryBackup(string startupConfigPath)
+        {
+            string recoveryBackupPath;
+            return File.Exists(startupConfigPath)
+                   || StartupConfigTelemetry.TryGetRecoveryBackupPath(startupConfigPath, out recoveryBackupPath);
         }
 
         private static void AddPathCandidate(List<string> candidates, string path)

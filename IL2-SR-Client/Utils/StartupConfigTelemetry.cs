@@ -11,6 +11,7 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.Utils
     {
         private const string SrsAddress = "127.0.0.1";
         private const int SrsPort = 4322;
+        private const string RecoveryBackupSuffix = ".il2srs.lastgood";
 
         private static readonly Regex TelemetrySectionRegex = new Regex(
             @"^[ \t]*\[KEY[ \t]*=[ \t]*telemetrydevice[ \t]*\][ \t]*(?:\r\n|\n|\r)(?<body>.*?)(?<end>^[ \t]*\[END\][ \t]*(?:\r\n|\n|\r|$))",
@@ -19,6 +20,10 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.Utils
         private static readonly Regex SettingRegex = new Regex(
             @"^(?<indent>[ \t]*)(?<key>[A-Za-z_][A-Za-z0-9_]*)(?<spacing>[ \t]*=[ \t]*)(?<value>.*?)(?<tail>[ \t]*(?:[#;].*)?)$",
             RegexOptions.Compiled);
+
+        private static readonly Regex CompleteSectionRegex = new Regex(
+            @"^[ \t]*\[KEY[ \t]*=[^\]]+\][ \t]*(?:\r\n|\n|\r).*?^[ \t]*\[END\][ \t]*(?:\r\n|\n|\r|$)",
+            RegexOptions.IgnoreCase | RegexOptions.Multiline | RegexOptions.Singleline | RegexOptions.Compiled);
 
         public static bool EnsureEnabled(string cfgPath, Action<string> log)
         {
@@ -61,11 +66,13 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.Utils
             RunWithRetries(delegate
             {
                 StartupConfigFile configFile = ReadConfigFile(cfgPath);
+                EnsureHealthyConfig(configFile.Text, cfgPath);
                 bool textChanged;
                 string updatedConfig = EnsureEndpointInText(configFile.Text, address, port, out textChanged);
 
                 if (!textChanged)
                 {
+                    RefreshRecoveryBackup(cfgPath, configFile, log, writeAllowed);
                     Log(log, "startup.cfg already contains telemetry endpoint " + address + ":" + port);
                     return;
                 }
@@ -97,6 +104,8 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.Utils
                     {
                         throw new IOException("Failed to verify telemetry endpoint " + address + ":" + port + " in startup.cfg after writing.");
                     }
+
+                    RefreshRecoveryBackup(cfgPath, verifiedConfig, log, writeAllowed);
                 }
                 finally
                 {
@@ -118,7 +127,115 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.Utils
                 return false;
             }
 
-            return ContainsSrsTelemetryEndpoint(ReadConfigFile(cfgPath).Text);
+            StartupConfigFile configFile = ReadConfigFile(cfgPath);
+            return IsHealthyConfig(configFile.Text) && ContainsSrsTelemetryEndpoint(configFile.Text);
+        }
+
+        internal static bool NeedsRecovery(string cfgPath)
+        {
+            return string.IsNullOrWhiteSpace(cfgPath)
+                   || !File.Exists(cfgPath)
+                   || !IsHealthyConfig(ReadConfigFile(cfgPath).Text);
+        }
+
+        internal static bool TryGetRecoveryBackupPath(string cfgPath, out string backupPath)
+        {
+            backupPath = null;
+            if (string.IsNullOrWhiteSpace(cfgPath))
+            {
+                return false;
+            }
+
+            foreach (string candidate in new[] { cfgPath + RecoveryBackupSuffix, cfgPath + ".il2srs.bak" })
+            {
+                if (!File.Exists(candidate))
+                {
+                    continue;
+                }
+
+                try
+                {
+                    if (IsHealthyConfig(ReadConfigFile(candidate).Text))
+                    {
+                        backupPath = candidate;
+                        return true;
+                    }
+                }
+                catch
+                {
+                }
+            }
+
+            return false;
+        }
+
+        internal static string RestoreRecoveryBackup(string cfgPath, Action<string> log, Func<bool> writeAllowed)
+        {
+            string backupPath;
+            if (!TryGetRecoveryBackupPath(cfgPath, out backupPath))
+            {
+                throw new FileNotFoundException("No usable IL2-SRS startup.cfg recovery backup was found.", cfgPath);
+            }
+
+            if (writeAllowed != null && !writeAllowed())
+            {
+                throw new InvalidOperationException("IL-2 is running. Close IL-2 before restoring startup.cfg.");
+            }
+
+            byte[] recoveryBytes = File.ReadAllBytes(backupPath);
+            string tempPath = cfgPath + ".il2srs." + Guid.NewGuid().ToString("N") + ".tmp";
+            bool targetExists = File.Exists(cfgPath);
+            FileAttributes originalAttributes = targetExists ? File.GetAttributes(cfgPath) : FileAttributes.Normal;
+            bool wasReadOnly = targetExists
+                               && (originalAttributes & FileAttributes.ReadOnly) == FileAttributes.ReadOnly;
+
+            if (wasReadOnly)
+            {
+                File.SetAttributes(cfgPath, originalAttributes & ~FileAttributes.ReadOnly);
+            }
+
+            try
+            {
+                using (FileStream stream = new FileStream(tempPath, FileMode.CreateNew, FileAccess.Write, FileShare.Read))
+                {
+                    stream.Write(recoveryBytes, 0, recoveryBytes.Length);
+                    stream.Flush(true);
+                }
+
+                if (writeAllowed != null && !writeAllowed())
+                {
+                    throw new InvalidOperationException("IL-2 started while SRS was preparing to restore startup.cfg. No changes were made.");
+                }
+
+                if (targetExists)
+                {
+                    string damagedPath = cfgPath + ".il2srs.damaged-"
+                                         + DateTime.Now.ToString("yyyyMMdd-HHmmss") + "-"
+                                         + Guid.NewGuid().ToString("N").Substring(0, 8) + ".bak";
+                    File.Replace(tempPath, cfgPath, damagedPath, true);
+                    Log(log, "Damaged startup.cfg preserved at " + damagedPath);
+                }
+                else
+                {
+                    File.Move(tempPath, cfgPath);
+                }
+
+                EnsureHealthyConfig(ReadConfigFile(cfgPath).Text, cfgPath);
+                Log(log, "Restored startup.cfg from " + backupPath);
+                return backupPath;
+            }
+            finally
+            {
+                if (File.Exists(tempPath))
+                {
+                    File.Delete(tempPath);
+                }
+
+                if (wasReadOnly && File.Exists(cfgPath))
+                {
+                    File.SetAttributes(cfgPath, originalAttributes);
+                }
+            }
         }
 
         internal static string EnsureEnabledInText(string config, out bool changed)
@@ -343,6 +460,73 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.Utils
                 encoding,
                 preambleLength > 0,
                 bytes);
+        }
+
+        private static bool IsHealthyConfig(string text)
+        {
+            return !string.IsNullOrWhiteSpace(text)
+                   && CompleteSectionRegex.Matches(text).Count >= 2;
+        }
+
+        private static void EnsureHealthyConfig(string text, string path)
+        {
+            if (!IsHealthyConfig(text))
+            {
+                throw new InvalidDataException(
+                    "startup.cfg is missing, empty, or incomplete. SRS will not modify it. Restore a known-good backup or let IL-2 recreate it: "
+                    + path);
+            }
+        }
+
+        private static void RefreshRecoveryBackup(
+            string path,
+            StartupConfigFile configFile,
+            Action<string> log,
+            Func<bool> writeAllowed)
+        {
+            if (writeAllowed != null && !writeAllowed())
+            {
+                Log(log, "Skipped startup.cfg recovery backup refresh because IL-2 is running");
+                return;
+            }
+
+            string backupPath = path + RecoveryBackupSuffix;
+            string tempPath = backupPath + "." + Guid.NewGuid().ToString("N") + ".tmp";
+            try
+            {
+                using (FileStream stream = new FileStream(tempPath, FileMode.CreateNew, FileAccess.Write, FileShare.Read))
+                {
+                    stream.Write(configFile.OriginalBytes, 0, configFile.OriginalBytes.Length);
+                    stream.Flush(true);
+                }
+
+                if (!BytesEqual(File.ReadAllBytes(path), configFile.OriginalBytes))
+                {
+                    throw new IOException("startup.cfg changed while SRS was creating its recovery backup.");
+                }
+
+                if (File.Exists(backupPath))
+                {
+                    File.Replace(tempPath, backupPath, null, true);
+                }
+                else
+                {
+                    File.Move(tempPath, backupPath);
+                }
+
+                Log(log, "Known-good startup.cfg recovery backup refreshed at " + backupPath);
+            }
+            catch (Exception ex)
+            {
+                Log(log, "Unable to refresh startup.cfg recovery backup: " + ex.Message);
+            }
+            finally
+            {
+                if (File.Exists(tempPath))
+                {
+                    File.Delete(tempPath);
+                }
+            }
         }
 
         private static void DetectEncoding(byte[] bytes, out Encoding encoding, out int preambleLength)

@@ -196,8 +196,8 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI
             Width = GetClientWindowWidth(_globalSettings.GetFinitePositionSetting(GlobalSettingsKeys.ClientWidth, DefaultClientWidth));
             Height = GetClientWindowHeight(_globalSettings.GetFinitePositionSetting(GlobalSettingsKeys.ClientHeight, DefaultClientHeight));
 
-            Title = Title + " - " + UpdaterChecker.RELEASE_TAG;
-            StatusVersionLabel.Text = UpdaterChecker.RELEASE_TAG;
+            Title = Title + " - " + UpdaterChecker.DISPLAY_VERSION;
+            StatusVersionLabel.Text = UpdaterChecker.DISPLAY_VERSION;
 
             CheckWindowVisibility();
 

@@ -40,7 +40,7 @@ The completed report identifies each detected game installation and clearly mark
 
 SRS needs an enabled telemetry target using port `4322`. Additional telemetry applications must use separate endpoints when they cannot reliably share the same UDP listener.
 
-Do not replace unrelated `startup.cfg` settings. The built-in repair preserves unrelated content, encoding, backups the original before its first change, and restores a read-only attribute after updating the telemetry section.
+Do not replace unrelated `startup.cfg` settings. The built-in repair preserves unrelated content and encoding, backs up the original before its first change, maintains a known-good recovery copy, and restores a read-only attribute after updating the telemetry section. If the file is missing, empty, or incomplete, SRS refuses to modify it and offers to restore a valid backup while IL-2 is closed.
 
 ## Windows Firewall
 

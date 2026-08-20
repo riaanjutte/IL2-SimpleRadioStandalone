@@ -157,6 +157,98 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Common.Tests.Utils
             });
         }
 
+        [TestMethod]
+        public void ClientRepairRejectsEmptyConfigWithoutWriting()
+        {
+            WithTemporaryConfig(new byte[0], delegate(string path)
+            {
+                AssertInvalidData(delegate
+                {
+                    ClientStartupConfigTelemetry.EnsureEnabled(path, null, () => true);
+                });
+
+                Assert.AreEqual(0, new FileInfo(path).Length);
+                Assert.IsFalse(File.Exists(path + ".il2srs.bak"));
+                Assert.IsFalse(File.Exists(path + ".il2srs.lastgood"));
+            });
+        }
+
+        [TestMethod]
+        public void InstallerRepairRejectsIncompleteConfigWithoutWriting()
+        {
+            byte[] incomplete = new UTF8Encoding(false).GetBytes(
+                "[KEY = account]\r\n\tlogin = \"pilot@example.com\"\r\n[END]\r\n");
+
+            WithTemporaryConfig(incomplete, delegate(string path)
+            {
+                AssertInvalidData(delegate
+                {
+                    InstallerStartupConfigTelemetry.EnsureEnabled(path, null, () => true);
+                });
+
+                CollectionAssert.AreEqual(incomplete, File.ReadAllBytes(path));
+                Assert.IsFalse(File.Exists(path + ".il2srs.lastgood"));
+            });
+        }
+
+        [TestMethod]
+        public void ClientRepairCreatesAndRefreshesLastGoodBackup()
+        {
+            byte[] original = new UTF8Encoding(false).GetBytes(OriginalConfig);
+
+            WithTemporaryConfig(original, delegate(string path)
+            {
+                ClientStartupConfigTelemetry.EnsureEnabled(path, null, () => true);
+                CollectionAssert.AreEqual(File.ReadAllBytes(path), File.ReadAllBytes(path + ".il2srs.lastgood"));
+
+                string current = File.ReadAllText(path)
+                                 + "\r\n[KEY = sound]\r\n\tvolume = 0.75\r\n[END]\r\n";
+                File.WriteAllText(path, current, new UTF8Encoding(false));
+
+                bool changed = ClientStartupConfigTelemetry.EnsureEnabled(path, null, () => true);
+
+                Assert.IsFalse(changed);
+                CollectionAssert.AreEqual(File.ReadAllBytes(path), File.ReadAllBytes(path + ".il2srs.lastgood"));
+            });
+        }
+
+        [TestMethod]
+        public void ClientRecoveryRestoresEmptyReadOnlyConfigAndPreservesDamagedFile()
+        {
+            byte[] original = new UTF8Encoding(false).GetBytes(OriginalConfig);
+
+            WithTemporaryConfig(new byte[0], delegate(string path)
+            {
+                File.WriteAllBytes(path + ".il2srs.lastgood", original);
+                File.SetAttributes(path, File.GetAttributes(path) | FileAttributes.ReadOnly);
+
+                string restoredFrom = ClientStartupConfigTelemetry.RestoreRecoveryBackup(path, null, () => true);
+
+                Assert.AreEqual(path + ".il2srs.lastgood", restoredFrom);
+                CollectionAssert.AreEqual(original, File.ReadAllBytes(path));
+                Assert.AreNotEqual(0, File.GetAttributes(path) & FileAttributes.ReadOnly);
+                Assert.AreEqual(1, Directory.GetFiles(Path.GetDirectoryName(path), "startup.cfg.il2srs.damaged-*.bak").Length);
+
+                File.SetAttributes(path, File.GetAttributes(path) & ~FileAttributes.ReadOnly);
+            });
+        }
+
+        [TestMethod]
+        public void ClientRecoveryRestoresMissingConfig()
+        {
+            byte[] original = new UTF8Encoding(false).GetBytes(OriginalConfig);
+
+            WithTemporaryConfig(original, delegate(string path)
+            {
+                File.WriteAllBytes(path + ".il2srs.lastgood", original);
+                File.Delete(path);
+
+                ClientStartupConfigTelemetry.RestoreRecoveryBackup(path, null, () => true);
+
+                CollectionAssert.AreEqual(original, File.ReadAllBytes(path));
+            });
+        }
+
         private static void WithTemporaryConfig(byte[] contents, Action<string> test)
         {
             string directory = Path.Combine(
@@ -185,6 +277,18 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Common.Tests.Utils
                    && bytes[0] == 0xEF
                    && bytes[1] == 0xBB
                    && bytes[2] == 0xBF;
+        }
+
+        private static void AssertInvalidData(Action action)
+        {
+            try
+            {
+                action();
+                Assert.Fail("Expected startup.cfg validation to reject the file.");
+            }
+            catch (InvalidDataException)
+            {
+            }
         }
 
         private static byte[] Combine(byte[] first, byte[] second)

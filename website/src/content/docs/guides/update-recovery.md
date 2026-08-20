@@ -81,6 +81,14 @@ Keep the current folder backed up before restoring individual configuration file
 
 If SRS cannot parse `global.cfg`, it creates `global.cfg.bak` and starts with default global settings. Preserve both files before attempting recovery. Control profiles are stored in separate `.cfg` files and may still be usable even when the global configuration is damaged.
 
+### Recover IL-2 startup.cfg
+
+SRS maintains `startup.cfg.il2srs.lastgood` beside each structurally valid IL-2 `startup.cfg`. If the game configuration becomes missing, empty, or incomplete, SRS will not add telemetry settings to the damaged file. With IL-2 closed, SRS offers to restore the most recent valid backup and preserves the damaged file with an `.il2srs.damaged-...bak` name.
+
+The original `startup.cfg.il2srs.bak` created before SRS's first telemetry change remains available as a fallback. A restored older backup may not contain the latest game settings, so review graphics and sound options after recovery.
+
+If no usable backup exists, close SRS, move the damaged `startup.cfg` out of the game's `data` folder, start and close IL-2 once so the game can recreate it, then run **Help → Telemetry Diagnostics** to restore the SRS telemetry endpoint.
+
 ## Reset SRS configuration
 
 Use this only when reinstalling the application did not solve a configuration problem:

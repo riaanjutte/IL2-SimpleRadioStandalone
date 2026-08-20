@@ -17,6 +17,7 @@
 - Added backup-first detection and consolidation of duplicate SRS installations while preserving profiles, bindings, favourites, and presets.
 - Added safe telemetry backup, repair, and Windows Firewall diagnostics for UDP port 4322.
 - Added guided IL2WinWing compatibility repair using separate telemetry and SimApp Pro forwarding ports.
+- Added rotating known-good `startup.cfg` recovery backups and an opt-in restore prompt for missing, empty, or incomplete files.
 - Added Pilot Roster server capability detection and a server-administrator integration guide.
 - Added click-to-sort Pilot Roster columns.
 - Added configurable server channel names for channels 1-25 and optional squad channel labels.
@@ -40,6 +41,7 @@
 
 - Fixed an auto-connect race when IL-2 telemetry arrived while the SRS server connection was still being established.
 - Prevented unsafe `startup.cfg` changes while IL-2 is running, partial writes, and loss of unrelated settings or file encoding.
+- Prevented telemetry repair from turning an empty or truncated `startup.cfg` into a telemetry-only configuration.
 - Fixed stale coalition and vehicle state after returning to the neutral lobby or changing missions.
 - Prevented unconfigured Pilot Roster sources from delaying server synchronization and stopped server-only paths and RCon credentials from being sent to clients.
 - Fixed the Pilot Roster losing its in-game topmost state and retaining stale callsign data across missions.
@@ -56,7 +58,7 @@
 ### Validation
 
 - Built `IL2-SimpleRadioStandalone.sln` Release/x64 successfully.
-- Ran `IL2-SR-CommonTests` Release/x64: 181/181 passed.
+- Ran `IL2-SR-CommonTests` Release/x64: 183/183 passed.
 
 ## IL2-SRS 1.0.4.8-beta.10 community update
 

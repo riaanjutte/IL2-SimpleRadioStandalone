@@ -11,6 +11,7 @@ namespace Installer
     {
         private const string SrsAddress = "127.0.0.1";
         private const int SrsPort = 4322;
+        private const string RecoveryBackupSuffix = ".il2srs.lastgood";
         private static readonly Regex TelemetrySectionRegex = new Regex(
             @"^[ \t]*\[KEY[ \t]*=[ \t]*telemetrydevice[ \t]*\][ \t]*(?:\r\n|\n|\r)(?<body>.*?)(?<end>^[ \t]*\[END\][ \t]*(?:\r\n|\n|\r|$))",
             RegexOptions.IgnoreCase | RegexOptions.Multiline | RegexOptions.Singleline | RegexOptions.Compiled);
@@ -18,6 +19,10 @@ namespace Installer
         private static readonly Regex SettingRegex = new Regex(
             @"^(?<indent>[ \t]*)(?<key>[A-Za-z_][A-Za-z0-9_]*)(?<spacing>[ \t]*=[ \t]*)(?<value>.*?)(?<tail>[ \t]*(?:[#;].*)?)$",
             RegexOptions.Compiled);
+
+        private static readonly Regex CompleteSectionRegex = new Regex(
+            @"^[ \t]*\[KEY[ \t]*=[^\]]+\][ \t]*(?:\r\n|\n|\r).*?^[ \t]*\[END\][ \t]*(?:\r\n|\n|\r|$)",
+            RegexOptions.IgnoreCase | RegexOptions.Multiline | RegexOptions.Singleline | RegexOptions.Compiled);
 
         public static void EnsureEnabled(string cfgPath, Action<string> log)
         {
@@ -39,11 +44,13 @@ namespace Installer
             RunWithRetries(delegate
             {
                 StartupConfigFile configFile = ReadConfigFile(cfgPath);
+                EnsureHealthyConfig(configFile.Text, cfgPath);
                 bool changed;
                 string updatedConfig = EnsureEnabledInText(configFile.Text, out changed);
 
                 if (!changed)
                 {
+                    RefreshRecoveryBackup(cfgPath, configFile, log, writeAllowed);
                     Log(log, "startup.cfg already contains the IL2-SRS telemetry endpoint");
                     return;
                 }
@@ -74,6 +81,8 @@ namespace Installer
                     {
                         throw new IOException("Failed to verify IL2-SRS telemetry endpoint in startup.cfg after writing.");
                     }
+
+                    RefreshRecoveryBackup(cfgPath, verifiedConfig, log, writeAllowed);
                 }
                 finally
                 {
@@ -370,6 +379,73 @@ namespace Installer
             }
 
             Log(log, "Original startup.cfg backed up to " + backupPath);
+        }
+
+        private static bool IsHealthyConfig(string text)
+        {
+            return !string.IsNullOrWhiteSpace(text)
+                   && CompleteSectionRegex.Matches(text).Count >= 2;
+        }
+
+        private static void EnsureHealthyConfig(string text, string path)
+        {
+            if (!IsHealthyConfig(text))
+            {
+                throw new InvalidDataException(
+                    "startup.cfg is missing, empty, or incomplete. The installer will not modify it. Restore a known-good backup or let IL-2 recreate it: "
+                    + path);
+            }
+        }
+
+        private static void RefreshRecoveryBackup(
+            string path,
+            StartupConfigFile configFile,
+            Action<string> log,
+            Func<bool> writeAllowed)
+        {
+            if (writeAllowed != null && !writeAllowed())
+            {
+                Log(log, "Skipped startup.cfg recovery backup refresh because IL-2 is running");
+                return;
+            }
+
+            string backupPath = path + RecoveryBackupSuffix;
+            string tempPath = backupPath + "." + Guid.NewGuid().ToString("N") + ".tmp";
+            try
+            {
+                using (FileStream stream = new FileStream(tempPath, FileMode.CreateNew, FileAccess.Write, FileShare.Read))
+                {
+                    stream.Write(configFile.OriginalBytes, 0, configFile.OriginalBytes.Length);
+                    stream.Flush(true);
+                }
+
+                if (!BytesEqual(File.ReadAllBytes(path), configFile.OriginalBytes))
+                {
+                    throw new IOException("startup.cfg changed while the installer was creating its recovery backup.");
+                }
+
+                if (File.Exists(backupPath))
+                {
+                    File.Replace(tempPath, backupPath, null, true);
+                }
+                else
+                {
+                    File.Move(tempPath, backupPath);
+                }
+
+                Log(log, "Known-good startup.cfg recovery backup refreshed at " + backupPath);
+            }
+            catch (Exception ex)
+            {
+                Log(log, "Unable to refresh startup.cfg recovery backup: " + ex.Message);
+            }
+            finally
+            {
+                if (File.Exists(tempPath))
+                {
+                    File.Delete(tempPath);
+                }
+            }
         }
 
         private static void WriteAllText(
