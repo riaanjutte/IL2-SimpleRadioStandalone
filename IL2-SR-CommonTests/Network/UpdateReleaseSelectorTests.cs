@@ -21,6 +21,17 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Common.Tests.Network
         }
 
         [TestMethod]
+        public void StableClientWithEmptyReleaseTagDoesNotRedownloadSameVersion()
+        {
+            var current = Current("1.0.4.8", "");
+            var releases = Releases(Stable("v1.0.4.8"));
+
+            var selected = UpdateReleaseSelector.SelectClientUpdate(releases, current, false);
+
+            Assert.IsNull(selected);
+        }
+
+        [TestMethod]
         public void StableClientWithBetaEnabledDetectsLatestBeta()
         {
             var current = Current("1.0.4.3", "1.0.4.3");
@@ -112,6 +123,21 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Common.Tests.Network
 
             Assert.AreEqual("v1.0.4.3", selected.TagName);
             Assert.IsFalse(selected.IsPrerelease);
+        }
+
+        [TestMethod]
+        public void DirectStableUpdaterWithEmptyReleaseTagDoesNotRedownloadSameVersion()
+        {
+            var current = Current("1.0.4.8", "");
+            var releases = Releases(Stable("v1.0.4.8"));
+
+            var selected = UpdateReleaseSelector.SelectAutoUpdaterDownload(
+                releases,
+                current,
+                false,
+                null);
+
+            Assert.IsNull(selected);
         }
 
         [TestMethod]

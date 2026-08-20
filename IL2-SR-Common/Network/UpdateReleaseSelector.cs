@@ -244,6 +244,11 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Common.Network
                 return left.IsPrerelease ? -1 : 1;
             }
 
+            if (!left.IsPrerelease)
+            {
+                return 0;
+            }
+
             return ComparePrereleaseTags(left.TagName, right.TagName);
         }
 

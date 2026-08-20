@@ -39,6 +39,7 @@
 
 ### Fixed
 
+- Fixed stable clients repeatedly offering and reinstalling the same stable version.
 - Fixed an auto-connect race when IL-2 telemetry arrived while the SRS server connection was still being established.
 - Prevented unsafe `startup.cfg` changes while IL-2 is running, partial writes, and loss of unrelated settings or file encoding.
 - Prevented telemetry repair from turning an empty or truncated `startup.cfg` into a telemetry-only configuration.
@@ -58,7 +59,7 @@
 ### Validation
 
 - Built `IL2-SimpleRadioStandalone.sln` Release/x64 successfully.
-- Ran `IL2-SR-CommonTests` Release/x64: 183/183 passed.
+- Ran `IL2-SR-CommonTests` Release/x64: 185/185 passed.
 
 ## IL2-SRS 1.0.4.8-beta.10 community update
 
