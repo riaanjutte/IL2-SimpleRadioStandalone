@@ -1,5 +1,23 @@
 # Changelog
 
+## IL2-SRS 1.0.4.9-beta.1 community update
+
+### Changed
+
+- Pilot Roster radio columns now show compact channel numbers without the redundant `CHN` prefix.
+- The R1 and R2 columns now fit their header widths, leaving more room for pilot and vehicle information.
+- Pilots without an assigned callsign now show `Req. Callsign` in the vehicle column so they are easy to identify.
+
+### Compatibility
+
+- Updated clients and servers remain compatible with `1.0.4.8` installations.
+- Clients must use this beta to see the new Pilot Roster presentation.
+
+### Validation
+
+- Built `IL2-SimpleRadioStandalone.sln` Release/x64 successfully.
+- Ran `IL2-SR-CommonTests` Release/x64: 186/186 passed.
+
 ## IL2-SRS 1.0.4.8 community update
 
 ### Highlights

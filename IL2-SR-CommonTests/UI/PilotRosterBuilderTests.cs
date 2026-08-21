@@ -27,8 +27,8 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Common.Tests.UI
             Assert.AreEqual(1, roster.Count);
             Assert.AreEqual("STUD 3", roster[0].Callsign);
             Assert.AreEqual("BROADWAY", roster[0].PilotName);
-            Assert.AreEqual("CHN 3", roster[0].Radio1Channel);
-            Assert.AreEqual("CHN 4", roster[0].Radio2Channel);
+            Assert.AreEqual("3", roster[0].Radio1Channel);
+            Assert.AreEqual("4", roster[0].Radio2Channel);
         }
 
         [TestMethod]
@@ -62,6 +62,8 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Common.Tests.UI
 
             Assert.AreEqual(1, roster.Count);
             Assert.AreEqual("--", roster[0].Callsign);
+            Assert.AreEqual("Req. Callsign", roster[0].Vehicle);
+            Assert.IsTrue(roster[0].HasVehicle);
             Assert.AreEqual("--", roster[0].Radio1Channel);
             Assert.AreEqual("--", roster[0].Radio2Channel);
         }
@@ -147,8 +149,12 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Common.Tests.UI
 
             Assert.AreEqual(3, roster.Count);
             Assert.IsTrue(roster.Any(entry => entry.PilotName == "ASSIGNED" && entry.Callsign == "COWBOY-6"));
-            Assert.IsTrue(roster.Any(entry => entry.PilotName == "NOCALLSIGNONE" && entry.Callsign == "--"));
-            Assert.IsTrue(roster.Any(entry => entry.PilotName == "NOCALLSIGNTWO" && entry.Callsign == "--"));
+            Assert.IsTrue(roster.Any(entry => entry.PilotName == "NOCALLSIGNONE" &&
+                                              entry.Callsign == "--" &&
+                                              entry.Vehicle == "Req. Callsign"));
+            Assert.IsTrue(roster.Any(entry => entry.PilotName == "NOCALLSIGNTWO" &&
+                                              entry.Callsign == "--" &&
+                                              entry.Vehicle == "Req. Callsign"));
         }
 
 

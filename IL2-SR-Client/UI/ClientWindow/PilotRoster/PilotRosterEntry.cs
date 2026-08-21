@@ -20,7 +20,7 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI.ClientWindow.PilotRoster
         {
             Callsign = Normalize(callsign, "--");
             PilotName = Normalize(pilotName, "---");
-            Vehicle = Normalize(vehicle, string.Empty);
+            Vehicle = Callsign == "--" ? "Req. Callsign" : Normalize(vehicle, string.Empty);
             Radio1ChannelNumber = NormalizeChannel(radio1Channel);
             Radio2ChannelNumber = NormalizeChannel(radio2Channel);
             Radio1Channel = FormatChannel(Radio1ChannelNumber);
@@ -58,7 +58,7 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI.ClientWindow.PilotRoster
         private static string FormatChannel(int channel)
         {
             return channel > 0
-                ? "CHN " + channel.ToString(CultureInfo.InvariantCulture)
+                ? channel.ToString(CultureInfo.InvariantCulture)
                 : "--";
         }
     }

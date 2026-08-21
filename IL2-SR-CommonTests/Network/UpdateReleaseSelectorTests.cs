@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using Ciribob.IL2.SimpleRadio.Standalone.Common.Network;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -29,6 +30,28 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Common.Tests.Network
             var selected = UpdateReleaseSelector.SelectClientUpdate(releases, current, false);
 
             Assert.IsNull(selected);
+        }
+
+        [TestMethod]
+        public void CurrentReleaseMetadataDoesNotRedownloadMatchingRelease()
+        {
+            var current = Current(ReleaseMetadata.Version, ReleaseMetadata.ReleaseTag);
+            var isPrerelease = !string.IsNullOrWhiteSpace(ReleaseMetadata.ReleaseTag);
+            var tag = "v" + (isPrerelease ? ReleaseMetadata.ReleaseTag : ReleaseMetadata.Version);
+            var releases = Releases(Release(tag, isPrerelease));
+
+            var clientUpdate = UpdateReleaseSelector.SelectClientUpdate(
+                releases,
+                current,
+                isPrerelease);
+            var updaterDownload = UpdateReleaseSelector.SelectAutoUpdaterDownload(
+                releases,
+                current,
+                isPrerelease,
+                null);
+
+            Assert.IsNull(clientUpdate);
+            Assert.IsNull(updaterDownload);
         }
 
         [TestMethod]

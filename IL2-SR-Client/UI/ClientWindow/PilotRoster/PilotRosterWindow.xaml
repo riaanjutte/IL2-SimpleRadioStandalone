@@ -203,15 +203,13 @@
                                         Header="R1"
                                         Binding="{Binding Radio1Channel}"
                                         SortMemberPath="Radio1ChannelNumber"
-                                        Width="Auto"
-                                        MinWidth="64"
+                                        Width="SizeToHeader"
                                         ElementStyle="{StaticResource RosterCellTextStyle}" />
                     <DataGridTextColumn x:Name="Radio2Column"
                                         Header="R2"
                                         Binding="{Binding Radio2Channel}"
                                         SortMemberPath="Radio2ChannelNumber"
-                                        Width="Auto"
-                                        MinWidth="64"
+                                        Width="SizeToHeader"
                                         ElementStyle="{StaticResource RosterCellTextStyle}" />
                 </DataGrid.Columns>
             </DataGrid>

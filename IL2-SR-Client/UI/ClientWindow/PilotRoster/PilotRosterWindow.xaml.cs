@@ -235,8 +235,8 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI.ClientWindow.PilotRoster
         {
             CallsignColumn.Width = DataGridLength.Auto;
             VehicleColumn.Width = DataGridLength.Auto;
-            Radio1Column.Width = DataGridLength.Auto;
-            Radio2Column.Width = DataGridLength.Auto;
+            Radio1Column.Width = DataGridLength.SizeToHeader;
+            Radio2Column.Width = DataGridLength.SizeToHeader;
             PilotColumn.Width = new DataGridLength(1, DataGridLengthUnitType.Star);
             PilotList.UpdateLayout();
         }
