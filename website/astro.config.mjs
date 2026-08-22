@@ -40,6 +40,7 @@ export default defineConfig({
 						{ label: 'Installation', slug: 'guides/installation' },
 						{ label: 'Updates and recovery', slug: 'guides/update-recovery' },
 						{ label: 'Quick start', slug: 'guides/quick-start' },
+						{ label: 'Using both radios', slug: 'guides/two-radios' },
 						{ label: 'Controls and PTT', slug: 'guides/controls' },
 						{ label: 'Overlays', slug: 'guides/overlays' },
 					],
