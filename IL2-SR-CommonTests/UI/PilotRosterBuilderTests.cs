@@ -172,6 +172,28 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Common.Tests.UI
         }
 
         [TestMethod]
+        public void BuildIncludesAndSortsAssignedAirfieldWhenAvailable()
+        {
+            var roster = PilotRosterBuilder.Build(CreateState(FriendlyCoalition, 1, 2), new[]
+            {
+                CreateClient("friendly-1", "Zulu", "RAVEN-1", FriendlyCoalition, 3, 2, "P-47D-28", "  Bierset  "),
+                CreateClient("friendly-2", "Alpha", "EAGLE-1", FriendlyCoalition, 3, 2, "P-51D-15", "Le Culot")
+            }).ToList();
+
+            Assert.AreEqual("BIE", roster.Single(entry => entry.PilotName == "ZULU").Airfield);
+            Assert.AreEqual("Bierset", roster.Single(entry => entry.PilotName == "ZULU").AirfieldName);
+            Assert.IsTrue(roster.Single(entry => entry.PilotName == "ZULU").HasAirfield);
+
+            roster.Sort(new PilotRosterEntryComparer(
+                PilotRosterSortColumn.Airfield,
+                System.ComponentModel.ListSortDirection.Ascending));
+
+            CollectionAssert.AreEqual(
+                new[] { "ZULU", "ALPHA" },
+                roster.Select(entry => entry.PilotName).ToArray());
+        }
+
+        [TestMethod]
         public void BuildActiveSquadOpsSummaryGroupsFriendlySquadsByOperationalChannel()
         {
             var summary = PilotRosterBuilder.BuildActiveSquadOpsSummary(CreateState(FriendlyCoalition, 1, 2), new[]
@@ -278,7 +300,8 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Common.Tests.UI
             int coalition,
             int radio1Channel,
             int radio2Channel,
-            string vehicle = null)
+            string vehicle = null,
+            string airfield = null)
         {
             return new SRClient
             {
@@ -286,6 +309,7 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Common.Tests.UI
                 Name = name,
                 AssignedCallsign = callsign,
                 AssignedVehicle = vehicle,
+                AssignedAirfield = airfield,
                 Coalition = coalition,
                 GameState = CreateState(coalition, radio1Channel, radio2Channel)
             };

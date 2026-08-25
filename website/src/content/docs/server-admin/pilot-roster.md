@@ -1,9 +1,9 @@
 ---
 title: Pilot Roster integration
-description: Supply callsigns and vehicle names to the SRS Pilot Roster from a server-side JSON file.
+description: Supply callsigns, vehicle names, and spawn airfields to the SRS Pilot Roster from a server-side JSON file.
 ---
 
-The Pilot Roster combines connected-client radio state with optional callsign and aircraft assignments supplied by the server owner.
+The Pilot Roster combines connected-client radio state with optional callsign, aircraft, and spawn-airfield assignments supplied by the server owner.
 
 | Data | Source |
 | --- | --- |
@@ -11,6 +11,7 @@ The Pilot Roster combines connected-client radio state with optional callsign an
 | Radio 1 and Radio 2 channels | Connected SRS client telemetry |
 | Assigned callsign | Server-provided JSON |
 | Aircraft or vehicle | Server-provided JSON |
+| Current sortie spawn airfield | Server-provided JSON |
 
 ## JSON format
 
@@ -24,19 +25,23 @@ Create UTF-8 JSON with a top-level `players` array:
       "name": "=TBAS=Mayhem-1",
       "coalitionCode": 1,
       "callsign": "MANIAC-1",
-      "vehicle": "P-51D-15"
+      "vehicle": "P-51D-15",
+      "airfield": "Bierset"
     },
     {
       "name": "JG27_PilotTwo",
       "coalitionCode": 2,
       "callsign": "RAVEN-2",
-      "vehicle": "Bf 109 G-14"
+      "vehicle": "Bf 109 G-14",
+      "airfield": "Le Culot"
     }
   ]
 }
 ```
 
-`name` matching is case-insensitive and surrounding whitespace is ignored. `coalitionCode` must match the player's current SRS coalition. Callsign and vehicle are optional, but each record needs at least one of them.
+`name` matching is case-insensitive and surrounding whitespace is ignored. `coalitionCode` must match the player's current SRS coalition. Callsign, vehicle, and airfield are optional, but each record needs at least one of them. Property matching is case-insensitive, so `Vehicle` and `Airfield` are accepted.
+
+Send the complete recognizable airfield name. Current clients map known Great Battles names and common variants to stable three-letter codes, while preserving the supplied name in a tooltip. The lookup ignores case, accents, punctuation, historical field prefixes such as `B-78`, and operational suffixes such as `BSP` or `FSP`. Unknown fields use a deterministic three-letter fallback, so no server-side code table is required.
 
 ## Configure the server
 
@@ -78,7 +83,7 @@ This explicitly clears the previous assignment map. Do not leave the old file in
 1. Inspect `serverlog.txt` for roster-file warnings.
 2. Connect a client whose player name and coalition appear in the JSON.
 3. Open **Show Pilot Roster**.
-4. Change a callsign, publish the file, and confirm the client updates without restarting SRS.
+4. Change a callsign or airfield, publish the file, and confirm the client updates without restarting SRS.
 5. Publish an empty `players` array and confirm previous-mission assignments disappear.
 
 The complete reference guide remains available as [Pilot-Roster-Server-Guide.md](https://github.com/riaanjutte/IL2-SimpleRadioStandalone/blob/master/Pilot-Roster-Server-Guide.md).

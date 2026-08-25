@@ -1,6 +1,6 @@
 # IL2-SRS Pilot Roster Server Guide
 
-This guide describes how an IL-2 server can supply assigned callsigns and aircraft/vehicle names to the IL2-SRS Community Edition Pilot Roster.
+This guide describes how an IL-2 server can supply assigned callsigns, aircraft/vehicle names, and spawn airfields to the IL2-SRS Community Edition Pilot Roster.
 
 ## Client compatibility
 
@@ -20,12 +20,13 @@ The roster combines two sources:
 | Radio 1 and Radio 2 channels | Connected SRS client telemetry |
 | Assigned callsign | Server-provided JSON file |
 | Aircraft or vehicle | Server-provided JSON file |
+| Current sortie spawn airfield | Server-provided JSON file |
 
-The JSON file is not a complete snapshot of radio state. It only maps an in-game player name and coalition to an optional callsign and vehicle. The SRS server reads the file, attaches those assignments to connected clients, and broadcasts changes to SRS clients.
+The JSON file is not a complete snapshot of radio state. It only maps an in-game player name and coalition to an optional callsign, vehicle, and spawn airfield. The SRS server reads the file, attaches those assignments to connected clients, and broadcasts changes to SRS clients.
 
-Clients display only pilots on their own coalition. Friendly pilots without an assignment still appear, with `--` in the callsign column. The vehicle column is shown when at least one visible pilot has a vehicle value.
+Clients display only pilots on their own coalition. Friendly pilots without an assignment still appear, with `--` in the callsign column. The vehicle and airfield columns are shown only when at least one visible pilot has the corresponding value. Known Great Battles airfields are displayed as concise three-letter codes; hovering a code shows the full name supplied by the server.
 
-SRS does not assign callsigns or translate IL-2 vehicle IDs into display names. The server administrator must provide those values from a mission-management system, stats service, RCON integration, web application, or another local process. The JSON only needs records for pilots who currently have a callsign or vehicle assignment; SRS supplies the rest of the connected pilot list.
+SRS does not assign callsigns, translate IL-2 vehicle IDs, or derive spawn airfield names. The server administrator must provide those values from a mission-management system, stats service, RCON integration, web application, or another local process. The JSON only needs records for pilots who currently have a callsign, vehicle, or airfield assignment; SRS supplies the rest of the connected pilot list.
 
 ## Requirements
 
@@ -48,13 +49,15 @@ Use UTF-8 JSON with a top-level `players` array:
       "name": "=TBAS=Mayhem-1",
       "coalitionCode": 1,
       "callsign": "MANIAC-1",
-      "vehicle": "P-51D-15"
+      "vehicle": "P-51D-15",
+      "airfield": "Bierset"
     },
     {
       "name": "JG27_PilotTwo",
       "coalitionCode": 2,
       "callsign": "RAVEN-2",
-      "vehicle": "Bf 109 G-14"
+      "vehicle": "Bf 109 G-14",
+      "airfield": "Le Culot"
     },
     {
       "name": "VehicleOnlyExample",
@@ -76,10 +79,11 @@ Additional properties such as `generatedAtUtc`, `coalition`, or `callsignAssigne
 | `coalitionCode` | Yes | Positive integer matching the coalition reported to SRS. Current IL-2 convention is `1` for Allies/Red and `2` for Axis/Blue. |
 | `callsign` | No | Assigned tactical callsign. Blank values are treated as unassigned. |
 | `vehicle` | No | Aircraft or vehicle display name. Blank values are treated as unavailable. |
+| `airfield` | No | Current sortie's spawn-airfield display name. Blank values are treated as unavailable. |
 
-Each record must contain at least one nonblank `callsign` or `vehicle`. Records with neither are ignored. If the same normalized player name and coalition appear more than once, the last record wins.
+Each record must contain at least one nonblank `callsign`, `vehicle`, or `airfield`. Records with none of these values are ignored. JSON property matching is case-insensitive, so `Vehicle` and `Airfield` from existing producers are also accepted. If the same normalized player name and coalition appear more than once, the last record wins.
 
-Keep callsigns and vehicle names concise. SRS trims their surrounding whitespace and displays them in uppercase, but does not otherwise validate or shorten them.
+Keep callsigns and vehicle names concise. Send the complete recognizable airfield name rather than generating a code on the server. The client resolves airfield aliases case-insensitively, including common punctuation, accent, historical-field-prefix, and operational-suffix variants. Unknown airfields remain visible using a deterministic three-letter fallback.
 
 ## Configure the SRS server
 
@@ -114,7 +118,7 @@ Restart `IL2-SR-Server.exe` after changing `server.cfg`.
 
 ## Producing updates safely
 
-The SRS server checks the configured file approximately once per second. Changed callsigns and vehicles are broadcast to connected clients without restarting SRS.
+The SRS server checks the configured file approximately once per second. Changed callsigns, vehicles, and airfields are broadcast to connected clients without restarting SRS.
 
 Use this publishing sequence:
 
@@ -140,7 +144,7 @@ Validate the JSON from PowerShell:
 
 ```powershell
 $roster = Get-Content 'C:\IL2-SRS\data\pilot-roster.json' -Raw | ConvertFrom-Json
-$roster.players | Format-Table name, coalitionCode, callsign, vehicle
+$roster.players | Format-Table name, coalitionCode, callsign, vehicle, airfield
 ```
 
 Then verify the complete path:
@@ -150,7 +154,7 @@ Then verify the complete path:
 3. Connect an SRS client using a player name and coalition present in the JSON.
 4. Change that player's callsign in the JSON and publish the file again.
 5. Confirm the server logs that assigned callsign updates were broadcast.
-6. Using a current Community Edition client, open **Show Pilot Roster** and confirm the callsign, vehicle, and radio channels.
+6. Using a current Community Edition client, open **Show Pilot Roster** and confirm the callsign, vehicle, airfield, and radio channels.
 
 ## Troubleshooting
 
@@ -162,6 +166,7 @@ Then verify the complete path:
 | Assignments stop updating | The latest JSON is invalid or the producer can no longer replace the file. Check `serverlog.txt`. |
 | Assignments disappear | The live file was missing temporarily or an empty roster was published. |
 | Vehicle column is absent | No friendly visible pilot currently has a nonblank `vehicle`. |
+| Airfield column is absent | No friendly visible pilot currently has a nonblank `airfield`. |
 | Enemy pilots are absent | Expected behavior; the Pilot Roster filters to the local player's coalition. |
 | Radio channels are absent or `--` | Those values come from each connected client's telemetry, not from the roster JSON. |
 
@@ -182,4 +187,4 @@ The Active Squad Ops summary does not require additional JSON fields. It is deri
 - [ ] Producer publishes with atomic replacement
 - [ ] `serverlog.txt` contains no roster file errors
 - [ ] Clients updated to a build that supports server-advertised Pilot Roster availability
-- [ ] Callsign and vehicle updates tested with connected clients
+- [ ] Callsign, vehicle, and airfield updates tested with connected clients

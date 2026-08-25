@@ -399,6 +399,11 @@ namespace Installer
                 {
                     message += "\nConsolidated duplicate installations: " + consolidation.RetiredInstallationCount;
                 }
+                if (consolidation.ImportedLegacyDeviceListEntryCount > 0)
+                {
+                    message += "\nRecovered legacy input-device whitelist/blacklist entries: " +
+                               consolidation.ImportedLegacyDeviceListEntryCount;
+                }
                 if (!string.IsNullOrWhiteSpace(consolidation.BackupPath))
                 {
                     message += "\nMigration backup: " + consolidation.BackupPath;

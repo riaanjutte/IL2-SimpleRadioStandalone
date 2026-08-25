@@ -247,7 +247,7 @@
                                    MouseDown="RadioFrequencyText_Click"
                                    Opacity="1"
                                    Style="{x:Null}"
-                                   Text="CHN 1"
+                                   Text="#1"
                                    TextAlignment="Center"
                                    TextWrapping="NoWrap" />
                     </Canvas>

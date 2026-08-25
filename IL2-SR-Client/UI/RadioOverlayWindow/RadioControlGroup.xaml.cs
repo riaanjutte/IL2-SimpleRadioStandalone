@@ -541,7 +541,7 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI.RadioOverlayWindow
         {
             var displayName = RadioHelper.GetEffectiveChannelName(
                 channel,
-                LocalizationManager.Format("CHN {0}", channel));
+                "#" + channel);
 
             var squadTag = GetMajoritySquadTag(channel);
             return string.IsNullOrWhiteSpace(squadTag)

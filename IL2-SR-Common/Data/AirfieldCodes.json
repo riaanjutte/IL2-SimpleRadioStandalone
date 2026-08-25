@@ -1,0 +1,5652 @@
+{
+  "schemaVersion": 1,
+  "entries": [
+    {
+      "map": "Kuban",
+      "code": "ABI",
+      "names": [
+        "Abinskaya"
+      ]
+    },
+    {
+      "map": "Kuban",
+      "code": "ADL",
+      "names": [
+        "Adler"
+      ]
+    },
+    {
+      "map": "Kuban",
+      "code": "AGO",
+      "names": [
+        "Agoy"
+      ]
+    },
+    {
+      "map": "Kuban",
+      "code": "ALI",
+      "names": [
+        "Alibay"
+      ]
+    },
+    {
+      "map": "Kuban",
+      "code": "AND",
+      "names": [
+        "Andreevskaya"
+      ]
+    },
+    {
+      "map": "Kuban",
+      "code": "ANP",
+      "names": [
+        "Anapa"
+      ]
+    },
+    {
+      "map": "Kuban",
+      "code": "ANS",
+      "names": [
+        "Anastasievskaya"
+      ]
+    },
+    {
+      "map": "Kuban",
+      "code": "BAG",
+      "names": [
+        "Bagerovo"
+      ]
+    },
+    {
+      "map": "Kuban",
+      "code": "BEL",
+      "names": [
+        "Belorechenskaya",
+        "Belorechen"
+      ]
+    },
+    {
+      "map": "Kuban",
+      "code": "BUR",
+      "names": [
+        "Buryakovskaya"
+      ]
+    },
+    {
+      "map": "Kuban",
+      "code": "DNE",
+      "names": [
+        "Dneprovskaya"
+      ]
+    },
+    {
+      "map": "Kuban",
+      "code": "ELI",
+      "names": [
+        "Elizavetinskaya"
+      ]
+    },
+    {
+      "names": [
+        "Gelendzhik",
+        "Gelenjik"
+      ],
+      "map": "Kuban",
+      "code": "GEL"
+    },
+    {
+      "map": "Kuban",
+      "code": "GJA",
+      "names": [
+        "Gelenjik-1",
+        "Gelendzhik-1"
+      ]
+    },
+    {
+      "map": "Kuban",
+      "code": "GJB",
+      "names": [
+        "Gelenjik-2",
+        "Gelendzhik-2"
+      ]
+    },
+    {
+      "map": "Kuban",
+      "code": "GJC",
+      "names": [
+        "Gelenjik-3",
+        "Gelendzhik-3"
+      ]
+    },
+    {
+      "map": "Kuban",
+      "code": "GOS",
+      "names": [
+        "Gostagaevskaya"
+      ]
+    },
+    {
+      "map": "Kuban",
+      "code": "HAR",
+      "names": [
+        "Hardji-Bie"
+      ]
+    },
+    {
+      "map": "Kuban",
+      "code": "HOL",
+      "names": [
+        "Holmskaya"
+      ]
+    },
+    {
+      "map": "Kuban",
+      "code": "IVA",
+      "names": [
+        "Ivanovskaya"
+      ]
+    },
+    {
+      "map": "Kuban",
+      "code": "JUR",
+      "names": [
+        "Juravskaya"
+      ]
+    },
+    {
+      "map": "Kuban",
+      "code": "KAL",
+      "names": [
+        "Kalinino"
+      ]
+    },
+    {
+      "map": "Kuban",
+      "code": "KCH",
+      "names": [
+        "Kerch"
+      ]
+    },
+    {
+      "map": "Kuban",
+      "code": "KIE",
+      "names": [
+        "Kievskoe"
+      ]
+    },
+    {
+      "map": "Kuban",
+      "code": "KIO",
+      "names": [
+        "Kievskoe-1"
+      ]
+    },
+    {
+      "map": "Kuban",
+      "code": "KOR",
+      "names": [
+        "Korenovskaya"
+      ]
+    },
+    {
+      "map": "Kuban",
+      "code": "KRA",
+      "names": [
+        "Krasnoarmeyskayas",
+        "Krasnoarmeyskaya"
+      ]
+    },
+    {
+      "map": "Kuban",
+      "code": "KRD",
+      "names": [
+        "Krasnodar"
+      ]
+    },
+    {
+      "map": "Kuban",
+      "code": "KRT",
+      "names": [
+        "Kerch-2"
+      ]
+    },
+    {
+      "map": "Kuban",
+      "code": "KRY",
+      "names": [
+        "Krymskaya"
+      ]
+    },
+    {
+      "map": "Kuban",
+      "code": "LAZ",
+      "names": [
+        "Lazarevskoe",
+        "Lazarevskoye"
+      ]
+    },
+    {
+      "map": "Kuban",
+      "code": "MAR",
+      "names": [
+        "Marfovka"
+      ]
+    },
+    {
+      "map": "Kuban",
+      "code": "MIR",
+      "names": [
+        "Mirskaya"
+      ]
+    },
+    {
+      "map": "Kuban",
+      "code": "MKA",
+      "names": [
+        "Maykop-1",
+        "Maikop-1"
+      ]
+    },
+    {
+      "map": "Kuban",
+      "code": "MKB",
+      "names": [
+        "Maykop-2",
+        "Maikop-2"
+      ]
+    },
+    {
+      "map": "Kuban",
+      "code": "MKC",
+      "names": [
+        "Maykop-3",
+        "Maikop-3"
+      ]
+    },
+    {
+      "map": "Kuban",
+      "code": "MYS",
+      "names": [
+        "Myshako"
+      ]
+    },
+    {
+      "map": "Kuban",
+      "code": "NTT",
+      "names": [
+        "Novotitarovskaya"
+      ]
+    },
+    {
+      "map": "Kuban",
+      "code": "NVL",
+      "names": [
+        "Novovelichkovskaya"
+      ]
+    },
+    {
+      "map": "Kuban",
+      "code": "PAS",
+      "names": [
+        "Pashkovskaya"
+      ]
+    },
+    {
+      "map": "Kuban",
+      "code": "POP",
+      "names": [
+        "Popovicheskaya"
+      ]
+    },
+    {
+      "map": "Kuban",
+      "code": "SEM",
+      "names": [
+        "Semisotka"
+      ]
+    },
+    {
+      "map": "Kuban",
+      "code": "SEV",
+      "names": [
+        "Severskaya"
+      ]
+    },
+    {
+      "map": "Kuban",
+      "code": "SLA",
+      "names": [
+        "Slavyanskaya"
+      ]
+    },
+    {
+      "map": "Kuban",
+      "code": "SOC",
+      "names": [
+        "Sochi"
+      ]
+    },
+    {
+      "map": "Kuban",
+      "code": "STA",
+      "names": [
+        "Staro-Nijne-Steblievskaya",
+        "Staro-Nizhne-Steblievskaya"
+      ]
+    },
+    {
+      "map": "Kuban",
+      "code": "TAM",
+      "names": [
+        "Taman"
+      ]
+    },
+    {
+      "map": "Kuban",
+      "code": "TIM",
+      "names": [
+        "Timashevskaya"
+      ]
+    },
+    {
+      "map": "Kuban",
+      "code": "VYS",
+      "names": [
+        "Vyselki"
+      ]
+    },
+    {
+      "map": "Kuban",
+      "code": "ZAM",
+      "names": [
+        "Zamorsk"
+      ]
+    },
+    {
+      "map": "Kuban",
+      "code": "ZAP",
+      "names": [
+        "Zaporojskaya",
+        "Zaporozhskaya",
+        "Zaporo"
+      ]
+    },
+    {
+      "map": "Moscow",
+      "code": "BAH",
+      "names": [
+        "Bahmutovo"
+      ]
+    },
+    {
+      "map": "Moscow",
+      "code": "BOL",
+      "names": [
+        "Bolshoe Vergovo"
+      ]
+    },
+    {
+      "map": "Moscow",
+      "code": "BOR",
+      "names": [
+        "Borko"
+      ]
+    },
+    {
+      "map": "Moscow",
+      "code": "BRY",
+      "names": [
+        "Brykovo"
+      ]
+    },
+    {
+      "map": "Moscow",
+      "code": "BYK",
+      "names": [
+        "Bykovo"
+      ]
+    },
+    {
+      "map": "Moscow",
+      "code": "DRA",
+      "names": [
+        "Drakino"
+      ]
+    },
+    {
+      "map": "Moscow",
+      "code": "DUG",
+      "names": [
+        "Dugino"
+      ]
+    },
+    {
+      "map": "Moscow",
+      "code": "DYA",
+      "names": [
+        "Dyatlovo"
+      ]
+    },
+    {
+      "map": "Moscow",
+      "code": "GOR",
+      "names": [
+        "Gorstovo"
+      ]
+    },
+    {
+      "map": "Moscow",
+      "code": "GZH",
+      "names": [
+        "Gzhatsk"
+      ]
+    },
+    {
+      "map": "Moscow",
+      "code": "ILI",
+      "names": [
+        "Ilinskoe"
+      ]
+    },
+    {
+      "map": "Moscow",
+      "code": "INY",
+      "names": [
+        "Inyutino"
+      ]
+    },
+    {
+      "map": "Moscow",
+      "code": "IVA",
+      "names": [
+        "Ivanskoe",
+        "Ivanovskoe"
+      ]
+    },
+    {
+      "map": "Moscow",
+      "code": "KAL",
+      "names": [
+        "Kalinin"
+      ]
+    },
+    {
+      "map": "Moscow",
+      "code": "KAR",
+      "names": [
+        "Karpovo"
+      ]
+    },
+    {
+      "map": "Moscow",
+      "code": "KHI",
+      "names": [
+        "Khimki"
+      ]
+    },
+    {
+      "map": "Moscow",
+      "code": "KHO",
+      "names": [
+        "Kholm"
+      ]
+    },
+    {
+      "map": "Moscow",
+      "code": "KLE",
+      "names": [
+        "Kletino"
+      ]
+    },
+    {
+      "map": "Moscow",
+      "code": "KLN",
+      "names": [
+        "Klin"
+      ]
+    },
+    {
+      "map": "Moscow",
+      "code": "KLV",
+      "names": [
+        "Klimovo"
+      ]
+    },
+    {
+      "map": "Moscow",
+      "code": "KOL",
+      "names": [
+        "Kolodezi"
+      ]
+    },
+    {
+      "map": "Moscow",
+      "code": "KRY",
+      "names": [
+        "Kryukovo"
+      ]
+    },
+    {
+      "map": "Moscow",
+      "code": "LOS",
+      "names": [
+        "Losinski"
+      ]
+    },
+    {
+      "map": "Moscow",
+      "code": "LOT",
+      "names": [
+        "Lotoshino"
+      ]
+    },
+    {
+      "map": "Moscow",
+      "code": "LUK",
+      "names": [
+        "Lukovnikovo"
+      ]
+    },
+    {
+      "map": "Moscow",
+      "code": "MAL",
+      "names": [
+        "Maloyaroslavetc"
+      ]
+    },
+    {
+      "map": "Moscow",
+      "code": "MIG",
+      "names": [
+        "Migalovo"
+      ]
+    },
+    {
+      "map": "Moscow",
+      "code": "MOZ",
+      "names": [
+        "Mozhaysk"
+      ]
+    },
+    {
+      "map": "Moscow",
+      "code": "MYA",
+      "names": [
+        "Myatlevo"
+      ]
+    },
+    {
+      "map": "Moscow",
+      "code": "NAZ",
+      "names": [
+        "Nazaryevo"
+      ]
+    },
+    {
+      "map": "Moscow",
+      "code": "NES",
+      "names": [
+        "Nesterovo"
+      ]
+    },
+    {
+      "map": "Moscow",
+      "code": "NIK",
+      "names": [
+        "Nikolskoye"
+      ]
+    },
+    {
+      "map": "Moscow",
+      "code": "NOV",
+      "names": [
+        "Novoye Selo"
+      ]
+    },
+    {
+      "names": [
+        "Olkhovka",
+        "Ol Hovka"
+      ],
+      "map": "Moscow",
+      "code": "OLK"
+    },
+    {
+      "map": "Moscow",
+      "code": "PHI",
+      "names": [
+        "Phily",
+        "Fili"
+      ]
+    },
+    {
+      "map": "Moscow",
+      "code": "PVL",
+      "names": [
+        "Pavlovskoe"
+      ]
+    },
+    {
+      "map": "Moscow",
+      "code": "PVS",
+      "names": [
+        "Pavshino"
+      ]
+    },
+    {
+      "map": "Moscow",
+      "code": "RJE",
+      "names": [
+        "Rjev",
+        "Rzhev"
+      ]
+    },
+    {
+      "map": "Moscow",
+      "code": "ROG",
+      "names": [
+        "Rogachevko"
+      ]
+    },
+    {
+      "map": "Moscow",
+      "code": "RUZ",
+      "names": [
+        "Ruza"
+      ]
+    },
+    {
+      "map": "Moscow",
+      "code": "RYA",
+      "names": [
+        "Ryabinki"
+      ]
+    },
+    {
+      "map": "Moscow",
+      "code": "SIM",
+      "names": [
+        "Simonkovo"
+      ]
+    },
+    {
+      "map": "Moscow",
+      "code": "SLO",
+      "names": [
+        "Sloboda"
+      ]
+    },
+    {
+      "map": "Moscow",
+      "code": "SOL",
+      "names": [
+        "Solodilovo"
+      ]
+    },
+    {
+      "map": "Moscow",
+      "code": "STA",
+      "names": [
+        "Staritsa"
+      ]
+    },
+    {
+      "map": "Moscow",
+      "code": "SYC",
+      "names": [
+        "Sychevka"
+      ]
+    },
+    {
+      "map": "Moscow",
+      "code": "TEM",
+      "names": [
+        "Temkino"
+      ]
+    },
+    {
+      "map": "Moscow",
+      "code": "TOR",
+      "names": [
+        "Torjok",
+        "Torzhok"
+      ]
+    },
+    {
+      "map": "Moscow",
+      "code": "TRE",
+      "names": [
+        "Trekhsvyatskoye"
+      ]
+    },
+    {
+      "map": "Moscow",
+      "code": "TUS",
+      "names": [
+        "Tushino"
+      ]
+    },
+    {
+      "map": "Moscow",
+      "code": "VAR",
+      "names": [
+        "Varvarovka"
+      ]
+    },
+    {
+      "map": "Moscow",
+      "code": "VAT",
+      "names": [
+        "Vatulino"
+      ]
+    },
+    {
+      "map": "Moscow",
+      "code": "VJA",
+      "names": [
+        "Vjazma",
+        "Vyazma"
+      ]
+    },
+    {
+      "map": "Moscow",
+      "code": "VLA",
+      "names": [
+        "Vlasyevo"
+      ]
+    },
+    {
+      "map": "Moscow",
+      "code": "VNU",
+      "names": [
+        "Vnukovo"
+      ]
+    },
+    {
+      "map": "Moscow",
+      "code": "YUH",
+      "names": [
+        "Yuhnov",
+        "Yukhnov"
+      ]
+    },
+    {
+      "map": "Moscow",
+      "code": "ZAK",
+      "names": [
+        "Zakharkovo"
+      ]
+    },
+    {
+      "map": "Moscow",
+      "code": "ZAL",
+      "names": [
+        "Zaluje"
+      ]
+    },
+    {
+      "map": "Moscow",
+      "code": "ZEN",
+      "names": [
+        "Zenino"
+      ]
+    },
+    {
+      "map": "Moscow",
+      "code": "ZNA",
+      "names": [
+        "Znamenka"
+      ]
+    },
+    {
+      "map": "Normandy",
+      "code": "ABB",
+      "names": [
+        "Abbeville Drucat"
+      ]
+    },
+    {
+      "map": "Normandy",
+      "code": "APU",
+      "names": [
+        "Apuldram"
+      ]
+    },
+    {
+      "map": "Normandy",
+      "code": "ASH",
+      "names": [
+        "Ashford"
+      ]
+    },
+    {
+      "map": "Normandy",
+      "code": "AZE",
+      "names": [
+        "A-7 Azeville"
+      ]
+    },
+    {
+      "map": "Normandy",
+      "code": "BAZ",
+      "names": [
+        "B-2 Bazenville"
+      ]
+    },
+    {
+      "map": "Normandy",
+      "code": "BEN",
+      "names": [
+        "B-4 Beny sur Mer"
+      ]
+    },
+    {
+      "map": "Normandy",
+      "code": "BER",
+      "names": [
+        "Berck sur Mer"
+      ]
+    },
+    {
+      "map": "Normandy",
+      "code": "BEU",
+      "names": [
+        "Beaulieu"
+      ]
+    },
+    {
+      "map": "Normandy",
+      "code": "BIS",
+      "names": [
+        "Bisterne"
+      ]
+    },
+    {
+      "map": "Normandy",
+      "code": "BLA",
+      "names": [
+        "Blackbushe"
+      ]
+    },
+    {
+      "map": "Normandy",
+      "code": "BMR",
+      "names": [
+        "Beaumont le Roger"
+      ]
+    },
+    {
+      "map": "Normandy",
+      "code": "BOG",
+      "names": [
+        "Bognor"
+      ]
+    },
+    {
+      "map": "Normandy",
+      "code": "BOU",
+      "names": [
+        "Boulogne Alprech"
+      ]
+    },
+    {
+      "map": "Normandy",
+      "code": "BRE",
+      "names": [
+        "Brenzett"
+      ]
+    },
+    {
+      "map": "Normandy",
+      "code": "BRU",
+      "names": [
+        "A-16 Brucheville"
+      ]
+    },
+    {
+      "map": "Normandy",
+      "code": "BVT",
+      "names": [
+        "Beauvais Tille"
+      ]
+    },
+    {
+      "map": "Normandy",
+      "code": "BZV",
+      "names": [
+        "A-6 Beuzeville"
+      ]
+    },
+    {
+      "map": "Normandy",
+      "code": "CAL",
+      "names": [
+        "Calais Coquelles"
+      ]
+    },
+    {
+      "map": "Normandy",
+      "code": "CAM",
+      "names": [
+        "B-5 Camilly"
+      ]
+    },
+    {
+      "map": "Normandy",
+      "code": "CDV",
+      "names": [
+        "A-3 Cardonville"
+      ]
+    },
+    {
+      "map": "Normandy",
+      "code": "CEP",
+      "names": [
+        "Crecy en Ponthieu"
+      ]
+    },
+    {
+      "map": "Normandy",
+      "code": "CEV",
+      "names": [
+        "Chaumont en Vexin"
+      ]
+    },
+    {
+      "map": "Normandy",
+      "code": "CHP",
+      "names": [
+        "A-5 Chippelle"
+      ]
+    },
+    {
+      "map": "Normandy",
+      "code": "CHY",
+      "names": [
+        "Chailey"
+      ]
+    },
+    {
+      "map": "Normandy",
+      "code": "CLA",
+      "names": [
+        "Clais Marck",
+        "Calais-Marck",
+        "Calais Marck"
+      ]
+    },
+    {
+      "map": "Normandy",
+      "code": "CLB",
+      "names": [
+        "Chilbolton"
+      ]
+    },
+    {
+      "map": "Normandy",
+      "code": "COO",
+      "names": [
+        "Coolham"
+      ]
+    },
+    {
+      "map": "Normandy",
+      "code": "COR",
+      "names": [
+        "Cormeilles en Vexin"
+      ]
+    },
+    {
+      "map": "Normandy",
+      "code": "COU",
+      "names": [
+        "B-6 Coulombs"
+      ]
+    },
+    {
+      "map": "Normandy",
+      "code": "CPQ",
+      "names": [
+        "B-17 Carpiquet"
+      ]
+    },
+    {
+      "map": "Normandy",
+      "code": "CQV",
+      "names": [
+        "A-2 Criqueville"
+      ]
+    },
+    {
+      "map": "Normandy",
+      "code": "CRT",
+      "names": [
+        "A-10 Carentan"
+      ]
+    },
+    {
+      "map": "Normandy",
+      "code": "CST",
+      "names": [
+        "B-18 Cristot"
+      ]
+    },
+    {
+      "map": "Normandy",
+      "code": "CTV",
+      "names": [
+        "A-14 Cretteville"
+      ]
+    },
+    {
+      "map": "Normandy",
+      "code": "DEA",
+      "names": [
+        "Deanland"
+      ]
+    },
+    {
+      "map": "Normandy",
+      "code": "DEU",
+      "names": [
+        "A-4 Deux Jumeaux"
+      ]
+    },
+    {
+      "map": "Normandy",
+      "code": "DIE",
+      "names": [
+        "Dieppe Saint Aubin"
+      ]
+    },
+    {
+      "map": "Normandy",
+      "code": "DKM",
+      "names": [
+        "Dunkerque Mardyck"
+      ]
+    },
+    {
+      "map": "Normandy",
+      "code": "DNF",
+      "names": [
+        "Dunsfold"
+      ]
+    },
+    {
+      "map": "Normandy",
+      "code": "DRE",
+      "names": [
+        "Dreux"
+      ]
+    },
+    {
+      "map": "Normandy",
+      "code": "ELL",
+      "names": [
+        "B-12 Ellon"
+      ]
+    },
+    {
+      "map": "Normandy",
+      "code": "EVF",
+      "names": [
+        "Evreux Fauville"
+      ]
+    },
+    {
+      "map": "Normandy",
+      "code": "EVH",
+      "names": [
+        "Evreux Huest"
+      ]
+    },
+    {
+      "map": "Normandy",
+      "code": "FOR",
+      "names": [
+        "Ford"
+      ]
+    },
+    {
+      "map": "Normandy",
+      "code": "FRI",
+      "names": [
+        "Friston"
+      ]
+    },
+    {
+      "map": "Normandy",
+      "code": "FUN",
+      "names": [
+        "Funtington"
+      ]
+    },
+    {
+      "map": "Normandy",
+      "code": "GUY",
+      "names": [
+        "Guyancourt"
+      ]
+    },
+    {
+      "map": "Normandy",
+      "code": "HAW",
+      "names": [
+        "Hawkinge"
+      ]
+    },
+    {
+      "map": "Normandy",
+      "code": "HCF",
+      "names": [
+        "Highcliffe"
+      ]
+    },
+    {
+      "map": "Normandy",
+      "code": "HEA",
+      "names": [
+        "Headcorn"
+      ]
+    },
+    {
+      "map": "Normandy",
+      "code": "HHD",
+      "names": [
+        "High Halden"
+      ]
+    },
+    {
+      "map": "Normandy",
+      "code": "HOL",
+      "names": [
+        "Holmsley South"
+      ]
+    },
+    {
+      "map": "Normandy",
+      "code": "HOR",
+      "names": [
+        "Horne"
+      ]
+    },
+    {
+      "map": "Normandy",
+      "code": "HUE",
+      "names": [
+        "Huen",
+        "Hurn"
+      ]
+    },
+    {
+      "map": "Normandy",
+      "code": "IBS",
+      "names": [
+        "Ibsley"
+      ]
+    },
+    {
+      "map": "Normandy",
+      "code": "KIN",
+      "names": [
+        "Kingsnorth"
+      ]
+    },
+    {
+      "map": "Normandy",
+      "code": "LAN",
+      "names": [
+        "B-9 Lantheuil"
+      ]
+    },
+    {
+      "map": "Normandy",
+      "code": "LAV",
+      "names": [
+        "A-19 La Vielle"
+      ]
+    },
+    {
+      "map": "Normandy",
+      "code": "LES",
+      "names": [
+        "Les Mesnuls"
+      ]
+    },
+    {
+      "map": "Normandy",
+      "code": "LIG",
+      "names": [
+        "A-12 Lignerolles"
+      ]
+    },
+    {
+      "map": "Normandy",
+      "code": "LIN",
+      "names": [
+        "B-19 Lingevres"
+      ]
+    },
+    {
+      "map": "Normandy",
+      "code": "LNG",
+      "names": [
+        "B-11 Longues"
+      ]
+    },
+    {
+      "map": "Normandy",
+      "code": "LNR",
+      "names": [
+        "Lonrai"
+      ]
+    },
+    {
+      "map": "Normandy",
+      "code": "LSD",
+      "names": [
+        "Lashenden"
+      ]
+    },
+    {
+      "map": "Normandy",
+      "code": "LSH",
+      "names": [
+        "Lasham"
+      ]
+    },
+    {
+      "map": "Normandy",
+      "code": "LYG",
+      "names": [
+        "Lymington"
+      ]
+    },
+    {
+      "map": "Normandy",
+      "code": "LYP",
+      "names": [
+        "Lympne"
+      ]
+    },
+    {
+      "map": "Normandy",
+      "code": "MAN",
+      "names": [
+        "Manston"
+      ]
+    },
+    {
+      "map": "Normandy",
+      "code": "MAR",
+      "names": [
+        "B-7 Martragny"
+      ]
+    },
+    {
+      "map": "Normandy",
+      "code": "MAU",
+      "names": [
+        "Maupertus"
+      ]
+    },
+    {
+      "map": "Normandy",
+      "code": "MEA",
+      "names": [
+        "A-17 Meautis"
+      ]
+    },
+    {
+      "map": "Normandy",
+      "code": "NEE",
+      "names": [
+        "Needs Oar Point",
+        "Needs Ore Point"
+      ]
+    },
+    {
+      "map": "Normandy",
+      "code": "NEW",
+      "names": [
+        "Newchurch"
+      ]
+    },
+    {
+      "map": "Normandy",
+      "code": "NOG",
+      "names": [
+        "Nogent le Roi"
+      ]
+    },
+    {
+      "map": "Normandy",
+      "code": "OCT",
+      "names": [
+        "Octeville sur Mer"
+      ]
+    },
+    {
+      "map": "Normandy",
+      "code": "OYS",
+      "names": [
+        "Oysonville"
+      ]
+    },
+    {
+      "map": "Normandy",
+      "code": "PIC",
+      "names": [
+        "A-8 Picauville"
+      ]
+    },
+    {
+      "map": "Normandy",
+      "code": "PLU",
+      "names": [
+        "B-10 Plumetot"
+      ]
+    },
+    {
+      "map": "Normandy",
+      "code": "POI",
+      "names": [
+        "Poix Nord"
+      ]
+    },
+    {
+      "map": "Normandy",
+      "code": "PON",
+      "names": [
+        "A-28 Pontorson"
+      ]
+    },
+    {
+      "map": "Normandy",
+      "code": "SAE",
+      "names": [
+        "Saint Andre de lEure"
+      ]
+    },
+    {
+      "map": "Normandy",
+      "code": "SCM",
+      "names": [
+        "B3 Saint Croix sur Mer"
+      ]
+    },
+    {
+      "map": "Normandy",
+      "code": "SEL",
+      "names": [
+        "Selsey"
+      ]
+    },
+    {
+      "map": "Normandy",
+      "code": "SLB",
+      "names": [
+        "A-11 Saint Lambert"
+      ]
+    },
+    {
+      "map": "Normandy",
+      "code": "SOM",
+      "names": [
+        "Saint Omer"
+      ]
+    },
+    {
+      "map": "Normandy",
+      "code": "SOU",
+      "names": [
+        "Sours"
+      ]
+    },
+    {
+      "map": "Normandy",
+      "code": "SPM",
+      "names": [
+        "A-1 Saint Pierre du Mont"
+      ]
+    },
+    {
+      "map": "Normandy",
+      "code": "STA",
+      "names": [
+        "Staplehurst"
+      ]
+    },
+    {
+      "map": "Normandy",
+      "code": "TAN",
+      "names": [
+        "Tangmere"
+      ]
+    },
+    {
+      "map": "Normandy",
+      "code": "THO",
+      "names": [
+        "Thorney Island"
+      ]
+    },
+    {
+      "map": "Normandy",
+      "code": "THR",
+      "names": [
+        "Thruxton"
+      ]
+    },
+    {
+      "map": "Normandy",
+      "code": "TOU",
+      "names": [
+        "A-13 Tour en Bessin"
+      ]
+    },
+    {
+      "map": "Normandy",
+      "code": "TRI",
+      "names": [
+        "Triqueville"
+      ]
+    },
+    {
+      "map": "Normandy",
+      "code": "VEL",
+      "names": [
+        "Velizy Villacoublay"
+      ]
+    },
+    {
+      "map": "Normandy",
+      "code": "WES",
+      "names": [
+        "Westhampnett"
+      ]
+    },
+    {
+      "map": "Normandy",
+      "code": "WIN",
+      "names": [
+        "Winkton"
+      ]
+    },
+    {
+      "map": "Normandy",
+      "code": "WOO",
+      "names": [
+        "Woodchurch"
+      ]
+    },
+    {
+      "names": [
+        "Akkerman"
+      ],
+      "map": "Odessa",
+      "code": "AKK"
+    },
+    {
+      "names": [
+        "Chizhova"
+      ],
+      "map": "Odessa",
+      "code": "CHI"
+    },
+    {
+      "names": [
+        "Manzir"
+      ],
+      "map": "Odessa",
+      "code": "MAN"
+    },
+    {
+      "names": [
+        "St. Revaka",
+        "St Revaka"
+      ],
+      "map": "Odessa",
+      "code": "REV"
+    },
+    {
+      "names": [
+        "Tuzly"
+      ],
+      "map": "Odessa",
+      "code": "TUZ"
+    },
+    {
+      "names": [
+        "Zatishye"
+      ],
+      "map": "Odessa",
+      "code": "ZAT"
+    },
+    {
+      "map": "Rhineland",
+      "code": "AAC",
+      "names": [
+        "Aachen"
+      ]
+    },
+    {
+      "map": "Rhineland",
+      "code": "ACH",
+      "names": [
+        "Achmer"
+      ]
+    },
+    {
+      "map": "Rhineland",
+      "code": "ALT",
+      "names": [
+        "Altenstadt"
+      ]
+    },
+    {
+      "map": "Rhineland",
+      "code": "AMS",
+      "names": [
+        "Schiphol",
+        "Amsterdam-Schiphol",
+        "Amsterdam Schiphol"
+      ]
+    },
+    {
+      "map": "Rhineland",
+      "code": "ARN",
+      "names": [
+        "Arnhem Deelen",
+        "Arnhem-Deelen",
+        "Arnhem",
+        "Deelen"
+      ]
+    },
+    {
+      "names": [
+        "Asbach"
+      ],
+      "map": "Rhineland",
+      "code": "ASB"
+    },
+    {
+      "names": [
+        "Maitzborn"
+      ],
+      "map": "Rhineland",
+      "code": "MTZ"
+    },
+    {
+      "names": [
+        "Mayen",
+        "Mayen Recovery Airstrip"
+      ],
+      "map": "Rhineland",
+      "code": "MAY"
+    },
+    {
+      "map": "Rhineland",
+      "code": "ASC",
+      "names": [
+        "Asch"
+      ]
+    },
+    {
+      "map": "Rhineland",
+      "code": "BAB",
+      "names": [
+        "Babenhausen"
+      ]
+    },
+    {
+      "map": "Rhineland",
+      "code": "BAD",
+      "names": [
+        "Bad Lippspringe"
+      ]
+    },
+    {
+      "map": "Rhineland",
+      "code": "BIE",
+      "names": [
+        "Bierset",
+        "Liege",
+        "Liège",
+        "Bierset-Liege",
+        "Bierset–Liege",
+        "Liege-Bierset",
+        "Liege/Bierset"
+      ]
+    },
+    {
+      "map": "Rhineland",
+      "code": "BNH",
+      "names": [
+        "Bonn-Hangelar_3960",
+        "Bonn-Hangelar"
+      ]
+    },
+    {
+      "map": "Rhineland",
+      "code": "BNS",
+      "names": [
+        "Bonninghardt-Sud",
+        "Boenninghardt-Sud",
+        "Boenninghardt"
+      ]
+    },
+    {
+      "map": "Rhineland",
+      "code": "BRE",
+      "names": [
+        "Breitscheid"
+      ]
+    },
+    {
+      "map": "Rhineland",
+      "code": "CHI",
+      "names": [
+        "Chievres"
+      ]
+    },
+    {
+      "map": "Rhineland",
+      "code": "COE",
+      "names": [
+        "Coesfeld-Lette"
+      ]
+    },
+    {
+      "map": "Rhineland",
+      "code": "DEU",
+      "names": [
+        "Deurne",
+        "Deurne-Antwerpen",
+        "Deurne Antwerpen"
+      ]
+    },
+    {
+      "map": "Rhineland",
+      "code": "DIE",
+      "names": [
+        "Diest"
+      ]
+    },
+    {
+      "map": "Rhineland",
+      "code": "DOR",
+      "names": [
+        "Dortmund"
+      ]
+    },
+    {
+      "map": "Rhineland",
+      "code": "DRO",
+      "names": [
+        "Drope"
+      ]
+    },
+    {
+      "map": "Rhineland",
+      "code": "DUS",
+      "names": [
+        "Dusseldorf-Lohausen",
+        "Dusseldorf"
+      ]
+    },
+    {
+      "map": "Rhineland",
+      "code": "EIN",
+      "names": [
+        "Eindhoven"
+      ]
+    },
+    {
+      "map": "Rhineland",
+      "code": "ESS",
+      "names": [
+        "Essen-Mulheim"
+      ]
+    },
+    {
+      "map": "Rhineland",
+      "code": "ETT",
+      "names": [
+        "Ettinghausen"
+      ]
+    },
+    {
+      "map": "Rhineland",
+      "code": "EUD",
+      "names": [
+        "Eudenbach/Asbach",
+        "Eudenbach"
+      ]
+    },
+    {
+      "map": "Rhineland",
+      "code": "EVE",
+      "names": [
+        "Evere"
+      ]
+    },
+    {
+      "map": "Rhineland",
+      "code": "FES",
+      "names": [
+        "Frankfurt-Eschborn"
+      ]
+    },
+    {
+      "map": "Rhineland",
+      "code": "FLO",
+      "names": [
+        "Florennes"
+      ]
+    },
+    {
+      "map": "Rhineland",
+      "code": "FRM",
+      "names": [
+        "Frankfurt/Rhein-Main"
+      ]
+    },
+    {
+      "map": "Rhineland",
+      "code": "FUR",
+      "names": [
+        "Furstenau",
+        "Fürstenau"
+      ]
+    },
+    {
+      "map": "Rhineland",
+      "code": "GEL",
+      "names": [
+        "Gelnhausen"
+      ]
+    },
+    {
+      "map": "Rhineland",
+      "code": "GIL",
+      "names": [
+        "Gilze-Rijen"
+      ]
+    },
+    {
+      "map": "Rhineland",
+      "code": "GOT",
+      "names": [
+        "Gotzenhain"
+      ]
+    },
+    {
+      "map": "Rhineland",
+      "code": "GRA",
+      "names": [
+        "GraveKeent",
+        "Grave-Keent"
+      ]
+    },
+    {
+      "map": "Rhineland",
+      "code": "GRE",
+      "names": [
+        "Greven-Lette"
+      ]
+    },
+    {
+      "map": "Rhineland",
+      "code": "GRI",
+      "names": [
+        "Grimbergen"
+      ]
+    },
+    {
+      "map": "Rhineland",
+      "code": "GRO",
+      "names": [
+        "Gross-Ostheim"
+      ]
+    },
+    {
+      "map": "Rhineland",
+      "code": "GUT",
+      "names": [
+        "Gutersloh",
+        "Gütersloh"
+      ]
+    },
+    {
+      "map": "Rhineland",
+      "code": "HEE",
+      "names": [
+        "Heesch"
+      ]
+    },
+    {
+      "map": "Rhineland",
+      "code": "HEL",
+      "names": [
+        "Helmond"
+      ]
+    },
+    {
+      "map": "Rhineland",
+      "code": "HES",
+      "names": [
+        "Hesepe"
+      ]
+    },
+    {
+      "map": "Rhineland",
+      "code": "HIL",
+      "names": [
+        "Hilversum"
+      ]
+    },
+    {
+      "map": "Rhineland",
+      "code": "HOP",
+      "names": [
+        "Hopsten"
+      ]
+    },
+    {
+      "map": "Rhineland",
+      "code": "KBU",
+      "names": [
+        "Koln-Butzweilerhof",
+        "Köln-Butzweilerhof"
+      ]
+    },
+    {
+      "map": "Rhineland",
+      "code": "KEL",
+      "names": [
+        "Kelz"
+      ]
+    },
+    {
+      "map": "Rhineland",
+      "code": "KHL",
+      "names": [
+        "Kirchhellen"
+      ]
+    },
+    {
+      "map": "Rhineland",
+      "code": "KLA",
+      "names": [
+        "Klausheide"
+      ]
+    },
+    {
+      "map": "Rhineland",
+      "code": "KLU",
+      "names": [
+        "Kluis"
+      ]
+    },
+    {
+      "map": "Rhineland",
+      "code": "KOS",
+      "names": [
+        "Koln-Ostheim",
+        "Köln-Ostheim"
+      ]
+    },
+    {
+      "map": "Rhineland",
+      "code": "KRF",
+      "names": [
+        "Krefeld"
+      ]
+    },
+    {
+      "map": "Rhineland",
+      "code": "KRL",
+      "names": [
+        "Krefeld-Linn"
+      ]
+    },
+    {
+      "map": "Rhineland",
+      "code": "KTF",
+      "names": [
+        "Kirtorf"
+      ]
+    },
+    {
+      "map": "Rhineland",
+      "code": "KWA",
+      "names": [
+        "Koln-Wahn",
+        "Köln-Wahn"
+      ]
+    },
+    {
+      "map": "Rhineland",
+      "code": "LCE",
+      "names": [
+        "LeCulot East",
+        "Le Culot East"
+      ]
+    },
+    {
+      "map": "Rhineland",
+      "code": "LCT",
+      "names": [
+        "LeCulot",
+        "Le Culot"
+      ]
+    },
+    {
+      "map": "Rhineland",
+      "code": "LIM",
+      "names": [
+        "Limburg-Linter",
+        "Limburg"
+      ]
+    },
+    {
+      "map": "Rhineland",
+      "code": "MAI",
+      "names": [
+        "Mainz-Finthen"
+      ]
+    },
+    {
+      "map": "Rhineland",
+      "code": "MEL",
+      "names": [
+        "Melsbroek"
+      ]
+    },
+    {
+      "map": "Rhineland",
+      "code": "MER",
+      "names": [
+        "Merzhausen"
+      ]
+    },
+    {
+      "map": "Rhineland",
+      "code": "MIL",
+      "names": [
+        "Mill"
+      ]
+    },
+    {
+      "map": "Rhineland",
+      "code": "MUN",
+      "names": [
+        "Munster-Handorf",
+        "Münster-Handorf"
+      ]
+    },
+    {
+      "map": "Rhineland",
+      "code": "NID",
+      "names": [
+        "Nidda"
+      ]
+    },
+    {
+      "map": "Rhineland",
+      "code": "NIV",
+      "names": [
+        "Nivelles"
+      ]
+    },
+    {
+      "map": "Rhineland",
+      "code": "ODE",
+      "names": [
+        "Odendorf"
+      ]
+    },
+    {
+      "map": "Rhineland",
+      "code": "OPH",
+      "names": [
+        "Ophoven"
+      ]
+    },
+    {
+      "map": "Rhineland",
+      "code": "PAD",
+      "names": [
+        "Paderborn"
+      ]
+    },
+    {
+      "map": "Rhineland",
+      "code": "PET",
+      "names": [
+        "PetitBrogel",
+        "Petit Brogel"
+      ]
+    },
+    {
+      "map": "Rhineland",
+      "code": "PLA",
+      "names": [
+        "Plantlunne",
+        "Plantlünne"
+      ]
+    },
+    {
+      "map": "Rhineland",
+      "code": "QUA",
+      "names": [
+        "Quackenbruck",
+        "Quakenbruck",
+        "Quakenbrück"
+      ]
+    },
+    {
+      "map": "Rhineland",
+      "code": "RHE",
+      "names": [
+        "Rheine"
+      ]
+    },
+    {
+      "map": "Rhineland",
+      "code": "RIP",
+      "names": [
+        "Rips",
+        "De Rips"
+      ]
+    },
+    {
+      "map": "Rhineland",
+      "code": "SCJ",
+      "names": [
+        "Schijndel"
+      ]
+    },
+    {
+      "map": "Rhineland",
+      "code": "SIN",
+      "names": [
+        "Sint-Denijs-Westrem"
+      ]
+    },
+    {
+      "map": "Rhineland",
+      "code": "SOE",
+      "names": [
+        "Soesterberg"
+      ]
+    },
+    {
+      "map": "Rhineland",
+      "code": "STO",
+      "names": [
+        "Stormede",
+        "Stoermede"
+      ]
+    },
+    {
+      "map": "Rhineland",
+      "code": "STR",
+      "names": [
+        "Strassfeld"
+      ]
+    },
+    {
+      "map": "Rhineland",
+      "code": "STT",
+      "names": [
+        "St.Trond",
+        "St. Trond",
+        "St Trond",
+        "Saint Trond",
+        "Sint-Truiden",
+        "Sint Truiden"
+      ]
+    },
+    {
+      "map": "Rhineland",
+      "code": "TWE",
+      "names": [
+        "Twente"
+      ]
+    },
+    {
+      "map": "Rhineland",
+      "code": "VEN",
+      "names": [
+        "Venlo"
+      ]
+    },
+    {
+      "map": "Rhineland",
+      "code": "VOL",
+      "names": [
+        "Volkel"
+      ]
+    },
+    {
+      "map": "Rhineland",
+      "code": "VOR",
+      "names": [
+        "Vorden"
+      ]
+    },
+    {
+      "map": "Rhineland",
+      "code": "WER",
+      "names": [
+        "Werl"
+      ]
+    },
+    {
+      "map": "Rhineland",
+      "code": "WIE",
+      "names": [
+        "Wiesbaden-Erbenheim"
+      ]
+    },
+    {
+      "map": "Rhineland",
+      "code": "WOE",
+      "names": [
+        "Woensdrecht",
+        "Voensdrecht"
+      ]
+    },
+    {
+      "map": "Rhineland",
+      "code": "ZEL",
+      "names": [
+        "Zellhausen"
+      ]
+    },
+    {
+      "map": "Stalingrad",
+      "code": "ABG",
+      "names": [
+        "Abganerovo"
+      ]
+    },
+    {
+      "map": "Stalingrad",
+      "code": "AKA",
+      "names": [
+        "Akatovka"
+      ]
+    },
+    {
+      "map": "Stalingrad",
+      "code": "AKS",
+      "names": [
+        "Aksay"
+      ]
+    },
+    {
+      "map": "Stalingrad",
+      "code": "ALE",
+      "names": [
+        "Aleksandrovka"
+      ]
+    },
+    {
+      "map": "Stalingrad",
+      "code": "ALT",
+      "names": [
+        "Altuhov"
+      ]
+    },
+    {
+      "map": "Stalingrad",
+      "code": "BAS",
+      "names": [
+        "Basargino"
+      ]
+    },
+    {
+      "map": "Stalingrad",
+      "code": "BCP",
+      "names": [
+        "Bol. Chapurniki"
+      ]
+    },
+    {
+      "map": "Stalingrad",
+      "code": "BEK",
+      "names": [
+        "Beketovka"
+      ]
+    },
+    {
+      "map": "Stalingrad",
+      "code": "BER",
+      "names": [
+        "Berezovsky"
+      ]
+    },
+    {
+      "map": "Stalingrad",
+      "code": "BIV",
+      "names": [
+        "Bol. Ivanovka"
+      ]
+    },
+    {
+      "map": "Stalingrad",
+      "code": "BRS",
+      "names": [
+        "Bol. Rossoshka"
+      ]
+    },
+    {
+      "map": "Stalingrad",
+      "code": "CHE",
+      "names": [
+        "Chernishkovskiy"
+      ]
+    },
+    {
+      "map": "Stalingrad",
+      "code": "DAV",
+      "names": [
+        "Davydovskiy"
+      ]
+    },
+    {
+      "map": "Stalingrad",
+      "code": "ERZ",
+      "names": [
+        "Erzovka"
+      ]
+    },
+    {
+      "map": "Stalingrad",
+      "code": "EVL",
+      "names": [
+        "Evlampievsky"
+      ]
+    },
+    {
+      "map": "Stalingrad",
+      "code": "FED",
+      "names": [
+        "Fedorovka"
+      ]
+    },
+    {
+      "map": "Stalingrad",
+      "code": "FRO",
+      "names": [
+        "Frolov"
+      ]
+    },
+    {
+      "map": "Stalingrad",
+      "code": "GOL",
+      "names": [
+        "Golubinskiy"
+      ]
+    },
+    {
+      "map": "Stalingrad",
+      "code": "GRA",
+      "names": [
+        "Grachi"
+      ]
+    },
+    {
+      "map": "Stalingrad",
+      "code": "GRI",
+      "names": [
+        "Grishin"
+      ]
+    },
+    {
+      "map": "Stalingrad",
+      "code": "GRO",
+      "names": [
+        "Gromoslavka"
+      ]
+    },
+    {
+      "map": "Stalingrad",
+      "code": "GUM",
+      "names": [
+        "Gumrak"
+      ]
+    },
+    {
+      "map": "Stalingrad",
+      "code": "ILL",
+      "names": [
+        "Illarionovskiy"
+      ]
+    },
+    {
+      "map": "Stalingrad",
+      "code": "KAC",
+      "names": [
+        "Kachalinskaya"
+      ]
+    },
+    {
+      "map": "Stalingrad",
+      "code": "KAL",
+      "names": [
+        "Kalach"
+      ]
+    },
+    {
+      "map": "Stalingrad",
+      "code": "KAM",
+      "names": [
+        "Kamchie"
+      ]
+    },
+    {
+      "map": "Stalingrad",
+      "code": "KAR",
+      "names": [
+        "Karpovka"
+      ]
+    },
+    {
+      "map": "Stalingrad",
+      "code": "KLE",
+      "names": [
+        "Kletskaya"
+      ]
+    },
+    {
+      "map": "Stalingrad",
+      "code": "KOL",
+      "names": [
+        "Kolh.im.Kaganovicha",
+        "Kolkhoz im Kaganovicha"
+      ]
+    },
+    {
+      "map": "Stalingrad",
+      "code": "KON",
+      "names": [
+        "Konstitutsiya"
+      ]
+    },
+    {
+      "map": "Stalingrad",
+      "code": "KRA",
+      "names": [
+        "Krasnaya Zarjya",
+        "Krasnaya Zarya"
+      ]
+    },
+    {
+      "map": "Stalingrad",
+      "code": "KTO",
+      "names": [
+        "Kotelnikovo"
+      ]
+    },
+    {
+      "map": "Stalingrad",
+      "code": "KTY",
+      "names": [
+        "Kotelnikovsky"
+      ]
+    },
+    {
+      "map": "Stalingrad",
+      "code": "KUM",
+      "names": [
+        "Kumovka"
+      ]
+    },
+    {
+      "map": "Stalingrad",
+      "code": "KUZ",
+      "names": [
+        "Kuzmichy"
+      ]
+    },
+    {
+      "map": "Stalingrad",
+      "code": "LEN",
+      "names": [
+        "Leninsk"
+      ]
+    },
+    {
+      "map": "Stalingrad",
+      "code": "LIP",
+      "names": [
+        "Lipovsky"
+      ]
+    },
+    {
+      "map": "Stalingrad",
+      "code": "LUG",
+      "names": [
+        "Lugo-Vodyanoye"
+      ]
+    },
+    {
+      "map": "Stalingrad",
+      "code": "MAR",
+      "names": [
+        "Marinovka"
+      ]
+    },
+    {
+      "map": "Stalingrad",
+      "code": "MCP",
+      "names": [
+        "Mal. Chapurniki"
+      ]
+    },
+    {
+      "map": "Stalingrad",
+      "code": "MLG",
+      "names": [
+        "Malogolubaya"
+      ]
+    },
+    {
+      "map": "Stalingrad",
+      "code": "MOR",
+      "names": [
+        "Mal. Orlovka"
+      ]
+    },
+    {
+      "map": "Stalingrad",
+      "code": "MOS",
+      "names": [
+        "Morozovskiy South",
+        "Morozovsky South"
+      ]
+    },
+    {
+      "map": "Stalingrad",
+      "code": "MOW",
+      "names": [
+        "Morozovskiy West",
+        "Morozovsky West"
+      ]
+    },
+    {
+      "map": "Stalingrad",
+      "code": "NIZ",
+      "names": [
+        "Nizhniy Balykley"
+      ]
+    },
+    {
+      "map": "Stalingrad",
+      "code": "NNK",
+      "names": [
+        "Novonikolskoye"
+      ]
+    },
+    {
+      "map": "Stalingrad",
+      "code": "NSG",
+      "names": [
+        "Novo Sergievskiy"
+      ]
+    },
+    {
+      "map": "Stalingrad",
+      "code": "OBL",
+      "names": [
+        "Oblivskaya"
+      ]
+    },
+    {
+      "map": "Stalingrad",
+      "code": "PIC",
+      "names": [
+        "Pichuga"
+      ]
+    },
+    {
+      "map": "Stalingrad",
+      "code": "PIT",
+      "names": [
+        "Pitomnik"
+      ]
+    },
+    {
+      "map": "Stalingrad",
+      "code": "PLE",
+      "names": [
+        "Plesovskiy"
+      ]
+    },
+    {
+      "map": "Stalingrad",
+      "code": "PLO",
+      "names": [
+        "Plodovitoye"
+      ]
+    },
+    {
+      "map": "Stalingrad",
+      "code": "RAS",
+      "names": [
+        "Rastagaev"
+      ]
+    },
+    {
+      "map": "Stalingrad",
+      "code": "RAY",
+      "names": [
+        "Raygorod"
+      ]
+    },
+    {
+      "map": "Stalingrad",
+      "code": "RHK",
+      "names": [
+        "Rahinka"
+      ]
+    },
+    {
+      "map": "Stalingrad",
+      "code": "RHY",
+      "names": [
+        "Rahinsky"
+      ]
+    },
+    {
+      "map": "Stalingrad",
+      "code": "RYN",
+      "names": [
+        "Rynok"
+      ]
+    },
+    {
+      "map": "Stalingrad",
+      "code": "SAD",
+      "names": [
+        "Sadovoye"
+      ]
+    },
+    {
+      "map": "Stalingrad",
+      "code": "SAF",
+      "names": [
+        "Safronov"
+      ]
+    },
+    {
+      "map": "Stalingrad",
+      "code": "SAM",
+      "names": [
+        "Samovalovka"
+      ]
+    },
+    {
+      "map": "Stalingrad",
+      "code": "SEK",
+      "names": [
+        "Sekretov"
+      ]
+    },
+    {
+      "map": "Stalingrad",
+      "code": "SEL",
+      "names": [
+        "Seleznev"
+      ]
+    },
+    {
+      "map": "Stalingrad",
+      "code": "SKV",
+      "names": [
+        "Skvorin"
+      ]
+    },
+    {
+      "map": "Stalingrad",
+      "code": "SMU",
+      "names": [
+        "Smutnev"
+      ]
+    },
+    {
+      "map": "Stalingrad",
+      "code": "SOL",
+      "names": [
+        "Solodovka"
+      ]
+    },
+    {
+      "map": "Stalingrad",
+      "code": "SRE",
+      "names": [
+        "Srednyaya Ahtuba",
+        "Srednyaya Akhtuba"
+      ]
+    },
+    {
+      "map": "Stalingrad",
+      "code": "STG",
+      "names": [
+        "Stogov"
+      ]
+    },
+    {
+      "map": "Stalingrad",
+      "code": "STL",
+      "names": [
+        "Stolyarov"
+      ]
+    },
+    {
+      "map": "Stalingrad",
+      "code": "STU",
+      "names": [
+        "Stupino"
+      ]
+    },
+    {
+      "map": "Stalingrad",
+      "code": "SUR",
+      "names": [
+        "Surovikino"
+      ]
+    },
+    {
+      "map": "Stalingrad",
+      "code": "SVE",
+      "names": [
+        "Svetly Yar"
+      ]
+    },
+    {
+      "map": "Stalingrad",
+      "code": "TAT",
+      "names": [
+        "Tatsinskaya"
+      ]
+    },
+    {
+      "map": "Stalingrad",
+      "code": "TIN",
+      "names": [
+        "Tinguta"
+      ]
+    },
+    {
+      "map": "Stalingrad",
+      "code": "TOR",
+      "names": [
+        "Tormosin"
+      ]
+    },
+    {
+      "map": "Stalingrad",
+      "code": "TRU",
+      "names": [
+        "Trudolyublye"
+      ]
+    },
+    {
+      "map": "Stalingrad",
+      "code": "TUZ",
+      "names": [
+        "Tuzov"
+      ]
+    },
+    {
+      "map": "Stalingrad",
+      "code": "UMA",
+      "names": [
+        "Umantchevo"
+      ]
+    },
+    {
+      "map": "Stalingrad",
+      "code": "VAH",
+      "names": [
+        "Verh. Ahtuba",
+        "Verkhnyaya Akhtuba"
+      ]
+    },
+    {
+      "map": "Stalingrad",
+      "code": "VEN",
+      "names": [
+        "Ventsy"
+      ]
+    },
+    {
+      "map": "Stalingrad",
+      "code": "VKP",
+      "names": [
+        "Verkhne-Pogromnoye"
+      ]
+    },
+    {
+      "map": "Stalingrad",
+      "code": "VNP",
+      "names": [
+        "Verhne-Pogromnoye"
+      ]
+    },
+    {
+      "map": "Stalingrad",
+      "code": "VOR",
+      "names": [
+        "Voroponovo"
+      ]
+    },
+    {
+      "map": "Stalingrad",
+      "code": "ZAP",
+      "names": [
+        "Zaplavnoye"
+      ]
+    },
+    {
+      "map": "Stalingrad",
+      "code": "ZET",
+      "names": [
+        "Zety"
+      ]
+    },
+    {
+      "map": "Stalingrad",
+      "code": "ZHU",
+      "names": [
+        "Zhutovo"
+      ]
+    },
+    {
+      "map": "Stalingrad",
+      "code": "ZIM",
+      "names": [
+        "Zimovskoy"
+      ]
+    },
+    {
+      "map": "Stalingrad",
+      "code": "ZRY",
+      "names": [
+        "Zryansky"
+      ]
+    },
+    {
+      "names": [
+        "Cherkizova"
+      ],
+      "map": "Velikie Luki",
+      "code": "CHE"
+    },
+    {
+      "names": [
+        "Dvin Ye",
+        "Dvinye"
+      ],
+      "map": "Velikie Luki",
+      "code": "DVI"
+    },
+    {
+      "names": [
+        "Kochegarovo"
+      ],
+      "map": "Velikie Luki",
+      "code": "KOC"
+    },
+    {
+      "names": [
+        "Kuniya",
+        "Kunya"
+      ],
+      "map": "Velikie Luki",
+      "code": "KUN"
+    },
+    {
+      "names": [
+        "Nasva"
+      ],
+      "map": "Velikie Luki",
+      "code": "NAS"
+    },
+    {
+      "names": [
+        "Nevel"
+      ],
+      "map": "Velikie Luki",
+      "code": "NEV"
+    },
+    {
+      "names": [
+        "St Toropa",
+        "St. Toropa",
+        "Staraya Toropa"
+      ],
+      "map": "Velikie Luki",
+      "code": "STT"
+    },
+    {
+      "names": [
+        "Toropets"
+      ],
+      "map": "Velikie Luki",
+      "code": "TOR"
+    },
+    {
+      "names": [
+        "Zabel-ye",
+        "Zabelye"
+      ],
+      "map": "Velikie Luki",
+      "code": "ZAB"
+    },
+    {
+      "map": "Western Front",
+      "code": "AGA",
+      "names": [
+        "Agatha Berchem   Zeppelin shed"
+      ]
+    },
+    {
+      "map": "Western Front",
+      "code": "AIR",
+      "names": [
+        "Airaines"
+      ]
+    },
+    {
+      "map": "Western Front",
+      "code": "ALL",
+      "names": [
+        "Allonville"
+      ]
+    },
+    {
+      "map": "Western Front",
+      "code": "ALQ",
+      "names": [
+        "Alquines"
+      ]
+    },
+    {
+      "map": "Western Front",
+      "code": "ALU",
+      "names": [
+        "Alunoy"
+      ]
+    },
+    {
+      "map": "Western Front",
+      "code": "AMA",
+      "names": [
+        "Amanty"
+      ]
+    },
+    {
+      "map": "Western Front",
+      "code": "ANC",
+      "names": [
+        "Ancemont"
+      ]
+    },
+    {
+      "map": "Western Front",
+      "code": "ANI",
+      "names": [
+        "Aniche"
+      ]
+    },
+    {
+      "map": "Western Front",
+      "code": "ANS",
+      "names": [
+        "Ansauvillers"
+      ]
+    },
+    {
+      "map": "Western Front",
+      "code": "ARC",
+      "names": [
+        "Arcy Sainte Restitue"
+      ]
+    },
+    {
+      "map": "Western Front",
+      "code": "ASS",
+      "names": [
+        "Assevilers"
+      ]
+    },
+    {
+      "map": "Western Front",
+      "code": "ATT",
+      "names": [
+        "Attigny"
+      ]
+    },
+    {
+      "map": "Western Front",
+      "code": "AUC",
+      "names": [
+        "Auchel"
+      ]
+    },
+    {
+      "map": "Western Front",
+      "code": "AUL",
+      "names": [
+        "Aulnoje Aymeries"
+      ]
+    },
+    {
+      "map": "Western Front",
+      "code": "AUT",
+      "names": [
+        "Autremencourt"
+      ]
+    },
+    {
+      "map": "Western Front",
+      "code": "AUV",
+      "names": [
+        "Auve"
+      ]
+    },
+    {
+      "map": "Western Front",
+      "code": "AVE",
+      "names": [
+        "Avesnes le Sec Est"
+      ]
+    },
+    {
+      "map": "Western Front",
+      "code": "AVL",
+      "names": [
+        "Avesnes le Sec Quest",
+        "Avesnes le Sec Ouest"
+      ]
+    },
+    {
+      "map": "Western Front",
+      "code": "AVI",
+      "names": [
+        "Avillers St.Croix"
+      ]
+    },
+    {
+      "map": "Western Front",
+      "code": "AWO",
+      "names": [
+        "Awoingt"
+      ]
+    },
+    {
+      "map": "Western Front",
+      "code": "AZE",
+      "names": [
+        "Azelot"
+      ]
+    },
+    {
+      "map": "Western Front",
+      "code": "BAC",
+      "names": [
+        "Bachy"
+      ]
+    },
+    {
+      "map": "Western Front",
+      "code": "BAI",
+      "names": [
+        "Bailleul"
+      ]
+    },
+    {
+      "map": "Western Front",
+      "code": "BAL",
+      "names": [
+        "Balatre"
+      ]
+    },
+    {
+      "map": "Western Front",
+      "code": "BAR",
+      "names": [
+        "Bar le Duc"
+      ]
+    },
+    {
+      "map": "Western Front",
+      "code": "BAV",
+      "names": [
+        "Bavay"
+      ]
+    },
+    {
+      "map": "Western Front",
+      "code": "BAN",
+      "names": [
+        "Bavichove,N Courtrai",
+        "Bavichove North Courtrai"
+      ]
+    },
+    {
+      "map": "Western Front",
+      "code": "BAY",
+      "names": [
+        "Baye"
+      ]
+    },
+    {
+      "map": "Western Front",
+      "code": "BEA",
+      "names": [
+        "Beaucamp"
+      ]
+    },
+    {
+      "map": "Western Front",
+      "code": "BEU",
+      "names": [
+        "Beaucourt"
+      ]
+    },
+    {
+      "map": "Western Front",
+      "code": "BEV",
+      "names": [
+        "Beauvais"
+      ]
+    },
+    {
+      "map": "Western Front",
+      "code": "BVT",
+      "names": [
+        "Beauvais, Tille"
+      ]
+    },
+    {
+      "map": "Western Front",
+      "code": "BEE",
+      "names": [
+        "Beauvois en Cambrai"
+      ]
+    },
+    {
+      "map": "Western Front",
+      "code": "BES",
+      "names": [
+        "Beauze sur Aire"
+      ]
+    },
+    {
+      "map": "Western Front",
+      "code": "BEL",
+      "names": [
+        "Bellevue Ferme"
+      ]
+    },
+    {
+      "map": "Western Front",
+      "code": "BER",
+      "names": [
+        "Belrain"
+      ]
+    },
+    {
+      "map": "Western Front",
+      "code": "BEC",
+      "names": [
+        "Bergues Coudekerque"
+      ]
+    },
+    {
+      "map": "Western Front",
+      "code": "BEI",
+      "names": [
+        "Berlaimont"
+      ]
+    },
+    {
+      "map": "Western Front",
+      "code": "BEN",
+      "names": [
+        "Bernes"
+      ]
+    },
+    {
+      "map": "Western Front",
+      "code": "BSU",
+      "names": [
+        "Bernes sur Oise"
+      ]
+    },
+    {
+      "map": "Western Front",
+      "code": "BET",
+      "names": [
+        "Bertangles"
+      ]
+    },
+    {
+      "map": "Western Front",
+      "code": "BEY",
+      "names": [
+        "Bertry"
+      ]
+    },
+    {
+      "map": "Western Front",
+      "code": "BEO",
+      "names": [
+        "Besny et Loisy"
+      ]
+    },
+    {
+      "map": "Western Front",
+      "code": "BEH",
+      "names": [
+        "Bethelainville"
+      ]
+    },
+    {
+      "map": "Western Front",
+      "code": "BEG",
+      "names": [
+        "Beugnatre"
+      ]
+    },
+    {
+      "map": "Western Front",
+      "code": "BEX",
+      "names": [
+        "Beugneux"
+      ]
+    },
+    {
+      "map": "Western Front",
+      "code": "BUV",
+      "names": [
+        "Beuvry"
+      ]
+    },
+    {
+      "map": "Western Front",
+      "code": "BEZ",
+      "names": [
+        "Bezu"
+      ]
+    },
+    {
+      "map": "Western Front",
+      "code": "BLA",
+      "names": [
+        "Blaise"
+      ]
+    },
+    {
+      "map": "Western Front",
+      "code": "BOF",
+      "names": [
+        "Boffles"
+      ]
+    },
+    {
+      "map": "Western Front",
+      "code": "BOH",
+      "names": [
+        "Bohain"
+      ]
+    },
+    {
+      "map": "Western Front",
+      "code": "BOI",
+      "names": [
+        "Boistrancourt"
+      ]
+    },
+    {
+      "map": "Western Front",
+      "code": "BON",
+      "names": [
+        "Boncourt"
+      ]
+    },
+    {
+      "map": "Western Front",
+      "code": "BOM",
+      "names": [
+        "Bonne Maison"
+      ]
+    },
+    {
+      "map": "Western Front",
+      "code": "BFE",
+      "names": [
+        "Bonneuil Ferme"
+      ]
+    },
+    {
+      "map": "Western Front",
+      "code": "BOY",
+      "names": [
+        "Bony"
+      ]
+    },
+    {
+      "map": "Western Front",
+      "code": "BOU",
+      "names": [
+        "Bouleuse"
+      ]
+    },
+    {
+      "map": "Western Front",
+      "code": "BOR",
+      "names": [
+        "Bourlers"
+      ]
+    },
+    {
+      "map": "Western Front",
+      "code": "BOV",
+      "names": [
+        "Bouvincourt"
+      ]
+    },
+    {
+      "map": "Western Front",
+      "code": "BUY",
+      "names": [
+        "Bouy"
+      ]
+    },
+    {
+      "map": "Western Front",
+      "code": "BOE",
+      "names": [
+        "Bovee"
+      ]
+    },
+    {
+      "map": "Western Front",
+      "code": "BRA",
+      "names": [
+        "Brabant en Argonne"
+      ]
+    },
+    {
+      "map": "Western Front",
+      "code": "BRL",
+      "names": [
+        "Brabant le Roi"
+      ]
+    },
+    {
+      "map": "Western Front",
+      "code": "BRI",
+      "names": [
+        "Braizieux"
+      ]
+    },
+    {
+      "map": "Western Front",
+      "code": "BRE",
+      "names": [
+        "Breuil le Sec"
+      ]
+    },
+    {
+      "map": "Western Front",
+      "code": "BRS",
+      "names": [
+        "Briastre"
+      ]
+    },
+    {
+      "map": "Western Front",
+      "code": "BRU",
+      "names": [
+        "Bruay"
+      ]
+    },
+    {
+      "map": "Western Front",
+      "code": "BRY",
+      "names": [
+        "Bryas"
+      ]
+    },
+    {
+      "map": "Western Front",
+      "code": "BUL",
+      "names": [
+        "Bullecourt"
+      ]
+    },
+    {
+      "map": "Western Front",
+      "code": "BUR",
+      "names": [
+        "Burlioncourt"
+      ]
+    },
+    {
+      "map": "Western Front",
+      "code": "BUS",
+      "names": [
+        "Busigny"
+      ]
+    },
+    {
+      "map": "Western Front",
+      "code": "BUZ",
+      "names": [
+        "Buzancy"
+      ]
+    },
+    {
+      "map": "Western Front",
+      "code": "CAC",
+      "names": [
+        "Cachy"
+      ]
+    },
+    {
+      "map": "Western Front",
+      "code": "CAM",
+      "names": [
+        "Camp de Mailly"
+      ]
+    },
+    {
+      "map": "Western Front",
+      "code": "CAP",
+      "names": [
+        "Cappy"
+      ]
+    },
+    {
+      "map": "Western Front",
+      "code": "CAS",
+      "names": [
+        "Cappy SW"
+      ]
+    },
+    {
+      "map": "Western Front",
+      "code": "CAR",
+      "names": [
+        "Carignan"
+      ]
+    },
+    {
+      "map": "Western Front",
+      "code": "CAU",
+      "names": [
+        "Cauroir"
+      ]
+    },
+    {
+      "map": "Western Front",
+      "code": "CER",
+      "names": [
+        "Cernon"
+      ]
+    },
+    {
+      "map": "Western Front",
+      "code": "CEU",
+      "names": [
+        "Ceune"
+      ]
+    },
+    {
+      "map": "Western Front",
+      "code": "CHA",
+      "names": [
+        "Chalons sur Vesle"
+      ]
+    },
+    {
+      "map": "Western Front",
+      "code": "CHL",
+      "names": [
+        "Chambry Laon"
+      ]
+    },
+    {
+      "map": "Western Front",
+      "code": "CHM",
+      "names": [
+        "Champaubert"
+      ]
+    },
+    {
+      "map": "Western Front",
+      "code": "CHP",
+      "names": [
+        "Champcouelle"
+      ]
+    },
+    {
+      "map": "Western Front",
+      "code": "CPN",
+      "names": [
+        "Champien"
+      ]
+    },
+    {
+      "map": "Western Front",
+      "code": "CME",
+      "names": [
+        "Charleville Mezieres"
+      ]
+    },
+    {
+      "map": "Western Front",
+      "code": "CHF",
+      "names": [
+        "Chassonge Ferme,Stenay/Verdun"
+      ]
+    },
+    {
+      "map": "Western Front",
+      "code": "CHT",
+      "names": [
+        "Chateau Thierry"
+      ]
+    },
+    {
+      "map": "Western Front",
+      "code": "CHU",
+      "names": [
+        "Chauconin"
+      ]
+    },
+    {
+      "map": "Western Front",
+      "code": "CHD",
+      "names": [
+        "Chaudun"
+      ]
+    },
+    {
+      "map": "Western Front",
+      "code": "CHE",
+      "names": [
+        "Chenois"
+      ]
+    },
+    {
+      "map": "Western Front",
+      "code": "CLE",
+      "names": [
+        "Chery les Pouilly Nord"
+      ]
+    },
+    {
+      "map": "Western Front",
+      "code": "CLP",
+      "names": [
+        "Chery les Pouilly Sud"
+      ]
+    },
+    {
+      "map": "Western Front",
+      "code": "CHI",
+      "names": [
+        "Chievres"
+      ]
+    },
+    {
+      "map": "Western Front",
+      "code": "CLA",
+      "names": [
+        "Clairmarais"
+      ]
+    },
+    {
+      "map": "Western Front",
+      "code": "CLS",
+      "names": [
+        "Clastres"
+      ]
+    },
+    {
+      "map": "Western Front",
+      "code": "CLR",
+      "names": [
+        "Clermont"
+      ]
+    },
+    {
+      "map": "Western Front",
+      "code": "COG",
+      "names": [
+        "Cognelee Zeppelin shed"
+      ]
+    },
+    {
+      "map": "Western Front",
+      "code": "COI",
+      "names": [
+        "Coincy"
+      ]
+    },
+    {
+      "map": "Western Front",
+      "code": "CON",
+      "names": [
+        "Conteville"
+      ]
+    },
+    {
+      "map": "Western Front",
+      "code": "COU",
+      "names": [
+        "Coupru"
+      ]
+    },
+    {
+      "map": "Western Front",
+      "code": "COR",
+      "names": [
+        "Courcy"
+      ]
+    },
+    {
+      "map": "Western Front",
+      "code": "COT",
+      "names": [
+        "Coutiches"
+      ]
+    },
+    {
+      "map": "Western Front",
+      "code": "CRA",
+      "names": [
+        "Cramaille"
+      ]
+    },
+    {
+      "map": "Western Front",
+      "code": "CRE",
+      "names": [
+        "Crepy en Valois"
+      ]
+    },
+    {
+      "map": "Western Front",
+      "code": "CUI",
+      "names": [
+        "Cuirieux,Laon"
+      ]
+    },
+    {
+      "map": "Western Front",
+      "code": "DEL",
+      "names": [
+        "Delouze"
+      ]
+    },
+    {
+      "map": "Western Front",
+      "code": "DIE",
+      "names": [
+        "Dieuze"
+      ]
+    },
+    {
+      "map": "Western Front",
+      "code": "DOM",
+      "names": [
+        "Dommartin les Toul"
+      ]
+    },
+    {
+      "map": "Western Front",
+      "code": "DON",
+      "names": [
+        "Doncourt"
+      ]
+    },
+    {
+      "map": "Western Front",
+      "code": "DOS",
+      "names": [
+        "Donstiennes"
+      ]
+    },
+    {
+      "map": "Western Front",
+      "code": "DOU",
+      "names": [
+        "Douai"
+      ]
+    },
+    {
+      "map": "Western Front",
+      "code": "DRI",
+      "names": [
+        "Drionville"
+      ]
+    },
+    {
+      "map": "Western Front",
+      "code": "DRO",
+      "names": [
+        "Droglandt"
+      ]
+    },
+    {
+      "map": "Western Front",
+      "code": "DUG",
+      "names": [
+        "Dugny"
+      ]
+    },
+    {
+      "map": "Western Front",
+      "code": "ELL",
+      "names": [
+        "Ellignies"
+      ]
+    },
+    {
+      "map": "Western Front",
+      "code": "EME",
+      "names": [
+        "Emerchicourt"
+      ]
+    },
+    {
+      "map": "Western Front",
+      "code": "ENN",
+      "names": [
+        "Ennemain"
+      ]
+    },
+    {
+      "map": "Western Front",
+      "code": "EPI",
+      "names": [
+        "Epiez"
+      ]
+    },
+    {
+      "map": "Western Front",
+      "code": "EPN",
+      "names": [
+        "Epinoy"
+      ]
+    },
+    {
+      "map": "Western Front",
+      "code": "EPP",
+      "names": [
+        "Eppeville"
+      ]
+    },
+    {
+      "map": "Western Front",
+      "code": "ERC",
+      "names": [
+        "Erchin"
+      ]
+    },
+    {
+      "map": "Western Front",
+      "code": "ERI",
+      "names": [
+        "Erize la Petite"
+      ]
+    },
+    {
+      "map": "Western Front",
+      "code": "ESC",
+      "names": [
+        "Escaufort"
+      ]
+    },
+    {
+      "map": "Western Front",
+      "code": "ESQ",
+      "names": [
+        "Esquennoy"
+      ]
+    },
+    {
+      "map": "Western Front",
+      "code": "EST",
+      "names": [
+        "Estaimbourg"
+      ]
+    },
+    {
+      "map": "Western Front",
+      "code": "ESB",
+      "names": [
+        "Estree Blanche"
+      ]
+    },
+    {
+      "map": "Western Front",
+      "code": "ESW",
+      "names": [
+        "Eswars"
+      ]
+    },
+    {
+      "map": "Western Front",
+      "code": "ETR",
+      "names": [
+        "Etreux, Guise"
+      ]
+    },
+    {
+      "map": "Western Front",
+      "code": "ETT",
+      "names": [
+        "Etterbeek   Zeppelin shed"
+      ]
+    },
+    {
+      "map": "Western Front",
+      "code": "EVE",
+      "names": [
+        "Evere"
+      ]
+    },
+    {
+      "map": "Western Front",
+      "code": "FAG",
+      "names": [
+        "Fagnieres"
+      ]
+    },
+    {
+      "map": "Western Front",
+      "code": "FAL",
+      "names": [
+        "Falvy, Peronne"
+      ]
+    },
+    {
+      "map": "Western Front",
+      "code": "FAM",
+      "names": [
+        "Famars"
+      ]
+    },
+    {
+      "map": "Western Front",
+      "code": "FAU",
+      "names": [
+        "Faucouzy"
+      ]
+    },
+    {
+      "map": "Western Front",
+      "code": "FEN",
+      "names": [
+        "Fenain"
+      ]
+    },
+    {
+      "map": "Western Front",
+      "code": "FER",
+      "names": [
+        "Fere en Tardenois"
+      ]
+    },
+    {
+      "map": "Western Front",
+      "code": "FEC",
+      "names": [
+        "Ferme Constantine"
+      ]
+    },
+    {
+      "map": "Western Front",
+      "code": "FCR",
+      "names": [
+        "Ferme Cravancon"
+      ]
+    },
+    {
+      "map": "Western Front",
+      "code": "FED",
+      "names": [
+        "Ferme de Alger"
+      ]
+    },
+    {
+      "map": "Western Front",
+      "code": "FDE",
+      "names": [
+        "Ferme de Conflans"
+      ]
+    },
+    {
+      "map": "Western Front",
+      "code": "FDC",
+      "names": [
+        "Ferme de Corbeaulieu"
+      ]
+    },
+    {
+      "map": "Western Front",
+      "code": "FDM",
+      "names": [
+        "Ferme de Moras"
+      ]
+    },
+    {
+      "map": "Western Front",
+      "code": "FDR",
+      "names": [
+        "Ferme de Rosnay"
+      ]
+    },
+    {
+      "map": "Western Front",
+      "code": "FEH",
+      "names": [
+        "Ferme Haut Chemin"
+      ]
+    },
+    {
+      "map": "Western Front",
+      "code": "FEL",
+      "names": [
+        "Ferme Les Greves"
+      ]
+    },
+    {
+      "map": "Western Front",
+      "code": "FEM",
+      "names": [
+        "Ferme Marimbois"
+      ]
+    },
+    {
+      "map": "Western Front",
+      "code": "FIE",
+      "names": [
+        "Fienvillers"
+      ]
+    },
+    {
+      "map": "Western Front",
+      "code": "FIL",
+      "names": [
+        "Filescamp Ferme"
+      ]
+    },
+    {
+      "map": "Western Front",
+      "code": "FLO",
+      "names": [
+        "Florenville"
+      ]
+    },
+    {
+      "map": "Western Front",
+      "code": "FON",
+      "names": [
+        "Fonsomme"
+      ]
+    },
+    {
+      "map": "Western Front",
+      "code": "FNO",
+      "names": [
+        "Fontaine Notre Dame"
+      ]
+    },
+    {
+      "map": "Western Front",
+      "code": "FOU",
+      "names": [
+        "Fontaine Uterte"
+      ]
+    },
+    {
+      "map": "Western Front",
+      "code": "FOR",
+      "names": [
+        "Foreste"
+      ]
+    },
+    {
+      "map": "Western Front",
+      "code": "FOE",
+      "names": [
+        "Foucaucourt en Santerre"
+      ]
+    },
+    {
+      "map": "Western Front",
+      "code": "FOQ",
+      "names": [
+        "Fouquerollers Nord"
+      ]
+    },
+    {
+      "map": "Western Front",
+      "code": "FOO",
+      "names": [
+        "Fouquerolles"
+      ]
+    },
+    {
+      "map": "Western Front",
+      "code": "FOM",
+      "names": [
+        "Fourmies"
+      ]
+    },
+    {
+      "map": "Western Front",
+      "code": "FOV",
+      "names": [
+        "Fouvry"
+      ]
+    },
+    {
+      "map": "Western Front",
+      "code": "FRA",
+      "names": [
+        "Francheville sur Marne"
+      ]
+    },
+    {
+      "map": "Western Front",
+      "code": "FRO",
+      "names": [
+        "Froides"
+      ]
+    },
+    {
+      "map": "Western Front",
+      "code": "FRL",
+      "names": [
+        "Frolois"
+      ]
+    },
+    {
+      "map": "Western Front",
+      "code": "FRM",
+      "names": [
+        "Fromelles"
+      ]
+    },
+    {
+      "map": "Western Front",
+      "code": "GEN",
+      "names": [
+        "Gengoult"
+      ]
+    },
+    {
+      "map": "Western Front",
+      "code": "GHL",
+      "names": [
+        "Ghlin, Mons"
+      ]
+    },
+    {
+      "map": "Western Front",
+      "code": "GIR",
+      "names": [
+        "Giraumont"
+      ]
+    },
+    {
+      "map": "Western Front",
+      "code": "GIV",
+      "names": [
+        "Givry"
+      ]
+    },
+    {
+      "map": "Western Front",
+      "code": "GIE",
+      "names": [
+        "Givry en Argonne"
+      ]
+    },
+    {
+      "map": "Western Front",
+      "code": "GON",
+      "names": [
+        "Gonnelieu"
+      ]
+    },
+    {
+      "map": "Western Front",
+      "code": "GOU",
+      "names": [
+        "Gourgancon"
+      ]
+    },
+    {
+      "map": "Western Front",
+      "code": "GOY",
+      "names": [
+        "Gouy"
+      ]
+    },
+    {
+      "map": "Western Front",
+      "code": "GRA",
+      "names": [
+        "Grandmetz"
+      ]
+    },
+    {
+      "map": "Western Front",
+      "code": "GRI",
+      "names": [
+        "Grivesnes"
+      ]
+    },
+    {
+      "map": "Western Front",
+      "code": "GRO",
+      "names": [
+        "Grostenquin"
+      ]
+    },
+    {
+      "map": "Western Front",
+      "code": "GUI",
+      "names": [
+        "Guise Nord"
+      ]
+    },
+    {
+      "map": "Western Front",
+      "code": "GUS",
+      "names": [
+        "Guisnain"
+      ]
+    },
+    {
+      "map": "Western Front",
+      "code": "GUZ",
+      "names": [
+        "Guzancourt"
+      ]
+    },
+    {
+      "map": "Western Front",
+      "code": "HAL",
+      "names": [
+        "Halluin"
+      ]
+    },
+    {
+      "map": "Western Front",
+      "code": "HAM",
+      "names": [
+        "Ham"
+      ]
+    },
+    {
+      "map": "Western Front",
+      "code": "HMA",
+      "names": [
+        "Ham Matigny"
+      ]
+    },
+    {
+      "map": "Western Front",
+      "code": "HAN",
+      "names": [
+        "Hancourt"
+      ]
+    },
+    {
+      "map": "Western Front",
+      "code": "HAR",
+      "names": [
+        "Harlebeeke,Bavichove,NE Courtai",
+        "Harlebeeke Bavichove NE Courtrai"
+      ]
+    },
+    {
+      "map": "Western Front",
+      "code": "HAU",
+      "names": [
+        "Hauvine"
+      ]
+    },
+    {
+      "map": "Western Front",
+      "code": "HEL",
+      "names": [
+        "Helesmes"
+      ]
+    },
+    {
+      "map": "Western Front",
+      "code": "HER",
+      "names": [
+        "Herbisse"
+      ]
+    },
+    {
+      "map": "Western Front",
+      "code": "HEE",
+      "names": [
+        "Herbisse Est"
+      ]
+    },
+    {
+      "map": "Western Front",
+      "code": "HLE",
+      "names": [
+        "Herlin le Sec"
+      ]
+    },
+    {
+      "map": "Western Front",
+      "code": "HEC",
+      "names": [
+        "Hermies, Cambrai"
+      ]
+    },
+    {
+      "map": "Western Front",
+      "code": "HES",
+      "names": [
+        "Hesdigneul"
+      ]
+    },
+    {
+      "map": "Western Front",
+      "code": "HET",
+      "names": [
+        "Hetomesnil"
+      ]
+    },
+    {
+      "map": "Western Front",
+      "code": "HEU",
+      "names": [
+        "Heule"
+      ]
+    },
+    {
+      "map": "Western Front",
+      "code": "HIV",
+      "names": [
+        "Hivry Circourt"
+      ]
+    },
+    {
+      "map": "Western Front",
+      "code": "HOO",
+      "names": [
+        "Hoog Huys"
+      ]
+    },
+    {
+      "map": "Western Front",
+      "code": "HOU",
+      "names": [
+        "Houdelmont"
+      ]
+    },
+    {
+      "map": "Western Front",
+      "code": "HOP",
+      "names": [
+        "Houplin"
+      ]
+    },
+    {
+      "map": "Western Front",
+      "code": "HOV",
+      "names": [
+        "Hoves"
+      ]
+    },
+    {
+      "map": "Western Front",
+      "code": "JAM",
+      "names": [
+        "Jametz"
+      ]
+    },
+    {
+      "map": "Western Front",
+      "code": "JEN",
+      "names": [
+        "Jenlain"
+      ]
+    },
+    {
+      "map": "Western Front",
+      "code": "JUL",
+      "names": [
+        "Julvecourt"
+      ]
+    },
+    {
+      "map": "Western Front",
+      "code": "KOR",
+      "names": [
+        "Kortrijk"
+      ]
+    },
+    {
+      "map": "Western Front",
+      "code": "LAB",
+      "names": [
+        "La Bellevue"
+      ]
+    },
+    {
+      "map": "Western Front",
+      "code": "LBR",
+      "names": [
+        "La Brayelle"
+      ]
+    },
+    {
+      "map": "Western Front",
+      "code": "LAC",
+      "names": [
+        "La Capelle"
+      ]
+    },
+    {
+      "map": "Western Front",
+      "code": "LCE",
+      "names": [
+        "La Cense"
+      ]
+    },
+    {
+      "map": "Western Front",
+      "code": "LCH",
+      "names": [
+        "La Cheppe"
+      ]
+    },
+    {
+      "map": "Western Front",
+      "code": "LAF",
+      "names": [
+        "La Ferte Chevresis"
+      ]
+    },
+    {
+      "map": "Western Front",
+      "code": "LFE",
+      "names": [
+        "La Ferte Gaucher"
+      ]
+    },
+    {
+      "map": "Western Front",
+      "code": "LAG",
+      "names": [
+        "La Gorgue"
+      ]
+    },
+    {
+      "map": "Western Front",
+      "code": "LAJ",
+      "names": [
+        "La Jolly Ferme"
+      ]
+    },
+    {
+      "map": "Western Front",
+      "code": "LAL",
+      "names": [
+        "La Lovie"
+      ]
+    },
+    {
+      "map": "Western Front",
+      "code": "LAM",
+      "names": [
+        "La Mellette"
+      ]
+    },
+    {
+      "map": "Western Front",
+      "code": "LAN",
+      "names": [
+        "La Neuville"
+      ]
+    },
+    {
+      "map": "Western Front",
+      "code": "LNO",
+      "names": [
+        "La Noblette"
+      ]
+    },
+    {
+      "map": "Western Front",
+      "code": "LAP",
+      "names": [
+        "La Petrie"
+      ]
+    },
+    {
+      "map": "Western Front",
+      "code": "LAS",
+      "names": [
+        "La Selve"
+      ]
+    },
+    {
+      "map": "Western Front",
+      "code": "LAT",
+      "names": [
+        "La Tergette"
+      ]
+    },
+    {
+      "map": "Western Front",
+      "code": "LAI",
+      "names": [
+        "Lagnicourt"
+      ]
+    },
+    {
+      "map": "Western Front",
+      "code": "LLE",
+      "names": [
+        "Lagny le Sec"
+      ]
+    },
+    {
+      "map": "Western Front",
+      "code": "LEF",
+      "names": [
+        "Le Fay Saint Quentin"
+      ]
+    },
+    {
+      "map": "Western Front",
+      "code": "LEH",
+      "names": [
+        "Le Hameau"
+      ]
+    },
+    {
+      "map": "Western Front",
+      "code": "LEP",
+      "names": [
+        "Le Plessis Belleville"
+      ]
+    },
+    {
+      "map": "Western Front",
+      "code": "LEA",
+      "names": [
+        "Lealvillers"
+      ]
+    },
+    {
+      "map": "Western Front",
+      "code": "LEC",
+      "names": [
+        "Lechelle"
+      ]
+    },
+    {
+      "map": "Western Front",
+      "code": "LEI",
+      "names": [
+        "Leffincourt"
+      ]
+    },
+    {
+      "map": "Western Front",
+      "code": "LEM",
+      "names": [
+        "Lemmes"
+      ]
+    },
+    {
+      "map": "Western Front",
+      "code": "LEN",
+      "names": [
+        "Lens, Mons"
+      ]
+    },
+    {
+      "map": "Western Front",
+      "code": "LHE",
+      "names": [
+        "Lhery"
+      ]
+    },
+    {
+      "map": "Western Front",
+      "code": "LIE",
+      "names": [
+        "Liesse"
+      ]
+    },
+    {
+      "map": "Western Front",
+      "code": "LIS",
+      "names": [
+        "Lieu St.Amand"
+      ]
+    },
+    {
+      "map": "Western Front",
+      "code": "LEB",
+      "names": [
+        "Lisle en Barrois"
+      ]
+    },
+    {
+      "map": "Western Front",
+      "code": "LOM",
+      "names": [
+        "Lomme"
+      ]
+    },
+    {
+      "map": "Western Front",
+      "code": "LON",
+      "names": [
+        "Longchamps"
+      ]
+    },
+    {
+      "map": "Western Front",
+      "code": "LOR",
+      "names": [
+        "Lormaison"
+      ]
+    },
+    {
+      "map": "Western Front",
+      "code": "LOU",
+      "names": [
+        "Louan"
+      ]
+    },
+    {
+      "map": "Western Front",
+      "code": "LOQ",
+      "names": [
+        "Louvignies Quesnoy"
+      ]
+    },
+    {
+      "map": "Western Front",
+      "code": "LOV",
+      "names": [
+        "Louvres"
+      ]
+    },
+    {
+      "map": "Western Front",
+      "code": "MAI",
+      "names": [
+        "Maizy"
+      ]
+    },
+    {
+      "map": "Western Front",
+      "code": "MAL",
+      "names": [
+        "Malmy Chemery"
+      ]
+    },
+    {
+      "map": "Western Front",
+      "code": "MAZ",
+      "names": [
+        "Malzeville"
+      ]
+    },
+    {
+      "map": "Western Front",
+      "code": "MAN",
+      "names": [
+        "Mannoncourt en Vermois"
+      ]
+    },
+    {
+      "map": "Western Front",
+      "code": "MAR",
+      "names": [
+        "Marchais"
+      ]
+    },
+    {
+      "map": "Western Front",
+      "code": "MAC",
+      "names": [
+        "Marcke"
+      ]
+    },
+    {
+      "map": "Western Front",
+      "code": "MAE",
+      "names": [
+        "Marieux"
+      ]
+    },
+    {
+      "map": "Western Front",
+      "code": "MAA",
+      "names": [
+        "Marle Autremencourt"
+      ]
+    },
+    {
+      "map": "Western Front",
+      "code": "MLA",
+      "names": [
+        "Marly la Ville"
+      ]
+    },
+    {
+      "map": "Western Front",
+      "code": "MAQ",
+      "names": [
+        "Marquain"
+      ]
+    },
+    {
+      "map": "Western Front",
+      "code": "MLT",
+      "names": [
+        "Mars La Tour"
+      ]
+    },
+    {
+      "map": "Western Front",
+      "code": "MAS",
+      "names": [
+        "Marson"
+      ]
+    },
+    {
+      "map": "Western Front",
+      "code": "MAT",
+      "names": [
+        "Martincourt"
+      ]
+    },
+    {
+      "map": "Western Front",
+      "code": "MAV",
+      "names": [
+        "Marville"
+      ]
+    },
+    {
+      "map": "Western Front",
+      "code": "MAY",
+      "names": [
+        "Masny"
+      ]
+    },
+    {
+      "map": "Western Front",
+      "code": "MAO",
+      "names": [
+        "Matougues"
+      ]
+    },
+    {
+      "map": "Western Front",
+      "code": "MAU",
+      "names": [
+        "Maubeuge Pont Allant"
+      ]
+    },
+    {
+      "map": "Western Front",
+      "code": "MUL",
+      "names": [
+        "Maulan"
+      ]
+    },
+    {
+      "map": "Western Front",
+      "code": "MEA",
+      "names": [
+        "Meaux"
+      ]
+    },
+    {
+      "map": "Western Front",
+      "code": "MEN",
+      "names": [
+        "Menin"
+      ]
+    },
+    {
+      "map": "Western Front",
+      "code": "MER",
+      "names": [
+        "Mercy le Haut"
+      ]
+    },
+    {
+      "map": "Western Front",
+      "code": "MEL",
+      "names": [
+        "Mercy le Haut South"
+      ]
+    },
+    {
+      "map": "Western Front",
+      "code": "MES",
+      "names": [
+        "Mesnil Bruntel"
+      ]
+    },
+    {
+      "map": "Western Front",
+      "code": "MNE",
+      "names": [
+        "Mesnil NE"
+      ]
+    },
+    {
+      "map": "Western Front",
+      "code": "MNW",
+      "names": [
+        "Mesnil NW"
+      ]
+    },
+    {
+      "map": "Western Front",
+      "code": "MSW",
+      "names": [
+        "Mesnil SW"
+      ]
+    },
+    {
+      "map": "Western Front",
+      "code": "MET",
+      "names": [
+        "Metz Frescaty"
+      ]
+    },
+    {
+      "map": "Western Front",
+      "code": "MEF",
+      "names": [
+        "Metz Frescaty Zeppelin Shed"
+      ]
+    },
+    {
+      "map": "Western Front",
+      "code": "MIT",
+      "names": [
+        "Mitry Mory"
+      ]
+    },
+    {
+      "map": "Western Front",
+      "code": "MOI",
+      "names": [
+        "Moislains"
+      ]
+    },
+    {
+      "map": "Western Front",
+      "code": "MON",
+      "names": [
+        "Moislains NE"
+      ]
+    },
+    {
+      "map": "Western Front",
+      "code": "MOL",
+      "names": [
+        "Monchy les Chateau"
+      ]
+    },
+    {
+      "map": "Western Front",
+      "code": "MOE",
+      "names": [
+        "Mons en Chaussee"
+      ]
+    },
+    {
+      "map": "Western Front",
+      "code": "MOD",
+      "names": [
+        "Mont de Soissons"
+      ]
+    },
+    {
+      "map": "Western Front",
+      "code": "MLX",
+      "names": [
+        "Mont l*Eveque",
+        "Mont l'Eveque"
+      ]
+    },
+    {
+      "map": "Western Front",
+      "code": "MOS",
+      "names": [
+        "Mont St Eloi"
+      ]
+    },
+    {
+      "map": "Western Front",
+      "code": "MOF",
+      "names": [
+        "Montagne Fayel"
+      ]
+    },
+    {
+      "map": "Western Front",
+      "code": "MOT",
+      "names": [
+        "Montgobert"
+      ]
+    },
+    {
+      "map": "Western Front",
+      "code": "MOO",
+      "names": [
+        "Montoy"
+      ]
+    },
+    {
+      "map": "Western Front",
+      "code": "MOR",
+      "names": [
+        "Morhange"
+      ]
+    },
+    {
+      "map": "Western Front",
+      "code": "MOV",
+      "names": [
+        "Morville"
+      ]
+    },
+    {
+      "map": "Western Front",
+      "code": "MOU",
+      "names": [
+        "Mounchin"
+      ]
+    },
+    {
+      "map": "Western Front",
+      "code": "MOZ",
+      "names": [
+        "Mouzon"
+      ]
+    },
+    {
+      "map": "Western Front",
+      "code": "MUI",
+      "names": [
+        "Muizon"
+      ]
+    },
+    {
+      "map": "Western Front",
+      "code": "NAN",
+      "names": [
+        "Nancy Malzeville"
+      ]
+    },
+    {
+      "map": "Western Front",
+      "code": "NAL",
+      "names": [
+        "Nanteuil le Haudouin"
+      ]
+    },
+    {
+      "map": "Western Front",
+      "code": "NAS",
+      "names": [
+        "Nanteuil sur Aisne"
+      ]
+    },
+    {
+      "map": "Western Front",
+      "code": "NEU",
+      "names": [
+        "Neuflize"
+      ]
+    },
+    {
+      "map": "Western Front",
+      "code": "NEV",
+      "names": [
+        "Neuvilly"
+      ]
+    },
+    {
+      "map": "Western Front",
+      "code": "NEI",
+      "names": [
+        "Neuvilly 2"
+      ]
+    },
+    {
+      "map": "Western Front",
+      "code": "NIV",
+      "names": [
+        "Nivelles"
+      ]
+    },
+    {
+      "map": "Western Front",
+      "code": "NOU",
+      "names": [
+        "Nouvion et Catillon"
+      ]
+    },
+    {
+      "map": "Western Front",
+      "code": "NOY",
+      "names": [
+        "Noyelles"
+      ]
+    },
+    {
+      "map": "Western Front",
+      "code": "OCH",
+      "names": [
+        "Ochey"
+      ]
+    },
+    {
+      "map": "Western Front",
+      "code": "PAR",
+      "names": [
+        "Parpeville"
+      ]
+    },
+    {
+      "map": "Western Front",
+      "code": "PHA",
+      "names": [
+        "Phalempin"
+      ]
+    },
+    {
+      "map": "Western Front",
+      "code": "PIE",
+      "names": [
+        "Pierre Morains"
+      ]
+    },
+    {
+      "map": "Western Front",
+      "code": "PIR",
+      "names": [
+        "Pierrefonds"
+      ]
+    },
+    {
+      "map": "Western Front",
+      "code": "PLO",
+      "names": [
+        "Plomion, SE Vervins"
+      ]
+    },
+    {
+      "map": "Western Front",
+      "code": "POM",
+      "names": [
+        "Pomacle"
+      ]
+    },
+    {
+      "map": "Western Front",
+      "code": "PRE",
+      "names": [
+        "Pretz en Argonne"
+      ]
+    },
+    {
+      "map": "Western Front",
+      "code": "PRO",
+      "names": [
+        "Pronville"
+      ]
+    },
+    {
+      "map": "Western Front",
+      "code": "PUI",
+      "names": [
+        "Puisieux Ferme Laon"
+      ]
+    },
+    {
+      "map": "Western Front",
+      "code": "PUX",
+      "names": [
+        "Puxieux"
+      ]
+    },
+    {
+      "map": "Western Front",
+      "code": "QUI",
+      "names": [
+        "Quinquempoix"
+      ]
+    },
+    {
+      "map": "Western Front",
+      "code": "RAM",
+      "names": [
+        "Ramegnies Chin"
+      ]
+    },
+    {
+      "map": "Western Front",
+      "code": "RAN",
+      "names": [
+        "Rancourt"
+      ]
+    },
+    {
+      "map": "Western Front",
+      "code": "RAR",
+      "names": [
+        "Raray"
+      ]
+    },
+    {
+      "map": "Western Front",
+      "code": "RAV",
+      "names": [
+        "Ravenel"
+      ]
+    },
+    {
+      "map": "Western Front",
+      "code": "REC",
+      "names": [
+        "Reclinghem"
+      ]
+    },
+    {
+      "map": "Western Front",
+      "code": "REM",
+      "names": [
+        "Rembercourt"
+      ]
+    },
+    {
+      "map": "Western Front",
+      "code": "REE",
+      "names": [
+        "Remmenecourt"
+      ]
+    },
+    {
+      "map": "Western Front",
+      "code": "RES",
+      "names": [
+        "Ressons Ferme du Val Valereux"
+      ]
+    },
+    {
+      "map": "Western Front",
+      "code": "REL",
+      "names": [
+        "Ressons l Abbaye"
+      ]
+    },
+    {
+      "map": "Western Front",
+      "code": "REU",
+      "names": [
+        "Reumont"
+      ]
+    },
+    {
+      "map": "Western Front",
+      "code": "ROI",
+      "names": [
+        "Roissy"
+      ]
+    },
+    {
+      "map": "Western Front",
+      "code": "RON",
+      "names": [
+        "Ronssoy"
+      ]
+    },
+    {
+      "map": "Western Front",
+      "code": "ROU",
+      "names": [
+        "Roubaix"
+      ]
+    },
+    {
+      "map": "Western Front",
+      "code": "ROC",
+      "names": [
+        "Roucourt"
+      ]
+    },
+    {
+      "map": "Western Front",
+      "code": "ROP",
+      "names": [
+        "Roupy"
+      ]
+    },
+    {
+      "map": "Western Front",
+      "code": "RUG",
+      "names": [
+        "Rugny"
+      ]
+    },
+    {
+      "map": "Western Front",
+      "code": "RUI",
+      "names": [
+        "Ruisseauville"
+      ]
+    },
+    {
+      "map": "Western Front",
+      "code": "RUM",
+      "names": [
+        "Rumbeke"
+      ]
+    },
+    {
+      "map": "Western Front",
+      "code": "SAC",
+      "names": [
+        "Saconin Breuil"
+      ]
+    },
+    {
+      "map": "Western Front",
+      "code": "SAL",
+      "names": [
+        "Sacy le Grand"
+      ]
+    },
+    {
+      "map": "Western Front",
+      "code": "SAI",
+      "names": [
+        "Sains Richaumont"
+      ]
+    },
+    {
+      "map": "Western Front",
+      "code": "SAG",
+      "names": [
+        "Saint Gerard"
+      ]
+    },
+    {
+      "map": "Western Front",
+      "code": "SAJ",
+      "names": [
+        "Saint Just"
+      ]
+    },
+    {
+      "map": "Western Front",
+      "code": "SLO",
+      "names": [
+        "Saint Loup Nord"
+      ]
+    },
+    {
+      "map": "Western Front",
+      "code": "SLS",
+      "names": [
+        "Saint Loup Sud"
+      ]
+    },
+    {
+      "map": "Western Front",
+      "code": "SAR",
+      "names": [
+        "Saint Remy le Petit"
+      ]
+    },
+    {
+      "map": "Western Front",
+      "code": "SAM",
+      "names": [
+        "Sainte Menehould"
+      ]
+    },
+    {
+      "map": "Western Front",
+      "code": "SAN",
+      "names": [
+        "Saints"
+      ]
+    },
+    {
+      "map": "Western Front",
+      "code": "SAZ",
+      "names": [
+        "Saizerais"
+      ]
+    },
+    {
+      "map": "Western Front",
+      "code": "SAP",
+      "names": [
+        "Saponay"
+      ]
+    },
+    {
+      "map": "Western Front",
+      "code": "SAU",
+      "names": [
+        "Saultain"
+      ]
+    },
+    {
+      "map": "Western Front",
+      "code": "SAV",
+      "names": [
+        "Savy Berlette"
+      ]
+    },
+    {
+      "map": "Western Front",
+      "code": "SCH",
+      "names": [
+        "Scheldewindeke"
+      ]
+    },
+    {
+      "map": "Western Front",
+      "code": "SEN",
+      "names": [
+        "Senard en Argonne"
+      ]
+    },
+    {
+      "map": "Western Front",
+      "code": "SEL",
+      "names": [
+        "Senlis"
+      ]
+    },
+    {
+      "map": "Western Front",
+      "code": "SER",
+      "names": [
+        "Seraincourt"
+      ]
+    },
+    {
+      "map": "Western Front",
+      "code": "SEY",
+      "names": [
+        "Serny"
+      ]
+    },
+    {
+      "map": "Western Front",
+      "code": "SIS",
+      "names": [
+        "Sissonne"
+      ]
+    },
+    {
+      "map": "Western Front",
+      "code": "SIV",
+      "names": [
+        "Sivry"
+      ]
+    },
+    {
+      "map": "Western Front",
+      "code": "SMB",
+      "names": [
+        "Sombrin"
+      ]
+    },
+    {
+      "map": "Western Front",
+      "code": "SOV",
+      "names": [
+        "Somme Vesle"
+      ]
+    },
+    {
+      "map": "Western Front",
+      "code": "SOE",
+      "names": [
+        "Sommereux"
+      ]
+    },
+    {
+      "map": "Western Front",
+      "code": "SOU",
+      "names": [
+        "Soude Ste Croix"
+      ]
+    },
+    {
+      "map": "Western Front",
+      "code": "SOI",
+      "names": [
+        "Souilly"
+      ]
+    },
+    {
+      "map": "Western Front",
+      "code": "SPY",
+      "names": [
+        "Spy"
+      ]
+    },
+    {
+      "map": "Western Front",
+      "code": "STM",
+      "names": [
+        "St Marguerite"
+      ]
+    },
+    {
+      "map": "Western Front",
+      "code": "SMA",
+      "names": [
+        "St Marie Cappel"
+      ]
+    },
+    {
+      "map": "Western Front",
+      "code": "SOM",
+      "names": [
+        "St.Omer",
+        "St Omer",
+        "Saint Omer"
+      ]
+    },
+    {
+      "map": "Western Front",
+      "code": "STE",
+      "names": [
+        "Stenay"
+      ]
+    },
+    {
+      "map": "Western Front",
+      "code": "STS",
+      "names": [
+        "Stenay South"
+      ]
+    },
+    {
+      "map": "Western Front",
+      "code": "TAR",
+      "names": [
+        "Tarcienne"
+      ]
+    },
+    {
+      "map": "Western Front",
+      "code": "TEL",
+      "names": [
+        "Tellancourt"
+      ]
+    },
+    {
+      "map": "Western Front",
+      "code": "TEM",
+      "names": [
+        "Templeuve"
+      ]
+    },
+    {
+      "map": "Western Front",
+      "code": "THO",
+      "names": [
+        "Thonne les Pres"
+      ]
+    },
+    {
+      "map": "Western Front",
+      "code": "THU",
+      "names": [
+        "Thuillies"
+      ]
+    },
+    {
+      "map": "Western Front",
+      "code": "TIC",
+      "names": [
+        "Tichemont Castle"
+      ]
+    },
+    {
+      "map": "Western Front",
+      "code": "TIL",
+      "names": [
+        "Tilloy"
+      ]
+    },
+    {
+      "map": "Western Front",
+      "code": "TOU",
+      "names": [
+        "Toul Aerodrom",
+        "Toul Aerodrome"
+      ]
+    },
+    {
+      "map": "Western Front",
+      "code": "TOL",
+      "names": [
+        "Toulis"
+      ]
+    },
+    {
+      "map": "Western Front",
+      "code": "TOQ",
+      "names": [
+        "Touquin"
+      ]
+    },
+    {
+      "map": "Western Front",
+      "code": "TOR",
+      "names": [
+        "Tourpes"
+      ]
+    },
+    {
+      "map": "Western Front",
+      "code": "TRE",
+      "names": [
+        "Trecon"
+      ]
+    },
+    {
+      "map": "Western Front",
+      "code": "TRI",
+      "names": [
+        "Treizennes"
+      ]
+    },
+    {
+      "map": "Western Front",
+      "code": "TEU",
+      "names": [
+        "Trier Euren"
+      ]
+    },
+    {
+      "map": "Western Front",
+      "code": "TEZ",
+      "names": [
+        "Trier Euren Zeppelin Shed"
+      ]
+    },
+    {
+      "map": "Western Front",
+      "code": "UGN",
+      "names": [
+        "Ugny l Equipee"
+      ]
+    },
+    {
+      "map": "Western Front",
+      "code": "VAC",
+      "names": [
+        "Vacon"
+      ]
+    },
+    {
+      "map": "Western Front",
+      "code": "VAD",
+      "names": [
+        "Vadelaincourt"
+      ]
+    },
+    {
+      "map": "Western Front",
+      "code": "VAL",
+      "names": [
+        "Valheureux"
+      ]
+    },
+    {
+      "map": "Western Front",
+      "code": "VAT",
+      "names": [
+        "Vatimont"
+      ]
+    },
+    {
+      "map": "Western Front",
+      "code": "VAU",
+      "names": [
+        "Vauciennes"
+      ]
+    },
+    {
+      "map": "Western Front",
+      "code": "VAO",
+      "names": [
+        "Vaucouleurs"
+      ]
+    },
+    {
+      "map": "Western Front",
+      "code": "VAX",
+      "names": [
+        "Vaux"
+      ]
+    },
+    {
+      "map": "Western Front",
+      "code": "VAE",
+      "names": [
+        "Vauxcere"
+      ]
+    },
+    {
+      "map": "Western Front",
+      "code": "VEL",
+      "names": [
+        "Velu"
+      ]
+    },
+    {
+      "map": "Western Front",
+      "code": "VER",
+      "names": [
+        "Verdun"
+      ]
+    },
+    {
+      "map": "Western Front",
+      "code": "VEG",
+      "names": [
+        "Vert Galant"
+      ]
+    },
+    {
+      "map": "Western Front",
+      "code": "VEF",
+      "names": [
+        "Vervins Fontaine"
+      ]
+    },
+    {
+      "map": "Western Front",
+      "code": "VEZ",
+      "names": [
+        "Vez"
+      ]
+    },
+    {
+      "map": "Western Front",
+      "code": "VIG",
+      "names": [
+        "Vignacourt"
+      ]
+    },
+    {
+      "map": "Western Front",
+      "code": "VIL",
+      "names": [
+        "Villacoublay"
+      ]
+    },
+    {
+      "map": "Western Front",
+      "code": "VIE",
+      "names": [
+        "Ville en Tardenois"
+      ]
+    },
+    {
+      "map": "Western Front",
+      "code": "VLE",
+      "names": [
+        "Villeneuve les Vertus"
+      ]
+    },
+    {
+      "map": "Western Front",
+      "code": "VIB",
+      "names": [
+        "Villers Bretonneu 2",
+        "Villers Bretonneux 2"
+      ]
+    },
+    {
+      "map": "Western Front",
+      "code": "VBR",
+      "names": [
+        "Villers Bretonneux"
+      ]
+    },
+    {
+      "map": "Western Front",
+      "code": "VEN",
+      "names": [
+        "Villers en Lieu"
+      ]
+    },
+    {
+      "map": "Western Front",
+      "code": "VIS",
+      "names": [
+        "Villers sur Nicole"
+      ]
+    },
+    {
+      "map": "Western Front",
+      "code": "VIA",
+      "names": [
+        "Villesavoye"
+      ]
+    },
+    {
+      "map": "Western Front",
+      "code": "VIV",
+      "names": [
+        "Villeselve"
+      ]
+    },
+    {
+      "map": "Western Front",
+      "code": "VIN",
+      "names": [
+        "Villeseneux"
+      ]
+    },
+    {
+      "map": "Western Front",
+      "code": "VSA",
+      "names": [
+        "Villiers Saint Georges"
+      ]
+    },
+    {
+      "map": "Western Front",
+      "code": "VII",
+      "names": [
+        "Vivaise"
+      ]
+    },
+    {
+      "map": "Western Front",
+      "code": "VOU",
+      "names": [
+        "Vouziers"
+      ]
+    },
+    {
+      "map": "Western Front",
+      "code": "WAR",
+      "names": [
+        "Warfusee"
+      ]
+    },
+    {
+      "map": "Western Front",
+      "code": "WAS",
+      "names": [
+        "Wasquehal"
+      ]
+    },
+    {
+      "map": "Western Front",
+      "code": "WAI",
+      "names": [
+        "Wassigny"
+      ]
+    },
+    {
+      "map": "Western Front",
+      "code": "WAV",
+      "names": [
+        "Wavrechain sous Denain"
+      ]
+    }
+  ],
+  "sources": [
+    "PWCGDeveloper/PWCGCampaign airfield location data",
+    "Combat Box mission archive and operational aliases"
+  ]
+}

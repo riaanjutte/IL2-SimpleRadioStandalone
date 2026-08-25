@@ -38,8 +38,8 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Common.Network
                     continue;
                 }
 
-                var assignment = new CombatBoxRosterAssignment(player.Callsign, player.Vehicle);
-                if (!assignment.HasCallsign && !assignment.HasVehicle)
+                var assignment = new CombatBoxRosterAssignment(player.Callsign, player.Vehicle, player.Airfield);
+                if (!assignment.HasCallsign && !assignment.HasVehicle && !assignment.HasAirfield)
                 {
                     continue;
                 }
@@ -69,24 +69,32 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Common.Network
 
             [JsonProperty("vehicle")]
             public string Vehicle { get; set; }
+
+            [JsonProperty("airfield")]
+            public string Airfield { get; set; }
         }
     }
 
     public class CombatBoxRosterAssignment
     {
-        public CombatBoxRosterAssignment(string callsign, string vehicle)
+        public CombatBoxRosterAssignment(string callsign, string vehicle, string airfield)
         {
             Callsign = Normalize(callsign);
             Vehicle = Normalize(vehicle);
+            Airfield = Normalize(airfield);
         }
 
         public string Callsign { get; }
 
         public string Vehicle { get; }
 
+        public string Airfield { get; }
+
         public bool HasCallsign => !string.IsNullOrWhiteSpace(Callsign);
 
         public bool HasVehicle => !string.IsNullOrWhiteSpace(Vehicle);
+
+        public bool HasAirfield => !string.IsNullOrWhiteSpace(Airfield);
 
         private static string Normalize(string value)
         {

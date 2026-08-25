@@ -12,7 +12,7 @@
 
         <TextBlock Grid.Row="0"
                    Margin="0,0,0,8"
-                   Text="Names are optional. Blank channels use their standard CHN number."
+                   Text="Names are optional. Blank channels use their standard channel number."
                    TextWrapping="Wrap" />
 
         <Grid Grid.Row="1">

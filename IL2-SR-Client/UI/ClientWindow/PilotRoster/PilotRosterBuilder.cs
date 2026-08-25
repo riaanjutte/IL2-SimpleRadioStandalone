@@ -25,6 +25,7 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI.ClientWindow.PilotRoster
                     client.AssignedCallsign,
                     client.Name,
                     client.AssignedVehicle,
+                    client.AssignedAirfield,
                     GetRadioChannel(client.GameState, 1),
                     GetRadioChannel(client.GameState, 2)));
 

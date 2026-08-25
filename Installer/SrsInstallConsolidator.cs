@@ -42,6 +42,7 @@ namespace Installer
         public string BackupPath { get; set; }
         public int MigratedInstallationCount { get; set; }
         public int RetiredInstallationCount { get; set; }
+        public int ImportedLegacyDeviceListEntryCount { get; set; }
     }
 
     internal static class SrsInstallConsolidator
@@ -57,6 +58,11 @@ namespace Installer
             "SRS-AutoUpdater.exe",
             "opus.dll",
             "speexdsp.dll"
+        };
+        private static readonly string[] DeviceListFiles =
+        {
+            "whitelist.txt",
+            "blacklist.txt"
         };
 
         public static string UserDataPath
@@ -109,6 +115,7 @@ namespace Installer
 
             string migrationMarker = Path.Combine(userDataPath, ".legacy-migration-complete");
             bool migrationAlreadyCompleted = File.Exists(migrationMarker);
+            int importedDeviceListEntries = ImportLegacyDeviceLists(plan.Installations, userDataPath, log);
             List<string> sources = plan.Installations
                 .Where(ContainsUserData)
                 .Where(source => !migrationAlreadyCompleted
@@ -120,7 +127,8 @@ namespace Installer
                 return new SrsConsolidationResult
                 {
                     UserDataPath = userDataPath,
-                    MigratedInstallationCount = 0
+                    MigratedInstallationCount = 0,
+                    ImportedLegacyDeviceListEntryCount = importedDeviceListEntries
                 };
             }
 
@@ -179,7 +187,8 @@ namespace Installer
             {
                 UserDataPath = userDataPath,
                 BackupPath = backupRoot,
-                MigratedInstallationCount = sources.Count
+                MigratedInstallationCount = sources.Count,
+                ImportedLegacyDeviceListEntryCount = importedDeviceListEntries
             };
         }
 
@@ -518,7 +527,40 @@ namespace Installer
             }
         }
 
-        private static void MergeUniqueLines(string sourceFile, string targetFile)
+        private static int ImportLegacyDeviceLists(
+            IEnumerable<string> sources,
+            string userDataPath,
+            Action<string> log)
+        {
+            int importedEntries = 0;
+            foreach (string source in sources
+                         .Where(Directory.Exists)
+                         .Where(path => !PathsEqual(path, userDataPath))
+                         .Distinct(StringComparer.OrdinalIgnoreCase))
+            {
+                foreach (string fileName in DeviceListFiles)
+                {
+                    string sourceFile = Path.Combine(source, fileName);
+                    if (!File.Exists(sourceFile))
+                    {
+                        continue;
+                    }
+
+                    int added = MergeUniqueLines(sourceFile, Path.Combine(userDataPath, fileName));
+                    if (added <= 0)
+                    {
+                        continue;
+                    }
+
+                    importedEntries += added;
+                    Log(log, "Recovered " + added + " legacy " + fileName + " entries from " + source);
+                }
+            }
+
+            return importedEntries;
+        }
+
+        private static int MergeUniqueLines(string sourceFile, string targetFile)
         {
             List<string> lines = new List<string>();
             if (File.Exists(targetFile))
@@ -527,15 +569,18 @@ namespace Installer
             }
 
             HashSet<string> existing = new HashSet<string>(lines, StringComparer.OrdinalIgnoreCase);
+            int added = 0;
             foreach (string line in File.ReadAllLines(sourceFile))
             {
                 if (existing.Add(line))
                 {
                     lines.Add(line);
+                    added++;
                 }
             }
 
             File.WriteAllLines(targetFile, lines, Encoding.UTF8);
+            return added;
         }
 
         private static HashSet<string> ReadProfileNames(string globalConfigPath)

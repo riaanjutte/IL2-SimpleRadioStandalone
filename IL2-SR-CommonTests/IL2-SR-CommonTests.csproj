@@ -75,6 +75,7 @@
   <ItemGroup>
     <Compile Include="Audio\RadioCollisionEffectProcessorTests.cs" />
     <Compile Include="DCSState\PlayerGameStateTests.cs" />
+    <Compile Include="Helpers\AirfieldCodeLookupTests.cs" />
     <Compile Include="Helpers\ConversionHelpersTests.cs" />
     <Compile Include="Input\InputBindingLayoutTests.cs" />
     <Compile Include="Input\InputPollingCycleCacheTests.cs" />
@@ -101,6 +102,7 @@
     <Compile Include="UI\RadioOverlaySpeakerNameScrollTests.cs" />
     <Compile Include="UI\PilotRosterAccessPolicyTests.cs" />
     <Compile Include="UI\PilotRosterBuilderTests.cs" />
+    <Compile Include="UI\PilotRosterScreenBoundsTests.cs" />
     <Compile Include="UI\WindowsFirewallTelemetryDiagnosticTests.cs" />
     <Compile Include="Utils\RadioHelperMuteTests.cs" />
     <Compile Include="Utils\RadioHelperChannelNameTests.cs" />

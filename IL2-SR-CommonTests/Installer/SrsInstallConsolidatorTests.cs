@@ -91,6 +91,47 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Common.Tests.Installer
             }
         }
 
+        [TestMethod]
+        public void CompletedMigrationStillRecoversWhitelistFromCurrentInstallFolder()
+        {
+            string root = Path.Combine(Path.GetTempPath(), "il2-srs-whitelist-recovery-" + Guid.NewGuid().ToString("N"));
+            string installation = Path.Combine(root, "installation");
+            string userData = Path.Combine(root, "userdata");
+
+            try
+            {
+                Directory.CreateDirectory(installation);
+                Directory.CreateDirectory(userData);
+                Write(Path.Combine(userData, ".legacy-migration-complete"), "done");
+                Write(Path.Combine(userData, "whitelist.txt"), "existing-guid\r\n");
+                Write(Path.Combine(installation, "whitelist.txt"), "EXISTING-GUID\r\nnew-vpc-guid\r\n");
+
+                var plan = new global::Installer.SrsConsolidationPlan(
+                    installation,
+                    new[] { installation });
+
+                global::Installer.SrsConsolidationResult result =
+                    global::Installer.SrsInstallConsolidator.MigrateUserDataTo(
+                        plan,
+                        installation,
+                        userData,
+                        null);
+
+                CollectionAssert.AreEqual(
+                    new[] { "existing-guid", "new-vpc-guid" },
+                    File.ReadAllLines(Path.Combine(userData, "whitelist.txt")));
+                Assert.AreEqual(1, result.ImportedLegacyDeviceListEntryCount);
+                Assert.AreEqual(0, result.MigratedInstallationCount);
+            }
+            finally
+            {
+                if (Directory.Exists(root))
+                {
+                    Directory.Delete(root, true);
+                }
+            }
+        }
+
         private static void Write(string path, string value)
         {
             File.WriteAllText(path, value);

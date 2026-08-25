@@ -148,5 +148,30 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Common.Tests.Network
             Assert.AreEqual("", assignments[new CallsignRosterKey("VehicleOnly", 1)].Callsign);
             Assert.AreEqual("Bf 109 G-14", assignments[new CallsignRosterKey("VehicleOnly", 1)].Vehicle);
         }
+
+        [TestMethod]
+        public void ParseAssignmentsExtractsAirfieldsWhenAvailable()
+        {
+            const string roster = @"{
+  ""players"": [
+    {
+      ""name"": ""JARRUS-USMC"",
+      ""coalitionCode"": 1,
+      ""callsign"": ""RAVEN-1"",
+      ""Vehicle"": ""P-47D-28"",
+      ""Airfield"": ""  Bierset  ""
+    },
+    { ""name"": ""AirfieldOnly"", ""coalitionCode"": 2, ""Airfield"": ""Le Culot"" },
+    { ""name"": ""Empty"", ""coalitionCode"": 1, ""Airfield"": """" }
+  ]
+}";
+
+            var assignments = CombatBoxCallsignRoster.ParseAssignments(roster);
+
+            Assert.AreEqual(2, assignments.Count);
+            Assert.AreEqual("Bierset", assignments[new CallsignRosterKey("JARRUS-USMC", 1)].Airfield);
+            Assert.AreEqual("Le Culot", assignments[new CallsignRosterKey("AirfieldOnly", 2)].Airfield);
+            Assert.IsTrue(assignments[new CallsignRosterKey("AirfieldOnly", 2)].HasAirfield);
+        }
     }
 }

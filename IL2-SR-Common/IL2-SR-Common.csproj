@@ -111,6 +111,7 @@
   <ItemGroup>
     <Compile Include="DCSState\RadioReceivingPriority.cs" />
     <Compile Include="DCSState\RadioReceivingState.cs" />
+    <Compile Include="Helpers\AirfieldCodeLookup.cs" />
     <Compile Include="Helpers\CircularBuffer.cs" />
     <Compile Include="Helpers\ConversionHelpers.cs" />
     <Compile Include="Helpers\JsonIL2IgnoreSerializationAttribute.cs" />
@@ -144,6 +145,7 @@
     <Compile Include="Network\UpdaterChecker.cs" />
   </ItemGroup>
   <ItemGroup>
+    <EmbeddedResource Include="Data\AirfieldCodes.json" />
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>

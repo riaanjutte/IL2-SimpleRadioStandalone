@@ -266,6 +266,7 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.Network
                                                 srClient.AssignedCallsign = updatedSrClient.AssignedCallsign;
 
                                                 srClient.AssignedVehicle = updatedSrClient.AssignedVehicle;
+                                                srClient.AssignedAirfield = updatedSrClient.AssignedAirfield;
                                                 if (updatedSrClient.GameState != null)
                                                 {
                                                     srClient.GameState = updatedSrClient.GameState;

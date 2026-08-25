@@ -76,6 +76,7 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI.ClientWindow.PilotRoster
             CallsignColumn.Header = UppercaseLocalized("CALLSIGN");
             PilotColumn.Header = UppercaseLocalized("PILOT");
             VehicleColumn.Header = UppercaseLocalized("VEHICLE");
+            AirfieldColumn.Header = UppercaseLocalized("FLD");
         }
 
         public void RefreshLocalization()
@@ -96,12 +97,11 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI.ClientWindow.PilotRoster
 
         private void RestoreWindowBounds()
         {
-            var workArea = SystemParameters.WorkArea;
             var configuredWidth = Math.Max(MinWidth, _globalSettings.GetFinitePositionSetting(GlobalSettingsKeys.PilotRosterWidth, DefaultRosterWidth));
             var configuredHeight = Math.Max(MinHeight, _globalSettings.GetFinitePositionSetting(GlobalSettingsKeys.PilotRosterHeight, DefaultRosterHeight));
 
-            Width = Math.Min(configuredWidth, Math.Max(MinWidth, workArea.Width));
-            Height = Math.Min(configuredHeight, Math.Max(MinHeight, workArea.Height));
+            Width = configuredWidth;
+            Height = configuredHeight;
             Left = _globalSettings.GetFinitePositionSetting(GlobalSettingsKeys.PilotRosterX, DefaultRosterX);
             Top = _globalSettings.GetFinitePositionSetting(GlobalSettingsKeys.PilotRosterY, DefaultRosterY);
             EnsureWindowIsOnScreen();
@@ -211,6 +211,11 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI.ClientWindow.PilotRoster
                 return PilotRosterSortColumn.Vehicle;
             }
 
+            if (ReferenceEquals(column, AirfieldColumn))
+            {
+                return PilotRosterSortColumn.Airfield;
+            }
+
             if (ReferenceEquals(column, Radio1Column))
             {
                 return PilotRosterSortColumn.Radio1;
@@ -227,6 +232,7 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI.ClientWindow.PilotRoster
         private void RefreshRosterLayout()
         {
             VehicleColumn.Visibility = _pilotRoster.Any(entry => entry.HasVehicle) ? Visibility.Visible : Visibility.Collapsed;
+            AirfieldColumn.Visibility = _pilotRoster.Any(entry => entry.HasAirfield) ? Visibility.Visible : Visibility.Collapsed;
             RefreshAutoColumnWidths();
             FitHeightToRoster();
         }
@@ -235,6 +241,7 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI.ClientWindow.PilotRoster
         {
             CallsignColumn.Width = DataGridLength.Auto;
             VehicleColumn.Width = DataGridLength.Auto;
+            AirfieldColumn.Width = DataGridLength.SizeToHeader;
             Radio1Column.Width = DataGridLength.SizeToHeader;
             Radio2Column.Width = DataGridLength.SizeToHeader;
             PilotColumn.Width = new DataGridLength(1, DataGridLengthUnitType.Star);
@@ -263,7 +270,7 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI.ClientWindow.PilotRoster
                                     RosterGridHeightSafetyPadding;
             var rosterChromeHeight = Math.Max(0, ActualHeight - currentGridHeight);
             var desiredHeight = rosterChromeHeight + desiredGridHeight;
-            var maxHeight = Math.Max(MinHeight, SystemParameters.WorkArea.Height - RosterMaximumScreenMargin);
+            var maxHeight = Math.Max(MinHeight, GetCurrentWorkArea().Height - RosterMaximumScreenMargin);
             var fittedHeight = Math.Max(MinHeight, Math.Min(maxHeight, desiredHeight));
             var shouldScroll = desiredHeight > maxHeight;
 
@@ -328,46 +335,78 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI.ClientWindow.PilotRoster
 
         private void EnsureWindowIsOnScreen()
         {
-            var workArea = SystemParameters.WorkArea;
             const double margin = 10.0;
+            var fallback = GetPrimaryWorkArea();
 
             if (double.IsNaN(Left) || double.IsInfinity(Left))
             {
-                Left = workArea.Left + margin;
+                Left = fallback.Left + margin;
             }
 
             if (double.IsNaN(Top) || double.IsInfinity(Top))
             {
-                Top = workArea.Top + margin;
+                Top = fallback.Top + margin;
             }
 
-            if (Width > workArea.Width)
+            if (double.IsNaN(Width) || double.IsInfinity(Width))
             {
-                Width = Math.Max(MinWidth, workArea.Width - margin * 2);
+                Width = DefaultRosterWidth;
             }
 
-            if (Height > workArea.Height)
+            if (double.IsNaN(Height) || double.IsInfinity(Height))
             {
-                Height = Math.Max(MinHeight, workArea.Height - margin * 2);
+                Height = DefaultRosterHeight;
             }
 
-            if (Left < workArea.Left + margin)
+            var bounds = new Rect(Left, Top, Math.Max(MinWidth, Width), Math.Max(MinHeight, Height));
+            var constrained = PilotRosterScreenBounds.ConstrainToWorkArea(
+                bounds,
+                GetCurrentWorkArea(bounds),
+                margin,
+                MinWidth,
+                MinHeight);
+
+            Width = constrained.Width;
+            Height = constrained.Height;
+            Left = constrained.Left;
+            Top = constrained.Top;
+        }
+
+        private Rect GetCurrentWorkArea()
+        {
+            return GetCurrentWorkArea(new Rect(
+                Left,
+                Top,
+                Math.Max(MinWidth, Width),
+                Math.Max(MinHeight, Height)));
+        }
+
+        private static Rect GetCurrentWorkArea(Rect windowBounds)
+        {
+            var fallback = GetPrimaryWorkArea();
+            var workAreas = System.Windows.Forms.Screen.AllScreens
+                .Select(screen => new Rect(
+                    screen.WorkingArea.Left,
+                    screen.WorkingArea.Top,
+                    screen.WorkingArea.Width,
+                    screen.WorkingArea.Height));
+
+            return PilotRosterScreenBounds.SelectWorkArea(windowBounds, workAreas, fallback);
+        }
+
+        private static Rect GetPrimaryWorkArea()
+        {
+            var primary = System.Windows.Forms.Screen.PrimaryScreen;
+            if (primary == null)
             {
-                Left = workArea.Left + margin;
-            }
-            else if (Left + Width > workArea.Right - margin)
-            {
-                Left = Math.Max(workArea.Left + margin, workArea.Right - Width - margin);
+                return SystemParameters.WorkArea;
             }
 
-            if (Top < workArea.Top + margin)
-            {
-                Top = workArea.Top + margin;
-            }
-            else if (Top + Height > workArea.Bottom - margin)
-            {
-                Top = Math.Max(workArea.Top + margin, workArea.Bottom - Height - margin);
-            }
+            return new Rect(
+                primary.WorkingArea.Left,
+                primary.WorkingArea.Top,
+                primary.WorkingArea.Width,
+                primary.WorkingArea.Height);
         }
 
         protected override void OnClosing(CancelEventArgs e)

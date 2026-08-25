@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Globalization;
+using Ciribob.IL2.SimpleRadio.Standalone.Common.Helpers;
 
 namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI.ClientWindow.PilotRoster
 {
@@ -10,17 +11,20 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI.ClientWindow.PilotRoster
         Callsign,
         PilotName,
         Vehicle,
+        Airfield,
         Radio1,
         Radio2
     }
 
     public class PilotRosterEntry
     {
-        public PilotRosterEntry(string callsign, string pilotName, string vehicle, int radio1Channel, int radio2Channel)
+        public PilotRosterEntry(string callsign, string pilotName, string vehicle, string airfield, int radio1Channel, int radio2Channel)
         {
             Callsign = Normalize(callsign, "--");
             PilotName = Normalize(pilotName, "---");
             Vehicle = Callsign == "--" ? "Req. Callsign" : Normalize(vehicle, string.Empty);
+            AirfieldName = string.IsNullOrWhiteSpace(airfield) ? string.Empty : airfield.Trim();
+            Airfield = AirfieldCodeLookup.GetCode(AirfieldName);
             Radio1ChannelNumber = NormalizeChannel(radio1Channel);
             Radio2ChannelNumber = NormalizeChannel(radio2Channel);
             Radio1Channel = FormatChannel(Radio1ChannelNumber);
@@ -34,6 +38,12 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI.ClientWindow.PilotRoster
         public string Vehicle { get; }
 
         public bool HasVehicle => !string.IsNullOrWhiteSpace(Vehicle);
+
+        public string Airfield { get; }
+
+        public string AirfieldName { get; }
+
+        public bool HasAirfield => !string.IsNullOrWhiteSpace(Airfield);
 
         public string Radio1Channel { get; }
 
@@ -99,6 +109,9 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI.ClientWindow.PilotRoster
                     break;
                 case PilotRosterSortColumn.Vehicle:
                     comparison = CompareText(left.Vehicle, right.Vehicle, string.Empty);
+                    break;
+                case PilotRosterSortColumn.Airfield:
+                    comparison = CompareText(left.Airfield, right.Airfield, string.Empty);
                     break;
                 case PilotRosterSortColumn.Radio1:
                     comparison = CompareChannel(left.Radio1ChannelNumber, right.Radio1ChannelNumber);

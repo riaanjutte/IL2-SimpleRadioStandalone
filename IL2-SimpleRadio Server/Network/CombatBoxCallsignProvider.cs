@@ -39,6 +39,11 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Server.Network
             return GetAssignment(playerName, coalition)?.Vehicle ?? string.Empty;
         }
 
+        public string GetAssignedAirfield(string playerName, int coalition)
+        {
+            return GetAssignment(playerName, coalition)?.Airfield ?? string.Empty;
+        }
+
         public void RefreshIfNeeded()
         {
             if ((DateTime.UtcNow - _lastRefreshUtc) < RefreshInterval)

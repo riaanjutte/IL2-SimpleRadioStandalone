@@ -37,6 +37,12 @@
             <Setter Property="TextTrimming" Value="CharacterEllipsis" />
             <Setter Property="TextWrapping" Value="NoWrap" />
         </Style>
+        <Style x:Key="RosterRightAlignedCellTextStyle"
+               TargetType="{x:Type TextBlock}"
+               BasedOn="{StaticResource RosterCellTextStyle}">
+            <Setter Property="HorizontalAlignment" Value="Stretch" />
+            <Setter Property="TextAlignment" Value="Right" />
+        </Style>
         <Style TargetType="{x:Type DataGridColumnHeader}">
             <Setter Property="Background" Value="{DynamicResource MilActionBrush}" />
             <Setter Property="Foreground" Value="{DynamicResource MilTextPrimaryBrush}" />
@@ -49,6 +55,11 @@
             <Setter Property="BorderThickness" Value="0,0,1,1" />
             <Setter Property="ToolTip"
                     Value="Click to sort this column. Click again to reverse the order." />
+        </Style>
+        <Style x:Key="RosterRightAlignedHeaderStyle"
+               TargetType="{x:Type DataGridColumnHeader}"
+               BasedOn="{StaticResource {x:Type DataGridColumnHeader}}">
+            <Setter Property="HorizontalContentAlignment" Value="Right" />
         </Style>
         <Style TargetType="{x:Type DataGridRow}">
             <Setter Property="Background" Value="{DynamicResource MilWellBrush}" />
@@ -199,18 +210,33 @@
                                         MinWidth="96"
                                         Visibility="Collapsed"
                                         ElementStyle="{StaticResource RosterCellTextStyle}" />
+                    <DataGridTextColumn x:Name="AirfieldColumn"
+                                        Header="FLD"
+                                        Binding="{Binding Airfield}"
+                                        SortMemberPath="Airfield"
+                                        Width="SizeToHeader"
+                                        Visibility="Collapsed">
+                        <DataGridTextColumn.ElementStyle>
+                            <Style TargetType="{x:Type TextBlock}"
+                                   BasedOn="{StaticResource RosterCellTextStyle}">
+                                <Setter Property="ToolTip" Value="{Binding AirfieldName}" />
+                            </Style>
+                        </DataGridTextColumn.ElementStyle>
+                    </DataGridTextColumn>
                     <DataGridTextColumn x:Name="Radio1Column"
                                         Header="R1"
                                         Binding="{Binding Radio1Channel}"
                                         SortMemberPath="Radio1ChannelNumber"
                                         Width="SizeToHeader"
-                                        ElementStyle="{StaticResource RosterCellTextStyle}" />
+                                        HeaderStyle="{StaticResource RosterRightAlignedHeaderStyle}"
+                                        ElementStyle="{StaticResource RosterRightAlignedCellTextStyle}" />
                     <DataGridTextColumn x:Name="Radio2Column"
                                         Header="R2"
                                         Binding="{Binding Radio2Channel}"
                                         SortMemberPath="Radio2ChannelNumber"
                                         Width="SizeToHeader"
-                                        ElementStyle="{StaticResource RosterCellTextStyle}" />
+                                        HeaderStyle="{StaticResource RosterRightAlignedHeaderStyle}"
+                                        ElementStyle="{StaticResource RosterRightAlignedCellTextStyle}" />
                 </DataGrid.Columns>
             </DataGrid>
 

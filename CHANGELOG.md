@@ -2,21 +2,33 @@
 
 ## IL2-SRS 1.0.4.9-beta.1 community update
 
+### Added
+
+- Pilot Roster data can now include each player's current sortie spawn airfield, displayed in a sortable FLD column when supplied by the server.
+- Added a case-insensitive alias table covering known Great Battles airfields, including operational and historical name variants.
+
 ### Changed
 
+- Radio overlay displays now use compact channel labels such as `#3` instead of `CHN 3` when the server has not supplied a custom channel name.
 - Pilot Roster radio columns now show compact channel numbers without the redundant `CHN` prefix.
 - The R1 and R2 columns now fit their header widths, leaving more room for pilot and vehicle information.
 - Pilots without an assigned callsign now show `Req. Callsign` in the vehicle column so they are easy to identify.
+- Pilot Roster airfields now use stable three-letter codes; hovering a code shows the complete name supplied by the server.
+
+### Fixed
+
+- The installer now checks active and duplicate legacy installation folders for `whitelist.txt` and `blacklist.txt` on every update, merging missing entries into `%AppData%\IL2-SRS` even when the original one-time configuration migration has already completed.
+- The Pilot Roster now uses the working area of the monitor it is currently on when automatically fitting its height, preventing roster updates from moving it back to the primary monitor.
 
 ### Compatibility
 
 - Updated clients and servers remain compatible with `1.0.4.8` installations.
-- Clients must use this beta to see the new Pilot Roster presentation.
+- Clients must use this beta to see the new Pilot Roster presentation and spawn-airfield data.
 
 ### Validation
 
 - Built `IL2-SimpleRadioStandalone.sln` Release/x64 successfully.
-- Ran `IL2-SR-CommonTests` Release/x64: 186/186 passed.
+- Ran `IL2-SR-CommonTests` Release/x64: 196/196 passed.
 
 ## IL2-SRS 1.0.4.8 community update
 

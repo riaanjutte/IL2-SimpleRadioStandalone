@@ -43,6 +43,8 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Common.Network
 
         public string AssignedVehicle { get; set; }
 
+        public string AssignedAirfield { get; set; }
+
         public int Coalition
         {
             get { return _coalition; }
