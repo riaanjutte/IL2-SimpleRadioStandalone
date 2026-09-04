@@ -1,6 +1,12 @@
 # Changelog
 
-## IL2-SRS 1.0.4.9-beta.1 community update
+## IL2-SRS 1.0.4.9 community update
+
+### Highlights
+
+- Pilot Roster data can now show each player's spawn airfield using recognizable three-letter codes when supplied by the server.
+- Radio and roster displays are more compact, leaving more room for useful pilot information.
+- Installation failures caused by a damaged IL-2 configuration or a running game now provide clearer recovery guidance without blocking the SRS binaries unnecessarily.
 
 ### Added
 
@@ -19,16 +25,18 @@
 
 - The installer now checks active and duplicate legacy installation folders for `whitelist.txt` and `blacklist.txt` on every update, merging missing entries into `%AppData%\IL2-SRS` even when the original one-time configuration migration has already completed.
 - The Pilot Roster now uses the working area of the monitor it is currently on when automatically fitting its height, preventing roster updates from moving it back to the primary monitor.
+- A damaged or missing IL-2 `startup.cfg` now produces a prominent telemetry-repair warning without preventing the SRS binaries from being installed or updated.
+- If IL-2 is running during an update, the installer now displays a dedicated warning with prominent instructions to close the game and retry.
 
 ### Compatibility
 
 - Updated clients and servers remain compatible with `1.0.4.8` installations.
-- Clients must use this beta to see the new Pilot Roster presentation and spawn-airfield data.
+- The updated server is required to distribute spawn-airfield data, and clients must use `1.0.4.9` to display it.
 
 ### Validation
 
 - Built `IL2-SimpleRadioStandalone.sln` Release/x64 successfully.
-- Ran `IL2-SR-CommonTests` Release/x64: 196/196 passed.
+- Ran `IL2-SR-CommonTests` Release/x64: 204/204 passed.
 
 ## IL2-SRS 1.0.4.8 community update
 

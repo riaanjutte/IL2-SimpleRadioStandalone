@@ -38,7 +38,7 @@ namespace Installer
         private readonly bool _autoUpdateMode;
         private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
         private ProgressBarDialog _progressBarDialog = null;
-        private string _installFailureMessage = string.Empty;
+        private InstallerFailurePresentation _installFailurePresentation;
         private readonly string _registeredSrsPath;
 
         public MainWindow()
@@ -167,7 +167,7 @@ namespace Installer
                 return;
             }
 
-            _installFailureMessage = string.Empty;
+            _installFailurePresentation = null;
             InstallButton.IsEnabled = false;
             RemoveButton.IsEnabled = false;
 
@@ -255,21 +255,20 @@ namespace Installer
                 {
                     _progressBarDialog.UpdateProgress(true, "Error with Installation");
 
-                    string errorMessage = "Error with installation.";
-                    if (!string.IsNullOrWhiteSpace(_installFailureMessage))
-                    {
-                        errorMessage += "\n\n" + _installFailureMessage;
-                    }
-
-                    errorMessage += "\n\nPlease post your installer-log.txt on the SRS Discord under IL2-SRS support if the problem continues.";
+                    InstallerFailurePresentation failure = _installFailurePresentation
+                        ?? InstallerFailurePresentation.FromException(null);
 
                     MessageBox.Show(
-                        errorMessage,
-                        "Installation Error",
-                        MessageBoxButton.OK, MessageBoxImage.Error);
+                        failure.Message,
+                        failure.Title,
+                        MessageBoxButton.OK,
+                        failure.Image);
 
-                    Process.Start("https://discord.gg/vqxAw7H");
-                    Process.Start("explorer.exe", GetWorkingDirectory());
+                    if (failure.OpenSupportResources)
+                    {
+                        Process.Start("https://discord.gg/vqxAw7H");
+                        Process.Start("explorer.exe", GetWorkingDirectory());
+                    }
                     Environment.Exit(0);
                 }
             }).Invoke();
@@ -372,7 +371,7 @@ namespace Installer
                     Logger.Info($"Installing - Paths: \nProgram:{srPath} IL2: NO PATH - NO CONFIG");
                 }
 
-                List<Il2Install> configuredInstalls = ConfigureInstalledTelemetry(IL2ScriptsPath);
+                TelemetryConfigurationResult telemetryResult = ConfigureInstalledTelemetry(IL2ScriptsPath);
 
                 //install program
                 InstallProgram(srPath);
@@ -408,26 +407,43 @@ namespace Installer
                 {
                     message += "\nMigration backup: " + consolidation.BackupPath;
                 }
-                if (configuredInstalls.Count > 0)
+                if (telemetryResult.ConfiguredInstalls.Count > 0)
                 {
                     message += "\n\nVerified SRS telemetry for:";
-                    foreach (Il2Install install in configuredInstalls)
+                    foreach (Il2Install install in telemetryResult.ConfiguredInstalls)
                     {
                         message += "\n" + install.DisplayName + ": " + install.InstallPath;
                     }
                 }
-                else
+                else if (telemetryResult.DetectedInstalls.Count == 0)
                 {
-                    message += "\n\nNo installed IL-2 Great Battles or IL-2 Korea startup.cfg was detected. SRS will check again whenever the client starts.";
+                    message += "\n\nNo IL-2 Great Battles or IL-2 Korea installation was detected. SRS will check again whenever the client starts.";
                 }
 
-                MessageBox.Show(message, "IL2-SRS Installer",
-                    MessageBoxButton.OK, MessageBoxImage.Information);
+                if (telemetryResult.Warnings.Count > 0)
+                {
+                    message += "\n\nACTION REQUIRED: SRS was installed, but telemetry could not be configured for:";
+                    foreach (TelemetryConfigurationWarning warning in telemetryResult.Warnings)
+                    {
+                        message += "\n\n" + warning.DisplayName + "\n" + warning.StartupConfigPath;
+                    }
+
+                    message += "\n\nThe affected startup.cfg is missing, empty, or incomplete. SRS did not modify it. "
+                               + "Close IL-2, restore an IL2-SRS backup or let IL-2 recreate startup.cfg, "
+                               + "then run Telemetry Diagnostics from the SRS Help tab.";
+                }
+
+                bool telemetryWarning = telemetryResult.Warnings.Count > 0;
+                MessageBox.Show(
+                    message,
+                    telemetryWarning ? "IL2-SRS Installed - Telemetry Repair Required" : "IL2-SRS Installer",
+                    MessageBoxButton.OK,
+                    telemetryWarning ? MessageBoxImage.Warning : MessageBoxImage.Information);
                 return 1;
             }
             catch (Exception ex)
             {
-                _installFailureMessage = ex.Message;
+                _installFailurePresentation = InstallerFailurePresentation.FromException(ex);
                 Logger.Error(ex, "Error Running IL2-SRS Installer");
 
                 return -1;
@@ -690,34 +706,29 @@ namespace Installer
             shortcut.Save();
         }
 
-        private List<Il2Install> ConfigureInstalledTelemetry(string selectedPath)
+        private TelemetryConfigurationResult ConfigureInstalledTelemetry(string selectedPath)
         {
             List<Il2Install> installs = Il2InstallDiscovery.FindInstalledGames(selectedPath);
             if (installs.Count == 0)
             {
-                Logger.Warn("No installed IL-2 Great Battles or IL-2 Korea startup.cfg files were detected during installation");
-                return installs;
+                Logger.Warn("No IL-2 Great Battles or IL-2 Korea installations were detected during installation");
+                return new TelemetryConfigurationResult(installs);
             }
 
-            foreach (Il2Install install in installs)
+            TelemetryConfigurationResult result = InstallerTelemetryConfiguration.Configure(
+                installs,
+                install => EnableTelemetry(install.InstallPath),
+                logMessage => Logger.Warn(logMessage));
+
+            foreach (Il2Install install in result.DetectedInstalls)
             {
-                try
-                {
-                    EnableTelemetry(install.InstallPath);
-                }
-                catch (Exception ex)
-                {
-                    throw new IOException(
-                        "SRS could not update telemetry settings in " + install.StartupConfigPath +
-                        ". Close IL-2, run the installer as administrator, and try again.", ex);
-                }
                 WritePath(install.InstallPath,
                     Il2InstallDiscovery.IsKorea(install) ? "IL2KoreaPath" : "IL2GreatBattlesPath");
             }
 
             // Keep the legacy value populated for older clients and future nearby-install discovery.
             WritePath(installs[0].InstallPath, "IL2Path");
-            return installs;
+            return result;
         }
 
         private void EnableTelemetry(string path)

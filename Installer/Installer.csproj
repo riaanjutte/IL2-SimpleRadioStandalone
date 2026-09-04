@@ -152,6 +152,7 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="Il2InstallDiscovery.cs" />
+    <Compile Include="InstallerTelemetryConfiguration.cs" />
     <Compile Include="MainWindow.xaml.cs">
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>

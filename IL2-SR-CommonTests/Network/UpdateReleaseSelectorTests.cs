@@ -24,8 +24,9 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Common.Tests.Network
         [TestMethod]
         public void StableClientWithEmptyReleaseTagDoesNotRedownloadSameVersion()
         {
-            var current = Current("1.0.4.8", "");
-            var releases = Releases(Stable("v1.0.4.8"));
+            Assert.AreEqual(string.Empty, ReleaseMetadata.ReleaseTag);
+            var current = Current(ReleaseMetadata.Version, ReleaseMetadata.ReleaseTag);
+            var releases = Releases(Stable("v" + ReleaseMetadata.Version));
 
             var selected = UpdateReleaseSelector.SelectClientUpdate(releases, current, false);
 
@@ -151,8 +152,9 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Common.Tests.Network
         [TestMethod]
         public void DirectStableUpdaterWithEmptyReleaseTagDoesNotRedownloadSameVersion()
         {
-            var current = Current("1.0.4.8", "");
-            var releases = Releases(Stable("v1.0.4.8"));
+            Assert.AreEqual(string.Empty, ReleaseMetadata.ReleaseTag);
+            var current = Current(ReleaseMetadata.Version, ReleaseMetadata.ReleaseTag);
+            var releases = Releases(Stable("v" + ReleaseMetadata.Version));
 
             var selected = UpdateReleaseSelector.SelectAutoUpdaterDownload(
                 releases,

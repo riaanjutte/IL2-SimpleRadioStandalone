@@ -298,8 +298,7 @@ namespace Installer
             {
                 try
                 {
-                    if (Directory.Exists(candidate)
-                        && File.Exists(Path.Combine(candidate, "data", "startup.cfg")))
+                    if (IsValidInstallRoot(candidate))
                     {
                         return Path.GetFullPath(candidate);
                     }
@@ -310,6 +309,23 @@ namespace Installer
             }
 
             return string.Empty;
+        }
+
+        private static bool IsValidInstallRoot(string candidate)
+        {
+            if (!Directory.Exists(candidate) || !Directory.Exists(Path.Combine(candidate, "data")))
+            {
+                return false;
+            }
+
+            if (File.Exists(Path.Combine(candidate, "data", "startup.cfg")))
+            {
+                return true;
+            }
+
+            string gameDirectory = Path.Combine(candidate, "bin", "game");
+            return File.Exists(Path.Combine(gameDirectory, "Il-2.exe"))
+                   || File.Exists(Path.Combine(gameDirectory, "IL2Series.exe"));
         }
 
         private static void AddPathCandidate(ICollection<string> candidates, string path)

@@ -57,8 +57,7 @@ namespace Installer
 
                 if (writeAllowed != null && !writeAllowed())
                 {
-                    throw new InvalidOperationException(
-                        "IL-2 is running. Close IL-2 before the installer repairs startup.cfg.");
+                    throw new Il2RunningTelemetryConfigurationException(cfgPath);
                 }
 
                 FileAttributes originalAttributes = File.GetAttributes(cfgPath);
