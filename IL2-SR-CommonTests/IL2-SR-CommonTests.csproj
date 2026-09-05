@@ -80,6 +80,7 @@
     <Compile Include="Input\InputBindingLayoutTests.cs" />
     <Compile Include="Input\InputPollingCycleCacheTests.cs" />
     <Compile Include="Installer\Il2InstallDiscoveryTests.cs" />
+    <Compile Include="Installer\SteamGameDiscoveryTests.cs" />
     <Compile Include="Installer\InstallerTelemetryConfigurationTests.cs" />
     <Compile Include="Installer\SrsInstallConsolidatorTests.cs" />
     <Compile Include="Settings\UserDataPathsTests.cs" />

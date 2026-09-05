@@ -1,5 +1,17 @@
 # Changelog
 
+## IL2-SRS 1.0.4.10 hotfix
+
+### Fixed
+
+- The installer, client startup checks, and Telemetry Diagnostics now recognize Steam's `IL2Series` folder and identify Korea by `IL2Series.exe`. Steam app manifests provide a fallback for differently named installation folders.
+
+### Updating
+
+- Close IL-2 Great Battles and IL-2 Korea before installing the update.
+- If Steam Korea was previously not detected, update SRS and run **Help > Telemetry Diagnostics** while the game is closed, then restart Korea.
+- Existing clients and servers remain compatible. Server owners do not need to update for this detection fix.
+
 ## IL2-SRS 1.0.4.9 community update
 
 ### Highlights

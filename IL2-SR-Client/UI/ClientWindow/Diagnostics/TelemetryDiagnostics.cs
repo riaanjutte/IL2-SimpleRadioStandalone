@@ -11,6 +11,7 @@ using Ciribob.IL2.SimpleRadio.Standalone.Client.Settings;
 using Ciribob.IL2.SimpleRadio.Standalone.Client.Singletons;
 using Ciribob.IL2.SimpleRadio.Standalone.Client.Utils;
 using Microsoft.Win32;
+using Ciribob.IL2.SimpleRadio.Standalone.Common.Helpers;
 
 namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI.ClientWindow.Diagnostics
 {
@@ -26,7 +27,8 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI.ClientWindow.Diagnostics
             "IL-2 Sturmovik Battle of Stalingrad",
             "IL-2 Sturmovik Great Battles",
             "IL-2 Sturmovik Korea",
-            "IL-2 Korea"
+            "IL-2 Korea",
+            "IL2Series"
         };
 
         private readonly IList<ITelemetryDiagnosticProvider> _providers;
@@ -317,10 +319,15 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI.ClientWindow.Diagnostics
             }
         }
 
-        private static void AddSteamCandidates(Dictionary<string, Il2InstallCandidate> candidates)
+        internal static void AddSteamCandidates(Dictionary<string, Il2InstallCandidate> candidates, IEnumerable<string> libraryRoots = null)
         {
-            foreach (string steamRoot in GetSteamLibraryRoots())
+            foreach (string steamRoot in libraryRoots ?? GetSteamLibraryRoots())
             {
+                foreach (string installRoot in Il2SteamInstallDiscovery.FindManifestInstallRoots(steamRoot))
+                {
+                    AddCandidate(candidates, "Steam IL-2 install", "Steam app manifest", installRoot);
+                }
+
                 string commonPath = Path.Combine(steamRoot, "steamapps", "common");
                 if (!Directory.Exists(commonPath))
                 {
@@ -487,6 +494,11 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI.ClientWindow.Diagnostics
                 return;
             }
 
+            if (Il2SteamInstallDiscovery.HasKoreaExecutable(installPath))
+            {
+                displayName = KoreaDisplayName;
+            }
+
             string startupConfigPath = Path.Combine(installPath, "data", "startup.cfg");
             string key = Path.GetFullPath(startupConfigPath);
             Il2InstallCandidate existing;
@@ -546,7 +558,8 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI.ClientWindow.Diagnostics
                 {
                     if (Directory.Exists(candidate)
                         && Directory.Exists(Path.Combine(candidate, "data"))
-                        && HasStartupConfigOrRecoveryBackup(Path.Combine(candidate, "data", "startup.cfg")))
+                        && (HasStartupConfigOrRecoveryBackup(Path.Combine(candidate, "data", "startup.cfg"))
+                            || Il2SteamInstallDiscovery.HasGameExecutable(candidate)))
                     {
                         return Path.GetFullPath(candidate);
                     }
@@ -619,7 +632,8 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI.ClientWindow.Diagnostics
             }
 
             string lower = value.ToLowerInvariant();
-            return (lower.Contains("il-2") || lower.Contains("il2") || lower.Contains("sturmovik"))
+            return lower.Contains("il2series")
+                   || (lower.Contains("il-2") || lower.Contains("il2") || lower.Contains("sturmovik"))
                    && (lower.Contains("korea")
                        || lower.Contains("great battles")
                        || lower.Contains("battle of stalingrad")
@@ -629,7 +643,7 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI.ClientWindow.Diagnostics
         private static string InferDisplayName(string value, string fallback)
         {
             string lower = (value ?? string.Empty).ToLowerInvariant();
-            if (lower.Contains("korea"))
+            if (lower.Contains("korea") || lower.Contains("il2series"))
             {
                 return KoreaDisplayName;
             }

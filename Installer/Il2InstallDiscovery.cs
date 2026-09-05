@@ -6,6 +6,7 @@ using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
 using Microsoft.Win32;
+using Ciribob.IL2.SimpleRadio.Standalone.Common.Helpers;
 
 namespace Installer
 {
@@ -37,7 +38,8 @@ namespace Installer
             "IL-2 Sturmovik Battle of Stalingrad",
             "IL-2 Sturmovik Great Battles",
             "IL-2 Sturmovik Korea",
-            "IL-2 Korea"
+            "IL-2 Korea",
+            "IL2Series"
         };
 
         public static List<Il2Install> FindInstalledGames(params string[] explicitPaths)
@@ -149,10 +151,15 @@ namespace Installer
             }
         }
 
-        private static void AddSteamCandidates(Dictionary<string, Il2Install> installs)
+        internal static void AddSteamCandidates(Dictionary<string, Il2Install> installs, IEnumerable<string> libraryRoots = null)
         {
-            foreach (string steamRoot in GetSteamLibraryRoots())
+            foreach (string steamRoot in libraryRoots ?? GetSteamLibraryRoots())
             {
+                foreach (string installRoot in Il2SteamInstallDiscovery.FindManifestInstallRoots(steamRoot))
+                {
+                    AddCandidate(installs, installRoot, string.Empty);
+                }
+
                 string commonPath = Path.Combine(steamRoot, "steamapps", "common");
                 if (!Directory.Exists(commonPath))
                 {
@@ -258,7 +265,9 @@ namespace Installer
             }
 
             string configPath = Path.GetFullPath(Path.Combine(root, "data", "startup.cfg"));
-            string displayName = InferDisplayName(root + " " + displayHint);
+            string displayName = Il2SteamInstallDiscovery.HasKoreaExecutable(root)
+                ? KoreaDisplayName
+                : InferDisplayName(root + " " + displayHint);
             installs[configPath] = new Il2Install(displayName, root);
         }
 
@@ -323,9 +332,7 @@ namespace Installer
                 return true;
             }
 
-            string gameDirectory = Path.Combine(candidate, "bin", "game");
-            return File.Exists(Path.Combine(gameDirectory, "Il-2.exe"))
-                   || File.Exists(Path.Combine(gameDirectory, "IL2Series.exe"));
+            return Il2SteamInstallDiscovery.HasGameExecutable(candidate);
         }
 
         private static void AddPathCandidate(ICollection<string> candidates, string path)
@@ -405,7 +412,8 @@ namespace Installer
             }
 
             string lower = value.ToLowerInvariant();
-            return (lower.Contains("il-2") || lower.Contains("il2") || lower.Contains("sturmovik"))
+            return lower.Contains("il2series")
+                   || (lower.Contains("il-2") || lower.Contains("il2") || lower.Contains("sturmovik"))
                    && (lower.Contains("korea")
                        || lower.Contains("great battles")
                        || lower.Contains("battle of stalingrad")
@@ -415,6 +423,7 @@ namespace Installer
         private static string InferDisplayName(string value)
         {
             return value.IndexOf("korea", StringComparison.OrdinalIgnoreCase) >= 0
+                   || value.IndexOf("il2series", StringComparison.OrdinalIgnoreCase) >= 0
                 ? KoreaDisplayName
                 : GreatBattlesDisplayName;
         }
