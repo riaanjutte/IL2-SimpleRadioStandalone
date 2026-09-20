@@ -222,7 +222,11 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI.ClientWindow.PilotRoster
             return !string.Equals(trimmedName, "Axis Airfield", System.StringComparison.OrdinalIgnoreCase) &&
                    !string.Equals(trimmedName, "Axis Command", System.StringComparison.OrdinalIgnoreCase) &&
                    !string.Equals(trimmedName, "Allies Airfield", System.StringComparison.OrdinalIgnoreCase) &&
-                   !string.Equals(trimmedName, "Allies Command", System.StringComparison.OrdinalIgnoreCase);
+                   !string.Equals(trimmedName, "Allies Command", System.StringComparison.OrdinalIgnoreCase) &&
+                   !string.Equals(trimmedName, "UN Airfield", System.StringComparison.OrdinalIgnoreCase) &&
+                   !string.Equals(trimmedName, "UN Command", System.StringComparison.OrdinalIgnoreCase) &&
+                   !string.Equals(trimmedName, "CF Airfield", System.StringComparison.OrdinalIgnoreCase) &&
+                   !string.Equals(trimmedName, "CF Command", System.StringComparison.OrdinalIgnoreCase);
         }
     }
 }

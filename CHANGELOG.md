@@ -1,5 +1,15 @@
 # Changelog
 
+## IL2-SRS 1.0.4.11
+
+### Fixed
+
+- The Pilot Roster now recognizes IL-2 Korea's UN and CF command and airfield service accounts. They no longer appear as unassigned pilots with missing callsigns, while real player names remain visible.
+
+### Compatibility
+
+- Updated clients remain compatible with existing SRS servers. Server owners do not need to update for this client-side fix.
+
 ## IL2-SRS 1.0.4.10 hotfix
 
 ### Fixed

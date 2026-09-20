@@ -120,21 +120,31 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Common.Tests.UI
         }
 
         [TestMethod]
-        public void BuildExcludesCombatBoxInfrastructureClients()
+        public void BuildExcludesAirfieldAndCommandServiceClients()
         {
             var roster = PilotRosterBuilder.Build(CreateState(FriendlyCoalition, 1, 2), new[]
             {
                 CreateClient("friendly-1", "Axis Airfield", "", FriendlyCoalition, 2, 0),
                 CreateClient("friendly-2", "Axis Command", "", FriendlyCoalition, 1, 0),
+                CreateClient("friendly-5", " un airfield ", "", FriendlyCoalition, 2, 0),
+                CreateClient("friendly-6", "UN COMMAND", "", FriendlyCoalition, 1, 0),
+                CreateClient("friendly-8", "CF Airfield", "", FriendlyCoalition, 2, 0),
+                CreateClient("friendly-9", " cf command ", "", FriendlyCoalition, 1, 0),
                 CreateClient("friendly-3", "-TBAS-Haluter", "", FriendlyCoalition, 1, 2),
-                CreateClient("friendly-4", "KRAKEN__RCI", "RAVEN-3", FriendlyCoalition, 4, 2)
+                CreateClient("friendly-4", "KRAKEN__RCI", "RAVEN-3", FriendlyCoalition, 4, 2),
+                CreateClient("friendly-7", "UN Commander", "", FriendlyCoalition, 1, 2)
             }).ToList();
 
-            Assert.AreEqual(2, roster.Count);
+            Assert.AreEqual(3, roster.Count);
             Assert.IsFalse(roster.Any(entry => entry.PilotName == "AXIS AIRFIELD"));
             Assert.IsFalse(roster.Any(entry => entry.PilotName == "AXIS COMMAND"));
+            Assert.IsFalse(roster.Any(entry => entry.PilotName == "UN AIRFIELD"));
+            Assert.IsFalse(roster.Any(entry => entry.PilotName == "UN COMMAND"));
+            Assert.IsFalse(roster.Any(entry => entry.PilotName == "CF AIRFIELD"));
+            Assert.IsFalse(roster.Any(entry => entry.PilotName == "CF COMMAND"));
             Assert.IsTrue(roster.Any(entry => entry.PilotName == "-TBAS-HALUTER"));
             Assert.IsTrue(roster.Any(entry => entry.PilotName == "KRAKEN__RCI"));
+            Assert.IsTrue(roster.Any(entry => entry.PilotName == "UN COMMANDER"));
         }
 
         [TestMethod]
