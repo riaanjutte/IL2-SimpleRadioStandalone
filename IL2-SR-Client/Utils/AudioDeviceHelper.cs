@@ -1,4 +1,5 @@
 using System;
+using System.Runtime.InteropServices;
 using NAudio.CoreAudioApi;
 using NLog;
 
@@ -25,6 +26,10 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.Utils
             catch (NotImplementedException ex)
             {
                 Logger.Warn(ex, $"Unable to unmute audio device {device.FriendlyName} - continuing anyway");
+            }
+            catch (COMException ex)
+            {
+                Logger.Warn(ex, "Unable to unmute audio device - continuing anyway");
             }
         }
     }

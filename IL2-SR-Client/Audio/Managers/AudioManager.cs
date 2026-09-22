@@ -89,8 +89,10 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.Audio.Managers
         private int _errorCount = 0;
         private int _badMicFrameCount = 0;
         private long _lastMicPipelineResetUtcTicks = DateTime.MinValue.Ticks;
-        private bool _stoppingEncoding = false;
+        private volatile bool _stoppingEncoding = false;
         private int _micCaptureRestartInProgress = 0;
+        private int _micCaptureStoppedDuringRecovery = 0;
+        private CancellationTokenSource _micCaptureRecoveryCancellation = new CancellationTokenSource();
         //Stopwatch _stopwatch = new Stopwatch();
 
         object lockObj = new object();
@@ -127,6 +129,13 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.Audio.Managers
         public void StartEncoding(string guid, InputDeviceManager inputManager,
             IPAddress ipAddress, int port)
         {
+            lock (lockObj)
+            {
+                _micCaptureRecoveryCancellation.Cancel();
+                _micCaptureRecoveryCancellation = new CancellationTokenSource();
+                Interlocked.Exchange(ref _micCaptureRestartInProgress, 0);
+                Interlocked.Exchange(ref _micCaptureStoppedDuringRecovery, 0);
+            }
 
             MMDevice speakers = null;
             if (_audioOutputSingleton.SelectedAudioOutput.Value == null)
@@ -323,9 +332,8 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.Audio.Managers
 
         private void WasapiCaptureOnRecordingStopped(object sender, StoppedEventArgs e)
         {
-            if (_stoppingEncoding)
+            if (_stoppingEncoding || !ReferenceEquals(sender, _wasapiCapture))
             {
-                Logger.Info("Recording stopped during audio shutdown");
                 return;
             }
 
@@ -336,6 +344,12 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.Audio.Managers
             else
             {
                 Logger.Warn("Recording stopped unexpectedly. Restarting microphone capture.");
+            }
+
+            if (Interlocked.CompareExchange(ref _micCaptureRestartInProgress, 0, 0) == 1)
+            {
+                Interlocked.Exchange(ref _micCaptureStoppedDuringRecovery, 1);
+                return;
             }
 
             RestartMicCaptureAfterUnexpectedStop();
@@ -553,37 +567,32 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.Audio.Managers
         private MMDevice ResolveCaptureDevice()
         {
             var savedDeviceId = _globalSettings.GetClientSetting(GlobalSettingsKeys.AudioInputDeviceId).RawValue?.Trim();
-            var selectedDevice = _audioInputSingleton.SelectedAudioInput?.Value as MMDevice;
-            var selectedDeviceId = selectedDevice?.ID;
-
             if (string.IsNullOrWhiteSpace(savedDeviceId) || savedDeviceId.Equals("default", StringComparison.OrdinalIgnoreCase))
             {
-                if (selectedDevice == null)
-                {
-                    var defaultDevice = WasapiCapture.GetDefaultCaptureDevice();
-                    Logger.Info($"Resolved default microphone capture endpoint {defaultDevice.FriendlyName} {defaultDevice.ID}");
-                    return defaultDevice;
-                }
-
-                savedDeviceId = selectedDeviceId;
+                var defaultDevice = WasapiCapture.GetDefaultCaptureDevice();
+                Logger.Info($"Resolved default microphone capture endpoint {defaultDevice.FriendlyName} {defaultDevice.ID}");
+                return defaultDevice;
             }
 
-            var deviceEnum = new MMDeviceEnumerator();
-            var activeCaptureDevices = deviceEnum.EnumerateAudioEndPoints(DataFlow.Capture, DeviceState.Active);
-            foreach (var device in activeCaptureDevices)
+            using (var deviceEnum = new MMDeviceEnumerator())
             {
-                if (!device.ID.Equals(savedDeviceId, StringComparison.OrdinalIgnoreCase))
+                var activeCaptureDevices = deviceEnum.EnumerateAudioEndPoints(DataFlow.Capture, DeviceState.Active);
+                foreach (var device in activeCaptureDevices)
                 {
-                    continue;
-                }
+                    if (!device.ID.Equals(savedDeviceId, StringComparison.OrdinalIgnoreCase))
+                    {
+                        continue;
+                    }
 
-                _audioInputSingleton.SelectedAudioInput = new AudioDeviceListItem
-                {
-                    Text = device.FriendlyName,
-                    Value = device
-                };
-                Logger.Info($"Resolved saved microphone capture endpoint {device.FriendlyName} {device.ID}");
-                return device;
+                    // Keep the selected UI item so reconnect uses the refreshed endpoint too.
+                    var selectedInput = _audioInputSingleton.SelectedAudioInput;
+                    if (selectedInput != null)
+                    {
+                        selectedInput.Value = device;
+                    }
+                    Logger.Info($"Resolved saved microphone capture endpoint {device.FriendlyName} {device.ID}");
+                    return device;
+                }
             }
 
             throw new InvalidOperationException($"Saved microphone capture endpoint is not active: {savedDeviceId}");
@@ -596,48 +605,89 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.Audio.Managers
 
         private void RestartMicCapture(string reason, int delayMs)
         {
+            if (_stoppingEncoding)
+            {
+                return;
+            }
+
             if (Interlocked.Exchange(ref _micCaptureRestartInProgress, 1) == 1)
             {
                 return;
             }
 
+            var cancellation = _micCaptureRecoveryCancellation;
             Task.Run(() =>
             {
                 try
                 {
-                    Thread.Sleep(delayMs);
-                    if (_stoppingEncoding || !_audioInputSingleton.MicrophoneAvailable)
+                    var attempt = 0;
+                    while (!cancellation.Token.WaitHandle.WaitOne(delayMs))
                     {
-                        return;
+                        if (_stoppingEncoding || cancellation.IsCancellationRequested)
+                        {
+                            return;
+                        }
+
+                        attempt++;
+                        try
+                        {
+                            lock (lockObj)
+                            {
+                                if (_stoppingEncoding || cancellation.IsCancellationRequested)
+                                {
+                                    return;
+                                }
+
+                                var oldCapture = _wasapiCapture;
+                                _wasapiCapture = null;
+                                if (oldCapture != null)
+                                {
+                                    oldCapture.DataAvailable -= WasapiCaptureOnDataAvailable;
+                                    oldCapture.RecordingStopped -= WasapiCaptureOnRecordingStopped;
+                                    try
+                                    {
+                                        oldCapture.Dispose();
+                                    }
+                                    catch (Exception ex)
+                                    {
+                                        Logger.Warn(ex, "Failed to dispose stopped microphone capture; continuing recovery");
+                                    }
+                                }
+
+                                ResetMicProcessingPipeline(reason);
+
+                                var device = ResolveCaptureDevice();
+                                AudioDeviceHelper.TryUnmute(device);
+
+                                Logger.Info($"Restarting microphone capture on {device.FriendlyName} {device.ID} after {reason} (attempt {attempt})");
+                                var capture = new WasapiCapture(device, true);
+                                capture.ShareMode = AudioClientShareMode.Shared;
+                                capture.DataAvailable += WasapiCaptureOnDataAvailable;
+                                capture.RecordingStopped += WasapiCaptureOnRecordingStopped;
+                                _wasapiCapture = capture;
+                                capture.StartRecording();
+                            }
+
+                            Logger.Info($"Restarted microphone capture after {reason} (attempt {attempt})");
+                            return;
+                        }
+                        catch (Exception ex)
+                        {
+                            Logger.Warn(ex, $"Microphone capture recovery attempt {attempt} failed after {reason}; retrying");
+                            delayMs = Math.Min(10000, Math.Max(1000, delayMs * 2));
+                        }
                     }
-
-                    lock (lockObj)
-                    {
-                        _wasapiCapture?.Dispose();
-                        _wasapiCapture = null;
-
-                        ResetMicProcessingPipeline(reason);
-
-                        var device = ResolveCaptureDevice();
-                        AudioDeviceHelper.TryUnmute(device);
-
-                        Logger.Info($"Restarting microphone capture on {device.FriendlyName} {device.ID} after {reason}");
-                        _wasapiCapture = new WasapiCapture(device, true);
-                        _wasapiCapture.ShareMode = AudioClientShareMode.Shared;
-                        _wasapiCapture.DataAvailable += WasapiCaptureOnDataAvailable;
-                        _wasapiCapture.RecordingStopped += WasapiCaptureOnRecordingStopped;
-                        _wasapiCapture.StartRecording();
-                    }
-
-                    Logger.Info($"Restarted microphone capture after {reason}");
-                }
-                catch (Exception ex)
-                {
-                    Logger.Error(ex, $"Failed to restart microphone capture after {reason}");
                 }
                 finally
                 {
-                    Interlocked.Exchange(ref _micCaptureRestartInProgress, 0);
+                    if (ReferenceEquals(_micCaptureRecoveryCancellation, cancellation))
+                    {
+                        Interlocked.Exchange(ref _micCaptureRestartInProgress, 0);
+                        if (Interlocked.Exchange(ref _micCaptureStoppedDuringRecovery, 0) == 1 && !_stoppingEncoding)
+                        {
+                            RestartMicCaptureAfterUnexpectedStop();
+                        }
+                    }
                 }
             });
         }
@@ -864,6 +914,7 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.Audio.Managers
             lock (lockObj)
             {
                 _stoppingEncoding = true;
+                _micCaptureRecoveryCancellation.Cancel();
                 udpVoiceHandler = _udpVoiceHandler;
                 _udpVoiceHandler = null;
             }
