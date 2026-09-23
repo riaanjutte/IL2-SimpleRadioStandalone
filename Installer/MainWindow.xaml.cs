@@ -675,6 +675,10 @@ namespace Installer
             _progressBarDialog.UpdateProgress(false, $"Copying Program Files at {path}");
 
             Logger.Info($"Copying binaries");
+            if (LegacyAssemblyCleanup.RemoveExternalCommonAssembly(path))
+            {
+                Logger.Info("Removed stale DCS-SR-Common.dll so embedded release metadata is used");
+            }
             File.Copy(_currentDirectory + "\\opus.dll", path + "\\opus.dll", true);
             File.Copy(_currentDirectory + "\\speexdsp.dll", path + "\\speexdsp.dll", true);
         //    File.Copy(_currentDirectory + "\\Readme.txt", path + "\\Readme.txt", true);

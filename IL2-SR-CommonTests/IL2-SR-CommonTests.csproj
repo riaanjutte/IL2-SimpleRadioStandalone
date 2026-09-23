@@ -82,6 +82,7 @@
     <Compile Include="Installer\Il2InstallDiscoveryTests.cs" />
     <Compile Include="Installer\SteamGameDiscoveryTests.cs" />
     <Compile Include="Installer\InstallerTelemetryConfigurationTests.cs" />
+    <Compile Include="Installer\LegacyAssemblyCleanupTests.cs" />
     <Compile Include="Installer\SrsInstallConsolidatorTests.cs" />
     <Compile Include="Settings\UserDataPathsTests.cs" />
     <Compile Include="Settings\DefaultServerSettingsTests.cs" />

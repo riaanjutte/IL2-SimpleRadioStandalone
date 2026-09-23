@@ -31,6 +31,8 @@ IL-2 can rewrite `startup.cfg` when it exits. Closing the game first prevents it
 
 The Auto Updater closes running SRS components, downloads the latest stable package, runs its installer, and restarts the client after a successful automatic update.
 
+If the updater repeatedly offers the same release and the client title still shows an older version, run the latest stable Auto Updater again. The current installer removes an obsolete `DCS-SR-Common.dll` that could override the bundled client version. If it still loops, use the full ZIP repair steps below and include `installer-log.txt` when reporting the problem. Your settings in `%AppData%\IL2-SRS` are not removed.
+
 ## Install or continue testing a beta
 
 Open [GitHub Releases](https://github.com/riaanjutte/IL2-SimpleRadioStandalone/releases), select the required release marked **Pre-release**, and download its attached Auto Updater or full ZIP package.

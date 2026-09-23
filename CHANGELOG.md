@@ -8,6 +8,7 @@
 
 ### Fixed
 
+- The installer now removes a leftover `DCS-SR-Common.dll` from older installations. That file could override the updated client's bundled code, leaving the title at 1.0.4.11 and repeatedly offering the 1.0.4.12 update.
 - Microphone capture now attempts to recover automatically after a Windows audio device or endpoint reset, reducing cases where reconnecting to the server was needed to restore outgoing voice.
 - The Pilot Roster and Client List keep their chosen position and size when toggled. Roster updates no longer resize the window or pull it away from the screen edge.
 - Pilot Roster filtering now hides Korea's UN and CF command and airfield service accounts even when their names contain extra or invisible whitespace.

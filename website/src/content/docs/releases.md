@@ -21,7 +21,7 @@ Each release also provides a ZIP package containing the client, server, installe
 
 ## Release notes
 
-**1.0.4.12:** Bind keys to toggle the Pilot Roster and Client List; those windows now keep their position and size. The client also recovers microphone capture after audio device resets and remembers a separate pilot name for Great Battles and Korea. See the [1.0.4.12 release notes](https://github.com/riaanjutte/IL2-SimpleRadioStandalone/releases/tag/v1.0.4.12).
+**1.0.4.12:** Bind keys to toggle the Pilot Roster and Client List; those windows now keep their position and size. The client also recovers microphone capture after audio device resets, remembers a separate pilot name for Great Battles and Korea, and repairs an update loop caused by an obsolete DLL. See the [1.0.4.12 release notes](https://github.com/riaanjutte/IL2-SimpleRadioStandalone/releases/tag/v1.0.4.12).
 
 The client Help tab includes a **What's New in this version** link that opens the GitHub notes for the running build. The repository also keeps a cumulative [CHANGELOG.md](https://github.com/riaanjutte/IL2-SimpleRadioStandalone/blob/master/CHANGELOG.md).
 

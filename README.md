@@ -31,6 +31,7 @@ IL2-SRS supports IL-2 Korea alongside IL-2 Great Battles. Please report Korea-sp
 
 - Assign keys to show or hide the Pilot Roster and Client List. Both windows now keep their position and size when toggled or updated.
 - Microphone capture can recover automatically after an audio device reset.
+- Updating now removes an obsolete DLL that could make an installed 1.0.4.12 client continue to report 1.0.4.11 and offer the update again.
 - Pilot identity is remembered separately for Great Battles and Korea, improving callsign display when switching games. Start SRS before joining a multiplayer server in each game at least once so it can learn that game's pilot name.
 
 See the [full release notes](https://github.com/riaanjutte/IL2-SimpleRadioStandalone/releases/tag/v1.0.4.12).
