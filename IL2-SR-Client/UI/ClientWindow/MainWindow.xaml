@@ -549,11 +549,17 @@
                                                    ControlInputBinding="{x:Static settings:InputBinding.Intercom}"
                                                    InputName="Select Intercom" />
 
-                            <local:InputBindingControl x:Name="RadioOverlay"
-                                                   Grid.Row="5"
-                                                   Grid.ColumnSpan="5"
-                                                   ControlInputBinding="{x:Static settings:InputBinding.OverlayToggle}"
-                                                   InputName="Overlay Toggle" />
+                            <StackPanel Grid.Row="5" Grid.ColumnSpan="5">
+                                <local:InputBindingControl x:Name="RadioOverlay"
+                                                           ControlInputBinding="{x:Static settings:InputBinding.OverlayToggle}"
+                                                           InputName="Overlay Toggle" />
+                                <local:InputBindingControl x:Name="PilotRosterToggle"
+                                                           ControlInputBinding="{x:Static settings:InputBinding.TogglePilotRoster}"
+                                                           InputName="Toggle Pilot Roster" />
+                                <local:InputBindingControl x:Name="ClientListToggle"
+                                                           ControlInputBinding="{x:Static settings:InputBinding.ToggleClientList}"
+                                                           InputName="Toggle Client List" />
+                            </StackPanel>
 
                             <local:InputBindingControl x:Name="RadioChannelUp"
                                                    Grid.Row="6"

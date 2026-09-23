@@ -9,7 +9,9 @@ using System.Windows;
 using System.Windows.Input;
 using System.Windows.Threading;
 using Ciribob.IL2.SimpleRadio.Standalone.Client.Localization;
+using Ciribob.IL2.SimpleRadio.Standalone.Client.Settings;
 using Ciribob.IL2.SimpleRadio.Standalone.Client.Singletons;
+using Ciribob.IL2.SimpleRadio.Standalone.Client.UI.ClientWindow.PilotRoster;
 using Ciribob.IL2.SimpleRadio.Standalone.Common;
 
 namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI.ClientWindow.ClientList
@@ -20,6 +22,7 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI.ClientWindow.ClientList
     public partial class ClientListWindow :  Window
     {
         private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
+        private readonly GlobalSettingsStore _globalSettings = GlobalSettingsStore.Instance;
         private readonly DispatcherTimer _updateTimer;
 
         private readonly ObservableCollection<ClientListModel> _clientList = new ObservableCollection<ClientListModel>();
@@ -28,8 +31,12 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI.ClientWindow.ClientList
         {
             InitializeComponent();
             LocalizationManager.LocalizeElement(this);
+            RestoreWindowBounds();
             ClientList.ItemsSource = _clientList;
             UpdateList();
+
+            LocationChanged += WindowBoundsChanged;
+            SizeChanged += WindowBoundsChanged;
 
             _updateTimer = new DispatcherTimer { Interval = TimeSpan.FromSeconds(3) };
             _updateTimer.Tick += UpdateTimer_Tick;
@@ -82,6 +89,52 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI.ClientWindow.ClientList
             UpdateList();
         }
 
+        private void RestoreWindowBounds()
+        {
+            const double margin = 0.0;
+            var bounds = new Rect(
+                _globalSettings.GetFinitePositionSetting(GlobalSettingsKeys.ClientListX, 360),
+                _globalSettings.GetFinitePositionSetting(GlobalSettingsKeys.ClientListY, 260),
+                Math.Max(MinWidth, _globalSettings.GetFinitePositionSetting(GlobalSettingsKeys.ClientListWidth, 300)),
+                Math.Max(MinHeight, _globalSettings.GetFinitePositionSetting(GlobalSettingsKeys.ClientListHeight, 390)));
+            var screens = System.Windows.Forms.Screen.AllScreens;
+            var primaryWorkArea = System.Windows.Forms.Screen.PrimaryScreen?.WorkingArea;
+            var fallback = primaryWorkArea.HasValue
+                ? new Rect(primaryWorkArea.Value.Left, primaryWorkArea.Value.Top,
+                    primaryWorkArea.Value.Width, primaryWorkArea.Value.Height)
+                : SystemParameters.WorkArea;
+            var workArea = PilotRosterScreenBounds.SelectWorkArea(
+                bounds,
+                screens.Select(screen => new Rect(screen.WorkingArea.Left, screen.WorkingArea.Top,
+                    screen.WorkingArea.Width, screen.WorkingArea.Height)),
+                fallback);
+            var restored = PilotRosterScreenBounds.ConstrainToWorkArea(bounds, workArea, margin, MinWidth, MinHeight);
+
+            Width = restored.Width;
+            Height = restored.Height;
+            Left = restored.Left;
+            Top = restored.Top;
+            SaveWindowBounds();
+        }
+
+        private void WindowBoundsChanged(object sender, EventArgs e)
+        {
+            SaveWindowBounds();
+        }
+
+        private void SaveWindowBounds()
+        {
+            if (WindowState != WindowState.Normal)
+            {
+                return;
+            }
+
+            _globalSettings.SetPositionSetting(GlobalSettingsKeys.ClientListX, Left);
+            _globalSettings.SetPositionSetting(GlobalSettingsKeys.ClientListY, Top);
+            _globalSettings.SetPositionSetting(GlobalSettingsKeys.ClientListWidth, Width);
+            _globalSettings.SetPositionSetting(GlobalSettingsKeys.ClientListHeight, Height);
+        }
+
         private void ClientListWindow_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
             if (e.ChangedButton == MouseButton.Left)
@@ -92,6 +145,7 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI.ClientWindow.ClientList
 
         protected override void OnClosing(CancelEventArgs e)
         {
+            SaveWindowBounds();
             base.OnClosing(e);
 
             _updateTimer?.Stop();

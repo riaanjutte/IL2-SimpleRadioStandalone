@@ -182,7 +182,7 @@
                       SelectionMode="Single"
                       SelectionUnit="FullRow"
                       ScrollViewer.HorizontalScrollBarVisibility="Disabled"
-                      ScrollViewer.VerticalScrollBarVisibility="Disabled"
+                      ScrollViewer.VerticalScrollBarVisibility="Auto"
                       Background="{DynamicResource MilWellBrush}"
                       BorderBrush="#15100A"
                       BorderThickness="1"

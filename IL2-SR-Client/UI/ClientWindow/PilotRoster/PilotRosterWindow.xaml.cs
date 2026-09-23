@@ -7,7 +7,6 @@ using System.Windows.Controls;
 using System.Windows.Data;
 using System.Windows.Input;
 using System.Windows.Interop;
-using System.Windows.Media;
 using System.Windows.Threading;
 using Ciribob.IL2.SimpleRadio.Standalone.Client.Localization;
 using Ciribob.IL2.SimpleRadio.Standalone.Client.Settings;
@@ -22,8 +21,6 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI.ClientWindow.PilotRoster
         private const int HtRight = 11;
         private const int HtBottom = 15;
         private const int HtBottomRight = 17;
-        private const double RosterMaximumScreenMargin = 80.0;
-        private const double RosterGridHeightSafetyPadding = 8.0;
         private const double DefaultRosterX = 360.0;
         private const double DefaultRosterY = 260.0;
         private const double DefaultRosterWidth = 560.0;
@@ -141,9 +138,6 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI.ClientWindow.PilotRoster
                 + LocalizationManager.Get(PilotRosterAccessPolicy.ReconnectInstruction);
             UnavailableMessage.Visibility = Visibility.Visible;
 
-            Width = Math.Max(MinWidth, 500);
-            Height = Math.Max(MinHeight, 190);
-            EnsureWindowIsOnScreen();
         }
 
         private void RosterFrame_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
@@ -234,7 +228,6 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI.ClientWindow.PilotRoster
             VehicleColumn.Visibility = _pilotRoster.Any(entry => entry.HasVehicle) ? Visibility.Visible : Visibility.Collapsed;
             AirfieldColumn.Visibility = _pilotRoster.Any(entry => entry.HasAirfield) ? Visibility.Visible : Visibility.Collapsed;
             RefreshAutoColumnWidths();
-            FitHeightToRoster();
         }
 
         private void RefreshAutoColumnWidths()
@@ -248,94 +241,9 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI.ClientWindow.PilotRoster
             PilotList.UpdateLayout();
         }
 
-        private void FitHeightToRoster()
-        {
-            if (PilotList.Visibility != Visibility.Visible)
-            {
-                return;
-            }
-
-            PilotList.UpdateLayout();
-
-            var currentGridHeight = PilotList.ActualHeight;
-            if (currentGridHeight <= 0)
-            {
-                return;
-            }
-
-            var desiredGridHeight = PilotList.ColumnHeaderHeight +
-                                    _pilotRoster.Count * PilotList.RowHeight +
-                                    PilotList.BorderThickness.Top +
-                                    PilotList.BorderThickness.Bottom +
-                                    RosterGridHeightSafetyPadding;
-            var rosterChromeHeight = Math.Max(0, ActualHeight - currentGridHeight);
-            var desiredHeight = rosterChromeHeight + desiredGridHeight;
-            var maxHeight = Math.Max(MinHeight, GetCurrentWorkArea().Height - RosterMaximumScreenMargin);
-            var fittedHeight = Math.Max(MinHeight, Math.Min(maxHeight, desiredHeight));
-            var shouldScroll = desiredHeight > maxHeight;
-
-            SetPilotListScrollMode(shouldScroll);
-
-            if (Math.Abs(Height - fittedHeight) < 0.5)
-            {
-                PilotList.UpdateLayout();
-                Dispatcher.BeginInvoke(new Action(() => SetPilotListScrollMode(shouldScroll)), DispatcherPriority.Render);
-                return;
-            }
-
-            Height = fittedHeight;
-            EnsureWindowIsOnScreen();
-            PilotList.UpdateLayout();
-            Dispatcher.BeginInvoke(new Action(() => SetPilotListScrollMode(shouldScroll)), DispatcherPriority.Render);
-        }
-
-        private void SetPilotListScrollMode(bool shouldScroll)
-        {
-            var visibility = shouldScroll ? ScrollBarVisibility.Auto : ScrollBarVisibility.Disabled;
-            ScrollViewer.SetVerticalScrollBarVisibility(PilotList, visibility);
-
-            var scrollViewer = FindVisualChild<ScrollViewer>(PilotList);
-            if (scrollViewer == null)
-            {
-                return;
-            }
-
-            scrollViewer.VerticalScrollBarVisibility = visibility;
-            if (!shouldScroll)
-            {
-                scrollViewer.ScrollToTop();
-            }
-        }
-
-        private static T FindVisualChild<T>(DependencyObject parent) where T : DependencyObject
-        {
-            if (parent == null)
-            {
-                return null;
-            }
-
-            var childCount = VisualTreeHelper.GetChildrenCount(parent);
-            for (var index = 0; index < childCount; index++)
-            {
-                var child = VisualTreeHelper.GetChild(parent, index);
-                if (child is T typedChild)
-                {
-                    return typedChild;
-                }
-
-                var descendant = FindVisualChild<T>(child);
-                if (descendant != null)
-                {
-                    return descendant;
-                }
-            }
-
-            return null;
-        }
-
         private void EnsureWindowIsOnScreen()
         {
-            const double margin = 10.0;
+            const double margin = 0.0;
             var fallback = GetPrimaryWorkArea();
 
             if (double.IsNaN(Left) || double.IsInfinity(Left))
@@ -370,15 +278,6 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI.ClientWindow.PilotRoster
             Height = constrained.Height;
             Left = constrained.Left;
             Top = constrained.Top;
-        }
-
-        private Rect GetCurrentWorkArea()
-        {
-            return GetCurrentWorkArea(new Rect(
-                Left,
-                Top,
-                Math.Max(MinWidth, Width),
-                Math.Max(MinHeight, Height)));
         }
 
         private static Rect GetCurrentWorkArea(Rect windowBounds)

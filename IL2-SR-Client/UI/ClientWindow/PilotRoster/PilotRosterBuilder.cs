@@ -218,15 +218,15 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI.ClientWindow.PilotRoster
                 return false;
             }
 
-            var trimmedName = name.Trim();
-            return !string.Equals(trimmedName, "Axis Airfield", System.StringComparison.OrdinalIgnoreCase) &&
-                   !string.Equals(trimmedName, "Axis Command", System.StringComparison.OrdinalIgnoreCase) &&
-                   !string.Equals(trimmedName, "Allies Airfield", System.StringComparison.OrdinalIgnoreCase) &&
-                   !string.Equals(trimmedName, "Allies Command", System.StringComparison.OrdinalIgnoreCase) &&
-                   !string.Equals(trimmedName, "UN Airfield", System.StringComparison.OrdinalIgnoreCase) &&
-                   !string.Equals(trimmedName, "UN Command", System.StringComparison.OrdinalIgnoreCase) &&
-                   !string.Equals(trimmedName, "CF Airfield", System.StringComparison.OrdinalIgnoreCase) &&
-                   !string.Equals(trimmedName, "CF Command", System.StringComparison.OrdinalIgnoreCase);
+            var normalizedName = Regex.Replace(name, @"[\s\p{Cf}]+", " ").Trim();
+            return !string.Equals(normalizedName, "Axis Airfield", System.StringComparison.OrdinalIgnoreCase) &&
+                   !string.Equals(normalizedName, "Axis Command", System.StringComparison.OrdinalIgnoreCase) &&
+                   !string.Equals(normalizedName, "Allies Airfield", System.StringComparison.OrdinalIgnoreCase) &&
+                   !string.Equals(normalizedName, "Allies Command", System.StringComparison.OrdinalIgnoreCase) &&
+                   !string.Equals(normalizedName, "UN Airfield", System.StringComparison.OrdinalIgnoreCase) &&
+                   !string.Equals(normalizedName, "UN Command", System.StringComparison.OrdinalIgnoreCase) &&
+                   !string.Equals(normalizedName, "CF Airfield", System.StringComparison.OrdinalIgnoreCase) &&
+                   !string.Equals(normalizedName, "CF Command", System.StringComparison.OrdinalIgnoreCase);
         }
     }
 }

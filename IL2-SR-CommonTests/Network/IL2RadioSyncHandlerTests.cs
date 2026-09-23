@@ -10,6 +10,13 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Common.Tests.Network
     public class IL2RadioSyncHandlerTests
     {
         [TestMethod]
+        public void GameSwitchPublishesTheRememberedPilotName()
+        {
+            Assert.IsTrue(IL2RadioSyncHandler.HasPilotNameChanged("=TBAS=Haluter", "Haluter"));
+            Assert.IsFalse(IL2RadioSyncHandler.HasPilotNameChanged("Haluter", "Haluter"));
+        }
+
+        [TestMethod]
         public void ApplyControlDataClearsCoalitionAndVehicleForSpectator()
         {
             var state = new PlayerGameState

@@ -42,6 +42,10 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.Settings
         ClientY,
         ClientWidth,
         ClientHeight,
+        ClientListX,
+        ClientListY,
+        ClientListWidth,
+        ClientListHeight,
         PilotRosterX,
         PilotRosterY,
         PilotRosterWidth,
@@ -65,6 +69,8 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.Settings
         DenoiseAttenuation,
 
         LastSeenName,
+        LastSeenNameGreatBattles,
+        LastSeenNameKorea,
 
         CheckForBetaUpdates,
 
@@ -219,6 +225,12 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.Settings
         Ptt3 = 143,
         ModifierPtt3 = 243,
 
+        ToggleClientList = 144,
+        ModifierToggleClientList = 244,
+
+        TogglePilotRoster = 145,
+        ModifierTogglePilotRoster = 245,
+
     }
 
 
@@ -369,6 +381,11 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.Settings
             {GlobalSettingsKeys.ClientWidth.ToString(), "700"},
             {GlobalSettingsKeys.ClientHeight.ToString(), "650"},
 
+            {GlobalSettingsKeys.ClientListX.ToString(), "360"},
+            {GlobalSettingsKeys.ClientListY.ToString(), "260"},
+            {GlobalSettingsKeys.ClientListWidth.ToString(), "300"},
+            {GlobalSettingsKeys.ClientListHeight.ToString(), "390"},
+
             {GlobalSettingsKeys.PilotRosterX.ToString(), "360"},
             {GlobalSettingsKeys.PilotRosterY.ToString(), "260"},
             {GlobalSettingsKeys.PilotRosterWidth.ToString(), "560"},
@@ -394,6 +411,8 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.Settings
             {GlobalSettingsKeys.DenoiseAttenuation.ToString(),"-30" },
 
             {GlobalSettingsKeys.LastSeenName.ToString(), ""},
+            {GlobalSettingsKeys.LastSeenNameGreatBattles.ToString(), ""},
+            {GlobalSettingsKeys.LastSeenNameKorea.ToString(), ""},
 
             {GlobalSettingsKeys.CheckForBetaUpdates.ToString(), "false"},
 

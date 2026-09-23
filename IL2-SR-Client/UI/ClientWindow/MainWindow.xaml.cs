@@ -617,7 +617,8 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI
 
         private void InitInput()
         {
-            InputManager = new InputDeviceManager(this, ToggleOverlay, RestartClientFromKeybind);
+            InputManager = new InputDeviceManager(this, ToggleOverlay, TogglePilotRoster,
+                ToggleClientList, RestartClientFromKeybind);
 
             InitSettingsProfiles();
 
@@ -650,6 +651,14 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI
             RadioOverlay.InputName = LocalizationManager.Get("Overlay Toggle");
             RadioOverlay.ControlInputBinding = InputBinding.OverlayToggle;
             RadioOverlay.InputDeviceManager = InputManager;
+
+            PilotRosterToggle.InputName = LocalizationManager.Get("Toggle Pilot Roster");
+            PilotRosterToggle.ControlInputBinding = InputBinding.TogglePilotRoster;
+            PilotRosterToggle.InputDeviceManager = InputManager;
+
+            ClientListToggle.InputName = LocalizationManager.Get("Toggle Client List");
+            ClientListToggle.ControlInputBinding = InputBinding.ToggleClientList;
+            ClientListToggle.InputDeviceManager = InputManager;
 
             RadioChannelUp.InputName = LocalizationManager.Get("Radio Channel Up");
             RadioChannelUp.ControlInputBinding = InputBinding.RadioChannelUp;
@@ -765,6 +774,8 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI
             PTT3.InputName = LocalizationManager.Get("Push To Talk - PTT") + " 3";
             Intercom.InputName = LocalizationManager.Get("Select Intercom");
             RadioOverlay.InputName = LocalizationManager.Get("Overlay Toggle");
+            PilotRosterToggle.InputName = LocalizationManager.Get("Toggle Pilot Roster");
+            ClientListToggle.InputName = LocalizationManager.Get("Toggle Client List");
             RadioChannelUp.InputName = LocalizationManager.Get("Radio Channel Up");
             RadioChannelDown.InputName = LocalizationManager.Get("Radio Channel Down");
             RadioChannel1.InputName = LocalizationManager.Get("Radio Channel 1");
@@ -810,6 +821,8 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI
             PTT3.LoadInputSettings();
             Intercom.LoadInputSettings();
             RadioOverlay.LoadInputSettings();
+            PilotRosterToggle.LoadInputSettings();
+            ClientListToggle.LoadInputSettings();
             RadioChannelUp.LoadInputSettings();
             RadioChannelDown.LoadInputSettings();
             RadioChannel1.LoadInputSettings();
@@ -2536,6 +2549,11 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI
 
         private void ShowClientList_OnClick(object sender, RoutedEventArgs e)
         {
+            ToggleClientList();
+        }
+
+        private void ToggleClientList()
+        {
             if ((_clientListWindow == null) || !_clientListWindow.IsVisible ||
                 (_clientListWindow.WindowState == WindowState.Minimized))
             {
@@ -2545,7 +2563,7 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI
                 {
                     Opacity = GetOverlayOpacity(GlobalSettingsKeys.ClientListOpacity)
                 };
-                _clientListWindow.WindowStartupLocation = WindowStartupLocation.CenterOwner;
+                _clientListWindow.WindowStartupLocation = WindowStartupLocation.Manual;
                 _clientListWindow.Owner = this;
                 _clientListWindow.Closed += (closedSender, args) =>
                 {
@@ -2567,6 +2585,11 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI
         }
 
         private void ShowPilotRoster_OnClick(object sender, RoutedEventArgs e)
+        {
+            TogglePilotRoster();
+        }
+
+        private void TogglePilotRoster()
         {
             if (!IsPilotRosterAvailable())
             {

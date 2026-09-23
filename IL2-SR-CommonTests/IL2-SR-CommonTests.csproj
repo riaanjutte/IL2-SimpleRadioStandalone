@@ -93,6 +93,7 @@
     <Compile Include="Network\UpdateReleaseSelectorTests.cs" />
     <Compile Include="Network\UDPVoicePacketTests.cs" />
     <Compile Include="Singletons\ConnectedClientsSingletonTests.cs" />
+    <Compile Include="Singletons\ClientStateSingletonTests.cs" />
     <Compile Include="UI\MemoryLeakGuardTests.cs" />
     <Compile Include="UI\FavouriteServersViewModelTests.cs" />
     <Compile Include="UI\IL2WinWingCompatibilityTests.cs" />

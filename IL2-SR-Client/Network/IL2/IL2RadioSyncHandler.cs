@@ -39,6 +39,7 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.Network.IL2
         private readonly GlobalSettingsStore _globalSettings = GlobalSettingsStore.Instance;
 
         private volatile bool _stop = false;
+        private string _lastPublishedPilotName;
         public IL2RadioSyncHandler()
         {
         }
@@ -151,14 +152,19 @@ So if someone on Server has ParentID!=-1 but ParentID=12345 - this means that in
             if (message is ClientDataMessage dataMessage)
             {   //Just set the Client
 
+                var playerName = dataMessage.PlayerName?.Trim();
                 update = playerRadioInfo.unitId != dataMessage.ClientID ||
-                         !dataMessage.PlayerName.Equals(_clientStateSingleton.LastSeenName);
+                         (!string.IsNullOrWhiteSpace(playerName) &&
+                          !string.Equals(playerName, _clientStateSingleton.LastSeenName, StringComparison.Ordinal));
 
                 playerRadioInfo.unitId = dataMessage.ClientID;
 
                 Logger.Debug($"ClientID {dataMessage.ClientID}");
 
-                _clientStateSingleton.LastSeenName = dataMessage.PlayerName;
+                if (!string.IsNullOrWhiteSpace(playerName))
+                {
+                    _clientStateSingleton.LastSeenName = playerName;
+                }
             }
             else if (message is ControlDataMessage controlDataMessage)
             {
@@ -178,16 +184,24 @@ So if someone on Server has ParentID!=-1 but ParentID=12345 - this means that in
             }
 
             var diff = new TimeSpan(DateTime.Now.Ticks - _clientStateSingleton.LastSent);
+            var pilotName = _clientStateSingleton.LastSeenName;
 
             if (update
+                || HasPilotNameChanged(_lastPublishedPilotName, pilotName)
                 || _clientStateSingleton.LastSent < 1
                 || diff.TotalSeconds > RADIO_UPDATE_PING_INTERVAL)
             {
                 Logger.Debug("Sending Radio Info To Server - Update");
                 _clientStateSingleton.LastSent = DateTime.Now.Ticks;
+                _lastPublishedPilotName = pilotName;
 
                 MessageHub.Instance.Publish(new PlayerStateUpdate());
             }
+        }
+
+        internal static bool HasPilotNameChanged(string lastPublishedName, string currentName)
+        {
+            return !string.Equals(lastPublishedName, currentName, StringComparison.Ordinal);
         }
 
         internal static bool ApplyControlData(PlayerGameState playerRadioInfo, int parentVehicleClientId,

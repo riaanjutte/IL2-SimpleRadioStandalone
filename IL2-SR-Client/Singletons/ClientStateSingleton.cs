@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.Windows.Threading;
 using Ciribob.IL2.SimpleRadio.Standalone.Client.Network;
 using Ciribob.IL2.SimpleRadio.Standalone.Client.Settings;
@@ -77,10 +78,69 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.Singletons
 
         public string LastSeenName
         {
-            get => GlobalSettingsStore.Instance.GetClientSetting(Settings.GlobalSettingsKeys.LastSeenName).RawValue;
+            get
+            {
+                var settings = GlobalSettingsStore.Instance;
+                var gameKey = GetActiveGameNameKey();
+                var gameName = gameKey.HasValue
+                    ? settings.GetClientSetting(gameKey.Value).RawValue
+                    : string.Empty;
+                var lastName = settings.GetClientSetting(GlobalSettingsKeys.LastSeenName).RawValue;
+                return ResolvePilotName(gameName, lastName);
+            }
             set
             {
-                GlobalSettingsStore.Instance.SetClientSetting(GlobalSettingsKeys.LastSeenName, value);
+                var settings = GlobalSettingsStore.Instance;
+                settings.SetClientSetting(GlobalSettingsKeys.LastSeenName, value);
+                var gameKey = GetActiveGameNameKey();
+                if (gameKey.HasValue)
+                {
+                    settings.SetClientSetting(gameKey.Value, value);
+                }
+            }
+        }
+
+        internal static string ResolvePilotName(string gameName, string lastName)
+        {
+            return string.IsNullOrWhiteSpace(gameName) ? lastName : gameName;
+        }
+
+        internal static GlobalSettingsKeys? SelectGameNameKey(bool greatBattlesRunning, bool koreaRunning)
+        {
+            if (greatBattlesRunning == koreaRunning)
+            {
+                return null;
+            }
+
+            return koreaRunning ? GlobalSettingsKeys.LastSeenNameKorea : GlobalSettingsKeys.LastSeenNameGreatBattles;
+        }
+
+        private static GlobalSettingsKeys? GetActiveGameNameKey()
+        {
+            return SelectGameNameKey(IsProcessRunning("Il-2"), IsProcessRunning("IL2Series"));
+        }
+
+        private static bool IsProcessRunning(string processName)
+        {
+            Process[] processes = null;
+            try
+            {
+                processes = Process.GetProcessesByName(processName);
+                return processes.Length > 0;
+            }
+            catch
+            {
+                return false;
+            }
+            finally
+            {
+                if (processes != null)
+                {
+                    foreach (var process in processes)
+                    {
+                        process.Dispose();
+                    }
+                }
             }
         }
 
@@ -111,7 +171,7 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.Singletons
 
             if (LastSeenName == null || LastSeenName == "")
             {
-                LastSeenName = "IL2-SRS-Player";
+                GlobalSettingsStore.Instance.SetClientSetting(GlobalSettingsKeys.LastSeenName, "IL2-SRS-Player");
             }
 
         }

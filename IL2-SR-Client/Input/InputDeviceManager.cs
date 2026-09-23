@@ -55,6 +55,8 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.Settings
         private readonly object _inputDevicesLock = new object();
         private readonly Dictionary<Guid, Device> _inputDevices = new Dictionary<Guid, Device>();
         private readonly MainWindow.ToggleOverlayCallback _toggleOverlayCallback;
+        private readonly Action _togglePilotRosterCallback;
+        private readonly Action _toggleClientListCallback;
         private readonly Action _restartSrsCallback;
         private readonly IntPtr _windowHandle;
 
@@ -72,18 +74,23 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.Settings
         //used to trigger the update to a frequency
         private InputBinding _lastActiveBinding = InputBinding.ModifierIntercom
             ; //intercom used to represent null as we cant
+        private bool _pilotRosterTogglePressed;
+        private bool _clientListTogglePressed;
 
         private Settings.GlobalSettingsStore _globalSettings = Settings.GlobalSettingsStore.Instance;
 
 
-        public InputDeviceManager(Window window, MainWindow.ToggleOverlayCallback _toggleOverlayCallback, Action restartSrsCallback)
+        public InputDeviceManager(Window window, MainWindow.ToggleOverlayCallback toggleOverlayCallback,
+            Action togglePilotRosterCallback, Action toggleClientListCallback, Action restartSrsCallback)
         {
             _directInput = new DirectInput();
 
 
             _windowHandle = new WindowInteropHelper(window).Handle;
 
-            this._toggleOverlayCallback = _toggleOverlayCallback;
+            _toggleOverlayCallback = toggleOverlayCallback;
+            _togglePilotRosterCallback = togglePilotRosterCallback;
+            _toggleClientListCallback = toggleClientListCallback;
             _restartSrsCallback = restartSrsCallback;
 
             LoadWhiteList();
@@ -627,6 +634,7 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.Settings
                     callback(bindStates);
                     MarkPttInputPoll();
                     WarnIfPttInputPollIsSlow(pollStopwatch.ElapsedMilliseconds, bindStates.Count);
+                    HandleWindowToggleBindings(bindStates);
                     //handle overlay
 
                     foreach (var bindState in bindStates)
@@ -879,6 +887,8 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.Settings
                         }
 
                         _lastActiveBinding = InputBinding.ModifierIntercom;
+                        _pilotRosterTogglePressed = false;
+                        _clientListTogglePressed = false;
                         RequestDeviceReconnect();
                     }
 
@@ -887,6 +897,35 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.Settings
             });
             pttInputThread.IsBackground = true;
             pttInputThread.Start();
+        }
+
+        private void HandleWindowToggleBindings(List<InputBindState> bindStates)
+        {
+            var pilotRosterPressed = false;
+            var clientListPressed = false;
+            foreach (var bindState in bindStates)
+            {
+                if (bindState.MainDevice.InputBind == InputBinding.TogglePilotRoster)
+                {
+                    pilotRosterPressed = bindState.IsActive;
+                }
+                else if (bindState.MainDevice.InputBind == InputBinding.ToggleClientList)
+                {
+                    clientListPressed = bindState.IsActive;
+                }
+            }
+
+            if (pilotRosterPressed && !_pilotRosterTogglePressed)
+            {
+                Application.Current.Dispatcher.BeginInvoke(_togglePilotRosterCallback);
+            }
+            if (clientListPressed && !_clientListTogglePressed)
+            {
+                Application.Current.Dispatcher.BeginInvoke(_toggleClientListCallback);
+            }
+
+            _pilotRosterTogglePressed = pilotRosterPressed;
+            _clientListTogglePressed = clientListPressed;
         }
 
 
@@ -1271,7 +1310,7 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.Settings
 
             //REMEMBER TO UPDATE THIS WHEN NEW BINDINGS ARE ADDED
             //MIN + MAX bind numbers
-            for (int i = (int)InputBinding.Intercom; i <= (int)InputBinding.Ptt3; i++)
+            for (int i = (int)InputBinding.Intercom; i <= (int)InputBinding.TogglePilotRoster; i++)
             {
                 if (!currentInputProfile.ContainsKey((InputBinding)i))
                 {
