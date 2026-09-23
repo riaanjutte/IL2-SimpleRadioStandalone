@@ -1,5 +1,22 @@
 # Changelog
 
+## IL2-SRS 1.0.4.12
+
+### Added
+
+- Bind **Toggle Pilot Roster** and **Toggle Client List** in the Controls tab to show or hide those windows without returning to the main window.
+
+### Fixed
+
+- Microphone capture now attempts to recover automatically after a Windows audio device or endpoint reset, reducing cases where reconnecting to the server was needed to restore outgoing voice.
+- The Pilot Roster and Client List keep their chosen position and size when toggled. Roster updates no longer resize the window or pull it away from the screen edge.
+- Pilot Roster filtering now hides Korea's UN and CF command and airfield service accounts even when their names contain extra or invisible whitespace.
+- SRS remembers pilot names separately for Great Battles and Korea and sends the appropriate name promptly when switching games. Each game must have supplied a player-name telemetry event at least once with this version running.
+
+### Compatibility
+
+- Existing SRS servers remain compatible; no server update is required for these client-side changes.
+
 ## IL2-SRS 1.0.4.11
 
 ### Fixed

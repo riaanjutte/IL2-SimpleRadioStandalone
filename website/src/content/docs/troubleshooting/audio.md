@@ -17,6 +17,8 @@ Use moderate speaker boost. Very high boost can make clipping and radio effects 
 
 ## Microphone is not detected
 
+SRS attempts to restore microphone capture automatically after Windows resets an audio device. If others still cannot hear you, check the **Mic** indicator and try these steps:
+
 1. Confirm the microphone works in Windows Sound settings.
 2. Select it explicitly on the General tab.
 3. Use **Audio Preview**.
