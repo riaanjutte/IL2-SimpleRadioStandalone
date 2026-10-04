@@ -40,6 +40,8 @@ See the [full release notes](https://github.com/riaanjutte/IL2-SimpleRadioStanda
 
 Thanks to Broadway for extensive testing, practical feedback, and suggestions that helped shape the Community Edition improvements.
 
+Thanks to Asken for contributing the web server for Docker and Windows services.
+
 ## Helping with translations
 
 Client translations live in `IL2-SR-Client/Localization/*.resx`. The current non-English text is machine translated, so community corrections are welcome.
@@ -54,6 +56,20 @@ See `TRANSLATING.md` for the full workflow. Translation pull requests are automa
 ## Pilot Roster server support
 
 Server administrators can add Pilot Roster support by following [Pilot-Roster-Server-Guide.md](Pilot-Roster-Server-Guide.md).
+
+## Hosting a server
+
+There are two ways to run an IL2-SRS server. Current clients connect to either one in the same way, on the same port for TCP and UDP (default `6002`).
+
+- **Windows server window** (`IL2-SR-Server.exe`), included in every release package. See [Server setup](https://srsforil2.com/server-admin/server-setup/).
+- **Web server (preview)**, which runs in Docker (Linux or Windows) or as a Windows service, with no desktop session, and is managed from a browser:
+  - a dashboard with listener health, clients and recent activity;
+  - mute, kick and ban clients, with a reason and optional duration;
+  - settings, channel names and bans, applied immediately;
+  - an event log of admin actions and client connections;
+  - a REST API with read-only and read-write API keys.
+
+  On first start it imports an existing `server.cfg` and `banned.txt`, so settings, channel names and bans carry over. The web server is not in the release packages yet. Use the [`asken/il2-srs-server:preview`](https://hub.docker.com/r/asken/il2-srs-server) Docker image, or build `IL2-SRS-Server-Web` with the .NET 10 SDK. See [Web server (Docker and Windows service)](https://srsforil2.com/server-admin/web-server/) and [IL2-SRS-Server-Web/README.md](IL2-SRS-Server-Web/README.md).
 
 # IL2-SimpleRadio Standalone
 An open source Stand alone Radio for IL2

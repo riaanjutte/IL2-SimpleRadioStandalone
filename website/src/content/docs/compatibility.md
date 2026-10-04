@@ -35,3 +35,5 @@ Detection is based on known installation records, saved installer paths, and run
 ## Client and server compatibility
 
 Release notes identify features that need an updated server. Normal voice communication remains compatible across the current Community Edition release family, but server-controlled features such as Pilot Roster data or experimental collision effects require server support.
+
+Current clients work with both the Windows server window and the [web server](../server-admin/web-server/). They use the same port and protocol, so players do not need to change anything when a server moves to the web server.

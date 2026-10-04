@@ -110,7 +110,7 @@ Relative path:
 ASSIGNED_CALLSIGNS_JSON_FILE=data\pilot-roster.json
 ```
 
-A relative path is resolved from the directory containing `IL2-SR-Server.exe`, not from the location of a custom configuration passed with `-cfg=`.
+A relative path is resolved from the directory containing `IL2-SR-Server.exe`, not from the location of a custom configuration passed with `-cfg=`. The web server (`IL2-SRS-Server-Web`) resolves relative paths from its data folder instead; in Docker, keep the roster file in a mounted folder such as the `/data` volume.
 
 The setting accepts local and UNC filesystem paths. It does not download HTTP or HTTPS URLs. If the SRS server runs as a Windows service or scheduled task, test access using that service account rather than an interactive administrator account.
 

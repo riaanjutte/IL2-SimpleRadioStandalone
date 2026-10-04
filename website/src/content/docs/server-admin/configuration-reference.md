@@ -5,6 +5,10 @@ description: Current server.cfg sections, defaults, accepted values, and restart
 
 The server creates missing settings on startup while preserving existing values. Prefer the server UI for routine changes. Stop and restart the server after editing `server.cfg` manually because the file is not monitored for external changes.
 
+:::note[Web server]
+The [web server](../web-server/) uses the same setting keys and values, but stores them in its database. It imports `server.cfg` once, on first start. After that, change settings in the admin UI or the REST API, or fix them with `SRS_<SETTING>` environment variables or arguments. Edits to `server.cfg` are no longer read.
+:::
+
 ## Complete example
 
 ```ini

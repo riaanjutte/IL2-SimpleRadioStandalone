@@ -10,6 +10,10 @@ import serverWhiteTheme from '../../../assets/server-white-theme.png';
 
 The SRS server is a standalone Windows application. It does not need to be installed inside an IL-2 game directory, and a client installation is not required on a dedicated host.
 
+:::tip[Docker or a Windows service]
+This page covers the Windows server window, `IL2-SR-Server.exe`. To run SRS in Docker or as a Windows service and manage it from a browser, use the [web server](../web-server/) instead. It is a preview, and clients connect to it in the same way.
+:::
+
 For each public instance you need:
 
 - the current server files from the release ZIP;
@@ -108,6 +112,7 @@ The default files are written beside the server executable. Include `serverlog.t
 
 ## Next guides
 
+- [Web server](../web-server/) to run SRS in Docker or as a Windows service, with a browser admin UI and REST API.
 - [Configuration reference](../configuration-reference/) for every supported `server.cfg` key.
 - [Radio behavior](../radio-behavior/) for security, channels, collisions, and priority transmitters.
 - [Client administration](../client-administration/) for health monitoring, mute, kick, ban, and exports.

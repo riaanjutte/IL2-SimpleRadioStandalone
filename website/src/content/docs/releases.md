@@ -19,6 +19,8 @@ Use beta builds when you want to test new functionality and are prepared to repo
 
 Each release also provides a ZIP package containing the client, server, installer, and supporting files. Server administrators and users who cannot run the updater can download the ZIP from the release page.
 
+The [web server](../server-admin/web-server/) preview is not included in the release packages yet. Use its Docker image or build it from the repository, as described on that page.
+
 ## Release notes
 
 **1.0.4.12:** Bind keys to toggle the Pilot Roster and Client List; those windows now keep their position and size. The client also recovers microphone capture after audio device resets, remembers a separate pilot name for Great Battles and Korea, and repairs an update loop caused by an obsolete DLL. See the [1.0.4.12 release notes](https://github.com/riaanjutte/IL2-SimpleRadioStandalone/releases/tag/v1.0.4.12).

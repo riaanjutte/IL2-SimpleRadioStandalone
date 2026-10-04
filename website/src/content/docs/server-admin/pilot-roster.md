@@ -52,7 +52,7 @@ Stop the SRS server and add the path under `[General Settings]`:
 ASSIGNED_CALLSIGNS_JSON_FILE=C:\IL2-SRS\data\pilot-roster.json
 ```
 
-Local, relative, and UNC filesystem paths are supported. HTTP and HTTPS URLs are not. Relative paths are resolved from the directory containing `IL2-SR-Server.exe`.
+Local, relative, and UNC filesystem paths are supported. HTTP and HTTPS URLs are not. Relative paths are resolved from the directory containing `IL2-SR-Server.exe`. On the [web server](../web-server/), relative paths are resolved from its data folder instead; in Docker, keep the roster file in a mounted folder such as the `/data` volume.
 
 ## Publish updates safely
 
