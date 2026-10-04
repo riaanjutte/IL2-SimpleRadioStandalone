@@ -69,7 +69,7 @@ There are two ways to run an IL2-SRS server. Current clients connect to either o
   - an event log of admin actions and client connections;
   - a REST API with read-only and read-write API keys.
 
-  On first start it imports an existing `server.cfg` and `banned.txt`, so settings, channel names and bans carry over. The web server is not in the release packages yet. Use the [`asken/il2-srs-server:preview`](https://hub.docker.com/r/asken/il2-srs-server) Docker image, or build `IL2-SRS-Server-Web` with the .NET 10 SDK. See [Web server (Docker and Windows service)](https://srsforil2.com/server-admin/web-server/) and [IL2-SRS-Server-Web/README.md](IL2-SRS-Server-Web/README.md).
+  On first start it imports an existing `server.cfg` and `banned.txt`, so settings, channel names and bans carry over. From 1.0.5.0-beta.1, each release provides a self-contained Windows build, `IL2-SRS-Server-Web-<version>-win-x64.zip`, as a separate download that needs no .NET installation. You can also use the [`asken/il2-srs-server:preview`](https://hub.docker.com/r/asken/il2-srs-server) Docker image, or build `IL2-SRS-Server-Web` with the .NET 10 SDK. See [Web server (Docker and Windows service)](https://srsforil2.com/server-admin/web-server/) and [IL2-SRS-Server-Web/README.md](IL2-SRS-Server-Web/README.md).
 
 # IL2-SimpleRadio Standalone
 An open source Stand alone Radio for IL2

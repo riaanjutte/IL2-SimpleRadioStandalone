@@ -49,10 +49,16 @@ The admin UI and API use plain HTTP. Keep port 8080 on localhost, or put a rever
 
 ## Run as a Windows service
 
-1. Publish a self-contained build, which needs no .NET installation on the server:
+1. Get a self-contained build, which needs no .NET installation on the server. Download `IL2-SRS-Server-Web-<version>-win-x64.zip` from [GitHub Releases](https://github.com/riaanjutte/IL2-SimpleRadioStandalone/releases) (from 1.0.5.0-beta.1) and extract it to `C:\IL2-SRS\app`, or publish one yourself:
 
    ```powershell
    dotnet publish IL2-SRS-Server-Web -c Release -r win-x64 --self-contained -o C:\IL2-SRS\app
+   ```
+
+   Windows marks files extracted from a downloaded ZIP as coming from the internet. If PowerShell refuses to run the install script, unblock the folder first:
+
+   ```powershell
+   Get-ChildItem C:\IL2-SRS\app -Recurse | Unblock-File
    ```
 
 2. From an elevated PowerShell prompt, install and start the service:
