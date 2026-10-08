@@ -1,5 +1,15 @@
 # Changelog
 
+## Unreleased
+
+### Added
+
+- Right-click the Pilot Roster and choose **Fit height to pilots** to turn automatic fitting back on after resizing the window yourself.
+
+### Fixed
+
+- The Pilot Roster fits its height to the pilots listed again after updating. In 1.0.5.0-beta.1, any roster height saved by an earlier version was treated as a size you had chosen, which turned automatic fitting off for most existing users. Only dragging the roster's edge now turns it off.
+
 ## IL2-SRS 1.0.5.0-beta.1
 
 ### Added

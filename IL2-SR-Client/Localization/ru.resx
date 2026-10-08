@@ -732,6 +732,9 @@
   <data name="Mute / Unmute Radio 2" xml:space="preserve">
     <value>Приглушить / вернуть радио 2</value>
   </data>
+  <data name="Fit height to pilots" xml:space="preserve">
+    <value>Подогнать высоту под пилотов</value>
+  </data>
   <data name="Mute / Unmute Both Radios" xml:space="preserve">
     <value>Приглушить / вернуть оба радио</value>
   </data>

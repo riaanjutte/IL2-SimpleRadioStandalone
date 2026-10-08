@@ -130,14 +130,5 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Common.Tests.UI
             Assert.AreEqual(currentRoster, grown);
             Assert.AreEqual(currentRoster, shrunk);
         }
-
-        [TestMethod]
-        public void UpgradeTreatsNonDefaultSavedHeightAsManuallySized()
-        {
-            Assert.IsFalse(PilotRosterScreenBounds.IsUserChosenHeight(420, 420));
-            Assert.IsFalse(PilotRosterScreenBounds.IsUserChosenHeight(420.2, 420));
-            Assert.IsTrue(PilotRosterScreenBounds.IsUserChosenHeight(300, 420));
-            Assert.IsTrue(PilotRosterScreenBounds.IsUserChosenHeight(640, 420));
-        }
     }
 }

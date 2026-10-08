@@ -732,6 +732,9 @@
   <data name="Mute / Unmute Radio 2" xml:space="preserve">
     <value>Silenciar / reactivar radio 2</value>
   </data>
+  <data name="Fit height to pilots" xml:space="preserve">
+    <value>Ajustar la altura a los pilotos</value>
+  </data>
   <data name="Mute / Unmute Both Radios" xml:space="preserve">
     <value>Silenciar / reactivar ambas radios</value>
   </data>

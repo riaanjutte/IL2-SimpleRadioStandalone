@@ -93,7 +93,9 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.Settings
 
         ShowTransmitterName,
 
-        PilotRosterManuallySized
+        // Set only when the user drags a roster edge. Replaces 1.0.5.0-beta.1's PilotRosterManuallySized,
+        // which was also guessed from old saved heights and disabled auto-fit for most upgraded users.
+        PilotRosterUserResized
     }
 
     public enum InputBinding
@@ -356,7 +358,7 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.Settings
             {GlobalSettingsKeys.RadioOverlayTaskbarHide.ToString(), "false"},
             {GlobalSettingsKeys.AutoStartRadioOverlay.ToString(), "true"},
             {GlobalSettingsKeys.AutoStartPilotRoster.ToString(), "false"},
-            {GlobalSettingsKeys.PilotRosterManuallySized.ToString(), "false"},
+            {GlobalSettingsKeys.PilotRosterUserResized.ToString(), "false"},
             {GlobalSettingsKeys.RefocusIL2.ToString(), "false"},
             {GlobalSettingsKeys.ExpandControls.ToString(), "false"},
 
@@ -514,12 +516,6 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.Settings
         public void SetClientSetting(GlobalSettingsKeys key, string value)
         {
             SetSetting("Client Settings", key.ToString(), value);
-        }
-
-        public bool HasClientSetting(GlobalSettingsKeys key)
-        {
-            return _configuration.Contains("Client Settings")
-                   && _configuration["Client Settings"].Contains(key.ToString());
         }
 
         public void SetClientSetting(GlobalSettingsKeys key, bool value)

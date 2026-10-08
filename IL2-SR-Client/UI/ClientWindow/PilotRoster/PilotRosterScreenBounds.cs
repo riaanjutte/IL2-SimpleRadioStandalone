@@ -82,11 +82,6 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI.ClientWindow.PilotRoster
                 minimumHeight);
         }
 
-        internal static bool IsUserChosenHeight(double savedHeight, double defaultHeight)
-        {
-            return Math.Abs(savedHeight - defaultHeight) > 0.5;
-        }
-
         private static bool IsUsable(Rect area)
         {
             return !area.IsEmpty &&

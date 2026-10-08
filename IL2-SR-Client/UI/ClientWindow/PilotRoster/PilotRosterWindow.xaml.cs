@@ -32,13 +32,16 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI.ClientWindow.PilotRoster
         private readonly DispatcherTimer _updateTimer;
         private HwndSource _hwndSource;
         private bool _manuallySized;
+        private readonly MenuItem _fitHeightMenuItem = new MenuItem();
         public bool IsUnavailableMode { get; }
 
         public PilotRosterWindow(bool showUnavailableMessage = false)
         {
             IsUnavailableMode = showUnavailableMessage;
-            _manuallySized = LoadManuallySized();
+            _manuallySized = _globalSettings.GetClientSettingBool(GlobalSettingsKeys.PilotRosterUserResized);
             InitializeComponent();
+            _fitHeightMenuItem.Click += FitHeightMenuItem_Click;
+            RosterFrame.ContextMenu = new ContextMenu { Items = { _fitHeightMenuItem } };
             LocalizationManager.LocalizeElement(this);
             ApplyLocalizedText();
             RestoreWindowBounds();
@@ -78,6 +81,7 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI.ClientWindow.PilotRoster
             PilotColumn.Header = UppercaseLocalized("PILOT");
             VehicleColumn.Header = UppercaseLocalized("VEHICLE");
             AirfieldColumn.Header = UppercaseLocalized("FLD");
+            _fitHeightMenuItem.Header = LocalizationManager.Get("Fit height to pilots");
         }
 
         public void RefreshLocalization()
@@ -375,20 +379,6 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI.ClientWindow.PilotRoster
             return IntPtr.Zero;
         }
 
-        private bool LoadManuallySized()
-        {
-            if (!_globalSettings.HasClientSetting(GlobalSettingsKeys.PilotRosterManuallySized))
-            {
-                // First run with auto-fit: earlier versions never resized the roster themselves,
-                // so a non-default saved height is a size the user chose and must be kept.
-                var savedHeight = _globalSettings.GetFinitePositionSetting(GlobalSettingsKeys.PilotRosterHeight, DefaultRosterHeight);
-                _globalSettings.SetClientSetting(GlobalSettingsKeys.PilotRosterManuallySized,
-                    PilotRosterScreenBounds.IsUserChosenHeight(savedHeight, DefaultRosterHeight));
-            }
-
-            return _globalSettings.GetClientSettingBool(GlobalSettingsKeys.PilotRosterManuallySized);
-        }
-
         private void MarkManuallySized()
         {
             if (_manuallySized)
@@ -397,7 +387,14 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI.ClientWindow.PilotRoster
             }
 
             _manuallySized = true;
-            _globalSettings.SetClientSetting(GlobalSettingsKeys.PilotRosterManuallySized, true);
+            _globalSettings.SetClientSetting(GlobalSettingsKeys.PilotRosterUserResized, true);
+        }
+
+        private void FitHeightMenuItem_Click(object sender, RoutedEventArgs e)
+        {
+            _manuallySized = false;
+            _globalSettings.SetClientSetting(GlobalSettingsKeys.PilotRosterUserResized, false);
+            FitHeightToRoster();
         }
 
         private IntPtr GetResizeHitTest(IntPtr lParam)
