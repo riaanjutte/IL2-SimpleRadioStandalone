@@ -12,7 +12,7 @@ SRS needs current IL-2 telemetry to identify the player, coalition, aircraft, an
 
 ## Read the status indicators
 
-If **Server** and **VOIP** are green but **IL-2** is gray, SRS has reached the radio server but is not receiving fresh game telemetry. This is not an SRS server outage.
+If **Server** and **VOIP** are green but **IL-2** is gray, SRS has reached the radio server but is not receiving fresh game telemetry. This is not an SRS server outage. If a VPN is running, check [VPN software](#vpn-software) first.
 
 If all connection indicators remain gray, first verify that SRS has a valid server address and that your network can reach it.
 
@@ -48,6 +48,18 @@ Allow `IL2-SR-ClientRadio.exe` on both **Private** and **Public** Windows Firewa
 
 If Windows previously displayed a firewall prompt and only one network type was selected, use Telemetry Diagnostics or Windows Defender Firewall settings to correct the application rule.
 
+## VPN software
+
+Some VPN clients block or redirect the local traffic that IL-2 uses to send telemetry to SRS, even though both run on the same PC. SRS then does not detect that IL-2 is running and the **IL-2** indicator stays gray. Telemetry Diagnostics may still report that everything is set up correctly, because the game configuration itself is fine.
+
+To check whether your VPN is the cause:
+
+1. Disconnect the VPN.
+2. Restart IL-2.
+3. Check whether the **IL-2** indicator turns green.
+
+If it does, look in your VPN's settings for an option that keeps local traffic working while connected. Names vary between VPN apps; look for local network (LAN) access, the VPN's own firewall or kill switch, or split tunnelling. With split tunnelling, exclude the game (`Il-2.exe` for Great Battles, `IL2Series.exe` for Korea) and `IL2-SR-ClientRadio.exe`. If your VPN has no such option, disconnect it while flying with SRS.
+
 ## Third-party telemetry tools
 
 Force-feedback and hardware tools can also consume IL-2 telemetry. SRS and IL2WinWing should not both attempt to own UDP port `4322`. Use Telemetry Diagnostics to apply the supported split-port configuration instead of manually guessing port values.
@@ -64,5 +76,6 @@ If the IL-2 indicator remains gray, send support:
 - the relevant game's `startup.cfg`
 - `clientlog.txt` from the SRS application folder, captured while IL-2 is running
 - the game edition and whether it is Steam or standalone
+- whether a VPN, and which one, was running
 
 Use the **Report a Problem** button on the Help tab so the report includes the correct project and support destination.
