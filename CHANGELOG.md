@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased
+## IL2-SRS 1.0.5.0-beta.3
 
 ### Added
 
