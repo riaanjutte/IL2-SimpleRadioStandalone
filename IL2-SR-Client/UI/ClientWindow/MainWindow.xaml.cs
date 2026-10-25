@@ -82,6 +82,9 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI
         private bool _pilotRosterAutoStartedForCurrentConnection;
 
         private readonly DispatcherTimer _updateTimer;
+        // Reconnect after a lost connection: the attempt number (0 = not reconnecting) and the timer for the next try.
+        private int _reconnectAttempt;
+        private DispatcherTimer _reconnectTimer;
         private ServerAddress _serverAddress;
         private readonly DelegateCommand _connectCommand;
         private bool _initialisingLanguagePicker;
@@ -174,7 +177,7 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI
         {
             GCSettings.LatencyMode = GCLatencyMode.SustainedLowLatency;
 
-            _connectCommand = new DelegateCommand(Connect, () => ServerAddress != null);
+            _connectCommand = new DelegateCommand(ConnectButton, () => ServerAddress != null);
             FavouriteServersViewModel = new FavouriteServersViewModel(new CsvFavouriteServerStore());
 
             _initialisingOverlayOpacitySliders = true;
@@ -1319,6 +1322,64 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI
             toggleButton.Content = LocalizationManager.Get(toggleButton.IsChecked == true ? "ON" : "OFF");
         }
 
+        private void ConnectButton()
+        {
+            if (_reconnectAttempt > 0)
+            {
+                Logger.Info("Reconnecting cancelled by the user");
+                CancelReconnect();
+                Stop();
+                return;
+            }
+
+            Connect();
+        }
+
+        private void ScheduleReconnect()
+        {
+            _reconnectAttempt++;
+            var delay = ConnectionRecovery.DelayBefore(_reconnectAttempt);
+            Logger.Warn($"Connection to the server lost; reconnect attempt {_reconnectAttempt} in {delay.TotalSeconds:0} s");
+
+            if (_reconnectTimer == null)
+            {
+                _reconnectTimer = new DispatcherTimer();
+                _reconnectTimer.Tick += (sender, args) =>
+                {
+                    _reconnectTimer.Stop();
+                    if (_reconnectAttempt == 0 || ClientState.IsConnected || _client != null)
+                    {
+                        return;
+                    }
+
+                    Connect();
+                    if (_client == null)
+                    {
+                        // Connect declined (e.g. an invalid address or RCI Controller mode refused): stop trying.
+                        CancelReconnect();
+                    }
+                };
+            }
+
+            _reconnectTimer.Interval = delay;
+            _reconnectTimer.Start();
+
+            StartStop.Content = LocalizationManager.Get("Cancel");
+            UpdateConnectionStatusStrip();
+        }
+
+        private void CancelReconnect()
+        {
+            _reconnectTimer?.Stop();
+            if (_reconnectAttempt == 0)
+            {
+                return;
+            }
+
+            _reconnectAttempt = 0;
+            UpdateConnectionStatusStrip();
+        }
+
         private void Connect()
         {
             if (ClientState.IsConnected)
@@ -1531,6 +1592,17 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI
                 return;
             }
 
+            if (_reconnectAttempt > 0 && !ClientState.IsConnected)
+            {
+                ConnectionStatusStrip.Background = GetConnectionStatusBrush("MilStatusErrorBackgroundBrush", new SolidColorBrush(Color.FromRgb(0x32, 0x1C, 0x18)));
+                ConnectionStatusStrip.BorderBrush = GetConnectionStatusBrush("MilStatusErrorTextBrush", Brushes.Red);
+                ConnectionStatusLamp.Fill = GetConnectionStatusBrush("MilLedErrorBrush", Brushes.Red);
+                ConnectionStatusText.Foreground = GetConnectionStatusBrush("MilStatusErrorTextBrush", Brushes.Red);
+                ConnectionStatusText.Text = LocalizationManager.Get("RECONNECTING");
+                ConnectionStatusHint.Text = LocalizationManager.Get("Connection lost, retrying");
+                return;
+            }
+
             if (ClientState.IsConnectionErrored)
             {
                 ConnectionStatusStrip.Background = GetConnectionStatusBrush("MilStatusErrorBackgroundBrush", new SolidColorBrush(Color.FromRgb(0x32, 0x1C, 0x18)));
@@ -1586,6 +1658,12 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI
             if (result)
             {
                 ClientState.IsConnectionErrored = false;
+                if (_reconnectAttempt > 0)
+                {
+                    Logger.Info($"Reconnected to the server after {_reconnectAttempt} attempt(s)");
+                }
+
+                CancelReconnect();
 
                 if (!ClientState.IsConnected)
                 {
@@ -1633,6 +1711,23 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI
                     }
                 }
             }
+            else if (ConnectionRecovery.ShouldReconnect(sourceClient.ConnectionLost, connectionError, _reconnectAttempt > 0))
+            {
+                if (_reconnectAttempt == 0 && _globalSettings.GetClientSettingBool(GlobalSettingsKeys.PlayConnectionSounds))
+                {
+                    try
+                    {
+                        Sounds.BeepDisconnected.Play();
+                    }
+                    catch (Exception ex)
+                    {
+                        Logger.Warn(ex, "Failed to play disconnect sound");
+                    }
+                }
+
+                Stop();
+                ScheduleReconnect();
+            }
             else if (string.Equals(currentConnection, connection, StringComparison.OrdinalIgnoreCase))
             {
                 // Only stop connection/reset state if connection is currently active
@@ -1650,6 +1745,7 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI
 
         protected override void OnClosing(CancelEventArgs e)
         {
+            _reconnectTimer?.Stop();
             ClientStateSingleton.Instance.PropertyChanged -= ClientState_PropertyChanged;
             RciControllerMode.ActiveChanged -= OnRciControllerModeChanged;
             MessageHub.Instance.ClearSubscriptions();
