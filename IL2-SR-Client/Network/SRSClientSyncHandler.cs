@@ -33,6 +33,12 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.Network
         public static string ServerVersion = "Unknown";
         private readonly string _guid;
         private ConnectCallback _callback;
+
+        /// <summary>
+        /// True when the connection ended with a network error (timeout, reset) rather than a clean close or a
+        /// disconnect by this client. Read by the connect callback to decide whether to reconnect.
+        /// </summary>
+        public bool ConnectionLost { get; private set; }
         private ExternalAWACSModeConnectCallback _externalAWACSModeCallback;
         private UpdateUICallback _updateUICallback;
         private IPEndPoint _serverEndpoint;
@@ -402,6 +408,7 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.Network
                 {
                     if (!_connectionLifecycle.IsStopping)
                     {
+                        ConnectionLost = true;
                         Logger.Error(ex, "Client exception reading - Disconnecting ");
                     }
                 }
@@ -451,6 +458,7 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.Network
             {
                 if (!_connectionLifecycle.IsStopping)
                 {
+                    ConnectionLost = true;
                     Logger.Error(ex, "Client exception sending to server");
                 }
 

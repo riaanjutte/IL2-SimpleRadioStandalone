@@ -867,6 +867,12 @@
   <data name="CONNECTION ERROR" xml:space="preserve">
     <value>ОШИБКА СОЕДИНЕНИЯ</value>
   </data>
+  <data name="RECONNECTING" xml:space="preserve">
+    <value>ПЕРЕПОДКЛЮЧЕНИЕ</value>
+  </data>
+  <data name="Connection lost, retrying" xml:space="preserve">
+    <value>Связь потеряна, повтор</value>
+  </data>
   <data name="Server link inactive" xml:space="preserve">
     <value>Связь с сервером неактивна</value>
   </data>

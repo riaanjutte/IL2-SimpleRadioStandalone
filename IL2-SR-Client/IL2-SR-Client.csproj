@@ -237,6 +237,7 @@
     <Compile Include="Audio\Providers\JitterBufferProviderInterface.cs" />
     <Compile Include="Audio\Providers\VolumeSampleProviderWithPeak.cs" />
     <Compile Include="Audio\Utility\SpeexWrapper.cs" />
+    <Compile Include="Network\ConnectionRecovery.cs" />
     <Compile Include="Network\IL2\Models\ControlDataMessage.cs" />
     <Compile Include="Network\IL2\Models\ClientDataMessage.cs" />
     <Compile Include="Network\IL2\Models\IL2UDPMessage.cs" />

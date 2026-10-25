@@ -867,6 +867,12 @@
   <data name="CONNECTION ERROR" xml:space="preserve">
     <value>VERBINDUNGSFEHLER</value>
   </data>
+  <data name="RECONNECTING" xml:space="preserve">
+    <value>NEUE VERBINDUNG</value>
+  </data>
+  <data name="Connection lost, retrying" xml:space="preserve">
+    <value>Verbindung weg, neuer Versuch</value>
+  </data>
   <data name="Server link inactive" xml:space="preserve">
     <value>Serververbindung inaktiv</value>
   </data>

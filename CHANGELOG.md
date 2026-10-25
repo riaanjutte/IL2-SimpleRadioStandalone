@@ -1,5 +1,11 @@
 # Changelog
 
+## Unreleased
+
+### Changed
+
+- If the connection to the server drops because of a network problem, SRS now plays the disconnect sound, shows **RECONNECTING** and reconnects by itself: after 2, 5 and 10 seconds, then every 30 seconds until it is back. Press **Cancel** to stop trying. Before, SRS went quiet without warning and you had to notice and press Connect again. Being kicked or banned, or the server shutting down, is not retried.
+
 ## IL2-SRS 1.0.5.0-beta.3
 
 ### Added
