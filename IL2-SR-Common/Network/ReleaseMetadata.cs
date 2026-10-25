@@ -7,7 +7,7 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Common.Network
         public const string GithubUserAgent = GithubUsername + "_" + GithubRepository;
 
         public const string Version = "1.0.5.0";
-        public const string ReleaseTag = "1.0.5.0-beta.3";
+        public const string ReleaseTag = "1.0.5.0-beta.4";
         public const string MinimumProtocolVersion = "1.0.0.0";
     }
 }
