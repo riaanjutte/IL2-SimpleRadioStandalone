@@ -2,14 +2,23 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Text.RegularExpressions;
+using Ciribob.IL2.SimpleRadio.Standalone.Client.Settings;
 using Ciribob.IL2.SimpleRadio.Standalone.Client.Singletons;
 using Ciribob.IL2.SimpleRadio.Standalone.Common;
 using Ciribob.IL2.SimpleRadio.Standalone.Common.Network;
+using Ciribob.IL2.SimpleRadio.Standalone.Common.Setting;
 
 namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI.ClientWindow.PilotRoster
 {
     public static class PilotRosterBuilder
     {
+        // Tower and command clients on Great Battles and Korea servers; never pilots, whatever the server's list says.
+        private static readonly string[] BuiltInNonPilotNames =
+        {
+            "Axis Airfield", "Axis Command", "Allies Airfield", "Allies Command",
+            "UN Airfield", "UN Command", "CF Airfield", "CF Command"
+        };
+
         public static IList<PilotRosterEntry> Build(PlayerGameState localState, IEnumerable<SRClient> connectedClients)
         {
             var ownCoalition = localState?.coalition ?? 0;
@@ -18,10 +27,13 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI.ClientWindow.PilotRoster
                 return new List<PilotRosterEntry>();
             }
 
+            var nonPilots = NonPilotNames(SyncedServerSettings.Instance.GetSetting(ServerSettingsKeys.PRIORITY_TRANSMITTER_NAMES));
+            var secondRadioEnabled = SyncedServerSettings.Instance.GetSettingAsBool(ServerSettingsKeys.SECOND_RADIO_ENABLED);
+
             var entries = (connectedClients ?? Enumerable.Empty<SRClient>())
                 .Where(client => client != null &&
                                  client.Coalition == ownCoalition &&
-                                 IsRealPlayerClient(client.Name))
+                                 IsRealPlayerClient(client, nonPilots, secondRadioEnabled))
                 .Select(client => new PilotRosterEntry(
                     client.AssignedCallsign,
                     client.Name,
@@ -45,10 +57,13 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI.ClientWindow.PilotRoster
                 return string.Empty;
             }
 
+            var nonPilots = NonPilotNames(SyncedServerSettings.Instance.GetSetting(ServerSettingsKeys.PRIORITY_TRANSMITTER_NAMES));
+            var secondRadioEnabled = SyncedServerSettings.Instance.GetSettingAsBool(ServerSettingsKeys.SECOND_RADIO_ENABLED);
+
             var activeSquads = (connectedClients ?? Enumerable.Empty<SRClient>())
                 .Where(client => client != null &&
                                  client.Coalition == ownCoalition &&
-                                 IsRealPlayerClient(client.Name))
+                                 IsRealPlayerClient(client, nonPilots, secondRadioEnabled))
                 .Select(client => new
                 {
                     Squad = ExtractSquadTag(client.Name),
@@ -89,10 +104,13 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI.ClientWindow.PilotRoster
                 return string.Empty;
             }
 
+            var nonPilots = NonPilotNames(SyncedServerSettings.Instance.GetSetting(ServerSettingsKeys.PRIORITY_TRANSMITTER_NAMES));
+            var secondRadioEnabled = SyncedServerSettings.Instance.GetSettingAsBool(ServerSettingsKeys.SECOND_RADIO_ENABLED);
+
             var squadTags = (connectedClients ?? Enumerable.Empty<SRClient>())
                 .Where(client => client != null &&
                                  client.Coalition == ownCoalition &&
-                                 IsRealPlayerClient(client.Name) &&
+                                 IsRealPlayerClient(client, nonPilots, secondRadioEnabled) &&
                                  GetOperationalChannels(client.GameState).Contains(channel))
                 .Select(client => ExtractSquadTag(client.Name))
                 .ToList();
@@ -212,24 +230,48 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI.ClientWindow.PilotRoster
             return string.Empty;
         }
 
-        private static bool IsRealPlayerClient(string name)
+        /// <summary>
+        /// Names that are not pilots: the built-in tower and command names plus the server's Priority Transmitters
+        /// (a comma-separated list, the same setting the server uses for voice priority). Compared ignoring case and
+        /// extra spaces.
+        /// </summary>
+        internal static HashSet<string> NonPilotNames(string priorityTransmitterNames)
         {
-            if (string.IsNullOrWhiteSpace(name))
+            var names = new HashSet<string>(System.StringComparer.OrdinalIgnoreCase);
+            foreach (var name in BuiltInNonPilotNames.Concat((priorityTransmitterNames ?? string.Empty).Split(',')))
+            {
+                var normalized = NormalizeName(name);
+                if (normalized.Length > 0)
+                {
+                    names.Add(normalized);
+                }
+            }
+
+            return names;
+        }
+
+        private static string NormalizeName(string name)
+        {
+            return Regex.Replace(name ?? string.Empty, @"[\s\p{Cf}]+", " ").Trim();
+        }
+
+        private static bool IsRealPlayerClient(SRClient client, HashSet<string> nonPilotNames, bool secondRadioEnabled)
+        {
+            if (string.IsNullOrWhiteSpace(client.Name))
             {
                 return false;
             }
 
-            var normalizedName = Regex.Replace(name, @"[\s\p{Cf}]+", " ").Trim();
+            // Tower and command bots have no second radio. Every SRS client tunes radio 2 to a channel whenever the
+            // server allows a second radio, so on such a server a client without one is not a pilot.
+            if (secondRadioEnabled && GetRadioChannel(client.GameState, 2) == 0)
+            {
+                return false;
+            }
+
+            var normalizedName = NormalizeName(client.Name);
             // RCI controllers are not pilots; the RCI status panel shows them instead.
-            return !ConnectedClientsSingleton.IsRciName(normalizedName) &&
-                   !string.Equals(normalizedName, "Axis Airfield", System.StringComparison.OrdinalIgnoreCase) &&
-                   !string.Equals(normalizedName, "Axis Command", System.StringComparison.OrdinalIgnoreCase) &&
-                   !string.Equals(normalizedName, "Allies Airfield", System.StringComparison.OrdinalIgnoreCase) &&
-                   !string.Equals(normalizedName, "Allies Command", System.StringComparison.OrdinalIgnoreCase) &&
-                   !string.Equals(normalizedName, "UN Airfield", System.StringComparison.OrdinalIgnoreCase) &&
-                   !string.Equals(normalizedName, "UN Command", System.StringComparison.OrdinalIgnoreCase) &&
-                   !string.Equals(normalizedName, "CF Airfield", System.StringComparison.OrdinalIgnoreCase) &&
-                   !string.Equals(normalizedName, "CF Command", System.StringComparison.OrdinalIgnoreCase);
+            return !ConnectedClientsSingleton.IsRciName(normalizedName) && !nonPilotNames.Contains(normalizedName);
         }
     }
 }

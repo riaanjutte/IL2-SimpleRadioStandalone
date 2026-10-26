@@ -77,7 +77,7 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Server.Settings
             new SettingDefinition(ServerSettingsKeys.GLOBAL_LOBBY_FREQUENCIES, RadioGroup, "Global Lobby Freq. AM (MHz)",
                 "Comma-separated frequencies everyone can hear, regardless of coalition.", SettingKind.FrequencyList),
             new SettingDefinition(ServerSettingsKeys.PRIORITY_TRANSMITTER_NAMES, RadioGroup, "Priority Transmitters",
-                "Comma-separated client names whose transmissions win radio collisions.", SettingKind.Text,
+                "Comma-separated client names whose transmissions win radio collisions. Clients also leave them out of the Pilot Roster.", SettingKind.Text,
                 requiresRestart: true),
 
             new SettingDefinition(ServerSettingsKeys.SHOW_TUNED_COUNT, ClientGroup, "Show Tuned/Client Count",
