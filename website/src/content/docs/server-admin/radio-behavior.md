@@ -116,6 +116,8 @@ When a priority transmitter overlaps an ordinary transmitter on the same channel
 
 Two priority transmitters are not prioritized against each other and can still overlap. Use unique, controlled bot or service-account names so ordinary users cannot accidentally receive priority treatment.
 
+The list also keeps these clients out of the **Pilot Roster** (clients from the release after 1.0.5.0-beta.4), whether or not collision effects are enabled. The roster always leaves out `Axis`/`Allies`/`UN`/`CF` `Airfield` and `Command`, so add any other tower, command or bot names your server uses.
+
 ## Deployment checklist
 
 1. Decide whether coalition and spectator restrictions are required.

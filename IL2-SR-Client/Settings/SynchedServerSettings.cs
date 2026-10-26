@@ -94,6 +94,7 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.Settings
             _settings.TryRemove(ServerSettingsKeys.PILOT_ROSTER_DATA_AVAILABLE.ToString(), out _);
             _settings.TryRemove(ServerSettingsKeys.RADIO_COLLISION_EFFECTS.ToString(), out _);
             _settings.TryRemove(ServerSettingsKeys.SHOW_SQUAD_CHANNEL_LABELS.ToString(), out _);
+            _settings.TryRemove(ServerSettingsKeys.PRIORITY_TRANSMITTER_NAMES.ToString(), out _);
             foreach (var settingName in _settings.Keys)
             {
                 if (settingName.StartsWith(ChannelNameSettings.SyncedSettingPrefix, StringComparison.Ordinal))

@@ -70,7 +70,7 @@ Manual firewall rules and port forwarding are generally more predictable than UP
 | `CHANNEL_LIMIT` | `5` | Highest selectable channel; the UI provides 5, 10, 15, 20, or 25 |
 | `SHOW_SQUAD_CHANNEL_LABELS` | `false` | Append a majority squad tag to eligible channel names above channel 2 |
 | `RADIO_COLLISION_EFFECTS` | `false` | Signal overlapping same-channel transmissions to supporting clients |
-| `PRIORITY_TRANSMITTER_NAMES` | See below | Comma-separated exact pilot names protected during collisions |
+| `PRIORITY_TRANSMITTER_NAMES` | See below | Comma-separated exact pilot names protected during collisions, and left out of the Pilot Roster |
 | `ASSIGNED_CALLSIGNS_JSON_FILE` | blank | Local, relative, or UNC path to Pilot Roster assignments |
 
 The default priority list is:

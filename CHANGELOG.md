@@ -1,5 +1,11 @@
 # Changelog
 
+## Unreleased
+
+### Changed
+
+- The Pilot Roster now also leaves out the server's **Priority Transmitters** (the server setting `PRIORITY_TRANSMITTER_NAMES`, used for voice priority), so a server's own tower, command or bot names don't appear as pilots. The built-in `Axis`/`Allies`/`UN`/`CF` `Airfield` and `Command` names are still always left out. Before, only those built-in names were.
+
 ## IL2-SRS 1.0.5.0-beta.4
 
 ### Changed

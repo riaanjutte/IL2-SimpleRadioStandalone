@@ -1,8 +1,10 @@
 using System.Collections.Generic;
 using System.Linq;
+using Ciribob.IL2.SimpleRadio.Standalone.Client.Settings;
 using Ciribob.IL2.SimpleRadio.Standalone.Client.UI.ClientWindow.PilotRoster;
 using Ciribob.IL2.SimpleRadio.Standalone.Common;
 using Ciribob.IL2.SimpleRadio.Standalone.Common.Network;
+using Ciribob.IL2.SimpleRadio.Standalone.Common.Setting;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace Ciribob.IL2.SimpleRadio.Standalone.Common.Tests.UI
@@ -12,6 +14,71 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Common.Tests.UI
     {
         private const int FriendlyCoalition = 2;
         private const int EnemyCoalition = 1;
+
+        [TestCleanup]
+        public void TestCleanup()
+        {
+            // Back to "server sent no Priority Transmitters list", so other tests see the defaults.
+            SyncedServerSettings.Instance.Decode(new Dictionary<string, string>());
+        }
+
+        [TestMethod]
+        public void BuildExcludesTheServersPriorityTransmitters()
+        {
+            SyncedServerSettings.Instance.Decode(new Dictionary<string, string>
+            {
+                { ServerSettingsKeys.PRIORITY_TRANSMITTER_NAMES.ToString(), " Blue  Tower ,Red HQ,," }
+            });
+
+            var roster = PilotRosterBuilder.Build(CreateState(FriendlyCoalition, 1, 2), new[]
+            {
+                CreateClient("friendly-1", "blue tower", "", FriendlyCoalition, 2, 0),
+                CreateClient("friendly-2", "Red HQ", "", FriendlyCoalition, 1, 0),
+                CreateClient("friendly-3", "Axis Command", "", FriendlyCoalition, 1, 0),
+                CreateClient("friendly-4", "UN Airfield", "", FriendlyCoalition, 2, 0),
+                CreateClient("friendly-5", "Broadway", "STUD 3", FriendlyCoalition, 3, 4),
+                CreateClient("friendly-6", "Blue Tower 2", "", FriendlyCoalition, 2, 0)
+            }).Select(entry => entry.PilotName).ToList();
+
+            CollectionAssert.AreEquivalent(new[] { "BROADWAY", "BLUE TOWER 2" }, roster,
+                "The server's names and the built-in tower and command names are not pilots; only whole names match.");
+        }
+
+        [TestMethod]
+        public void PriorityTransmittersAreLeftOutOfSquadSummaries()
+        {
+            SyncedServerSettings.Instance.Decode(new Dictionary<string, string>
+            {
+                { ServerSettingsKeys.PRIORITY_TRANSMITTER_NAMES.ToString(), "=JG52= Tower" }
+            });
+
+            var summary = PilotRosterBuilder.BuildActiveSquadOpsSummary(CreateState(FriendlyCoalition, 1, 2), new[]
+            {
+                CreateClient("friendly-1", "=JG52= Tower", "", FriendlyCoalition, 5, 0),
+                CreateClient("friendly-2", "=JG52=Pilot", "", FriendlyCoalition, 5, 0)
+            });
+
+            Assert.AreEqual(string.Empty, summary, "One pilot and a tower are not an active squad.");
+        }
+
+        [TestMethod]
+        public void AServerThatSendsNoListUsesTheDefaults()
+        {
+            SyncedServerSettings.Instance.Decode(new Dictionary<string, string>
+            {
+                { ServerSettingsKeys.PRIORITY_TRANSMITTER_NAMES.ToString(), "Blue Tower" }
+            });
+            // Reconnecting to an older server that does not send the setting must not keep the previous server's list.
+            SyncedServerSettings.Instance.Decode(new Dictionary<string, string>());
+
+            var roster = PilotRosterBuilder.Build(CreateState(FriendlyCoalition, 1, 2), new[]
+            {
+                CreateClient("friendly-1", "Blue Tower", "", FriendlyCoalition, 2, 0),
+                CreateClient("friendly-2", "Allies Command", "", FriendlyCoalition, 1, 0)
+            }).Select(entry => entry.PilotName).ToList();
+
+            CollectionAssert.AreEquivalent(new[] { "BLUE TOWER" }, roster);
+        }
 
         [TestMethod]
         public void BuildIncludesOnlyPilotsOnLocalCoalition()
