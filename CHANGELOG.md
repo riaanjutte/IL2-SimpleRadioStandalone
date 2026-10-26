@@ -4,7 +4,7 @@
 
 ### Changed
 
-- The Pilot Roster now also leaves out the server's **Priority Transmitters** (the server setting `PRIORITY_TRANSMITTER_NAMES`, used for voice priority), so a server's own tower, command or bot names don't appear as pilots. The built-in `Axis`/`Allies`/`UN`/`CF` `Airfield` and `Command` names are still always left out. Before, only those built-in names were.
+- The Pilot Roster no longer lists tower, command and other radio bots under any name. When the server allows a second radio, a client with nothing on Radio 2 (shown as `--`) is a bot: every SRS client tunes Radio 2 to a channel on such a server. The roster also leaves out the server's **Priority Transmitters** (`PRIORITY_TRANSMITTER_NAMES`) and the built-in `Axis`/`Allies`/`UN`/`CF` `Airfield` and `Command` names, which still apply on servers that turn the second radio off. Before, only those built-in names were left out.
 
 ## IL2-SRS 1.0.5.0-beta.4
 

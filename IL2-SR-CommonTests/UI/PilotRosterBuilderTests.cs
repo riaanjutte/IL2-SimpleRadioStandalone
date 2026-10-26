@@ -19,7 +19,10 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Common.Tests.UI
         public void TestCleanup()
         {
             // Back to "server sent no Priority Transmitters list", so other tests see the defaults.
-            SyncedServerSettings.Instance.Decode(new Dictionary<string, string>());
+            SyncedServerSettings.Instance.Decode(new Dictionary<string, string>
+            {
+                { ServerSettingsKeys.SECOND_RADIO_ENABLED.ToString(), "true" }
+            });
         }
 
         [TestMethod]
@@ -32,16 +35,53 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Common.Tests.UI
 
             var roster = PilotRosterBuilder.Build(CreateState(FriendlyCoalition, 1, 2), new[]
             {
-                CreateClient("friendly-1", "blue tower", "", FriendlyCoalition, 2, 0),
-                CreateClient("friendly-2", "Red HQ", "", FriendlyCoalition, 1, 0),
-                CreateClient("friendly-3", "Axis Command", "", FriendlyCoalition, 1, 0),
-                CreateClient("friendly-4", "UN Airfield", "", FriendlyCoalition, 2, 0),
+                CreateClient("friendly-1", "blue tower", "", FriendlyCoalition, 2, 3),
+                CreateClient("friendly-2", "Red HQ", "", FriendlyCoalition, 1, 3),
+                CreateClient("friendly-3", "Axis Command", "", FriendlyCoalition, 1, 3),
+                CreateClient("friendly-4", "UN Airfield", "", FriendlyCoalition, 2, 3),
                 CreateClient("friendly-5", "Broadway", "STUD 3", FriendlyCoalition, 3, 4),
-                CreateClient("friendly-6", "Blue Tower 2", "", FriendlyCoalition, 2, 0)
+                CreateClient("friendly-6", "Blue Tower 2", "", FriendlyCoalition, 2, 3)
             }).Select(entry => entry.PilotName).ToList();
 
             CollectionAssert.AreEquivalent(new[] { "BROADWAY", "BLUE TOWER 2" }, roster,
                 "The server's names and the built-in tower and command names are not pilots; only whole names match.");
+        }
+
+        [TestMethod]
+        public void ClientsWithoutASecondRadioAreNotPilots()
+        {
+            // As in a test session: bots with their own names, on Radio 1 only.
+            var clients = new[]
+            {
+                CreateClient("bot-1", "Corpus GB Axis Airfield", "", FriendlyCoalition, 2, 0),
+                CreateClient("bot-2", "Corpus GB Axis Command", "", FriendlyCoalition, 1, 0),
+                CreateClient("pilot-1", "=TBAS=Haluter", "", FriendlyCoalition, 1, 2),
+                CreateClient("pilot-2", "Pazuzu", "MANIAC-5", FriendlyCoalition, 2, 3)
+            };
+            clients[1].GameState.radios[2].modulation = RadioInformation.Modulation.DISABLED;
+
+            var roster = PilotRosterBuilder.Build(CreateState(FriendlyCoalition, 1, 2), clients)
+                .Select(entry => entry.PilotName).ToList();
+
+            CollectionAssert.AreEquivalent(new[] { "=TBAS=HALUTER", "PAZUZU" }, roster);
+        }
+
+        [TestMethod]
+        public void WithoutASecondRadioOnTheServerOnlyNamesDecide()
+        {
+            SyncedServerSettings.Instance.Decode(new Dictionary<string, string>
+            {
+                { ServerSettingsKeys.SECOND_RADIO_ENABLED.ToString(), "false" }
+            });
+
+            var roster = PilotRosterBuilder.Build(CreateState(FriendlyCoalition, 1, 0), new[]
+            {
+                CreateClient("pilot-1", "=TBAS=Haluter", "", FriendlyCoalition, 1, 0),
+                CreateClient("bot-1", "Axis Command", "", FriendlyCoalition, 1, 0)
+            }).Select(entry => entry.PilotName).ToList();
+
+            CollectionAssert.AreEquivalent(new[] { "=TBAS=HALUTER" }, roster,
+                "Every client has radio 2 off when the server disables it, so pilots must still be listed.");
         }
 
         [TestMethod]
@@ -54,8 +94,8 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Common.Tests.UI
 
             var summary = PilotRosterBuilder.BuildActiveSquadOpsSummary(CreateState(FriendlyCoalition, 1, 2), new[]
             {
-                CreateClient("friendly-1", "=JG52= Tower", "", FriendlyCoalition, 5, 0),
-                CreateClient("friendly-2", "=JG52=Pilot", "", FriendlyCoalition, 5, 0)
+                CreateClient("friendly-1", "=JG52= Tower", "", FriendlyCoalition, 5, 6),
+                CreateClient("friendly-2", "=JG52=Pilot", "", FriendlyCoalition, 5, 6)
             });
 
             Assert.AreEqual(string.Empty, summary, "One pilot and a tower are not an active squad.");
@@ -73,8 +113,8 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Common.Tests.UI
 
             var roster = PilotRosterBuilder.Build(CreateState(FriendlyCoalition, 1, 2), new[]
             {
-                CreateClient("friendly-1", "Blue Tower", "", FriendlyCoalition, 2, 0),
-                CreateClient("friendly-2", "Allies Command", "", FriendlyCoalition, 1, 0)
+                CreateClient("friendly-1", "Blue Tower", "", FriendlyCoalition, 2, 3),
+                CreateClient("friendly-2", "Allies Command", "", FriendlyCoalition, 1, 3)
             }).Select(entry => entry.PilotName).ToList();
 
             CollectionAssert.AreEquivalent(new[] { "BLUE TOWER" }, roster);
@@ -112,6 +152,11 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Common.Tests.UI
         [TestMethod]
         public void BuildShowsEmptyCallsignAndUnavailableChannelsAsDashes()
         {
+            // A pilot only has radio 2 off when the server disables the second radio.
+            SyncedServerSettings.Instance.Decode(new Dictionary<string, string>
+            {
+                { ServerSettingsKeys.SECOND_RADIO_ENABLED.ToString(), "false" }
+            });
             var disabledState = CreateState(FriendlyCoalition, 1, 2);
             disabledState.radios[1].modulation = RadioInformation.Modulation.DISABLED;
             disabledState.radios[2].modulation = RadioInformation.Modulation.DISABLED;
@@ -172,7 +217,7 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Common.Tests.UI
         {
             var roster = PilotRosterBuilder.Build(CreateState(FriendlyCoalition, 1, 2), new[]
             {
-                CreateClient("friendly-1", "Unavailable", "", FriendlyCoalition, 0, 0),
+                CreateClient("friendly-1", "Unavailable", "", FriendlyCoalition, 0, 2),
                 CreateClient("friendly-2", "Lower", "", FriendlyCoalition, 3, 2),
                 CreateClient("friendly-3", "Higher", "", FriendlyCoalition, 12, 2)
             }).ToList();

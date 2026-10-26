@@ -28,11 +28,12 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI.ClientWindow.PilotRoster
             }
 
             var nonPilots = NonPilotNames(SyncedServerSettings.Instance.GetSetting(ServerSettingsKeys.PRIORITY_TRANSMITTER_NAMES));
+            var secondRadioEnabled = SyncedServerSettings.Instance.GetSettingAsBool(ServerSettingsKeys.SECOND_RADIO_ENABLED);
 
             var entries = (connectedClients ?? Enumerable.Empty<SRClient>())
                 .Where(client => client != null &&
                                  client.Coalition == ownCoalition &&
-                                 IsRealPlayerClient(client.Name, nonPilots))
+                                 IsRealPlayerClient(client, nonPilots, secondRadioEnabled))
                 .Select(client => new PilotRosterEntry(
                     client.AssignedCallsign,
                     client.Name,
@@ -57,11 +58,12 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI.ClientWindow.PilotRoster
             }
 
             var nonPilots = NonPilotNames(SyncedServerSettings.Instance.GetSetting(ServerSettingsKeys.PRIORITY_TRANSMITTER_NAMES));
+            var secondRadioEnabled = SyncedServerSettings.Instance.GetSettingAsBool(ServerSettingsKeys.SECOND_RADIO_ENABLED);
 
             var activeSquads = (connectedClients ?? Enumerable.Empty<SRClient>())
                 .Where(client => client != null &&
                                  client.Coalition == ownCoalition &&
-                                 IsRealPlayerClient(client.Name, nonPilots))
+                                 IsRealPlayerClient(client, nonPilots, secondRadioEnabled))
                 .Select(client => new
                 {
                     Squad = ExtractSquadTag(client.Name),
@@ -103,11 +105,12 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI.ClientWindow.PilotRoster
             }
 
             var nonPilots = NonPilotNames(SyncedServerSettings.Instance.GetSetting(ServerSettingsKeys.PRIORITY_TRANSMITTER_NAMES));
+            var secondRadioEnabled = SyncedServerSettings.Instance.GetSettingAsBool(ServerSettingsKeys.SECOND_RADIO_ENABLED);
 
             var squadTags = (connectedClients ?? Enumerable.Empty<SRClient>())
                 .Where(client => client != null &&
                                  client.Coalition == ownCoalition &&
-                                 IsRealPlayerClient(client.Name, nonPilots) &&
+                                 IsRealPlayerClient(client, nonPilots, secondRadioEnabled) &&
                                  GetOperationalChannels(client.GameState).Contains(channel))
                 .Select(client => ExtractSquadTag(client.Name))
                 .ToList();
@@ -252,14 +255,21 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI.ClientWindow.PilotRoster
             return Regex.Replace(name ?? string.Empty, @"[\s\p{Cf}]+", " ").Trim();
         }
 
-        private static bool IsRealPlayerClient(string name, HashSet<string> nonPilotNames)
+        private static bool IsRealPlayerClient(SRClient client, HashSet<string> nonPilotNames, bool secondRadioEnabled)
         {
-            if (string.IsNullOrWhiteSpace(name))
+            if (string.IsNullOrWhiteSpace(client.Name))
             {
                 return false;
             }
 
-            var normalizedName = NormalizeName(name);
+            // Tower and command bots have no second radio. Every SRS client tunes radio 2 to a channel whenever the
+            // server allows a second radio, so on such a server a client without one is not a pilot.
+            if (secondRadioEnabled && GetRadioChannel(client.GameState, 2) == 0)
+            {
+                return false;
+            }
+
+            var normalizedName = NormalizeName(client.Name);
             // RCI controllers are not pilots; the RCI status panel shows them instead.
             return !ConnectedClientsSingleton.IsRciName(normalizedName) && !nonPilotNames.Contains(normalizedName);
         }
