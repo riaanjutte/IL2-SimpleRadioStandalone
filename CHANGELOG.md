@@ -1,10 +1,48 @@
 # Changelog
 
-## Unreleased
+## IL2-SRS 1.0.5.0
+
+### Highlights
+
+- SRS reconnects by itself when the connection to the server drops: it plays the disconnect sound, shows **RECONNECTING** and keeps trying until the server is back.
+- PTT no longer lags when a joystick or other device with a keybind on it disappears, for example when Thrustmaster T.A.R.G.E.T. takes it over.
+- A **Classic** theme brings back the look of the original IL2-SRS 1.0.2.0, and users upgrading from 1.0.2.0 keep their settings and start in it.
+- The Pilot Roster fits its height to the pilots listed and no longer lists tower, command or other radio bots.
+- New web server (preview) for server administrators: run the IL2-SRS server in Docker or as a Windows service and manage it from the browser, with Allied and Axis channel names and a detailed event log. Thanks to Asken for contributing it.
+
+### Added
+
+- If the connection to the server drops because of a network problem, SRS now plays the disconnect sound, shows **RECONNECTING** and reconnects by itself: after 2, 5 and 10 seconds, then every 30 seconds until it is back. Press **Cancel** to stop trying. Being kicked or banned, or the server shutting down, is not retried.
+- A **Classic** theme in **Settings > Theme** that looks like the original IL2-SRS 1.0.2.0 client: plain light windows with a steel-blue title bar, standard controls and a flat grey radio overlay. Restart SRS when asked to finish switching to or from Classic. Like 1.0.2.0, the window is a fixed 550 x 610 with **Favourites** on its own tab; the other themes keep their layout.
+- Bind **Mute / Unmute Radio 1** and **Mute / Unmute Radio 2** in the Controls tab to mute or unmute a specific radio, whichever radio is selected.
+- Right-click the Pilot Roster and choose **Fit height to pilots** to turn automatic fitting back on after resizing the window yourself.
+- **RCI Controller mode** for Combat Box RCI officers, under **Settings > RCI Controller**, lets an officer use SRS without IL-2 using a personal access code from the Combat Box RCI dashboard. It is not active yet: until the dashboard issues codes, SRS reports that it cannot check them.
+- New web server (preview): the IL2-SRS server can run in Docker or as a Windows service and is managed from the browser, with a dashboard, client administration (mute, kick, ban with reason and duration), settings, channel names, a ban list, an event log and a REST API with read and write API keys. An existing `server.cfg` and `banned.txt` are imported on first start. Download `IL2-SRS-Server-Web-1.0.5.0-win-x64.zip` from this release, or use the `asken/il2-srs-server:preview` Docker image. The Windows server window remains available.
+- Web server: channel names can differ between Allies and Axis. An Allied or Axis name replaces the shared name for that coalition; pilots see their own coalition's names once spawned. ([#4](https://github.com/riaanjutte/IL2-SimpleRadioStandalone/issues/4))
+- Web server: every event has a type and details; the **Event Log** page filters by type and shows each event's details, and the log also records name changes, coalition changes and radio retuning. The API adds `type` and `client` filters to `/api/v1/events` and lists types at `/api/v1/event-types`.
+- Web server: an **IL-2 SRS** theme that matches the client's grey equipment-panel look.
 
 ### Changed
 
-- The Pilot Roster no longer lists tower, command and other radio bots under any name. When the server allows a second radio, a client with nothing on Radio 2 (shown as `--`) is a bot: every SRS client tunes Radio 2 to a channel on such a server. The roster also leaves out the server's **Priority Transmitters** (`PRIORITY_TRANSMITTER_NAMES`) and the built-in `Axis`/`Allies`/`UN`/`CF` `Airfield` and `Command` names, which still apply on servers that turn the second radio off. Before, only those built-in names were left out.
+- The Pilot Roster fits its height to the pilots listed, growing or shrinking as pilots join or leave. Once you resize it by dragging its edge, it keeps your size.
+- The Pilot Roster no longer lists tower, command and other radio bots, whatever their names: when the server allows a second radio, a client with nothing on Radio 2 is not a pilot. It also leaves out the server's **Priority Transmitters** and the built-in `Airfield` and `Command` names.
+- The installer and auto-updater update SRS in the folder where it is already installed, instead of moving it to `C:\Program Files\IL2-SimpleRadio-Standalone`.
+- Upgrading from the original IL2-SRS 1.0.2.0 (or earlier): the installer explains what will happen before it starts, keeps your settings, and starts SRS with the Classic theme and in English.
+- RCI controllers no longer appear as pilots in the Pilot Roster; the RCI status panel shows them.
+- Web server forms show what is wrong next to the field, and an open admin page reloads within seconds after the server restarts.
+
+### Fixed
+
+- PTT no longer lags when a device with a keybind on it disappears, for example a joystick taken over by Thrustmaster T.A.R.G.E.T. SRS used to slow every keybind check, including the keyboard, to about one a second while the device was missing.
+- The intercom and radio audio channel balance sliders now move the sound steadily from left to right. Before, the inner half of each side worked backwards. Check your balance settings after updating.
+- The buttons at the bottom of the **Help** tab no longer get cut off in a narrow window.
+
+### Compatibility
+
+- Existing clients and servers remain compatible. The client changes do not require a server update.
+- Allied and Axis channel names need both the web server and the client from this release. Older clients, and the Windows server window, use the shared channel names.
+- The web server upgrades its database (`srs.db`) on first start. An older web server can still open it.
+- The web server event log now records many more events and keeps at most 100,000, so on a busy server bans and logins may be removed before 30 days. Raise `SRS_EVENT_MAX_ROWS` to keep more.
 
 ## IL2-SRS 1.0.5.0-beta.4
 
