@@ -27,14 +27,16 @@ IL2-SRS supports IL-2 Korea alongside IL-2 Great Battles. Please report Korea-sp
 5. Community recommended settings prompt for existing users.
 6. Dark mode with Windows theme detection.
 
-## What's new in 1.0.4.12
+## What's new in 1.0.5.0
 
-- Assign keys to show or hide the Pilot Roster and Client List. Both windows now keep their position and size when toggled or updated.
-- Microphone capture can recover automatically after an audio device reset.
-- Updating now removes an obsolete DLL that could make an installed 1.0.4.12 client continue to report 1.0.4.11 and offer the update again.
-- Pilot identity is remembered separately for Great Battles and Korea, improving callsign display when switching games. Start SRS before joining a multiplayer server in each game at least once so it can learn that game's pilot name.
+- SRS reconnects by itself when the connection to the server drops, and tells you it is reconnecting.
+- PTT no longer lags when a joystick or other device with a keybind on it disappears, for example when Thrustmaster T.A.R.G.E.T. takes it over.
+- A **Classic** theme with the look of the original IL2-SRS 1.0.2.0; users upgrading from 1.0.2.0 keep their settings and start in it.
+- The Pilot Roster fits its height to the pilots listed and no longer lists tower, command or other radio bots.
+- Mute / Unmute keybinds for Radio 1 and Radio 2, and fixed audio channel balance sliders.
+- For server administrators, a new web server (preview) for Docker or a Windows service, managed from the browser.
 
-See the [full release notes](https://github.com/riaanjutte/IL2-SimpleRadioStandalone/releases/tag/v1.0.4.12).
+See the [full release notes](https://github.com/riaanjutte/IL2-SimpleRadioStandalone/releases/tag/v1.0.5.0).
 
 ## Community thanks
 
