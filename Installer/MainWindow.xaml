@@ -106,12 +106,10 @@
                     Content="Add game..." />
         </Grid>
 
-        <CheckBox x:Name="InstallScriptsCheckbox"
-                  Grid.Row="4"
-                  Margin="0,0,0,12"
-                  Content="Configure every detected IL-2 installation for SRS telemetry"
-                  IsChecked="True"
-                  IsEnabled="False" />
+        <TextBlock Grid.Row="4"
+                   Margin="0,0,0,12"
+                   TextWrapping="Wrap"
+                   Text="SRS adds its telemetry address to startup.cfg in every detected IL-2 game. Other telemetry devices in the file are kept." />
 
         <TextBlock Grid.Row="5"
                    Margin="0,0,0,12"
