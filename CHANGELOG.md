@@ -1,5 +1,11 @@
 # Changelog
 
+## Unreleased
+
+### Changed
+
+- The installer no longer shows a greyed-out telemetry checkbox. A short note now says SRS adds its address to each detected game's `startup.cfg` and keeps the other telemetry devices in it.
+
 ## IL2-SRS 1.0.5.0
 
 ### Highlights
