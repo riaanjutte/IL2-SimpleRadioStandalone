@@ -6,7 +6,7 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Common.Network
         public const string GithubRepository = "IL2-SimpleRadioStandalone";
         public const string GithubUserAgent = GithubUsername + "_" + GithubRepository;
 
-        public const string Version = "1.0.5.0";
+        public const string Version = "1.0.5.1";
         public const string ReleaseTag = "";
         public const string MinimumProtocolVersion = "1.0.0.0";
     }

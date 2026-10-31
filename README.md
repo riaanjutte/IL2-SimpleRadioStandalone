@@ -27,6 +27,13 @@ IL2-SRS supports IL-2 Korea alongside IL-2 Great Battles. Please report Korea-sp
 5. Community recommended settings prompt for existing users.
 6. Dark mode with Windows theme detection.
 
+## What's new in 1.0.5.1
+
+- Players who had switched on **RCI Controller mode** can connect again. The mode stays hidden until Combat Box issues RCI access codes.
+- The installer no longer shows a greyed-out telemetry checkbox. A note says SRS keeps your other telemetry devices in `startup.cfg`.
+
+See the [1.0.5.1 release notes](https://github.com/riaanjutte/IL2-SimpleRadioStandalone/releases/tag/v1.0.5.1).
+
 ## What's new in 1.0.5.0
 
 - SRS reconnects by itself when the connection to the server drops, and tells you it is reconnecting.
