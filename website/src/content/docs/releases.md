@@ -23,6 +23,8 @@ From 1.0.5.0, releases also provide the [web server](../server-admin/web-server/
 
 ## Release notes
 
+**1.0.5.1:** Players who had switched on RCI Controller mode can connect again; the mode stays hidden until Combat Box issues access codes. The installer explains that SRS keeps your other telemetry devices in `startup.cfg`. See the [1.0.5.1 release notes](https://github.com/riaanjutte/IL2-SimpleRadioStandalone/releases/tag/v1.0.5.1).
+
 **1.0.5.0:** SRS reconnects by itself when the connection drops, PTT no longer lags when a device with a keybind on it disappears, a Classic theme with the look of 1.0.2.0, a Pilot Roster that fits its height and leaves out radio bots, Mute / Unmute keybinds per radio, and fixed audio channel balance sliders. Server administrators can try the new web server (preview). See the [full release notes](https://github.com/riaanjutte/IL2-SimpleRadioStandalone/releases/tag/v1.0.5.0).
 
 **1.0.4.12:** Bind keys to toggle the Pilot Roster and Client List; those windows now keep their position and size. The client also recovers microphone capture after audio device resets, remembers a separate pilot name for Great Battles and Korea, and repairs an update loop caused by an obsolete DLL. See the [1.0.4.12 release notes](https://github.com/riaanjutte/IL2-SimpleRadioStandalone/releases/tag/v1.0.4.12).
