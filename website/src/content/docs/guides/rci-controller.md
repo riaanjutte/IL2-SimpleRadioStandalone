@@ -5,6 +5,10 @@ description: Use SRS as a Combat Box Radar Controlled Intercept (RCI) officer wi
 
 RCI Controller mode lets a Combat Box RCI officer talk to pilots on the Combat Box SRS server without IL-2 running. It is for officers listed on the Combat Box RCI dashboard; pilots do not need it.
 
+:::note[Not available yet]
+RCI Controller mode becomes available once Combat Box starts issuing access codes. Until then, SRS hides the **RCI Controller** settings.
+:::
+
 While the mode is on:
 
 - SRS uses your RCI codename. Pilots see you as `CODENAME___RCI`, and their clients show a friendly or enemy RCI as on duty.
