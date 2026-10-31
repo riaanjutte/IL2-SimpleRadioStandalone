@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Fixed
+
+- Players who had switched on **RCI Controller mode** in Settings could not connect: SRS kept asking for an RCI access code. The mode is now hidden and ignored until SRS can check Combat Box RCI access codes, so these players connect as normal again.
+
 ### Changed
 
 - The installer no longer shows a greyed-out telemetry checkbox. A short note now says SRS adds its address to each detected game's `startup.cfg` and keeps the other telemetry devices in it.

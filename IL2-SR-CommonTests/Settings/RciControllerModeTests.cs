@@ -105,7 +105,17 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Common.Tests.Settings
                 settings.SetClientSetting(GlobalSettingsKeys.RciControllerEnabled, true);
                 settings.SetClientSetting(GlobalSettingsKeys.RciAccessCode, "not a code");
                 var result = RciControllerMode.Refresh(DateTime.UtcNow);
-                Assert.IsFalse(result.IsValid);
+                if (RciControllerMode.IsAvailable)
+                {
+                    Assert.IsFalse(result.IsValid);
+                }
+                else
+                {
+                    // Release builds before rci-web issues codes: a mode switched on earlier must not block connecting.
+                    Assert.IsNull(result, "Without a trusted key the mode stays off, even when switched on.");
+                    Assert.IsFalse(RciControllerMode.IsEnabledInSettings);
+                }
+
                 Assert.IsFalse(RciControllerMode.IsActive);
             }
             finally
