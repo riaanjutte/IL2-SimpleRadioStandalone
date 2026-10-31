@@ -15,6 +15,7 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI
         /// <summary>Called from the constructor, before the server address and IL-2 telemetry are set up.</summary>
         private void InitRciController()
         {
+            RciControllerGroup.Visibility = RciControllerMode.IsAvailable ? Visibility.Visible : Visibility.Collapsed;
             RciControllerToggle.IsChecked = RciControllerMode.IsEnabledInSettings;
             RciAccessCodeBox.Text = _globalSettings.GetClientSetting(GlobalSettingsKeys.RciAccessCode).RawValue ?? string.Empty;
             RciControllerMode.ActiveChanged += OnRciControllerModeChanged;

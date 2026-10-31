@@ -61,8 +61,14 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.Settings
         /// <summary>1 Allies or 2 Axis while active, otherwise 0.</summary>
         public static short Coalition => _activeCode?.Coalition ?? 0;
 
+        /// <summary>
+        /// False until this build trusts an RCI signing key. Until then no code can be valid, so the mode stays
+        /// hidden and off, even if it was switched on before.
+        /// </summary>
+        public static bool IsAvailable => RciAccessCode.TrustedKeys.Count > 0;
+
         public static bool IsEnabledInSettings =>
-            GlobalSettingsStore.Instance.GetClientSettingBool(GlobalSettingsKeys.RciControllerEnabled);
+            IsAvailable && GlobalSettingsStore.Instance.GetClientSettingBool(GlobalSettingsKeys.RciControllerEnabled);
 
         /// <summary>Raised on the calling thread when the mode turns on or off, or its code changes.</summary>
         public static event Action ActiveChanged;
@@ -73,7 +79,7 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.Settings
         public static RciAccessCodeResult Refresh(DateTime utcNow)
         {
             var settings = GlobalSettingsStore.Instance;
-            if (!settings.GetClientSettingBool(GlobalSettingsKeys.RciControllerEnabled))
+            if (!IsEnabledInSettings)
             {
                 SetActiveCode(null);
                 return null;

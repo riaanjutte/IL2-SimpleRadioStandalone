@@ -1018,7 +1018,7 @@
                         </Grid>
 
                     </GroupBox>
-                    <GroupBox Header="RCI Controller">
+                    <GroupBox x:Name="RciControllerGroup" Header="RCI Controller">
                         <Grid HorizontalAlignment="Center">
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition x:Name="RciControllerLabelColumn" Width="390" />
