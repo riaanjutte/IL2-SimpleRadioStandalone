@@ -18,6 +18,7 @@
 
 - Web server: an address that doesn't exist shows the **Page not found** page with a link to the dashboard, instead of an empty page.
 - Web server: two bans added at the same moment could leave one of them out of the list checked when clients connect, until the next ban change.
+- Web server: the Docker image is built on .NET 10.0.14 and a patched musl, fixing the vulnerabilities scanners reported in .NET 10.0.12 (two of them critical HTTP request smuggling issues) and in musl.
 
 ### Compatibility
 
