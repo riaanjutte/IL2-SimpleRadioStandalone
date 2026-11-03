@@ -13,6 +13,7 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Server.Integrations
         private static readonly TimeSpan Window = TimeSpan.FromMinutes(1);
 
         private readonly Dictionary<string, Queue<DateTime>> _sent = new(StringComparer.Ordinal);
+        private DateTime _lastSweep = DateTime.MinValue;
         private readonly Func<DateTime> _clock;
         private readonly int _perMinute;
 
@@ -48,17 +49,18 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Server.Integrations
             var now = _clock();
             lock (_sent)
             {
-                // Forget webhooks with nothing sent in the last minute, e.g. deleted integrations or changed URLs.
-                foreach (var (key, queue) in _sent)
+                // At most once a minute, forget webhooks with nothing sent in the last minute, e.g. deleted
+                // integrations or changed URLs.
+                if (now - _lastSweep >= Window)
                 {
-                    while (queue.Count > 0 && now - queue.Peek() >= Window)
+                    _lastSweep = now;
+                    foreach (var (key, queue) in _sent)
                     {
-                        queue.Dequeue();
-                    }
-
-                    if (queue.Count == 0)
-                    {
-                        _sent.Remove(key);
+                        Expire(queue, now);
+                        if (queue.Count == 0)
+                        {
+                            _sent.Remove(key);
+                        }
                     }
                 }
 
@@ -68,6 +70,8 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Server.Integrations
                     _sent[webhook] = sent;
                 }
 
+                Expire(sent, now);
+
                 if (sent.Count >= _perMinute)
                 {
                     return sent.Peek() + Window - now;
@@ -75,6 +79,14 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Server.Integrations
 
                 sent.Enqueue(now);
                 return null;
+            }
+        }
+
+        private static void Expire(Queue<DateTime> sent, DateTime now)
+        {
+            while (sent.Count > 0 && now - sent.Peek() >= Window)
+            {
+                sent.Dequeue();
             }
         }
     }

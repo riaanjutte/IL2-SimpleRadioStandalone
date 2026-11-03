@@ -703,6 +703,30 @@ WHERE pending.integration_id = 1 AND pending.status IN ('queued', 'running');";
             Assert.Equal(0, run.Attempts);
         }
 
+        [Fact]
+        public void ARunInterruptedTwiceFailsInsteadOfRunningOnEveryStart()
+        {
+            using var temp = new TempDirectory();
+            var (service, _, _) = IntegrationServiceTests.Create(temp);
+            var integration = Save(service, "Joins");
+            var id = service.Store.Enqueue(integration, "client.connected", null, EventData.Sample(SrsEventTypes.ClientConnected));
+
+            Assert.True(service.Store.TryStart(id));
+            Assert.Equal(1, service.Store.ResetRunning());
+            Assert.True(service.Store.TryStart(id));
+            Assert.Equal(0, service.Store.ResetRunning());
+
+            var run = service.Store.GetExecution(id);
+            Assert.Equal(ExecutionStatus.Failed, run.Status);
+            Assert.Equal(IntegrationStore.InterruptedTwiceError, run.LastError);
+
+            // Run again starts over, with another interruption allowed.
+            Assert.True(service.Store.Requeue(id));
+            Assert.True(service.Store.TryStart(id));
+            Assert.Equal(1, service.Store.ResetRunning());
+            Assert.Equal(ExecutionStatus.Queued, service.Store.GetExecution(id).Status);
+        }
+
         private static IntegrationDefinition Save(IntegrationService service, string name,
             IntegrationCondition condition = null, RetryMode retryMode = RetryMode.None, int maxRetries = 0)
         {

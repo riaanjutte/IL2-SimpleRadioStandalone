@@ -37,15 +37,18 @@
 
     private List<Preview> _previews = new();
 
+    // Optional, as for the integration service: without it the preview keeps the example server.* values.
+    private IServerInfo _server;
+
+    protected override void OnInitialized() => _server = (IServerInfo)Services.GetService(typeof(IServerInfo));
+
     protected override void OnParametersSet()
     {
-        // This server's identity, as Test and real runs use, rather than the example server.* values.
-        var server = EventData.ServerSection((IServerInfo)Services.GetService(typeof(IServerInfo)));
         _previews = Triggers.Select(trigger =>
         {
             try
             {
-                return new Preview(trigger, Render(EventData.Sample(trigger, server)), null);
+                return new Preview(trigger, Render(EventData.SampleFor(trigger, _server)), null);
             }
             catch (TemplateException ex)
             {

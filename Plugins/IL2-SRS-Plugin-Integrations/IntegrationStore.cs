@@ -295,7 +295,7 @@ WHERE id = $id;";
             {
                 // From attempt 1 again, so it gets the integration's retries.
                 command.CommandText = @"UPDATE integration_executions SET status = 'queued', attempts = 0,
-    next_attempt_at = $now, finished_at = NULL
+    interruptions = 0, next_attempt_at = $now, finished_at = NULL
 WHERE id = $id AND status IN ('failed', 'skipped', 'succeeded');";
                 command.Parameters.AddWithValue("$id", executionId);
                 command.Parameters.AddWithValue("$now", SqliteDatabase.FormatTimestamp(DateTime.UtcNow));
@@ -310,19 +310,59 @@ WHERE id = $id AND status IN ('failed', 'skipped', 'succeeded');";
             return updated > 0;
         }
 
+        /// <summary>Error of a run a restart interrupted twice.</summary>
+        public const string InterruptedTwiceError =
+            "The server stopped twice while this run was in progress, so it was not run again. Use Run again to retry it.";
+
         /// <summary>
-        /// Queues runs left running by a previous process (it stopped mid-run) again. The interrupted attempt is
+        /// Queues runs left running by a previous process (it stopped mid-run) again. The first interruption is
         /// not counted, as with <see cref="Defer"/>, so a shutdown does not use up one of the integration's retries.
+        /// A run interrupted a second time fails instead: one that crashes or hangs the server would otherwise be
+        /// run again on every start, since retries are only counted when a run finishes.
         /// </summary>
+        /// <returns>The runs queued again; failed ones are logged.</returns>
         public int ResetRunning()
         {
-            using var connection = _database.Open();
-            using var command = connection.CreateCommand();
-            command.CommandText = @"UPDATE integration_executions SET status = 'queued', attempts = MAX(attempts - 1, 0),
-    next_attempt_at = $now
+            int requeued, failed;
+            var now = SqliteDatabase.FormatTimestamp(DateTime.UtcNow);
+            using (var connection = _database.Open())
+            using (var transaction = connection.BeginTransaction())
+            {
+                using (var fail = connection.CreateCommand())
+                {
+                    fail.Transaction = transaction;
+                    fail.CommandText = @"UPDATE integration_executions SET status = 'failed', last_error = $error,
+    interruptions = interruptions + 1, next_attempt_at = NULL, finished_at = $now
+WHERE status = 'running' AND interruptions > 0;";
+                    fail.Parameters.AddWithValue("$error", InterruptedTwiceError);
+                    fail.Parameters.AddWithValue("$now", now);
+                    failed = fail.ExecuteNonQuery();
+                }
+
+                using (var requeue = connection.CreateCommand())
+                {
+                    requeue.Transaction = transaction;
+                    requeue.CommandText = @"UPDATE integration_executions SET status = 'queued',
+    attempts = MAX(attempts - 1, 0), interruptions = interruptions + 1, next_attempt_at = $now
 WHERE status = 'running';";
-            command.Parameters.AddWithValue("$now", SqliteDatabase.FormatTimestamp(DateTime.UtcNow));
-            return command.ExecuteNonQuery();
+                    requeue.Parameters.AddWithValue("$now", now);
+                    requeued = requeue.ExecuteNonQuery();
+                }
+
+                transaction.Commit();
+            }
+
+            if (failed > 0)
+            {
+                Logger.Warn($"{failed} integration run(s) were interrupted by a restart a second time and failed");
+            }
+
+            if (requeued + failed > 0)
+            {
+                RaiseExecutionsChanged();
+            }
+
+            return requeued;
         }
 
         public IReadOnlyList<IntegrationExecution> QueryExecutions(string status = null, long? integrationId = null,

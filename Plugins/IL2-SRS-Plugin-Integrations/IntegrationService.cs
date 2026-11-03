@@ -258,8 +258,7 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Server.Integrations
             var runs = new List<IntegrationTestRun>();
             foreach (var trigger in draft.Triggers(EventTypes).Distinct())
             {
-                // Example event data, but this server's real name, version and address.
-                var data = EventData.Sample(trigger, EventData.ServerSection(_identity));
+                var data = EventData.SampleFor(trigger, _identity);
                 var context = new IntegrationExecutionContext
                 {
                     Integration = draft,

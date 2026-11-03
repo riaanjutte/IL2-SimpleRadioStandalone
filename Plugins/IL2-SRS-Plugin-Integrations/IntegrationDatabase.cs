@@ -78,6 +78,11 @@ CREATE TABLE IF NOT EXISTS integration_state (
             {
                 @"CREATE INDEX IF NOT EXISTS ix_integration_executions_pending ON integration_executions (integration_id, id)
     WHERE status IN ('queued', 'running')"
+            },
+            // 4: how often a restart interrupted a run, so a run that keeps stopping the server is not run forever.
+            new[]
+            {
+                "ALTER TABLE integration_executions ADD COLUMN interruptions INTEGER NOT NULL DEFAULT 0"
             }
         };
 
