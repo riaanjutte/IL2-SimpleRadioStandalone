@@ -59,15 +59,15 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Server.Integrations
         }
 
         /// <summary>
-        /// Example data for an event type, built from its fields' example values; <paramref name="server"/>
-        /// replaces the example server identity with the real one.
-        /// </summary>
-        /// <summary>
         /// Example data for an event, with this server's real name, version and address rather than the example
         /// ones, as Test and the template preview show it. Without <paramref name="server"/>, the examples stay.
         /// </summary>
         public static JsonElement SampleFor(SrsEventType type, IServerInfo server) => Sample(type, ServerSection(server));
 
+        /// <summary>
+        /// Example data for an event type, built from its fields' example values; <paramref name="server"/>
+        /// replaces the example server identity with the real one.
+        /// </summary>
         public static JsonElement Sample(SrsEventType type, JsonObject server = null)
         {
             var data = new JsonObject();
