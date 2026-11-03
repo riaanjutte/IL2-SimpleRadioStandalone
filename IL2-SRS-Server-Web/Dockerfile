@@ -27,10 +27,14 @@ WORKDIR /app
 
 # The pinned base (built 2026-10-24: Alpine 3.24.3, .NET 10.0.14) ships musl 1.2.6-r3, vulnerable to
 # CVE-2026-107891 (fixed in 1.2.6-r6). Alpine 3.24 doesn't have the fix yet, so take musl and musl-utils (and the
-# scanelf they need) from edge, at least the fixed version; the build fails if edge can't provide it.
+# scanelf they need) from edge. "~1.2.6" keeps them on 1.2.6, so a newer musl release in edge (and whatever it
+# needs from edge) can't come along; the build fails if edge's 1.2.6 is older than the fix. (apk keeps only one
+# version constraint per package, so the minimum is checked after installing.)
 # Remove this step once a newer base digest includes the fix.
 RUN apk add --no-cache --upgrade --repository https://dl-cdn.alpinelinux.org/alpine/edge/main \
-    'musl>=1.2.6-r6' 'musl-utils>=1.2.6-r6'
+        'musl~1.2.6' 'musl-utils~1.2.6' \
+    && musl="$(apk info -v 2>/dev/null | sed -n 's/^musl-\([0-9].*\)$/\1/p')" \
+    && if [ "$(apk version -t "$musl" 1.2.6-r6)" = "<" ]; then echo "musl $musl is older than 1.2.6-r6" >&2; exit 1; fi
 
 # Set by scripts/Publish-DockerImage.ps1; plain builds are labelled "dev".
 ARG VERSION=dev
