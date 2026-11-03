@@ -57,7 +57,13 @@ export default defineConfig({
 					label: 'Server administrators',
 					items: [
 						{ label: 'Server setup', slug: 'server-admin/server-setup' },
-						{ label: 'Web server (Docker, service)', slug: 'server-admin/web-server' },
+						{
+							label: 'Web server',
+							items: [
+								{ label: 'Docker and Windows service', slug: 'server-admin/web-server' },
+								{ label: 'Integrations', slug: 'server-admin/web-server/integrations' },
+							],
+						},
 						{ label: 'Configuration reference', slug: 'server-admin/configuration-reference' },
 						{ label: 'Radio behavior', slug: 'server-admin/radio-behavior' },
 						{ label: 'Client administration', slug: 'server-admin/client-administration' },

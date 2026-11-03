@@ -1,0 +1,42 @@
+<Project Sdk="Microsoft.NET.Sdk.Razor">
+
+  <!-- The integrations plugin: Discord and HTTP webhook actions run on server events. Install the publish output
+       as plugins/IL2-SRS-Plugin-Integrations/ in the server's install folder or data directory. -->
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <AssemblyName>IL2-SRS-Plugin-Integrations</AssemblyName>
+    <RootNamespace>Ciribob.IL2.SimpleRadio.Standalone.Server.Integrations</RootNamespace>
+    <Version>1.0.0</Version>
+    <Nullable>disable</Nullable>
+    <ImplicitUsings>disable</ImplicitUsings>
+    <!-- The server loads the plugin from its folder; its dependencies (Scriban) must be next to it. -->
+    <EnableDynamicLoading>true</EnableDynamicLoading>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <InternalsVisibleTo Include="IL2-SRS-Plugin-Integrations.Tests" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <FrameworkReference Include="Microsoft.AspNetCore.App" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- The server provides the SDK (and SQLite); don't ship copies with the plugin. -->
+    <ProjectReference Include="..\..\IL2-SRS-Server-Abstractions\IL2-SRS-Server-Abstractions.csproj"
+                      Private="false" ExcludeAssets="runtime" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Scriban" Version="7.5.0" />
+    <!-- Provided by the server at runtime. -->
+    <PackageReference Include="NLog" Version="6.2.1" ExcludeAssets="runtime" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- Served at plugins/integrations/ (not Razor static web assets, which the server can't load at runtime). -->
+    <None Include="Assets\**" Link="wwwroot\%(RecursiveDir)%(Filename)%(Extension)"
+          CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest" />
+  </ItemGroup>
+
+</Project>

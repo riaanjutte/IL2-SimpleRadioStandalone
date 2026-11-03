@@ -16,6 +16,9 @@ services:
       SRS_SERVER_PORT: "6002"
       # SRS_COALITION_AUDIO_SECURITY: "true"
       # SRS_GLOBAL_LOBBY_FREQUENCIES: "248.22"
+      # Shown in integration messages as server.name and server.adminUrl:
+      # SRS_SERVER_NAME: "My IL-2 server"
+      # SRS_PUBLIC_ADMIN_URL: "https://srs.example.com"
       # SRS_EVENT_RETENTION_DAYS: "30"
       # SRS_EVENT_MAX_ROWS: "100000"
     ports:

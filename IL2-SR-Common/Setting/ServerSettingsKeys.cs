@@ -29,7 +29,9 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Common.Setting
         PILOT_ROSTER_DATA_AVAILABLE,
         DSERVER_RCON_ADDRESS,
         DSERVER_RCON_USERNAME,
-        DSERVER_RCON_PASSWORD
+        DSERVER_RCON_PASSWORD,
+        SERVER_NAME,
+        PUBLIC_ADMIN_URL
     }
 
     public class DefaultServerSettings
@@ -40,7 +42,9 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Common.Setting
             ServerSettingsKeys.CLIENT_EXPORT_FILE_PATH.ToString(),
             ServerSettingsKeys.CHECK_FOR_BETA_UPDATES.ToString(),
             ServerSettingsKeys.SERVER_UI_THEME.ToString(),
-            ServerSettingsKeys.UPNP_ENABLED.ToString()
+            ServerSettingsKeys.UPNP_ENABLED.ToString(),
+            ServerSettingsKeys.SERVER_NAME.ToString(),
+            ServerSettingsKeys.PUBLIC_ADMIN_URL.ToString()
         };
 
         public static readonly Dictionary<string, string> Defaults = new Dictionary<string, string>()
@@ -66,6 +70,8 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Common.Setting
             { ServerSettingsKeys.DSERVER_RCON_ADDRESS.ToString(), "" },
             { ServerSettingsKeys.DSERVER_RCON_USERNAME.ToString(), "" },
             { ServerSettingsKeys.DSERVER_RCON_PASSWORD.ToString(), "" },
+            { ServerSettingsKeys.SERVER_NAME.ToString(), "" },
+            { ServerSettingsKeys.PUBLIC_ADMIN_URL.ToString(), "" },
         };
     }
 }

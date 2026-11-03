@@ -37,15 +37,17 @@ The web server is new. The Windows server window remains available while the web
   	<Image src={eventLog} alt="Event log with the category and type of each event, filters and live updates" quality="high" />
   </a>
 
+- **Integrations** that post to Discord or call a web address when something happens on the server, for example a pilot joining or the server starting. See [Integrations](integrations/).
 - **API keys** for the REST API, with read-only or read-write access, and an interactive **API reference**.
+- **Plugins** that add pages, API endpoints and event handling. See [Plugins](#plugins).
 
 Times are shown in your own time zone. The **Desktop / Light / Dark / IL-2 SRS** button in the top bar switches the theme; **Desktop** follows your system setting. The choice is remembered in each browser.
 
-Settings, bans, the event log and API keys are stored in `srs.db`, a SQLite database in the server's data folder.
+Settings, bans, the event log and API keys are stored in `srs.db`, a SQLite database in the server's data folder. Plugins keep their own data under `plugin-data` in the same folder.
 
 ## On a phone
 
-The admin UI works in a phone's browser. On a narrow screen, the menu becomes a dropdown at the top of the page, named after the page you are on, and settings are shown in one column.
+The admin UI works in a phone's browser. On a narrow screen, the menu becomes a dropdown at the top of the page, named after the page you are on, and settings are shown in one column. The Integrations and Runs pages show a card for each item instead of a table.
 
 <a href={phone.src} target="_blank" rel="noreferrer">
 	<Image src={phone} width={260} alt="The dashboard on a phone, with the menu as a dropdown at the top of the page" quality="high" />
@@ -77,6 +79,8 @@ The admin UI and API use plain HTTP. You can publish port 8080 to the internet, 
    ```powershell
    dotnet publish IL2-SRS-Server-Web -c Release -r win-x64 --self-contained -o C:\IL2-SRS\app
    ```
+
+   The build includes the Integrations plugin, in `plugins\IL2-SRS-Plugin-Integrations`.
 
    Windows marks files extracted from a downloaded ZIP as coming from the internet. If PowerShell refuses to run the install script, unblock the folder first:
 
@@ -120,6 +124,8 @@ Use a tunnel such as [Cloudflare Tunnel](https://developers.cloudflare.com/cloud
 
   `docker network inspect` shows the network's range.
 
+Set **Public Admin URL** under **Settings** to the tunnel's address, so integration messages can link to the admin UI.
+
 ## Move an existing server
 
 Point the data folder at a copy of your existing server folder. On first start, the web server imports `server.cfg` and `banned.txt` into `srs.db`, so settings, channel names and bans carry over. The original files are not changed. After the import, change settings in the admin UI; edits to `server.cfg` are no longer read.
@@ -131,7 +137,8 @@ Everything the server keeps is in its data folder:
 | Item | What it holds |
 | --- | --- |
 | `srs.db` | Settings, channel names, bans, the event log and API keys |
-| `keys` | Keys for the login cookie |
+| `keys` | Keys for the login cookie and for encrypting integration webhooks. Without them, webhooks have to be entered again. |
+| `plugin-data` | Each plugin's own data, such as the integrations |
 | `srs-server.json` | Configuration, including the admin password on Windows |
 
 Stop the server before copying the folder, so the database is copied in a consistent state. Keep the data folder on a local disk or a Docker volume, not a network share.
@@ -173,11 +180,21 @@ Create a key under **API Keys** in the admin UI and send it as `Authorization: B
 curl -H "Authorization: Bearer $SRS_API_KEY" http://localhost:8080/api/v1/clients
 ```
 
-Read keys can view status, clients, settings, channel names, bans and events. Write keys can also change settings, kick, ban and mute clients, manage bans, clear the event log, and start, stop or restart the server. Every change made with a key is recorded in the event log under the key's name.
+Read keys can view status, clients, settings, channel names, bans, events, plugins and integrations. Write keys can also change settings, kick, ban and mute clients, manage bans and integrations, clear the event log, and start, stop or restart the server. Every change made with a key is recorded in the event log under the key's name.
 
 Each event has a type, such as `client.connected`, and details as JSON. `GET /api/v1/events` filters by type and client, and `GET /api/v1/event-types` lists the types and their fields.
 
 The **API reference** button on the API Keys page opens an interactive reference (`/scalar`) where you can paste a key and try requests from the browser. Scripts and code generators can use the OpenAPI document at `/openapi/v1.json`.
+
+## Integrations
+
+Integrations post to Discord or call a web address when something happens on the server, for example a pilot joining or the server starting. See [Integrations](integrations/).
+
+## Plugins
+
+Integrations are a plugin, included in the Docker image and the Windows build. The **Plugins** page shows the plugins the server runs, and why a plugin did not load.
+
+To add a plugin, copy its folder into `plugins` in the data folder and restart the server. Plugins run inside the server with its permissions, so only install plugins you trust. For writing your own, see [Plugins in the web server README](https://github.com/riaanjutte/IL2-SimpleRadioStandalone/blob/master/IL2-SRS-Server-Web/README.md#plugins).
 
 ## Differences from the server window
 

@@ -6,10 +6,14 @@ WORKDIR /src
 
 # Restore with the project's sources present: the SDK only adds Blazor's framework scripts
 # (_framework/blazor.web.js) when it sees the .razor files at restore time.
+COPY IL2-SRS-Server-Abstractions/ IL2-SRS-Server-Abstractions/
 COPY IL2-SRS-Server-Web/ IL2-SRS-Server-Web/
-RUN dotnet restore IL2-SRS-Server-Web/IL2-SRS-Server-Web.csproj
+COPY Plugins/IL2-SRS-Plugin-Integrations/ Plugins/IL2-SRS-Plugin-Integrations/
+RUN dotnet restore IL2-SRS-Server-Web/IL2-SRS-Server-Web.csproj \
+    && dotnet restore Plugins/IL2-SRS-Plugin-Integrations/IL2-SRS-Plugin-Integrations.csproj
 
 COPY IL2-SR-Common/ IL2-SR-Common/
+# Publishing the server also publishes the integrations plugin into /app/plugins; admins add others under /data/plugins.
 RUN dotnet publish IL2-SRS-Server-Web/IL2-SRS-Server-Web.csproj -c Release -o /app --no-restore \
     && rm -f /app/Install-WindowsService.ps1 /app/web.config \
     && mkdir -p /data
@@ -43,6 +47,7 @@ LABEL org.opencontainers.image.title="IL2-SRS Server" \
       org.opencontainers.image.base.digest="sha256:f62a272ac1b46e83f56b8ed0416572f31cd1128e2c4a5e63eb34d348e4a36095"
 
 ENV SRS_DATA_DIR=/data \
+    SRS_IMAGE_VERSION=$VERSION \
     ASPNETCORE_HTTP_PORTS=8080 \
     DOTNET_gcServer=0
 

@@ -4,7 +4,7 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Server.Components.Shared
 {
     /// <summary>
     /// Shows short confirmations, such as "Saved Channel Limit.", as toasts at the top of the admin UI. One per
-    /// browser tab (scoped to the circuit); inject it into a page and call <see cref="Show"/>.
+    /// browser tab (scoped to the circuit); inject it into a page, including a plugin's, and call <see cref="Show"/>.
     /// </summary>
     public sealed class ToastService
     {

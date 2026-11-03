@@ -55,6 +55,13 @@ These values control the local server process rather than in-game radio behavior
 
 Manual firewall rules and port forwarding are generally more predictable than UPnP on a dedicated host.
 
+The [web server](../web-server/) adds two settings, shown under **Settings** in its admin UI. The server window ignores them.
+
+| Setting | Default | Purpose |
+| --- | --- | --- |
+| `SERVER_NAME` | blank | The server's name in [integration](../web-server/integrations/) messages. Blank uses the host name. |
+| `PUBLIC_ADMIN_URL` | blank | Where admins reach the admin UI, for example `https://srs.example.com`, so messages can link to it |
+
 ## General Settings
 
 | Setting | Default | Purpose |

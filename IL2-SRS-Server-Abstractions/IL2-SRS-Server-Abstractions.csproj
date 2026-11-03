@@ -1,0 +1,23 @@
+<Project Sdk="Microsoft.NET.Sdk.Razor">
+
+  <!-- What plugins build against: events, the plugin contract and the shared admin UI components.
+       The server loads it once and shares it with every plugin, so plugins must not ship their own copy. -->
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <AssemblyName>IL2-SRS-Server.Abstractions</AssemblyName>
+    <RootNamespace>Ciribob.IL2.SimpleRadio.Standalone.Server</RootNamespace>
+    <!-- Raise the major version when a change breaks plugins built against an older one. -->
+    <Version>1.0.0</Version>
+    <Nullable>disable</Nullable>
+    <ImplicitUsings>disable</ImplicitUsings>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <FrameworkReference Include="Microsoft.AspNetCore.App" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Data.Sqlite" Version="10.0.12" />
+  </ItemGroup>
+
+</Project>

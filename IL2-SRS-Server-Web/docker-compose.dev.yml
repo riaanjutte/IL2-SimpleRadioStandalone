@@ -4,6 +4,9 @@
 #   docker compose -f IL2-SRS-Server-Web/docker-compose.dev.yml up -d
 #   docker compose -f IL2-SRS-Server-Web/docker-compose.dev.yml logs -f
 #
+# The integrations plugin is built when the container starts and loaded from /plugins-dev; after changing the
+# plugin, restart the container (dotnet watch only follows the server project and the SDK).
+#
 # Put SRS_ADMIN_PASSWORD in IL2-SRS-Server-Web/.env (git-ignored). Its data is in its own volume (il2-srs-dev-data),
 # so it never upgrades the database of a server started from the image; it uses the same SRS port (6002), so stop
 # that container first.
@@ -25,11 +28,15 @@ services:
     command:
       - sh
       - -c
-      - socat TCP-LISTEN:8083,fork,reuseaddr TCP:127.0.0.1:8082 & exec dotnet watch run --non-interactive --no-launch-profile
+      - >-
+        socat TCP-LISTEN:8083,fork,reuseaddr TCP:127.0.0.1:8082 &
+        dotnet build ../Plugins/IL2-SRS-Plugin-Integrations -o /plugins-dev/IL2-SRS-Plugin-Integrations &&
+        exec dotnet watch run --non-interactive --no-launch-profile
     environment:
       SRS_ADMIN_PASSWORD: ${SRS_ADMIN_PASSWORD:?Set SRS_ADMIN_PASSWORD (at least 8 characters)}
       SRS_DATA_DIR: /data
       SRS_SERVER_PORT: "6002"
+      SRS_PLUGIN_PATHS: /plugins-dev
       ASPNETCORE_ENVIRONMENT: Development
       ASPNETCORE_URLS: http://0.0.0.0:8080
       # Docker Desktop doesn't pass Windows file change events into containers, so poll for changes.
@@ -50,12 +57,20 @@ services:
       # Keep the container's build output and packages apart from Windows builds of the same folders.
       - dev-bin:/src/IL2-SRS-Server-Web/bin
       - dev-obj:/src/IL2-SRS-Server-Web/obj
+      - dev-sdk-bin:/src/IL2-SRS-Server-Abstractions/bin
+      - dev-sdk-obj:/src/IL2-SRS-Server-Abstractions/obj
+      - dev-plugin-bin:/src/Plugins/IL2-SRS-Plugin-Integrations/bin
+      - dev-plugin-obj:/src/Plugins/IL2-SRS-Plugin-Integrations/obj
       - dev-nuget:/root/.nuget/packages
       - il2-srs-dev-data:/data
 
 volumes:
   dev-bin:
   dev-obj:
+  dev-sdk-bin:
+  dev-sdk-obj:
+  dev-plugin-bin:
+  dev-plugin-obj:
   dev-nuget:
   il2-srs-dev-data:
     name: il2-srs-dev-data

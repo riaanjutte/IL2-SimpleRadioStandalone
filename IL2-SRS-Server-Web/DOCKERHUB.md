@@ -42,6 +42,8 @@ Open http://localhost:8080 and log in with the admin password. Clients connect t
 | `SRS_ADMIN_PASSWORD` | – | Admin password, at least 8 characters. Required. |
 | `SRS_ADMIN_PASSWORD_FILE` | – | Read the password from a file (Docker secrets). |
 | `SRS_SERVER_PORT` | `6002` | SRS port. Change the published ports to match. |
+| `SRS_SERVER_NAME` | host name | Server name in integration messages (`server.name`). |
+| `SRS_PUBLIC_ADMIN_URL` | – | Admin UI address integration messages can link to (`server.adminUrl`). |
 | `SRS_<SETTING>` | – | Fix any server setting, e.g. `SRS_COALITION_AUDIO_SECURITY=true`. |
 | `SRS_EVENT_RETENTION_DAYS` | `30` | Keep events for this many days. |
 | `SRS_EVENT_MAX_ROWS` | `100000` | Keep at most this many events. |

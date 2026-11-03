@@ -1,4 +1,6 @@
-<Router AppAssembly="typeof(Program).Assembly" NotFoundPage="typeof(Pages.NotFound)">
+@inject IEnumerable<AdminRazorAssembly> AdminPages
+
+<Router AppAssembly="typeof(Program).Assembly" AdditionalAssemblies="_additionalAssemblies" NotFoundPage="typeof(Pages.NotFound)">
     <Found Context="routeData">
         <AuthorizeRouteView RouteData="routeData" DefaultLayout="typeof(MainLayout)">
             <NotAuthorized>
@@ -8,3 +10,10 @@
         <FocusOnNavigate RouteData="routeData" Selector="h1" />
     </Found>
 </Router>
+
+@code {
+    private System.Reflection.Assembly[] _additionalAssemblies;
+
+    protected override void OnInitialized() =>
+        _additionalAssemblies = AdminPages.Select(page => page.Assembly).Distinct().ToArray();
+}

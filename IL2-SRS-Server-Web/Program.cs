@@ -1,6 +1,7 @@
 using System;
 using System.Globalization;
 using System.IO;
+using System.Linq;
 using System.Net;
 using System.Runtime;
 using Ciribob.IL2.SimpleRadio.Standalone.Server.Admin;
@@ -12,6 +13,7 @@ using Ciribob.IL2.SimpleRadio.Standalone.Server.Data;
 using Ciribob.IL2.SimpleRadio.Standalone.Server.Events;
 using Ciribob.IL2.SimpleRadio.Standalone.Server.Hosting;
 using Ciribob.IL2.SimpleRadio.Standalone.Server.Network;
+using Ciribob.IL2.SimpleRadio.Standalone.Server.Plugins;
 using Ciribob.IL2.SimpleRadio.Standalone.Server.Settings;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
@@ -40,7 +42,14 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Server
         /// <summary>Reverse proxies whose X-Forwarded-For and X-Forwarded-Proto headers are trusted.</summary>
         public const string TrustedProxiesKey = "SRS_TRUSTED_PROXIES";
 
-        public static int Main(string[] args)
+        public static int Main(string[] args) => Run(args);
+
+        /// <summary>
+        /// Runs the server. Hosts that build on it (for example to compile plugins in with
+        /// <see cref="ServerPlugins.AddServerPlugin"/>) call this from their own Main with <paramref name="configure"/>,
+        /// which runs after the server's own services are registered and the plugin folders are loaded.
+        /// </summary>
+        public static int Run(string[] args, Action<WebApplicationBuilder> configure = null)
         {
             if (args.Length == 1 && args[0] == HealthCheckCommand.Argument)
             {
@@ -69,7 +78,7 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Server
                 GCSettings.LatencyMode = GCLatencyMode.SustainedLowLatency;
                 logger.Info($"IL2-SRS Server starting. Data directory: {ServerPaths.DataDirectory}");
 
-                var app = BuildApp(startup);
+                var app = BuildApp(startup, configure);
                 app.Run();
                 return Environment.ExitCode;
             }
@@ -90,7 +99,7 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Server
             }
         }
 
-        public static WebApplication BuildApp(StartupArguments startup)
+        public static WebApplication BuildApp(StartupArguments startup, Action<WebApplicationBuilder> configure = null)
         {
             var builder = WebApplication.CreateBuilder(new WebApplicationOptions
             {
@@ -128,12 +137,18 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Server
 
             builder.Services.AddSingleton(adminAuth);
             builder.Services.AddSingleton<ServerEvents>();
+            builder.Services.AddSingleton<IEventBus>(services => services.GetRequiredService<ServerEvents>());
+            builder.Services.AddSingleton<IServerStatusEvents>(services => services.GetRequiredService<ServerEvents>());
+            builder.Services.AddSingleton<IEventTypeRegistry, EventTypeRegistry>();
             builder.Services.AddSingleton<ServerState>();
             builder.Services.AddSingleton<ClientEventRecorder>();
             builder.Services.AddSingleton<ServerAdminService>();
-            // Registered first so it stops last and stores the shutdown events.
+            builder.Services.AddSingleton<ServerIdentity>();
+            builder.Services.AddSingleton<IServerInfo>(services => services.GetRequiredService<ServerIdentity>());
+            builder.Services.AddSingleton<IAdminActor, AdminActor>();
+            // Hosted services start in order and stop in reverse: the audit log first, so it stops last and stores
+            // the shutdown events; the SRS server last (below, after the plugins), so plugins see it start and stop.
             builder.Services.AddHostedService(services => services.GetRequiredService<AuditLog>());
-            builder.Services.AddHostedService<SrsServerHostedService>();
 
             // Keep login cookies valid across restarts.
             builder.Services.AddDataProtection()
@@ -189,6 +204,11 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Server
                 .AddInteractiveServerComponents();
             builder.Services.AddScoped<ToastService>();
 
+            ServerPlugins.Catalog(builder.Services);
+            ServerPlugins.LoadFromFolders(builder);
+            configure?.Invoke(builder);
+            builder.Services.AddHostedService<SrsServerHostedService>();
+
             var app = builder.Build();
 
             // First, so the login rate limit, logged addresses and the cookie's Secure flag see the browser's
@@ -210,6 +230,7 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Server
             app.UseAuthorization();
             app.UseRateLimiter();
             app.UseAntiforgery();
+            ServerPlugins.UseStaticFiles(app);
 
             // Named explicitly so the manifest is found when another assembly (e.g. tests) is the entry point.
             var staticAssetsManifest = Path.Combine(AppContext.BaseDirectory,
@@ -228,7 +249,9 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Server
             app.MapAdminEndpoints();
             app.MapServerApi();
             app.MapRazorComponents<App>()
-                .AddInteractiveServerRenderMode();
+                .AddInteractiveServerRenderMode()
+                .AddAdditionalAssemblies(app.Services.GetServices<AdminRazorAssembly>()
+                    .Select(page => page.Assembly).Distinct().ToArray());
 
             return app;
         }

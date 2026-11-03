@@ -1,0 +1,155 @@
+@inherits IntegrationActionEditor
+@using System.Text.Json
+@using System.Text.Json.Nodes
+
+<div class="field">
+    <label for="discord-url">Webhook URL</label>
+    <input id="discord-url" type="text" class="secret-input" autocomplete="off" spellcheck="false"
+           data-1p-ignore data-lpignore="true" data-bwignore
+           placeholder="@SecretPlaceholder(DiscordWebhookAction.WebhookUrlField, "https://discord.com/api/webhooks/…")"
+           value="@GetString(DiscordWebhookAction.WebhookUrlField)"
+           @onchange="e => SetString(DiscordWebhookAction.WebhookUrlField, e.Value?.ToString()?.Trim())"
+           aria-invalid="@Invalid(DiscordWebhookAction.WebhookUrlField)"
+           aria-describedby="@DescribedBy(DiscordWebhookAction.WebhookUrlField)"
+           @onblur="() => Touch(DiscordWebhookAction.WebhookUrlField)" />
+    <FieldError Id="@ErrorId(DiscordWebhookAction.WebhookUrlField)" Message="@ErrorFor(DiscordWebhookAction.WebhookUrlField)" />
+    <span class="field-help">In Discord: channel settings → Integrations → Webhooks → Copy Webhook URL. Stored encrypted.</span>
+</div>
+
+<div class="field">
+    <label for="discord-mode">Each event</label>
+    <select id="discord-mode" value="@Mode" @onchange="e => SetString(DiscordWebhookAction.MessageModeField, e.Value?.ToString())">
+        <option value="@DiscordWebhookAction.ModePost">Posts a new message</option>
+        <option value="@DiscordWebhookAction.ModeUpdate">Updates one message</option>
+    </select>
+    <span class="field-help">
+        @if (Mode == DiscordWebhookAction.ModeUpdate)
+        {
+            <text>
+                The first event posts a message and later events edit it, e.g. a server status you pin in the channel.
+                If the message is deleted or the webhook changes, the next event posts a new one.
+                Test always posts a separate message.
+            </text>
+        }
+        else
+        {
+            <text>Every event is a new message in the channel.</text>
+        }
+    </span>
+</div>
+
+@if (Mode == DiscordWebhookAction.ModeUpdate)
+{
+    <div class="field">
+        <label for="discord-message-id">Current message</label>
+        @if (State.TryGetValue(DiscordWebhookAction.MessageIdState, out var messageId))
+        {
+            <div class="current-message">
+                <input id="discord-message-id" class="mono" readonly value="@messageId" />
+                @if (State.GetValueOrDefault(DiscordWebhookAction.MessageLinkState) is { } link)
+                {
+                    <a href="@link" target="_blank" rel="noopener noreferrer">Open in Discord ↗</a>
+                }
+            </div>
+            <span class="field-help">
+                @if (UpdatedAt is { } updated)
+                {
+                    <text>Last posted or updated <LocalTime Value="updated" />. </text>
+                }
+                Delete the message in Discord to have the next event post a new one.
+            </span>
+        }
+        else
+        {
+            <span id="discord-message-id" class="field-help">None yet — the next event posts one.</span>
+        }
+    </div>
+}
+
+<div class="field-grid">
+    <div class="field">
+        <label for="discord-style">Style</label>
+        <select id="discord-style" value="@Style" @onchange="e => SetString(DiscordWebhookAction.StyleField, e.Value?.ToString())">
+            <option value="@DiscordWebhookAction.StyleText">Plain message</option>
+            <option value="@DiscordWebhookAction.StyleEmbed">Card (embed)</option>
+        </select>
+    </div>
+    <div class="field">
+        <label for="discord-username">Bot name</label>
+        <input id="discord-username" type="text" maxlength="80" placeholder="The name set on the webhook"
+               value="@GetString(DiscordWebhookAction.UsernameField)"
+               @onchange="e => SetString(DiscordWebhookAction.UsernameField, e.Value?.ToString()?.Trim())"
+               aria-invalid="@Invalid(DiscordWebhookAction.UsernameField)"
+               aria-describedby="@DescribedBy(DiscordWebhookAction.UsernameField)"
+               @onblur="() => Touch(DiscordWebhookAction.UsernameField)" />
+        <FieldError Id="@ErrorId(DiscordWebhookAction.UsernameField)" Message="@ErrorFor(DiscordWebhookAction.UsernameField)" />
+    </div>
+</div>
+
+@if (Style == DiscordWebhookAction.StyleEmbed)
+{
+    <div class="field-grid">
+        <div class="field">
+            <label for="discord-title">Title</label>
+            <input id="discord-title" type="text" spellcheck="false" placeholder="@DiscordWebhookAction.DefaultTitle"
+                   value="@GetString(DiscordWebhookAction.TitleField)"
+                   @oninput="e => SetString(DiscordWebhookAction.TitleField, e.Value?.ToString())"
+                   aria-invalid="@Invalid(DiscordWebhookAction.TitleField)"
+                   aria-describedby="@DescribedBy(DiscordWebhookAction.TitleField)"
+                   @onblur="() => Touch(DiscordWebhookAction.TitleField)" />
+            <FieldError Id="@ErrorId(DiscordWebhookAction.TitleField)" Message="@ErrorFor(DiscordWebhookAction.TitleField)" />
+        </div>
+        <div class="field">
+            <label for="discord-color">Colour</label>
+            <input id="discord-color" type="color" class="input-color"
+                   value="@(GetString(DiscordWebhookAction.ColorField) ?? DiscordWebhookAction.DefaultColor)"
+                   @onchange="e => SetString(DiscordWebhookAction.ColorField, e.Value?.ToString())"
+                   aria-invalid="@Invalid(DiscordWebhookAction.ColorField)"
+                   aria-describedby="@DescribedBy(DiscordWebhookAction.ColorField)"
+                   @onblur="() => Touch(DiscordWebhookAction.ColorField)" />
+            <FieldError Id="@ErrorId(DiscordWebhookAction.ColorField)" Message="@ErrorFor(DiscordWebhookAction.ColorField)" />
+        </div>
+    </div>
+}
+
+<div class="field">
+    <label for="discord-content">Message</label>
+    <textarea id="discord-content" rows="4" spellcheck="false" placeholder="@DiscordWebhookAction.DefaultContent"
+              value="@GetString(DiscordWebhookAction.ContentField)"
+              @oninput="e => SetString(DiscordWebhookAction.ContentField, e.Value?.ToString())"
+              aria-invalid="@Invalid(DiscordWebhookAction.ContentField)"
+              aria-describedby="@DescribedBy(DiscordWebhookAction.ContentField)"
+              @onblur="() => Touch(DiscordWebhookAction.ContentField)"></textarea>
+    <FieldError Id="@ErrorId(DiscordWebhookAction.ContentField)" Message="@ErrorFor(DiscordWebhookAction.ContentField)" />
+    <TemplateHelp Escaping="Values from the event are escaped, so player names cannot add formatting or links, and the message never mentions anyone." />
+</div>
+
+<TemplatePreview Triggers="Triggers" Render="Preview" />
+
+@code {
+    private string Style => GetString(DiscordWebhookAction.StyleField) ?? DiscordWebhookAction.StyleText;
+    private string Mode => GetString(DiscordWebhookAction.MessageModeField) ?? DiscordWebhookAction.ModePost;
+
+    private DateTime? UpdatedAt =>
+        DateTime.TryParse(State.GetValueOrDefault(DiscordWebhookAction.MessageUpdatedState), CultureInfo.InvariantCulture,
+            DateTimeStyles.AdjustToUniversal | DateTimeStyles.AssumeUniversal, out var updated)
+            ? updated
+            : null;
+
+    private string Preview(JsonElement data)
+    {
+        var message = DiscordWebhookAction.BuildMessage(Config, data);
+        if (message["embeds"] is JsonArray { Count: > 0 } embeds && embeds[0] is JsonObject embed)
+        {
+            var title = embed["title"]?.GetValue<string>();
+            var description = embed["description"]?.GetValue<string>();
+            return Unescape(string.Join("\n\n", new[] { title, description }.Where(t => !string.IsNullOrEmpty(t))));
+        }
+
+        return Unescape(message["content"]?.GetValue<string>());
+    }
+
+    // Discord shows \( as (; the preview looks the same.
+    private static string Unescape(string text) =>
+        text == null ? null : System.Text.RegularExpressions.Regex.Replace(text, @"\\([^\w\s])", "$1");
+}
