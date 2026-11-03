@@ -1,6 +1,7 @@
 @page "/settings"
 @attribute [Authorize]
 @inherits LiveComponent
+@inject ToastService Toast
 
 <PageTitle>Settings · IL2-SRS Server</PageTitle>
 
@@ -21,10 +22,6 @@
 @if (_error != null)
 {
     <p class="alert alert-error" role="alert">@_error</p>
-}
-@if (_message != null)
-{
-    <p class="alert" role="status">@_message</p>
 }
 
 @foreach (var group in Groups)
@@ -95,7 +92,6 @@
     private readonly Dictionary<ServerSettingsKeys, ElementReference> _inputs = new();
     private readonly FormState _form = new();
     private string _error;
-    private string _message;
     private bool _restartNeeded;
 
     protected override bool RefreshEverySecond => false;
@@ -121,7 +117,6 @@
             _form.Touch(definition.Name);
             if (definition.Validate(draft) != null)
             {
-                _message = null;
                 await _inputs[definition.Key].FocusAsync();
                 return;
             }
@@ -139,18 +134,29 @@
     private void Report(SettingDefinition definition, string error)
     {
         _error = error;
-        _message = error == null ? $"Saved {definition.Label}." : null;
-        if (error == null && definition.RequiresRestart)
+        if (error != null)
+        {
+            return;
+        }
+
+        var message = $"Saved {definition.Label}.";
+        if (definition.RequiresRestart)
         {
             _restartNeeded = true;
-            _message += " It applies after the server restarts.";
+            message += " It applies after the server restarts.";
         }
+
+        Toast.Show(message);
     }
 
     private void Restart()
     {
         _error = Admin.Restart(Actor);
-        _message = _error == null ? $"Server restarted on port {Admin.Port}." : null;
+        if (_error == null)
+        {
+            Toast.Show($"Server restarted on port {Admin.Port}.");
+        }
+
         _restartNeeded = _error != null;
     }
 }

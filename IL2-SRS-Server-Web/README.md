@@ -55,6 +55,7 @@ Configuration keys can be set as environment variables, command-line arguments (
 | `SRS_<SETTING>` | – | Fix a server setting, e.g. `SRS_SERVER_PORT=6002`, `SRS_COALITION_AUDIO_SECURITY=true`. Locked in the UI. |
 | `SRS_EVENT_RETENTION_DAYS` | `30` | Delete events older than this. |
 | `SRS_EVENT_MAX_ROWS` | `100000` | Keep at most this many events. |
+| `SRS_TRUSTED_PROXIES` | – | Reverse proxies whose `X-Forwarded-For` and `X-Forwarded-Proto` headers are trusted: addresses or CIDR ranges, separated by `,` (e.g. `172.18.0.0/16` for a proxy in a Docker network). This machine is always trusted. |
 | `SRS_DATA_DIR` | app folder | Data directory (same as `--data-dir`). `/data` in the container. |
 | `urls` / `ASPNETCORE_URLS` | `http://localhost:8080` | Admin UI address. The container listens on port 8080 on all interfaces. |
 
@@ -104,7 +105,8 @@ Use `-Suffix '' -Channel latest` for a release. The repository category can only
 
 - Publish the SRS port for **both TCP and UDP**. If you change it with `SRS_SERVER_PORT`, change the published ports too.
 - The admin UI is plain HTTP on port 8080. Keep it on localhost, or put a reverse proxy with HTTPS
-  (Caddy, Traefik, nginx) in front before exposing it.
+  (Caddy, Traefik, nginx) in front before exposing it. Set `SRS_TRUSTED_PROXIES` to the proxy's address or network,
+  so login limits and the event log use the browser's address and the login cookie is marked secure.
 - To run several servers, run several containers with their own volume and ports.
 - The image has a health check: `docker ps` shows the container as `healthy` while both SRS listeners
   are running, and `unhealthy` if one fails or an admin stops the server from the UI. The same check is

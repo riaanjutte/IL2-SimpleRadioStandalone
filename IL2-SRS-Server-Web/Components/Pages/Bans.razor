@@ -2,6 +2,7 @@
 @attribute [Authorize]
 @inject ServerAdminService Admin
 @inject AdminAuthOptions AuthOptions
+@inject ToastService Toast
 
 <PageTitle>Bans · IL2-SRS Server</PageTitle>
 
@@ -47,10 +48,6 @@
     @if (_error != null)
     {
         <p class="alert alert-error" role="alert">@_error</p>
-    }
-    @if (_message != null)
-    {
-        <p class="alert" role="status">@_message</p>
     }
 </section>
 
@@ -115,7 +112,6 @@ else
     private string _reason;
     private int _minutes;
     private string _error;
-    private string _message;
     private readonly FormState _form = new();
     private ElementReference _ipInput;
 
@@ -128,7 +124,6 @@ else
     private async Task Add()
     {
         _error = null;
-        _message = null;
         _form.Submit();
         if (IpError != null)
         {
@@ -138,9 +133,9 @@ else
 
         _error = Admin.BanAddress(_ip, _player, _reason, _minutes > 0 ? TimeSpan.FromMinutes(_minutes) : null, Actor,
             out var ban);
-        _message = _error == null ? $"Banned {ban.IpAddress}." : null;
         if (_error == null)
         {
+            Toast.Show($"Banned {ban.IpAddress}.");
             _ip = _player = _reason = null;
             _minutes = 0;
             _form.Reset();
@@ -152,7 +147,7 @@ else
     private void Remove(BanRecord ban)
     {
         _error = null;
-        _message = Admin.Unban(ban.Id, Actor) ? $"Removed the ban on {ban.IpAddress}." : "That ban was already removed.";
+        Toast.Show(Admin.Unban(ban.Id, Actor) ? $"Removed the ban on {ban.IpAddress}." : "That ban was already removed.");
         _bans = Admin.GetBans();
     }
 }

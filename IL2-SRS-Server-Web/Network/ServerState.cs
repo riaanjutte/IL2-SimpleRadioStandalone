@@ -145,7 +145,10 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Server.Network
             }
         }
 
-        /// <summary>Bans a connected client's IP address and disconnects them; returns the ban, or null.</summary>
+        /// <summary>
+        /// Bans a connected client's IP address and disconnects every client from it, not only this one;
+        /// returns the ban, or null.
+        /// </summary>
         public BanRecord BanClient(string clientGuid, string reason, string actor, DateTime? expiresAtUtc)
         {
             if (!TryGetSession(clientGuid, out var client, out var session) ||
@@ -155,7 +158,7 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Server.Network
             }
 
             var ban = _banStore.Add(remoteEndPoint.Address, client.Name, reason, actor, expiresAtUtc);
-            KickClient(clientGuid);
+            DisconnectAddress(remoteEndPoint.Address);
             return ban;
         }
 

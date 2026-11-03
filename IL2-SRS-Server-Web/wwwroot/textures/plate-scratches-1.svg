@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 290 160" preserveAspectRatio="none">
+<!-- A few scratches for the IL-2 SRS theme's panels, stretched over the whole panel; strokes keep their width. -->
+<g fill="none" stroke="#d8d8cc" stroke-linecap="round">
+<path d="M18 128L74 104" stroke-width="1.2" opacity=".22" vector-effect="non-scaling-stroke"/>
+<path d="M22 132L61 115" stroke-width="1" opacity=".15" vector-effect="non-scaling-stroke"/>
+<path d="M205 22Q235 30 268 26" stroke-width="1.2" opacity=".18" vector-effect="non-scaling-stroke"/>
+<path d="M209 25Q230 31 251 29" stroke-width="0.8" opacity=".12" vector-effect="non-scaling-stroke"/>
+<path d="M248 96L262 72" stroke-width="1.4" opacity=".2" vector-effect="non-scaling-stroke"/>
+</g>
+</svg>

@@ -97,6 +97,109 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Server.Tests
         }
 
         [Fact]
+        public async Task ChangingThePasswordSignsOutExistingSessions()
+        {
+            var token = TestContext.Current.CancellationToken;
+            var cookies = new CookieContainer();
+
+            async Task<string> Open(string path)
+            {
+                using var http = new HttpClient(new HttpClientHandler { CookieContainer = cookies }) { BaseAddress = _http.BaseAddress };
+                using var response = await http.GetAsync(path, token);
+                return response.RequestMessage!.RequestUri!.AbsolutePath;
+            }
+
+            using (var http = new HttpClient(new HttpClientHandler { CookieContainer = cookies }) { BaseAddress = _http.BaseAddress })
+            {
+                var login = await http.GetStringAsync("/login", token);
+                var antiforgery = System.Text.RegularExpressions.Regex
+                    .Match(login, "name=\"__RequestVerificationToken\" value=\"([^\"]+)\"").Groups[1].Value;
+                using var form = new FormUrlEncodedContent(new[]
+                {
+                    new System.Collections.Generic.KeyValuePair<string, string>("__RequestVerificationToken", antiforgery),
+                    new System.Collections.Generic.KeyValuePair<string, string>("returnUrl", "/clients"),
+                    new System.Collections.Generic.KeyValuePair<string, string>("password", "correct-horse")
+                });
+                using var response = await http.PostAsync("/account/login", form, token);
+                Assert.Equal("/clients", response.RequestMessage!.RequestUri!.AbsolutePath);
+            }
+
+            // The same server, restarted with a new password: the old login cookie no longer works.
+            await _app.StopAsync(token);
+            await _app.DisposeAsync();
+            _http.Dispose();
+            _app = Program.BuildApp(StartupArguments.Parse(new[]
+            {
+                "--urls=http://127.0.0.1:0",
+                "--SRS_ADMIN_PASSWORD=battery-staple",
+                "--SRS_SERVER_PORT=" + FindFreePort()
+            }));
+            await _app.StartAsync(token);
+            _http = new HttpClient
+            {
+                BaseAddress = new Uri(_app.Services.GetRequiredService<IServer>().Features
+                    .Get<IServerAddressesFeature>().Addresses.First())
+            };
+
+            Assert.Equal("/login", await Open("/clients"));
+        }
+
+        [Fact]
+        public async Task LogsTheBrowsersAddressFromATrustedProxy()
+        {
+            var token = TestContext.Current.CancellationToken;
+            var (_, readKey) = _app.Services.GetRequiredService<ApiKeyStore>().Create("reader", ApiScope.Read);
+            var login = await _http.GetStringAsync("/login", token);
+            var antiforgery = System.Text.RegularExpressions.Regex
+                .Match(login, "name=\"__RequestVerificationToken\" value=\"([^\"]+)\"").Groups[1].Value;
+
+            // The test connects from 127.0.0.1, which is always trusted, as a reverse proxy on the same machine.
+            using (var request = new HttpRequestMessage(HttpMethod.Post, "/account/login"))
+            {
+                request.Headers.Add("X-Forwarded-For", "203.0.113.9");
+                request.Content = new FormUrlEncodedContent(new[]
+                {
+                    new System.Collections.Generic.KeyValuePair<string, string>("__RequestVerificationToken", antiforgery),
+                    new System.Collections.Generic.KeyValuePair<string, string>("password", "wrong-password")
+                });
+                using var response = await _http.SendAsync(request, token);
+            }
+
+            for (var i = 0; i < 50; i++)
+            {
+                using var events = Authorized(HttpMethod.Get, "/api/v1/events?type=auth.login_failed", readKey);
+                using var response = await _http.SendAsync(events, token);
+                var list = await response.Content.ReadFromJsonAsync<JsonElement>(token);
+                if (list.GetArrayLength() > 0)
+                {
+                    Assert.Equal("Failed admin login from 203.0.113.9", list[0].GetProperty("message").GetString());
+                    return;
+                }
+
+                await Task.Delay(100, token);
+            }
+
+            Assert.Fail("The failed login was not logged.");
+        }
+
+        [Fact]
+        public async Task UnknownAddressesShowTheNotFoundPageExceptInTheApi()
+        {
+            var token = TestContext.Current.CancellationToken;
+
+            foreach (var path in new[] { "/does-not-exist", "/missing/page.html", "/textures/missing.svg" })
+            {
+                using var page = await _http.GetAsync(path, token);
+                Assert.Equal(HttpStatusCode.NotFound, page.StatusCode);
+                Assert.Contains("Page not found", await page.Content.ReadAsStringAsync(token));
+            }
+
+            using var api = await _http.GetAsync("/api/v1/does-not-exist", token);
+            Assert.Equal(HttpStatusCode.NotFound, api.StatusCode);
+            Assert.DoesNotContain("Page not found", await api.Content.ReadAsStringAsync(token));
+        }
+
+        [Fact]
         public async Task ApiRequiresAKeyWithTheRightScope()
         {
             var keys = _app.Services.GetRequiredService<ApiKeyStore>();
@@ -159,6 +262,14 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Server.Tests
                 Assert.True(client.GetProperty("voiceLink").GetBoolean());
             }
 
+            // A second client from the same address, as two players behind one router.
+            using var neighbour = new TcpClient();
+            await neighbour.ConnectAsync(IPAddress.Loopback, _srsPort, token);
+            var neighbourReader = new StreamReader(neighbour.GetStream(), Encoding.UTF8);
+            await SendAsync(neighbour.GetStream(), "{\"ServerType\":\"IL2-SRS\",\"Version\":\"1.0.4.12\",\"MsgType\":2," +
+                                                   "\"Client\":{\"ClientGuid\":\"EndToEndClientGuid0002\",\"Name\":\"Wingman\",\"Coalition\":1}}", token);
+            Assert.Equal(2, (await ReadMessageAsync(neighbourReader, token)).GetProperty("MsgType").GetInt32());
+
             // A settings change through the API is pushed to connected clients.
             using (var change = Authorized(HttpMethod.Put, "/api/v1/settings/CHANNEL_LIMIT", writeKey))
             {
@@ -190,6 +301,10 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Server.Tests
             {
                 timeout.CancelAfter(TimeSpan.FromSeconds(5));
                 Assert.Null(await reader.ReadLineAsync(timeout.Token));
+                // The other client from the banned address goes too (after any messages already sent to it).
+                while (await neighbourReader.ReadLineAsync(timeout.Token) != null)
+                {
+                }
             }
 
             await Task.Delay(1500, token);

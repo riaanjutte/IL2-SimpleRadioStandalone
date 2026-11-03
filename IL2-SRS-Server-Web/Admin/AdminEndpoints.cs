@@ -62,7 +62,11 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Server.Admin
                     }
 
                     var identity = new ClaimsIdentity(
-                        new List<Claim> { new Claim(ClaimTypes.Name, "admin") },
+                        new List<Claim>
+                        {
+                            new Claim(ClaimTypes.Name, "admin"),
+                            new Claim(AdminAuthOptions.SessionStampClaim, auth.SessionStamp ?? string.Empty)
+                        },
                         CookieAuthenticationDefaults.AuthenticationScheme);
                     await context.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme,
                         new ClaimsPrincipal(identity));

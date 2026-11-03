@@ -20,13 +20,25 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Server.Admin
 
         private readonly byte[] _passwordHash;
 
+        /// <summary>Login cookie claim holding <see cref="SessionStamp"/>.</summary>
+        public const string SessionStampClaim = "srs:session-stamp";
+
         private AdminAuthOptions(bool disabled, byte[] passwordHash)
         {
             Disabled = disabled;
             _passwordHash = passwordHash;
+            SessionStamp = passwordHash == null
+                ? null
+                : Convert.ToHexString(SHA256.HashData(Encoding.UTF8.GetBytes("session:" + Convert.ToHexString(passwordHash))));
         }
 
         public bool Disabled { get; }
+
+        /// <summary>
+        /// Changes when the password does. Login cookies carry it, so changing the password signs out every browser
+        /// that logged in with the old one. Derived from the password hash, never the password itself.
+        /// </summary>
+        public string SessionStamp { get; }
 
         public static AdminAuthOptions FromConfiguration(IConfiguration configuration)
         {

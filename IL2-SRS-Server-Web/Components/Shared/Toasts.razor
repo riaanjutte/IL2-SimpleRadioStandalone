@@ -1,0 +1,60 @@
+@* The toasts from ToastService, top centre. Each goes after a few seconds or when closed; the newest three are kept. *@
+@implements IDisposable
+@inject ToastService Service
+
+<div class="toasts" role="status" aria-live="polite">
+    @foreach (var toast in _toasts)
+    {
+        <div class="toast" @key="toast.Id">
+            <span class="toast-lamp" aria-hidden="true"></span>
+            <span class="toast-text">@toast.Message</span>
+            <button type="button" class="toast-close" aria-label="Close" @onclick="() => Close(toast)">
+                <Icon Name="x" />
+            </button>
+        </div>
+    }
+</div>
+
+@code {
+    private const int MaxToasts = 3;
+    private static readonly TimeSpan Lifetime = TimeSpan.FromSeconds(5);
+
+    private readonly List<Toast> _toasts = new();
+    private int _nextId;
+    private bool _disposed;
+
+    protected override void OnInitialized() => Service.Shown += OnShown;
+
+    private void OnShown(string message)
+    {
+        _ = InvokeAsync(async () =>
+        {
+            var toast = new Toast(_nextId++, message);
+            _toasts.Add(toast);
+            if (_toasts.Count > MaxToasts)
+            {
+                _toasts.RemoveAt(0);
+            }
+
+            StateHasChanged();
+            await Task.Delay(Lifetime);
+            Close(toast);
+        });
+    }
+
+    private void Close(Toast toast)
+    {
+        if (_toasts.Remove(toast) && !_disposed)
+        {
+            StateHasChanged();
+        }
+    }
+
+    public void Dispose()
+    {
+        _disposed = true;
+        Service.Shown -= OnShown;
+    }
+
+    private sealed record Toast(int Id, string Message);
+}

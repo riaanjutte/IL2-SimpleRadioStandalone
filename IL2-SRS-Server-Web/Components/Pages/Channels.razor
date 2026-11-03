@@ -2,6 +2,7 @@
 @attribute [Authorize]
 @inject ServerAdminService Admin
 @inject AdminAuthOptions AuthOptions
+@inject ToastService Toast
 
 <PageTitle>Channel Names · IL2-SRS Server</PageTitle>
 
@@ -18,11 +19,6 @@
     shared name for that coalition only; leave them blank to use the shared name. Older clients show only the
     shared names. Up to @ChannelNameSettings.MaximumNameLength characters.
 </p>
-
-@if (_message != null)
-{
-    <p class="alert" role="status">@_message</p>
-}
 
 <div class="table-wrap">
     <table class="grid channel-table">
@@ -66,7 +62,6 @@
     };
 
     private readonly Dictionary<int, Dictionary<int, string>> _names = new Dictionary<int, Dictionary<int, string>>();
-    private string _message;
 
     private string Actor => AuthOptions.Disabled ? "admin (no login)" : "admin";
 
@@ -98,8 +93,6 @@
 
             _names[coalition] = names;
         }
-
-        _message = null;
     }
 
     private void Save()
@@ -110,6 +103,6 @@
                 _names[ChannelNameSettings.AxisCoalition]),
             Actor);
         Load();
-        _message = "Channel names saved and sent to connected clients.";
+        Toast.Show("Channel names saved and sent to connected clients.");
     }
 }

@@ -60,40 +60,55 @@
 @font-face { font-family: "Share Tech Mono"; src: url("fonts/ShareTechMono-Regular.ttf") format("truetype"); font-display: swap; }
 
 :root[data-theme="srs"] {
-    --bg: #393d3f;
-    --surface: #3d4144;
-    --surface-2: #313538;
-    --border: #51565a;
+    --bg: #3c3f3b;
+    --surface: #40433f;
+    --surface-2: #343733;
+    --border: #555953;
     --text: #e4e1d3;
     /* Text colours here and below meet WCAG AA (4.5:1) on the lightest stop of the plate and button faces. */
     --muted: #c4c6c0;
     --accent: #ccc6a9;
-    --accent-text: #1f2224;
+    --accent-text: #212321;
     --danger: #c25b4e;
     --ok: #4fe34f;
     --warn: #e0b95c;
     --red: #c25b4e;
     --blue: #5f8fc2;
-    --grey: #43474a;
+    --grey: #464945;
     --radius: 5px;
     --stencil: "Allerta Stencil", var(--font);
     --mono: "Share Tech Mono", ui-monospace, Consolas, monospace;
-    --rim: #17191b;
-    --well: #1f2224;
-    --chrome: #2b2e30;
+    --rim: #191a18;
+    --well: #212321;
+    --chrome: #2d2f2c;
     --highlight: rgb(255 255 255 / .14);
-    --plate: linear-gradient(#45494c, #34383b);
-    --btn-face: linear-gradient(#4d5256, #303437);
-    --btn-hover: linear-gradient(#5a6064, #3a3e41);
-    --btn-pressed: linear-gradient(#282c2e, #3e4346);
-    --steel-face: linear-gradient(#a5acb1, #888f94);
-    --steel-hover: linear-gradient(#b0b6ba, #949ba0);
+    --page: radial-gradient(ellipse at top, #464944, #2e302d);
+    --plate: #3b3e3a;
+    --plate-grime: rgb(0 0 0 / .12);
+    --plate-grime-faint: rgb(0 0 0 / .10);
+    --display: #151715;
+    --knob: radial-gradient(circle at 35% 30%, #c0bcad, #616660 70%, #2e302d);
+    --danger-face: linear-gradient(#8a4339, #5e2a23);
+    --danger-hover: linear-gradient(#9a4b40, #6a3028);
+    --display-danger: #e0705f;
+    --lit-ok: #1c3a1f;
+    --lit-ok-rim: #2f6b33;
+    --lit-warn: #3a321c;
+    --lit-warn-rim: #6b5a2f;
+    --lit-bad: #3a1f1c;
+    --lit-bad-rim: #6b332f;
+    --engraving: #000;
+    --btn-face: linear-gradient(#51554f, #333632);
+    --btn-hover: linear-gradient(#5e635d, #3d403c);
+    --btn-pressed: linear-gradient(#2b2d2a, #424540);
+    --steel-face: linear-gradient(#a9b2a7, #8d948a);
+    --steel-hover: linear-gradient(#b3bcb0, #99a096);
     --danger-text: #fbd0c8;
     --error-text: #e08a7e;
     --warn-text: #f4d895;
-    --lamp-ring: #3d4043;
-    --screw-stops: #c0bcad 0, #8f8d84 1.2px, #5f6266 3.2px, #2c2f31 4.6px, var(--rim) 5px, transparent 5.6px;
-    --screw-slot: linear-gradient(#202325, #202325);
+    --lamp-ring: #3f433e;
+    --screw-stops: #c0bcad 0, #8f8d84 1.2px, #616660 3.2px, #2e302d 4.6px, var(--rim) 5px, transparent 5.6px;
+    --screw-slot: linear-gradient(#222422, #222422);
     /* Four slotted screws, 11px in from each corner; layer them over a plate gradient. */
     --screws:
         var(--screw-slot) 7.5px 10.25px / 7px 1.5px no-repeat,
@@ -179,13 +194,60 @@ code, .mono { font-family: var(--mono); font-size: .92em; }
 .sidenav a:hover { background: var(--surface-2); }
 .sidenav a.active { background: var(--accent); color: var(--accent-text); }
 
-.content { grid-area: main; padding: 1.25rem 1.5rem 3rem; max-width: 1200px; width: 100%; }
+/* The phone dropdown's toggle and backdrop; side by side the links sit directly in the menu. */
+.nav-toggle, .nav-backdrop { display: none; }
+.nav-links { display: contents; }
+
+.content { grid-area: main; min-width: 0; }
+.content-inner { padding: 1.25rem 1.5rem 3rem; max-width: 1200px; }
+
+/* Side by side, the top bar and menu stay put and only the content scrolls. */
+@media (min-width: 761px) {
+    .shell { height: 100vh; min-height: 0; }
+    .sidenav { overflow-y: auto; }
+    .content { overflow-y: auto; }
+}
 
 @media (max-width: 760px) {
-    .shell { grid-template-columns: 1fr; grid-template-areas: "top" "nav" "main"; }
-    .sidenav { flex-direction: row; overflow-x: auto; border-right: 0; border-bottom: 1px solid var(--border); padding: .5rem; }
-    .sidenav a { white-space: nowrap; }
-    .content { padding: 1rem; }
+    /* The content takes the spare height, so the menu stays one row high on short pages. */
+    .shell { grid-template-columns: 1fr; grid-template-rows: auto auto 1fr; grid-template-areas: "top" "nav" "main"; }
+    .sidenav { position: relative; z-index: 20; border-right: 0; border-bottom: 1px solid var(--border); padding: .5rem; }
+    /* A dropdown named after the current page; it opens over the content. */
+    .nav-toggle {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        width: 100%;
+        padding: .45rem .75rem;
+        border: 1px solid var(--border);
+        border-radius: 6px;
+        background: var(--surface);
+        color: var(--text);
+        font: inherit;
+        cursor: pointer;
+    }
+    .nav-toggle .icon { transition: transform .15s; }
+    .sidenav.open .nav-toggle .icon { transform: rotate(180deg); }
+    .nav-links { display: none; }
+    .sidenav.open .nav-links {
+        display: flex;
+        flex-direction: column;
+        gap: 2px;
+        position: absolute;
+        top: 100%;
+        left: .5rem;
+        right: .5rem;
+        max-height: 70vh;
+        overflow-y: auto;
+        padding: .4rem;
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+        box-shadow: 0 8px 24px rgb(0 0 0 / .25);
+    }
+    /* Catches a tap outside the open menu. */
+    .nav-backdrop { display: block; position: fixed; inset: 0; z-index: 10; }
+    .content-inner { padding: 1rem; }
     .topbar-meta { display: none; }
 }
 
@@ -255,6 +317,49 @@ input[type=text], input[type=search], input[type=password], input[type=number], 
 }
 
 .alert-error { border-color: var(--danger); color: var(--error-text); }
+
+/* Toasts (Toasts.razor): short confirmations at the top centre, over everything; on a phone they span the width. */
+.toasts {
+    position: fixed;
+    top: max(.75rem, env(safe-area-inset-top));
+    left: 50%;
+    z-index: 1000;
+    display: grid;
+    gap: .5rem;
+    width: min(26rem, calc(100vw - 2rem));
+    transform: translateX(-50%);
+    pointer-events: none;
+}
+
+.toast {
+    display: flex;
+    align-items: center;
+    gap: .65rem;
+    padding: .5rem .45rem .5rem .9rem;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    background: var(--surface);
+    box-shadow: 0 6px 20px rgb(0 0 0 / .25);
+    pointer-events: auto;
+    animation: toast-in .18s ease-out;
+}
+
+.toast-lamp { flex: none; width: 8px; height: 8px; border-radius: 50%; background: var(--ok); }
+.toast-text { flex: 1; min-width: 0; overflow-wrap: anywhere; }
+.toast-close {
+    flex: none;
+    display: inline-flex;
+    padding: .3rem;
+    border: 0;
+    border-radius: 4px;
+    background: none;
+    color: var(--muted);
+    cursor: pointer;
+}
+.toast-close:hover { color: var(--text); }
+
+@keyframes toast-in { from { opacity: 0; transform: translateY(-.5rem); } }
+@media (prefers-reduced-motion: reduce) { .toast { animation: none; } }
 
 .badge {
     display: inline-block;
@@ -330,6 +435,7 @@ input[type=text], input[type=search], input[type=password], input[type=number], 
 .btn-small { padding: .1rem .3rem; margin-left: .35rem; vertical-align: middle; }
 .btn-small .icon { width: 14px; height: 14px; }
 .filter-chip { align-self: flex-end; }
+
 
 .live-toggle { display: inline-flex; align-items: center; gap: .35rem; font-size: .9rem; color: var(--muted); }
 
@@ -470,17 +576,38 @@ input[aria-invalid="true"]:focus-visible, select[aria-invalid="true"]:focus-visi
 
 /* IL-2 SRS theme: equipment plates with corner screws, bevelled pushbuttons, inset wells and indicator
    lamps, after the WPF client's MilitaryControls.xaml. Colours and the screw layers come from the variables set above. */
-:root[data-theme="srs"] body { min-height: 100vh; background: radial-gradient(ellipse at top, #42474a, #2c2f31); }
+:root[data-theme="srs"] body { min-height: 100vh; background: var(--page); }
 :root[data-theme="srs"] h1 { font-family: var(--stencil); font-weight: 400; text-transform: uppercase; letter-spacing: .04em; }
 
-/* Equipment plates */
+/* Equipment plates: painted steel with paint grain, two grime patches and a few scratches stretched over the plate.
+   Scratches and grime differ from one plate to the next; dirt collects along the edges. */
 :root[data-theme="srs"] .panel,
 :root[data-theme="srs"] .tile,
 :root[data-theme="srs"] .login-card,
 :root[data-theme="srs"] .reconnect-card {
-    background: var(--screws), var(--plate);
+    --scratches: url("textures/plate-scratches-1.svg");
+    --g1: 15% 20%;
+    --g2: 85% 80%;
+    background: var(--screws),
+        var(--scratches) 0 0 / 100% 100% no-repeat,
+        radial-gradient(ellipse at var(--g1), var(--plate-grime), transparent 50%),
+        radial-gradient(ellipse at var(--g2), var(--plate-grime-faint), transparent 50%),
+        url("textures/plate-grain.svg"),
+        var(--plate);
     border: 1px solid var(--rim);
-    box-shadow: inset 1px 1px 0 var(--highlight), 0 2px 6px rgb(0 0 0 / .35);
+    box-shadow: inset 1px 1px 0 var(--highlight), inset 0 0 22px rgb(20 16 10 / .3), 0 2px 6px rgb(0 0 0 / .35);
+}
+
+:root[data-theme="srs"] :is(.panel, .tile):nth-child(3n + 2) {
+    --scratches: url("textures/plate-scratches-2.svg");
+    --g1: 80% 15%;
+    --g2: 20% 90%;
+}
+
+:root[data-theme="srs"] :is(.panel, .tile):nth-child(3n) {
+    --scratches: url("textures/plate-scratches-3.svg");
+    --g1: 45% 85%;
+    --g2: 90% 25%;
 }
 
 :root[data-theme="srs"] .panel { padding: 1rem 1.75rem 1.1rem; }
@@ -493,7 +620,7 @@ input[aria-invalid="true"]:focus-visible, select[aria-invalid="true"]:focus-visi
     gap: .75rem;
     font: 400 1rem var(--stencil);
     color: var(--accent);
-    text-shadow: 0 1px 0 #000;
+    text-shadow: 0 1px 0 var(--engraving);
 }
 
 :root[data-theme="srs"] .panel h2::after {
@@ -533,9 +660,21 @@ input[aria-invalid="true"]:focus-visible, select[aria-invalid="true"]:focus-visi
     width: 8px;
     height: 8px;
     border-radius: 50%;
-    background: radial-gradient(circle at 30% 25%, rgb(255 255 255 / .55), transparent 55%), #43474a;
+    background: radial-gradient(circle at 30% 25%, rgb(255 255 255 / .55), transparent 55%), var(--grey);
     box-shadow: 0 0 0 1.5px var(--lamp-ring), 0 0 0 2.5px var(--rim);
 }
+
+:root[data-theme="srs"] .nav-toggle {
+    border-color: var(--rim);
+    border-radius: 4px;
+    background: var(--btn-face);
+    box-shadow: inset 0 1px 0 var(--highlight);
+    font-family: var(--stencil);
+    font-size: .88rem;
+    text-transform: uppercase;
+    letter-spacing: .03em;
+}
+:root[data-theme="srs"] .sidenav.open .nav-links { gap: 4px; background: var(--chrome); border-color: var(--rim); }
 
 :root[data-theme="srs"] .sidenav a:hover { background: var(--btn-hover); color: var(--text); }
 :root[data-theme="srs"] .sidenav a.active { background: var(--plate); color: var(--text); }
@@ -559,8 +698,8 @@ input[aria-invalid="true"]:focus-visible, select[aria-invalid="true"]:focus-visi
 :root[data-theme="srs"] .btn:active:not(:disabled) { background: var(--btn-pressed); box-shadow: inset 0 -1px 0 var(--highlight); }
 :root[data-theme="srs"] .btn-primary { background: var(--steel-face); color: var(--accent-text); }
 :root[data-theme="srs"] .btn-primary:hover:not(:disabled) { background: var(--steel-hover); filter: none; }
-:root[data-theme="srs"] .btn-danger { background: linear-gradient(#8a4339, #5e2a23); }
-:root[data-theme="srs"] .btn-danger:hover:not(:disabled) { background: linear-gradient(#9a4b40, #6a3028); filter: none; }
+:root[data-theme="srs"] .btn-danger { background: var(--danger-face); }
+:root[data-theme="srs"] .btn-danger:hover:not(:disabled) { background: var(--danger-hover); filter: none; }
 :root[data-theme="srs"] .btn-danger-outline { color: var(--danger-text); }
 :root[data-theme="srs"] .btn-quiet.is-on { color: var(--warn-text); }
 
@@ -584,6 +723,14 @@ input[aria-invalid="true"]:focus-visible, select[aria-invalid="true"]:focus-visi
 :root[data-theme="srs"] textarea[aria-invalid="true"] { border-color: var(--danger); }
 :root[data-theme="srs"] .alert-error { border-color: var(--danger); }
 
+/* Toasts: a small plate with a lit lamp. */
+:root[data-theme="srs"] .toast {
+    border-color: var(--rim);
+    background: url("textures/plate-grain.svg"), var(--plate);
+    box-shadow: inset 1px 1px 0 var(--highlight), inset 0 0 12px var(--plate-grime), 0 6px 18px rgb(0 0 0 / .5);
+}
+:root[data-theme="srs"] .toast-lamp { box-shadow: 0 0 0 2px var(--lamp-ring), 0 0 0 3px var(--rim), 0 0 7px var(--ok); }
+
 :root[data-theme="srs"] .table-wrap { background: var(--well); border-color: var(--rim); box-shadow: 0 1px 0 var(--highlight); }
 :root[data-theme="srs"] .grid th { background: var(--chrome); font-family: var(--mono); font-weight: 400; }
 :root[data-theme="srs"] .grid th,
@@ -598,7 +745,7 @@ input[aria-invalid="true"]:focus-visible, select[aria-invalid="true"]:focus-visi
     padding: .1rem .5rem;
     border: 1px solid var(--rim);
     border-radius: 3px;
-    background: #141617;
+    background: var(--display);
     box-shadow: inset 0 2px 4px rgb(0 0 0 / .6), 0 1px 0 var(--highlight);
     color: var(--ok);
     font-family: var(--mono);
@@ -608,15 +755,15 @@ input[aria-invalid="true"]:focus-visible, select[aria-invalid="true"]:focus-visi
 
 :root[data-theme="srs"] .tile-value.status-starting { color: var(--warn); text-shadow: 0 0 6px color-mix(in srgb, var(--warn) 50%, transparent); }
 :root[data-theme="srs"] .tile-value.status-degraded,
-:root[data-theme="srs"] .tile-value.status-stopped { color: #e0705f; text-shadow: 0 0 6px color-mix(in srgb, var(--danger) 60%, transparent); }
+:root[data-theme="srs"] .tile-value.status-stopped { color: var(--display-danger); text-shadow: 0 0 6px color-mix(in srgb, var(--danger) 60%, transparent); }
 
 /* Indicator lamps and status markers */
 :root[data-theme="srs"] .dot { box-shadow: 0 0 0 2px var(--lamp-ring), 0 0 0 3px var(--rim); }
 :root[data-theme="srs"] .dot-red { box-shadow: 0 0 0 2px var(--lamp-ring), 0 0 0 3px var(--rim), 0 0 7px var(--red); }
 :root[data-theme="srs"] .dot-blue { box-shadow: 0 0 0 2px var(--lamp-ring), 0 0 0 3px var(--rim), 0 0 7px var(--blue); }
 :root[data-theme="srs"] .pill { border-radius: 3px; font-family: var(--mono); font-weight: 400; text-transform: uppercase; letter-spacing: .05em; }
-:root[data-theme="srs"] .pill-ok { background: #1c3a1f; border: 1px solid #2f6b33; text-shadow: 0 0 5px color-mix(in srgb, var(--ok) 50%, transparent); }
-:root[data-theme="srs"] .pill-wait { background: #3a321c; border: 1px solid #6b5a2f; }
+:root[data-theme="srs"] .pill-ok { background: var(--lit-ok); border: 1px solid var(--lit-ok-rim); text-shadow: 0 0 5px color-mix(in srgb, var(--ok) 50%, transparent); }
+:root[data-theme="srs"] .pill-wait { background: var(--lit-warn); border: 1px solid var(--lit-warn-rim); }
 :root[data-theme="srs"] .tx-live { text-shadow: 0 0 5px color-mix(in srgb, var(--ok) 50%, transparent); }
 :root[data-theme="srs"] .tag { background: var(--well); border-color: var(--rim); font-family: var(--mono); font-weight: 400; }
 :root[data-theme="srs"] .badge { color: var(--well); font-family: var(--mono); font-weight: 400; }
@@ -624,8 +771,8 @@ input[aria-invalid="true"]:focus-visible, select[aria-invalid="true"]:focus-visi
 
 /* Toggle switches: inset slot with a metal knob, lit green when on. */
 :root[data-theme="srs"] .switch-track { background: var(--well); border: 1px solid var(--rim); box-shadow: inset 0 2px 3px rgb(0 0 0 / .6); }
-:root[data-theme="srs"] .switch-track::after { top: 2px; left: 2px; background: radial-gradient(circle at 35% 30%, #c0bcad, #5f6266 70%, #2c2f31); box-shadow: 0 1px 2px rgb(0 0 0 / .6); }
-:root[data-theme="srs"] .switch input:checked + .switch-track { background: #1c3a1f; border-color: #2f6b33; box-shadow: inset 0 2px 3px rgb(0 0 0 / .5), 0 0 6px color-mix(in srgb, var(--ok) 35%, transparent); }
+:root[data-theme="srs"] .switch-track::after { top: 2px; left: 2px; background: var(--knob); box-shadow: 0 1px 2px rgb(0 0 0 / .6); }
+:root[data-theme="srs"] .switch input:checked + .switch-track { background: var(--lit-ok); border-color: var(--lit-ok-rim); box-shadow: inset 0 2px 3px rgb(0 0 0 / .5), 0 0 6px color-mix(in srgb, var(--ok) 35%, transparent); }
 
 :root[data-theme="srs"] .channel-number { font-family: var(--mono); }
 :root[data-theme="srs"] .reconnect-spinner { border-color: var(--well); border-top-color: var(--ok); }

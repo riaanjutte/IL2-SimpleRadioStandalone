@@ -1,6 +1,7 @@
 @page "/clients"
 @attribute [Authorize]
 @inherits LiveComponent
+@inject ToastService Toast
 
 <PageTitle>Clients · IL2-SRS Server</PageTitle>
 
@@ -24,11 +25,6 @@
         </select>
     </label>
 </div>
-
-@if (_message != null)
-{
-    <p class="alert" role="status">@_message</p>
-}
 
 @if (_visible.Count == 0)
 {
@@ -104,7 +100,6 @@ else
     private IReadOnlyList<SRClient> _all = Array.Empty<SRClient>();
     private string _search = string.Empty;
     private string _coalition = ClientAdminPresentation.AllCoalitions;
-    private string _message;
     private string _banning;
     private string _banReason;
     private int _banMinutes;
@@ -140,9 +135,9 @@ else
 
     private void Kick(SRClient client)
     {
-        _message = Admin.KickClient(client.ClientGuid, Actor)
+        Toast.Show(Admin.KickClient(client.ClientGuid, Actor)
             ? $"Disconnected {client.Name}."
-            : $"{client.Name} is no longer connected.";
+            : $"{client.Name} is no longer connected.");
         _all = Admin.GetClients();
     }
 
@@ -157,9 +152,9 @@ else
     {
         var ban = Admin.BanClient(client.ClientGuid, _banReason,
             _banMinutes > 0 ? TimeSpan.FromMinutes(_banMinutes) : null, Actor);
-        _message = ban != null
+        Toast.Show(ban != null
             ? $"Banned {client.Name} ({ban.IpAddress})."
-            : $"{client.Name} is no longer connected.";
+            : $"{client.Name} is no longer connected.");
         _banning = null;
         _all = Admin.GetClients();
     }
