@@ -1,0 +1,23 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <OutputType>Exe</OutputType>
+    <RootNamespace>Ciribob.IL2.SimpleRadio.Standalone.Server.Integrations.Tests</RootNamespace>
+    <Nullable>disable</Nullable>
+    <ImplicitUsings>disable</ImplicitUsings>
+    <IsPackable>false</IsPackable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="xunit.v3" Version="4.0.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- The server hosts the plugin in the end-to-end tests. -->
+    <ProjectReference Include="..\..\IL2-SRS-Server-Web\IL2-SRS-Server-Web.csproj" />
+    <!-- Compiled in, as a host would; the plugin-loading tests load it from its build output folder too. -->
+    <ProjectReference Include="..\IL2-SRS-Plugin-Integrations\IL2-SRS-Plugin-Integrations.csproj" />
+  </ItemGroup>
+
+</Project>

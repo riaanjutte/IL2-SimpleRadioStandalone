@@ -1,0 +1,79 @@
+@inherits IntegrationActionEditor
+
+<div class="field">
+    <label for="http-url">URL</label>
+    <input id="http-url" type="text" class="secret-input" autocomplete="off" spellcheck="false"
+           data-1p-ignore data-lpignore="true" data-bwignore
+           placeholder="@SecretPlaceholder(HttpWebhookAction.UrlField, "https://example.com/hooks/srs")"
+           value="@GetString(HttpWebhookAction.UrlField)"
+           @onchange="e => SetString(HttpWebhookAction.UrlField, e.Value?.ToString()?.Trim())"
+           aria-invalid="@Invalid(HttpWebhookAction.UrlField)"
+           aria-describedby="@DescribedBy(HttpWebhookAction.UrlField)"
+           @onblur="() => Touch(HttpWebhookAction.UrlField)" />
+    <FieldError Id="@ErrorId(HttpWebhookAction.UrlField)" Message="@ErrorFor(HttpWebhookAction.UrlField)" />
+    <span class="field-help">Stored encrypted, since webhook URLs often contain a token.</span>
+</div>
+
+<div class="field-grid">
+    <div class="field">
+        <label for="http-method">Method</label>
+        <select id="http-method" value="@HttpWebhookAction.Method(Config)"
+                @onchange="e => SetString(HttpWebhookAction.MethodField, e.Value?.ToString())">
+            @foreach (var method in HttpWebhookAction.Methods)
+            {
+                <option value="@method">@method</option>
+            }
+        </select>
+    </div>
+    <div class="field">
+        <label for="http-content-type">Content type</label>
+        <input id="http-content-type" type="text" spellcheck="false" placeholder="@HttpWebhookAction.DefaultContentType"
+               value="@GetString(HttpWebhookAction.ContentTypeField)"
+               @onchange="e => SetString(HttpWebhookAction.ContentTypeField, e.Value?.ToString()?.Trim())"
+               aria-invalid="@Invalid(HttpWebhookAction.ContentTypeField)"
+               aria-describedby="@DescribedBy(HttpWebhookAction.ContentTypeField)"
+               @onblur="() => Touch(HttpWebhookAction.ContentTypeField)" />
+        <FieldError Id="@ErrorId(HttpWebhookAction.ContentTypeField)" Message="@ErrorFor(HttpWebhookAction.ContentTypeField)" />
+    </div>
+</div>
+
+<div class="field">
+    <label for="http-headers">Headers</label>
+    <textarea id="http-headers" rows="2" spellcheck="false" autocomplete="off"
+              placeholder="@SecretPlaceholder(HttpWebhookAction.HeadersField, "Authorization: Bearer …")"
+              value="@GetString(HttpWebhookAction.HeadersField)"
+              @onchange="e => SetString(HttpWebhookAction.HeadersField, e.Value?.ToString())"
+              aria-invalid="@Invalid(HttpWebhookAction.HeadersField)"
+              aria-describedby="@DescribedBy(HttpWebhookAction.HeadersField)"
+              @onblur="() => Touch(HttpWebhookAction.HeadersField)"></textarea>
+    <FieldError Id="@ErrorId(HttpWebhookAction.HeadersField)" Message="@ErrorFor(HttpWebhookAction.HeadersField)" />
+    <span class="field-help">Optional, one <code>Name: value</code> per line. Stored encrypted.</span>
+    @if (HasStoredSecret(HttpWebhookAction.HeadersField))
+    {
+        <label class="secret-clear">
+            <input type="checkbox" checked="@Config.ClearsSecret(HttpWebhookAction.HeadersField)"
+                   @onchange="e => SetSecretCleared(HttpWebhookAction.HeadersField, (bool)e.Value)" />
+            <span>Remove the stored headers when saving</span>
+        </label>
+    }
+</div>
+
+<div class="field">
+    <label for="http-body">Body</label>
+    <textarea id="http-body" rows="6" spellcheck="false" placeholder="Leave empty to send the event data as JSON"
+              value="@GetString(HttpWebhookAction.BodyField)"
+              @oninput="e => SetString(HttpWebhookAction.BodyField, e.Value?.ToString())"
+              aria-invalid="@Invalid(HttpWebhookAction.BodyField)"
+              aria-describedby="@DescribedBy(HttpWebhookAction.BodyField)"
+              @onblur="() => Touch(HttpWebhookAction.BodyField)"></textarea>
+    <FieldError Id="@ErrorId(HttpWebhookAction.BodyField)" Message="@ErrorFor(HttpWebhookAction.BodyField)" />
+    <TemplateHelp Escaping="@BodyEscaping" />
+</div>
+
+<TemplatePreview Label="Body preview" Triggers="Triggers" Render="data => HttpWebhookAction.BuildBody(Config, data)" />
+
+@code {
+    private string BodyEscaping => HttpWebhookAction.IsJson(HttpWebhookAction.ContentType(Config))
+        ? "With a JSON content type, text values are escaped for use inside quotes, e.g. \"name\": \"{{ client.name }}\"."
+        : null;
+}

@@ -20,11 +20,10 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Server.Tests
 
         public void Dispose()
         {
-            // Close pooled connections to this folder's databases so they can be deleted. Not ClearAllPools:
-            // tests run in parallel, and clearing every pool can close a connection another test is using.
+            // Only this directory's pools: clearing them all would close connections other tests are using.
             foreach (var database in Directory.EnumerateFiles(Path, "*.db", SearchOption.AllDirectories))
             {
-                SrsDatabase.ClearPool(database);
+                SqliteDatabase.ClearPool(database);
             }
 
             try

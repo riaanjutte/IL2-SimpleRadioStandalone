@@ -1,7 +1,7 @@
 @page "/api-keys"
 @attribute [Authorize]
 @inject ServerAdminService Admin
-@inject AdminAuthOptions AuthOptions
+@inject IAdminActor AdminActor
 
 <PageTitle>API Keys · IL2-SRS Server</PageTitle>
 
@@ -112,7 +112,7 @@ else
 
     private const string NameField = "name";
     private string NameError => _form.Show(NameField, ApiKeyStore.ValidateName(_name));
-    private string Actor => AuthOptions.Disabled ? "admin (no login)" : "admin";
+    private string Actor => AdminActor.Name;
 
     protected override void OnInitialized() => _keys = Admin.GetApiKeys();
 

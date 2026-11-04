@@ -2,6 +2,7 @@
 @attribute [Authorize]
 @inherits LiveComponent
 @using System.Text.Json
+@inject IEventTypeRegistry EventTypes
 
 <PageTitle>Event Log · IL2-SRS Server</PageTitle>
 
@@ -41,7 +42,7 @@
         <span>Type</span>
         <select @bind="Type" @bind:after="Load">
             <option value="">All</option>
-            @foreach (var eventType in SrsEventTypes.All.Where(t => string.IsNullOrEmpty(Category) || t.Category == Category))
+            @foreach (var eventType in EventTypes.All.Where(t => string.IsNullOrEmpty(Category) || t.Category == Category))
             {
                 <option value="@eventType.Type">@eventType.Label</option>
             }
@@ -163,7 +164,7 @@ else
 
     private void CategoryChanged()
     {
-        if (!string.IsNullOrEmpty(Type) && SrsEventTypes.Find(Type)?.Category != Category && !string.IsNullOrEmpty(Category))
+        if (!string.IsNullOrEmpty(Type) && EventTypes.Find(Type)?.Category != Category && !string.IsNullOrEmpty(Category))
         {
             Type = string.Empty;
         }

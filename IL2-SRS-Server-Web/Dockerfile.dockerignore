@@ -1,7 +1,9 @@
 # The build context is the repository root; only send what the server build needs.
 *
 !IL2-SR-Common/
+!IL2-SRS-Server-Abstractions/
 !IL2-SRS-Server-Web/
+!Plugins/IL2-SRS-Plugin-Integrations/
 **/bin/
 **/obj/
 IL2-SRS-Server-Web/data/

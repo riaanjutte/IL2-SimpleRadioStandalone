@@ -12,6 +12,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Ciribob.IL2.SimpleRadio.Standalone.Server.Api;
 using Ciribob.IL2.SimpleRadio.Standalone.Server.Hosting;
+using Ciribob.IL2.SimpleRadio.Standalone.Server.Plugins;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting.Server;
 using Microsoft.AspNetCore.Hosting.Server.Features;
@@ -24,6 +25,7 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Server.Tests
     /// Starts the real server (admin web host, SRS TCP and UDP listeners, SQLite) on free ports
     /// and talks to it the way an SRS client and an API consumer would.
     /// </summary>
+    [Collection(ServerCollection.Name)]
     public class ServerEndToEndTests : IAsyncLifetime
     {
         private const string ClientGuid = "EndToEndClientGuid0001";
@@ -44,7 +46,11 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Server.Tests
                 "--urls=http://127.0.0.1:0",
                 "--SRS_ADMIN_PASSWORD=correct-horse",
                 "--SRS_SERVER_PORT=" + _srsPort
-            }));
+            }), builder =>
+            {
+                // What a host building on the server does: add an admin link.
+                builder.Services.AddAdminNavItem("workflows", "Workflows");
+            });
             await _app.StartAsync(TestContext.Current.CancellationToken);
 
             var address = _app.Services.GetRequiredService<IServer>().Features
@@ -62,6 +68,12 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Server.Tests
             }
 
             _data.Dispose();
+        }
+
+        [Fact]
+        public void CreatesThePluginsFolderInTheDataDirectory()
+        {
+            Assert.True(Directory.Exists(Path.Combine(_data.Path, ServerPlugins.FolderName)));
         }
 
         [Fact]
@@ -332,7 +344,7 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Server.Tests
             Assert.Contains(typeList.EnumerateArray(), t => t.GetProperty("type").GetString() == "radio.frequency_changed");
         }
 
-        private static HttpRequestMessage Authorized(HttpMethod method, string path, string key)
+        internal static HttpRequestMessage Authorized(HttpMethod method, string path, string key)
         {
             var request = new HttpRequestMessage(method, path);
             request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", key);
@@ -361,7 +373,7 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Server.Tests
         /// them can all be refused for UDP. Random ports below the dynamic range (49152 and up) avoid those blocks,
         /// and each one is checked for both protocols.
         /// </summary>
-        private static int FindFreePort()
+        internal static int FindFreePort()
         {
             for (var attempt = 0; attempt < 100; attempt++)
             {

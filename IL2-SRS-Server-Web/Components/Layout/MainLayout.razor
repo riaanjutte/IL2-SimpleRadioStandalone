@@ -1,6 +1,7 @@
 @inherits LayoutComponentBase
 @inject ServerAdminService Admin
 @inject AdminAuthOptions AuthOptions
+@inject IEnumerable<AdminNavItem> ExtraNavItems
 @inject NavigationManager Navigation
 
 <div class="shell">
@@ -68,20 +69,21 @@
 
     private bool MenuOpen => _menuOpenOn != null && _menuOpenOn == CurrentPath;
 
-    private sealed record NavItem(string Href, string Label);
+    private IEnumerable<AdminNavItem> NavItems =>
+        new[]
+        {
+            new AdminNavItem("", "Dashboard"),
+            new AdminNavItem("clients", "Clients"),
+            new AdminNavItem("settings", "Settings"),
+            new AdminNavItem("channels", "Channel Names"),
+            new AdminNavItem("bans", "Bans"),
+            new AdminNavItem("events", "Event Log"),
+            new AdminNavItem("api-keys", "API Keys")
+        }
+        .Concat(ExtraNavItems)
+        .Append(new AdminNavItem("plugins", "Plugins"));
 
-    private static readonly NavItem[] NavItems =
-    {
-        new NavItem("", "Dashboard"),
-        new NavItem("clients", "Clients"),
-        new NavItem("settings", "Settings"),
-        new NavItem("channels", "Channel Names"),
-        new NavItem("bans", "Bans"),
-        new NavItem("events", "Event Log"),
-        new NavItem("api-keys", "API Keys")
-    };
-
-    // The longest matching link, as NavLink marks it active.
+    // The longest matching link, as NavLink marks it active (plugin pages like integrations/runs included).
     private string CurrentLabel
     {
         get

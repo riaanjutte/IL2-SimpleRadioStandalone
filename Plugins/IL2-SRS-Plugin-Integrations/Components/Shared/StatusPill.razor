@@ -1,0 +1,14 @@
+@* An integration run status as a coloured pill. *@
+<span class="pill @CssClass">@Status</span>
+
+@code {
+    [Parameter, EditorRequired] public string Status { get; set; }
+
+    private string CssClass => Status switch
+    {
+        ExecutionStatus.Succeeded => "pill-ok",
+        ExecutionStatus.Failed => "pill-bad",
+        ExecutionStatus.Skipped => "pill-quiet",
+        _ => "pill-wait"
+    };
+}

@@ -1,0 +1,110 @@
+/* Integrations plugin: its pages' styles, on top of the server's app.css (theme variables come from there). */
+
+.pill-bad { background: color-mix(in srgb, var(--danger) 18%, transparent); color: var(--error-text); }
+.pill-quiet { background: var(--surface-2); color: var(--muted); }
+
+.small { font-size: .82rem; }
+.plain-link { color: inherit; text-decoration: none; display: inline-flex; gap: .4rem; align-items: center; }
+.alert-ok { border-color: var(--ok); color: var(--ok); }
+
+/* Integration form */
+.integration-form { display: flex; flex-direction: column; gap: 1rem; max-width: 820px; }
+.integration-form > .muted { margin: 0; }
+.field { display: flex; flex-direction: column; gap: .3rem; }
+.field > label, .field-label { font-weight: 600; font-size: .9rem; }
+.field-help { color: var(--muted); font-size: .84rem; }
+/* Webhook URLs are secrets, not passwords: a masked text input, so browsers don't fill in the login password. */
+.secret-input { -webkit-text-security: disc; }
+.secret-input::placeholder { -webkit-text-security: none; }
+.current-message { display: flex; align-items: center; gap: .8rem; flex-wrap: wrap; }
+.current-message input { flex: 0 1 16rem; }
+.field-inline { flex-direction: row; align-items: center; gap: .6rem; }
+.field-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1rem; }
+.field textarea, .action-config textarea {
+    padding: .45rem .6rem;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    background: var(--surface);
+    color: var(--text);
+    font-family: var(--mono);
+    font-size: .86rem;
+    min-height: 5.5rem;
+    resize: vertical;
+}
+.condition { display: flex; flex-direction: column; gap: .25rem; }
+.trigger-row { display: flex; align-items: center; gap: .75rem; padding: .45rem .6rem; border: 1px solid var(--border); border-radius: 6px; background: var(--surface-2); }
+.trigger-text { display: flex; flex-direction: column; gap: .1rem; flex: 1; min-width: 0; }
+.condition-row { display: grid; grid-template-columns: minmax(0, 1.3fr) minmax(0, 1fr) minmax(0, 1.3fr) auto; gap: .5rem; align-items: center; }
+.action-config { display: flex; flex-direction: column; gap: 1rem; padding: .9rem 1rem; border: 1px solid var(--border); border-radius: var(--radius); background: var(--surface-2); }
+.template-preview { display: flex; flex-direction: column; gap: .3rem; }
+.template-preview .alert { margin: 0; }
+.preview-output { margin: 0; padding: .55rem .7rem; border: 1px dashed var(--border); border-radius: 6px; background: var(--surface); font-family: var(--mono); font-size: .84rem; white-space: pre-wrap; word-break: break-word; max-height: 16rem; overflow: auto; }
+.input-color { width: 4rem; height: 2.2rem; padding: .15rem; border: 1px solid var(--border); border-radius: 6px; background: var(--surface); }
+.schema summary { cursor: pointer; font-size: .86rem; color: var(--muted); padding: .2rem 0; }
+.schema table { margin-top: .4rem; }
+.grid.compact { font-size: .82rem; }
+.grid.compact th, .grid.compact td { padding: .3rem .5rem; }
+.form-actions { display: flex; justify-content: flex-end; gap: .5rem; flex-wrap: wrap; }
+
+@media (max-width: 760px) {
+    .condition-row { grid-template-columns: 1fr 1fr; }
+
+    /* Tables marked mobile-cards show a card per row: the title first, the switch or status in the corner,
+       each other field under its data-label, and the buttons at the bottom. */
+    .table-wrap.mobile-cards { overflow: visible; background: none; border: 0; box-shadow: none; }
+    .mobile-cards .grid, .mobile-cards tbody { display: block; }
+    .mobile-cards thead { display: none; }
+    .mobile-cards tbody tr {
+        position: relative;
+        display: flex;
+        flex-direction: column;
+        gap: .5rem;
+        margin-bottom: .75rem;
+        padding: .8rem 1rem;
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+    }
+    .mobile-cards .grid td { display: block; width: auto; padding: 0; border: 0; text-align: left; }
+    .mobile-cards td:empty { display: none; }
+    .mobile-cards td[data-label]::before {
+        content: attr(data-label);
+        display: block;
+        margin-bottom: .1rem;
+        color: var(--muted);
+        font-size: .72rem;
+        font-weight: 600;
+        letter-spacing: .05em;
+        text-transform: uppercase;
+    }
+    .mobile-cards .card-title { order: -2; padding-right: 6.5rem; font-weight: 600; }
+    .mobile-cards .card-corner { position: absolute; top: .8rem; right: 1rem; }
+    .mobile-cards .grid td.actions-col { display: flex; justify-content: flex-end; gap: .5rem; padding-top: .6rem; border-top: 1px solid var(--border); }
+    .mobile-cards .actions-col > .btn, .mobile-cards .actions-col > .confirm { margin-left: 0; }
+    /* An expanded run's details join its card. */
+    .mobile-cards tr[aria-expanded="true"] { margin-bottom: 0; border-bottom-left-radius: 0; border-bottom-right-radius: 0; }
+    .mobile-cards tr.payload-row { border-top: 1px dashed var(--border); border-top-left-radius: 0; border-top-right-radius: 0; }
+}
+
+:root[data-theme="srs"] .pill-bad { background: var(--lit-bad); border: 1px solid var(--lit-bad-rim); }
+:root[data-theme="srs"] .pill-quiet { background: var(--well); border: 1px solid var(--rim); }
+:root[data-theme="srs"] .field textarea,
+:root[data-theme="srs"] .action-config textarea {
+    border: 1px solid var(--rim);
+    border-radius: 3px;
+    background: var(--well);
+    box-shadow: inset 0 2px 3px rgb(0 0 0 / .5), 0 1px 0 var(--highlight);
+}
+:root[data-theme="srs"] .action-config { background: var(--well); border-color: var(--rim); border-radius: 4px; }
+@media (max-width: 760px) {
+    :root[data-theme="srs"] .mobile-cards tbody tr { background: var(--well); border-color: var(--rim); border-radius: 4px; box-shadow: 0 1px 0 var(--highlight); }
+}
+
+/* "Remove the stored …" under a secret field. */
+.secret-clear {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    margin-top: 0.35rem;
+    font-size: 0.9em;
+}

@@ -2,6 +2,7 @@ using System;
 using System.Security.Claims;
 using System.Text.Encodings.Web;
 using System.Threading.Tasks;
+using Ciribob.IL2.SimpleRadio.Standalone.Server.Plugins;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -14,8 +15,8 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Server.Api
     {
         public const string SchemeName = "ApiKey";
         public const string ScopeClaim = "scope";
-        public const string ReadPolicy = "api-read";
-        public const string WritePolicy = "api-write";
+        public const string ReadPolicy = ServerApi.ReadPolicy;
+        public const string WritePolicy = ServerApi.WritePolicy;
 
         private readonly ApiKeyStore _keys;
 

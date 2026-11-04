@@ -1,0 +1,159 @@
+@page "/integrations"
+@attribute [Authorize]
+@inherits LiveComponentBase
+@inject IntegrationService Service
+
+<PageTitle>Integrations · IL2-SRS Server</PageTitle>
+
+<div class="page-head">
+    <h1>Integrations</h1>
+    <div class="actions">
+        <a class="btn btn-quiet" href="integrations/runs">Runs</a>
+        <a class="btn btn-primary" href="integrations/new">New integration</a>
+    </div>
+</div>
+
+<p class="muted">
+    An integration runs an action, such as posting to a Discord channel, when an event happens on the server.
+    Conditions narrow it down, for example to one coalition. Runs are queued, retried if the integration allows it,
+    and listed under <a href="integrations/runs">Runs</a>.
+</p>
+
+@if (_error != null)
+{
+    <p class="alert alert-error" role="alert">@_error</p>
+}
+
+@if (_integrations.Count == 0)
+{
+    <p class="muted empty">
+        No integrations yet.
+        @if (Service.Actions.Count == 0)
+        {
+            <text>No action types are available on this server.</text>
+        }
+    </p>
+}
+else
+{
+    @* A card per integration on phones (integrations.css); data-label names the field there. *@
+    <div class="table-wrap mobile-cards">
+        <table class="grid">
+            <thead>
+                <tr>
+                    <th>Enabled</th>
+                    <th>Name</th>
+                    <th>When</th>
+                    <th>Then</th>
+                    <th>Last run</th>
+                    <th class="actions-col"></th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var integration in _integrations)
+                {
+                    _latest.TryGetValue(integration.Id, out var last);
+                    <tr @key="integration.Id" class="@(integration.Enabled ? null : "row-muted")">
+                        <td class="card-corner">
+                            <label class="switch" title="@(integration.Enabled ? "Disable" : "Enable")">
+                                <input type="checkbox" role="switch" checked="@integration.Enabled"
+                                       aria-label="Enabled"
+                                       @onchange="e => SetEnabled(integration, (bool)e.Value)" />
+                                <span class="switch-track" aria-hidden="true"></span>
+                            </label>
+                        </td>
+                        <td class="card-title">
+                            <a href="integrations/@integration.Id">@integration.Name</a>
+                            @if (!string.IsNullOrEmpty(integration.Description))
+                            {
+                                <div class="muted small">@integration.Description</div>
+                            }
+                        </td>
+                        <td data-label="When">
+                            @foreach (var trigger in integration.TriggerTypes)
+                            {
+                                <div>@(Service.EventTypes.Find(trigger)?.Label ?? trigger)</div>
+                            }
+                            @if (integration.Conditions.Count > 0)
+                            {
+                                <div class="muted small">
+                                    @string.Join(" and ", integration.Conditions.Select(Describe))
+                                </div>
+                            }
+                        </td>
+                        <td data-label="Then">@(Service.FindAction(integration.ActionType)?.Label ?? integration.ActionType + " (not available)")</td>
+                        <td class="nowrap" data-label="Last run">
+                            @if (last != null)
+                            {
+                                <a href="integrations/runs?integration=@integration.Id" class="plain-link">
+                                    <StatusPill Status="@last.Status" />
+                                    <LocalTime Value="last.CreatedAtUtc" Format="seconds" />
+                                </a>
+                            }
+                            else
+                            {
+                                <span class="muted">never</span>
+                            }
+                        </td>
+                        <td class="actions-col">
+                            <a class="btn btn-quiet" href="integrations/@integration.Id">Edit</a>
+                            <ConfirmButton Text="Delete" Question="Delete integration?" ConfirmText="Delete"
+                                           OnConfirm="() => Delete(integration)" />
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+}
+
+@code {
+    private IReadOnlyList<IntegrationDefinition> _integrations = Array.Empty<IntegrationDefinition>();
+    private IReadOnlyDictionary<long, IntegrationExecution> _latest = new Dictionary<long, IntegrationExecution>();
+    private string _error;
+
+    protected override bool RefreshEverySecond => false;
+
+    protected override void OnInitialized()
+    {
+        base.OnInitialized();
+        Service.Store.IntegrationsChanged += QueueRefresh;
+        Service.Store.ExecutionsChanged += QueueRefresh;
+        Load();
+    }
+
+    protected override void OnLiveRefresh() => Load();
+
+    private void Load()
+    {
+        _integrations = Service.Store.List();
+        _latest = Service.Store.LatestExecutions();
+    }
+
+    private void SetEnabled(IntegrationDefinition integration, bool enabled)
+    {
+        _error = Service.SetEnabled(integration.Id, enabled, Actor) ? null : "The integration no longer exists.";
+        Load();
+    }
+
+    private void Delete(IntegrationDefinition integration)
+    {
+        _error = Service.Delete(integration.Id, Actor) ? null : "The integration no longer exists.";
+        Load();
+    }
+
+    internal static string Describe(IntegrationCondition condition)
+    {
+        var op = ConditionOperator.All.FirstOrDefault(o => o.Value == condition.Operator).Label ?? condition.Operator;
+        return ConditionOperator.NeedsValue(condition.Operator)
+            ? $"{condition.Field} {op} \"{condition.Value}\""
+            : $"{condition.Field} {op}";
+    }
+
+    public override void Dispose()
+    {
+        Service.Store.IntegrationsChanged -= QueueRefresh;
+        Service.Store.ExecutionsChanged -= QueueRefresh;
+        base.Dispose();
+    }
+}
