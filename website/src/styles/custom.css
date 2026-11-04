@@ -71,6 +71,11 @@
 	}
 }
 
+/* Space above section headings: two thirds of the earlier 1.55em (Starlight's default is 1.5em). */
+.sl-markdown-content :not(h1, h2, h3, h4, h5, h6, .sl-heading-wrapper) + .sl-heading-wrapper.level-h2 {
+	margin-top: 1.05em;
+}
+
 /* Homepage layout overrides must follow Starlight's layered component styles. */
 :root[data-has-hero] main .content-panel {
 	padding-top: 0;

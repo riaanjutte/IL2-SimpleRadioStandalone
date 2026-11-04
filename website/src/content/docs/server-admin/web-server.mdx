@@ -3,6 +3,11 @@ title: Web server (Docker and Windows service)
 description: Run the IL2-SRS server in Docker or as a Windows service, managed from the browser and a REST API.
 ---
 
+import { Image } from 'astro:assets';
+import dashboard from '../../../assets/web-server-dashboard.png';
+import eventLog from '../../../assets/web-server-event-log.png';
+import phone from '../../../assets/web-server-phone.png';
+
 The web server is the IL2-SRS server as a .NET 10 application with a browser-based admin UI and a REST API. Existing IL2-SRS clients connect to it exactly as they do to the Windows server window; nothing changes for players.
 
 Use it when you want to:
@@ -18,15 +23,33 @@ The web server is new. The Windows server window remains available while the web
 ## What you get
 
 - **Dashboard** with listener health, uptime, clients, voice links, recent transmitters and recent activity.
+
+  <a href={dashboard.src} target="_blank" rel="noreferrer">
+  	<Image src={dashboard} alt="Web server dashboard in the IL-2 SRS theme, showing server health and recent activity" quality="high" />
+  </a>
+
 - **Clients**: search, mute, kick, and ban with a reason and optional duration.
 - **Settings** and **Channel Names**, applied immediately and sent to connected clients. Channel names can be shared, or set separately for Allies and Axis.
 - **Bans** with reason, who banned, and expiry. Ban an IP address directly or remove a ban.
-- **Event log** of logins, admin actions, server start and stop, client connections and refused connections. Old events are removed automatically.
+- **Event log** of logins, admin actions, server start and stop, client connections and refused connections, name and coalition changes and radio retuning. It updates live; filter it by category, type or client, and click an event to see its details. Old events are removed automatically.
+
+  <a href={eventLog.src} target="_blank" rel="noreferrer">
+  	<Image src={eventLog} alt="Event log with the category and type of each event, filters and live updates" quality="high" />
+  </a>
+
 - **API keys** for the REST API, with read-only or read-write access, and an interactive **API reference**.
 
-Times are shown in your own time zone. The **Desktop / Light / Dark** button in the top bar switches the theme; **Desktop** follows your system setting. The choice is remembered in each browser.
+Times are shown in your own time zone. The **Desktop / Light / Dark / IL-2 SRS** button in the top bar switches the theme; **Desktop** follows your system setting. The choice is remembered in each browser.
 
 Settings, bans, the event log and API keys are stored in `srs.db`, a SQLite database in the server's data folder.
+
+## On a phone
+
+The admin UI works in a phone's browser. On a narrow screen, the menu becomes a dropdown at the top of the page, named after the page you are on, and settings are shown in one column.
+
+<a href={phone.src} target="_blank" rel="noreferrer">
+	<Image src={phone} width={260} alt="The dashboard on a phone, with the menu as a dropdown at the top of the page" quality="high" />
+</a>
 
 ## Run in Docker
 
@@ -44,12 +67,12 @@ This publishes the SRS port `6002` for TCP and UDP, keeps the admin UI on `http:
 `docker ps` shows the container as `healthy` while both SRS listeners are running. It turns `unhealthy` if a listener fails, or while an admin has stopped the server from the dashboard.
 
 :::caution[Protect the admin UI]
-The admin UI and API use plain HTTP. Keep port 8080 on localhost, or put a reverse proxy with HTTPS (Caddy, Traefik, nginx) in front of it before exposing it to the internet.
+The admin UI and API use plain HTTP. You can publish port 8080 to the internet, but it is not recommended: apart from a limit of 10 login attempts a minute per address, the server has no rate limiting, DDoS protection or two-factor login. Reach it through a tunnel instead. See [Reach the admin UI remotely](#reach-the-admin-ui-remotely).
 :::
 
 ## Run as a Windows service
 
-1. Get a self-contained build, which needs no .NET installation on the server. Download `IL2-SRS-Server-Web-<version>-win-x64.zip` from [GitHub Releases](https://github.com/riaanjutte/IL2-SimpleRadioStandalone/releases) (from 1.0.5.0-beta.1) and extract it to `C:\IL2-SRS\app`, or publish one yourself:
+1. Get a self-contained build, which needs no .NET installation on the server. Download `IL2-SRS-Server-Web-<version>-win-x64.zip` from the latest [GitHub release](https://github.com/riaanjutte/IL2-SimpleRadioStandalone/releases/latest) and extract it to `C:\IL2-SRS\app`, or publish one yourself:
 
    ```powershell
    dotnet publish IL2-SRS-Server-Web -c Release -r win-x64 --self-contained -o C:\IL2-SRS\app
@@ -73,9 +96,58 @@ The admin UI and API use plain HTTP. Keep port 8080 on localhost, or put a rever
 
 To test without a service, run `IL2-SRS-Server.exe --data-dir C:\IL2-SRS\main` from a console with `SRS_ADMIN_PASSWORD` set. Without `--data-dir`, the server keeps its data next to the exe, or in `C:\ProgramData\IL2-SRS-Server` when that folder is not writable (for example under `C:\Program Files`).
 
+## Reach the admin UI remotely
+
+Use a tunnel such as [Cloudflare Tunnel](https://developers.cloudflare.com/cloudflare-one/connections/connect-networks/) or [Tailscale](https://tailscale.com/). A tunnel needs no open port and adds HTTPS. With Cloudflare, add a Cloudflare Access policy to the hostname, so only your admins reach the login page.
+
+- **Tunnel on the same machine:** point it at `http://localhost:8080`. Nothing else to set.
+- **Tunnel in another container:** run it on the same Docker network and point it at `http://il2-srs-server:8080`. Set `SRS_TRUSTED_PROXIES` to the network's range, so failed logins are limited and logged per browser and the login cookie is marked secure. For example, with Cloudflare Tunnel in the same compose file:
+
+  ```yaml
+  services:
+    il2-srs-server:
+      # ...as in docker-compose.yml, plus:
+      environment:
+        SRS_TRUSTED_PROXIES: "172.18.0.0/16"
+
+    cloudflared:
+      image: cloudflare/cloudflared:latest
+      restart: unless-stopped
+      command: tunnel run
+      environment:
+        TUNNEL_TOKEN: ${TUNNEL_TOKEN}
+  ```
+
+  `docker network inspect` shows the network's range.
+
 ## Move an existing server
 
 Point the data folder at a copy of your existing server folder. On first start, the web server imports `server.cfg` and `banned.txt` into `srs.db`, so settings, channel names and bans carry over. The original files are not changed. After the import, change settings in the admin UI; edits to `server.cfg` are no longer read.
+
+## Back up and update
+
+Everything the server keeps is in its data folder:
+
+| Item | What it holds |
+| --- | --- |
+| `srs.db` | Settings, channel names, bans, the event log and API keys |
+| `keys` | Keys for the login cookie |
+| `srs-server.json` | Configuration, including the admin password on Windows |
+
+Stop the server before copying the folder, so the database is copied in a consistent state. Keep the data folder on a local disk or a Docker volume, not a network share.
+
+To update in Docker, pull the new image and recreate the container with the same volume:
+
+```sh
+docker pull asken/il2-srs-server:preview
+docker rm -f il2-srs-server
+```
+
+Then run the `docker run` command above again, or use `docker compose pull` and `docker compose up -d`.
+
+On Windows, stop the service with `Stop-Service IL2-SRS-Server`, replace the files in `C:\IL2-SRS\app` with the new build, and start it again with `Start-Service IL2-SRS-Server`.
+
+The server upgrades its database on first start, so back up the data folder before updating if you might want to go back.
 
 ## Configuration
 
@@ -88,6 +160,7 @@ Set these as environment variables, as `--KEY=value` arguments, or in `srs-serve
 | `SRS_<SETTING>` | Fix any [server setting](../configuration-reference/), for example `SRS_SERVER_PORT=6002`. Fixed settings are shown as locked in the admin UI. |
 | `SRS_EVENT_RETENTION_DAYS` | Keep events for this many days (default 30). |
 | `SRS_EVENT_MAX_ROWS` | Keep at most this many events (default 100000). |
+| `SRS_TRUSTED_PROXIES` | The address or network of your tunnel or reverse proxy, when it runs in another container or on another machine, for example `172.18.0.0/16`. Separate several with `,`. |
 | `urls` | Admin UI address. Defaults to `http://localhost:8080` on Windows and port 8080 on all interfaces in Docker. |
 
 Run several servers by giving each its own data folder and SRS port, and on Windows its own service name and admin UI address.
@@ -101,6 +174,8 @@ curl -H "Authorization: Bearer $SRS_API_KEY" http://localhost:8080/api/v1/client
 ```
 
 Read keys can view status, clients, settings, channel names, bans and events. Write keys can also change settings, kick, ban and mute clients, manage bans, clear the event log, and start, stop or restart the server. Every change made with a key is recorded in the event log under the key's name.
+
+Each event has a type, such as `client.connected`, and details as JSON. `GET /api/v1/events` filters by type and client, and `GET /api/v1/event-types` lists the types and their fields.
 
 The **API reference** button on the API Keys page opens an interactive reference (`/scalar`) where you can paste a key and try requests from the browser. Scripts and code generators can use the OpenAPI document at `/openapi/v1.json`.
 

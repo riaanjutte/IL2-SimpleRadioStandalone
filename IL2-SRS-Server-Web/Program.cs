@@ -1,11 +1,13 @@
 using System;
 using System.Globalization;
 using System.IO;
+using System.Net;
 using System.Runtime;
 using Ciribob.IL2.SimpleRadio.Standalone.Server.Admin;
 using Ciribob.IL2.SimpleRadio.Standalone.Server.Api;
 using Ciribob.IL2.SimpleRadio.Standalone.Server.Audit;
 using Ciribob.IL2.SimpleRadio.Standalone.Server.Components;
+using Ciribob.IL2.SimpleRadio.Standalone.Server.Components.Shared;
 using Ciribob.IL2.SimpleRadio.Standalone.Server.Data;
 using Ciribob.IL2.SimpleRadio.Standalone.Server.Events;
 using Ciribob.IL2.SimpleRadio.Standalone.Server.Hosting;
@@ -18,6 +20,7 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -33,6 +36,9 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Server
         public const string ServiceName = "IL2-SRS-Server";
         public const string ConfigFileName = "srs-server.json";
         public const string DefaultLocalUrl = "http://localhost:8080";
+
+        /// <summary>Reverse proxies whose X-Forwarded-For and X-Forwarded-Proto headers are trusted.</summary>
+        public const string TrustedProxiesKey = "SRS_TRUSTED_PROXIES";
 
         public static int Main(string[] args)
         {
@@ -144,6 +150,16 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Server
                     options.Cookie.SecurePolicy = CookieSecurePolicy.SameAsRequest;
                     options.ExpireTimeSpan = TimeSpan.FromHours(12);
                     options.SlidingExpiration = true;
+                    // A cookie from before the password changed (or without a stamp) no longer signs in.
+                    options.Events.OnValidatePrincipal = async context =>
+                    {
+                        if (!adminAuth.Disabled &&
+                            context.Principal?.FindFirst(AdminAuthOptions.SessionStampClaim)?.Value != adminAuth.SessionStamp)
+                        {
+                            context.RejectPrincipal();
+                            await context.HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+                        }
+                    };
                 })
                 .AddScheme<AuthenticationSchemeOptions, ApiKeyAuthenticationHandler>(
                     ApiKeyAuthenticationHandler.SchemeName, null);
@@ -163,13 +179,21 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Server
                     .RequireClaim(ApiKeyAuthenticationHandler.ScopeClaim, ApiScope.Write));
             });
             builder.Services.AddCascadingAuthenticationState();
+            var trustedProxies = builder.Configuration[TrustedProxiesKey];
+            ConfigureForwardedHeaders(new ForwardedHeadersOptions(), trustedProxies); // Fails startup on a bad entry.
+            builder.Services.Configure<ForwardedHeadersOptions>(options => ConfigureForwardedHeaders(options, trustedProxies));
             builder.Services.AddAdminLoginRateLimiting();
             builder.Services.AddOpenApi(options => options.AddDocumentTransformer<ApiKeyOpenApiTransformer>());
 
             builder.Services.AddRazorComponents()
                 .AddInteractiveServerComponents();
+            builder.Services.AddScoped<ToastService>();
 
             var app = builder.Build();
+
+            // First, so the login rate limit, logged addresses and the cookie's Secure flag see the browser's
+            // address and scheme rather than the reverse proxy's.
+            app.UseForwardedHeaders();
 
             if (!app.Environment.IsDevelopment())
             {
@@ -179,6 +203,9 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Server
             // Friendly "not found" page for the admin UI only; API, login and health responses keep their own bodies.
             app.UseWhen(context => !IsMachineEndpoint(context.Request.Path),
                 branch => branch.UseStatusCodePagesWithReExecute("/not-found"));
+            // After the status code pages, so the re-executed request is matched to /not-found again; when left to
+            // WebApplication, routing runs first and the re-executed request finds no page (an empty 404).
+            app.UseRouting();
             app.UseAuthentication();
             app.UseAuthorization();
             app.UseRateLimiter();
@@ -240,6 +267,32 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Server
                 MaxRows = ReadPositiveInt(configuration, AuditRetention.MaxRowsKey, 100_000)
             });
             services.AddSingleton<AuditLog>();
+        }
+
+        /// <summary>
+        /// Trusts X-Forwarded-For and X-Forwarded-Proto from the reverse proxies in <paramref name="trustedProxies"/>
+        /// (addresses or CIDR ranges, separated by ',' or ';'), and from this machine.
+        /// </summary>
+        internal static void ConfigureForwardedHeaders(ForwardedHeadersOptions options, string trustedProxies)
+        {
+            options.ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto;
+            foreach (var entry in (trustedProxies ?? string.Empty).Split(new[] { ',', ';' },
+                         StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries))
+            {
+                if (entry.Contains('/') && System.Net.IPNetwork.TryParse(entry, out var network))
+                {
+                    options.KnownIPNetworks.Add(network);
+                }
+                else if (IPAddress.TryParse(entry, out var address))
+                {
+                    options.KnownProxies.Add(address);
+                }
+                else
+                {
+                    throw new ServerStartupException(
+                        $"{TrustedProxiesKey} entry \"{entry}\" is not an IP address or CIDR range (e.g. 172.18.0.0/16).");
+                }
+            }
         }
 
         private static bool IsMachineEndpoint(PathString path)

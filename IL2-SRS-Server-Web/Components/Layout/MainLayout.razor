@@ -1,6 +1,7 @@
 @inherits LayoutComponentBase
 @inject ServerAdminService Admin
 @inject AdminAuthOptions AuthOptions
+@inject NavigationManager Navigation
 
 <div class="shell">
     <header class="topbar">
@@ -24,22 +25,85 @@
         }
     </header>
 
-    <nav class="sidenav" aria-label="Main">
-        <NavLink href="" Match="NavLinkMatch.All">Dashboard</NavLink>
-        <NavLink href="clients">Clients</NavLink>
-        <NavLink href="settings">Settings</NavLink>
-        <NavLink href="channels">Channel Names</NavLink>
-        <NavLink href="bans">Bans</NavLink>
-        <NavLink href="events">Event Log</NavLink>
-        <NavLink href="api-keys">API Keys</NavLink>
+    @* On phones the menu is a dropdown named after the current page; side by side the toggle is hidden. *@
+    <nav class="sidenav @(MenuOpen ? "open" : null)" aria-label="Main" @onkeydown="CloseOnEscape">
+        <button type="button" class="nav-toggle" aria-expanded="@(MenuOpen ? "true" : "false")" aria-controls="nav-links"
+                @onclick="ToggleMenu">
+            <span>@CurrentLabel</span>
+            <Icon Name="chevron-down" />
+        </button>
+        <div class="nav-links" id="nav-links">
+            @foreach (var item in NavItems)
+            {
+                <NavLink href="@item.Href" Match="@(item.Href.Length == 0 ? NavLinkMatch.All : NavLinkMatch.Prefix)">@item.Label</NavLink>
+            }
+        </div>
     </nav>
+    @if (MenuOpen)
+    {
+        <div class="nav-backdrop" @onclick="CloseMenu"></div>
+    }
 
-    <main class="content">
-        @Body
+    @* Only the content scrolls. A new element per page, so each page starts at the top (the router only
+       scrolls the window); filters that change the query string keep their place. *@
+    <main class="content" @key="new Uri(Navigation.Uri).AbsolutePath">
+        <div class="content-inner">
+            @Body
+        </div>
     </main>
 </div>
+
+<Toasts />
 
 <div id="blazor-error-ui" data-nosnippet>
     The connection to the server was interrupted.
     <a href="" class="reload">Reload</a>
 </div>
+
+@code {
+    // The page the phone menu was opened on; it is open only while that page is shown, so it closes on navigation.
+    private string _menuOpenOn;
+
+    private string CurrentPath => Navigation.ToBaseRelativePath(Navigation.Uri).Split('?', '#')[0].TrimEnd('/');
+
+    private bool MenuOpen => _menuOpenOn != null && _menuOpenOn == CurrentPath;
+
+    private sealed record NavItem(string Href, string Label);
+
+    private static readonly NavItem[] NavItems =
+    {
+        new NavItem("", "Dashboard"),
+        new NavItem("clients", "Clients"),
+        new NavItem("settings", "Settings"),
+        new NavItem("channels", "Channel Names"),
+        new NavItem("bans", "Bans"),
+        new NavItem("events", "Event Log"),
+        new NavItem("api-keys", "API Keys")
+    };
+
+    // The longest matching link, as NavLink marks it active.
+    private string CurrentLabel
+    {
+        get
+        {
+            var path = CurrentPath;
+            var current = NavItems
+                .Where(i => i.Href.Length == 0 ? path.Length == 0 : path.Equals(i.Href, StringComparison.OrdinalIgnoreCase) || path.StartsWith(i.Href + "/", StringComparison.OrdinalIgnoreCase))
+                .OrderByDescending(i => i.Href.Length)
+                .FirstOrDefault();
+            return current?.Label ?? "Menu";
+        }
+    }
+
+    private void ToggleMenu() => _menuOpenOn = MenuOpen ? null : CurrentPath;
+
+    private void CloseMenu() => _menuOpenOn = null;
+
+    private void CloseOnEscape(KeyboardEventArgs e)
+    {
+        if (e.Key == "Escape")
+        {
+            CloseMenu();
+        }
+    }
+}

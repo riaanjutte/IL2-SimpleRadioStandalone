@@ -28,6 +28,8 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Server.Network
     {
         private readonly SrsDatabase _database;
         private readonly object _lock = new object();
+        // Refreshes read the table and replace the cache one at a time, so an older read never replaces a newer one.
+        private readonly object _refreshLock = new object();
         private Dictionary<IPAddress, DateTime?> _active = new Dictionary<IPAddress, DateTime?>();
 
         public BanStore(SrsDatabase database)
@@ -144,27 +146,30 @@ SELECT last_insert_rowid();";
 
         private void RefreshCache()
         {
-            var active = new Dictionary<IPAddress, DateTime?>();
-            var now = DateTime.UtcNow;
-            foreach (var ban in List())
+            lock (_refreshLock)
             {
-                if (!ban.IsActive(now) || !IPAddress.TryParse(ban.IpAddress, out var address))
+                var active = new Dictionary<IPAddress, DateTime?>();
+                var now = DateTime.UtcNow;
+                foreach (var ban in List())
                 {
-                    continue;
+                    if (!ban.IsActive(now) || !IPAddress.TryParse(ban.IpAddress, out var address))
+                    {
+                        continue;
+                    }
+
+                    address = Normalize(address);
+                    // A permanent ban wins over a temporary one; otherwise keep the latest expiry.
+                    if (!active.TryGetValue(address, out var existing) ||
+                        (existing != null && (ban.ExpiresAtUtc == null || ban.ExpiresAtUtc > existing)))
+                    {
+                        active[address] = ban.ExpiresAtUtc;
+                    }
                 }
 
-                address = Normalize(address);
-                // A permanent ban wins over a temporary one; otherwise keep the latest expiry.
-                if (!active.TryGetValue(address, out var existing) ||
-                    (existing != null && (ban.ExpiresAtUtc == null || ban.ExpiresAtUtc > existing)))
+                lock (_lock)
                 {
-                    active[address] = ban.ExpiresAtUtc;
+                    _active = active;
                 }
-            }
-
-            lock (_lock)
-            {
-                _active = active;
             }
         }
 

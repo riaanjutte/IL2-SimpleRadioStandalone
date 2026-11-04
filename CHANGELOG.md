@@ -1,5 +1,29 @@
 # Changelog
 
+## Unreleased
+
+### Added
+
+- Web server: `SRS_TRUSTED_PROXIES` names the reverse proxy in front of the admin UI. Failed logins are then limited and logged per browser rather than for the proxy, and the login cookie is marked secure when the proxy serves HTTPS.
+
+### Changed
+
+- Web server: panels in the IL-2 SRS theme have worn paint, with scratches, grime and dirt along the edges, and the whole theme uses the panels' olive grey.
+- Web server: confirmations such as "Saved Channel Limit." appear as a toast at the top of the page for a few seconds, instead of a line above the page content.
+- Web server: on a phone, the menu is a dropdown at the top of the page.
+- Web server: changing the admin password signs out every browser that logged in with the old one.
+- Web server: banning a client disconnects every client from that IP address, as banning the address directly already did.
+
+### Fixed
+
+- Web server: an address that doesn't exist shows the **Page not found** page with a link to the dashboard, instead of an empty page.
+- Web server: two bans added at the same moment could leave one of them out of the list checked when clients connect, until the next ban change.
+- Web server: the Docker image is built on .NET 10.0.14 and a patched musl, fixing the vulnerabilities scanners reported in .NET 10.0.12 (two of them critical HTTP request smuggling issues) and in musl.
+
+### Compatibility
+
+- After updating the web server, log in to the admin UI again once.
+
 ## IL2-SRS 1.0.5.1
 
 ### Fixed
