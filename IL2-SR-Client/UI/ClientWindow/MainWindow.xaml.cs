@@ -2274,7 +2274,15 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI
 
             TabControl.SelectionChanged += TabControl_SelectionChanged;
             // A window started minimised or maximised gets its General-tab height when restored.
-            StateChanged += (sender, e) => ResizeForCollapsedPanels();
+            StateChanged += (sender, e) =>
+            {
+                ResizeForCollapsedPanels();
+                if (_layout != null)
+                {
+                    // Outside Classic rows collapsed while maximised were not measured.
+                    Dispatcher.BeginInvoke(new Action(ApplyPanelCollapse), DispatcherPriority.Loaded);
+                }
+            };
             UpdatePanelCollapseToolTips();
         }
 

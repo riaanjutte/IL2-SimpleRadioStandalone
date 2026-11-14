@@ -234,6 +234,11 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI
                 return; // between clearing and refilling the tabs
             }
 
+            if (WindowState != WindowState.Normal || IsSnapped())
+            {
+                return; // the viewport isn't the normal height's; measured again when restored (see InitPanelCollapse)
+            }
+
             var rows = _layout.Tabs[index].Rows;
             _collapsedPanelsHeight = 0;
             // A tab that Controls or Help fills (no scroll viewer) has no empty space to give back.
