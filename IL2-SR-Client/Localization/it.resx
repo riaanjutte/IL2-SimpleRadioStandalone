@@ -822,6 +822,69 @@
   <data name="Customise layout" xml:space="preserve">
     <value>Personalizza layout</value>
   </data>
+  <data name="Tabs" xml:space="preserve">
+    <value>Schede</value>
+  </data>
+  <data name="Add tab" xml:space="preserve">
+    <value>Aggiungi scheda</value>
+  </data>
+  <data name="Delete" xml:space="preserve">
+    <value>Elimina</value>
+  </data>
+  <data name="Move up" xml:space="preserve">
+    <value>Sposta su</value>
+  </data>
+  <data name="Move down" xml:space="preserve">
+    <value>Sposta giù</value>
+  </data>
+  <data name="Panels on this tab" xml:space="preserve">
+    <value>Pannelli in questa scheda</value>
+  </data>
+  <data name="Move to tab" xml:space="preserve">
+    <value>Sposta nella scheda</value>
+  </data>
+  <data name="Target tab" xml:space="preserve">
+    <value>Scheda di destinazione</value>
+  </data>
+  <data name="Pair with row below" xml:space="preserve">
+    <value>Affianca alla riga sotto</value>
+  </data>
+  <data name="Unpair" xml:space="preserve">
+    <value>Separa</value>
+  </data>
+  <data name="Hide" xml:space="preserve">
+    <value>Nascondi</value>
+  </data>
+  <data name="Hidden panels" xml:space="preserve">
+    <value>Pannelli nascosti</value>
+  </data>
+  <data name="Add to this tab" xml:space="preserve">
+    <value>Aggiungi a questa scheda</value>
+  </data>
+  <data name="Reset layout" xml:space="preserve">
+    <value>Ripristina layout</value>
+  </data>
+  <data name="OK" xml:space="preserve">
+    <value>OK</value>
+  </data>
+  <data name="Apply" xml:space="preserve">
+    <value>Applica</value>
+  </data>
+  <data name="New tab" xml:space="preserve">
+    <value>Nuova scheda</value>
+  </data>
+  <data name="Tab name" xml:space="preserve">
+    <value>Nome della scheda</value>
+  </data>
+  <data name="Delete tab" xml:space="preserve">
+    <value>Elimina scheda</value>
+  </data>
+  <data name="Delete the tab &quot;{0}&quot;? Its panels will be hidden. You can add them back from Hidden panels." xml:space="preserve">
+    <value>Eliminare la scheda «{0}»? I suoi pannelli verranno nascosti. Puoi aggiungerli di nuovo da Pannelli nascosti.</value>
+  </data>
+  <data name="Reset the window layout to the default? Your tabs, tab names and hidden panels are lost, and every row is expanded." xml:space="preserve">
+    <value>Ripristinare il layout predefinito della finestra? Le tue schede, i loro nomi e i pannelli nascosti andranno persi e tutte le righe verranno espanse.</value>
+  </data>
   <data name="IL-2 IS FULLSCREEN" xml:space="preserve">
     <value>IL-2 A SCHERMO INTERO</value>
   </data>

@@ -1,0 +1,330 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Windows;
+using System.Windows.Automation;
+using System.Windows.Controls;
+using System.Windows.Input;
+using System.Windows.Threading;
+using Ciribob.IL2.SimpleRadio.Standalone.Client.Localization;
+using MahApps.Metro.Controls;
+
+namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI.ClientWindow
+{
+    /// <summary>Edits a copy of the main window's layout; OK and Apply hand a copy of the edit to the main window.</summary>
+    public partial class LayoutEditorWindow : MetroWindow
+    {
+        private readonly Action<CustomLayout> _apply;
+        private CustomLayout _layout;
+        private bool _filling;
+        private TextBox _renameBox;
+
+        internal LayoutEditorWindow(CustomLayout layout, Action<CustomLayout> apply)
+        {
+            InitializeComponent();
+            // Before the lists are filled: tab names are the player's own and must not be looked up as translations.
+            LocalizationManager.LocalizeElement(this);
+            AutomationProperties.SetName(TabList, LocalizationManager.Get("Tabs"));
+            AutomationProperties.SetName(RowList, LocalizationManager.Get("Panels on this tab"));
+            AutomationProperties.SetName(HiddenList, LocalizationManager.Get("Hidden panels"));
+            AutomationProperties.SetName(TargetTab, LocalizationManager.Get("Target tab"));
+
+            _layout = layout.Clone();
+            _apply = apply;
+            Loaded += (sender, e) => Refresh(0, 0);
+        }
+
+        /// <summary>A panel's translated header, from the main window; set before the window is shown.</summary>
+        internal Func<string, string> PanelName { get; set; } = key => key;
+
+        private int Tab => TabList.SelectedIndex;
+        private int Row => RowList.SelectedIndex;
+
+        private string TabHeader(int tab)
+        {
+            return CustomLayout.Header(_layout.Tabs[tab], LocalizationManager.Get);
+        }
+
+        private void Refresh(int tab, int row)
+        {
+            _filling = true;
+            Fill(TabList, Enumerable.Range(0, _layout.Tabs.Count).Select(TabHeader), tab);
+            Fill(HiddenList, _layout.Hidden.Select(PanelName), HiddenList.SelectedIndex);
+            _filling = false;
+            ShowRows(row);
+        }
+
+        /// <summary>Fills the selected tab's rows and the tabs its rows can move to.</summary>
+        private void ShowRows(int row)
+        {
+            _filling = true;
+            var rows = Tab < 0 ? new List<List<string>>() : _layout.Tabs[Tab].Rows;
+            Fill(RowList, rows.Select(r => string.Join(" + ", r.Select(PanelName))), row);
+            FillTargetTabs();
+            _filling = false;
+            UpdateButtons();
+        }
+
+        private void FillTargetTabs()
+        {
+            // Keeps the chosen tab, so several panels can be moved to it one after another.
+            var previous = (TargetTab.SelectedItem as ComboBoxItem)?.Tag;
+            TargetTab.Items.Clear();
+            for (int i = 0; i < _layout.Tabs.Count; i++)
+            {
+                if (i != Tab)
+                {
+                    TargetTab.Items.Add(new ComboBoxItem { Content = TabHeader(i), Tag = i });
+                }
+            }
+
+            var items = TargetTab.Items.Cast<ComboBoxItem>().ToList();
+            TargetTab.SelectedItem = items.FirstOrDefault(item => Equals(item.Tag, previous)) ?? items.FirstOrDefault();
+        }
+
+        // ListBoxItems rather than strings: two equal names would otherwise select as one.
+        private static void Fill(ListBox list, IEnumerable<string> names, int selected)
+        {
+            list.Items.Clear();
+            foreach (var name in names)
+            {
+                list.Items.Add(new ListBoxItem { Content = name });
+            }
+
+            list.SelectedIndex = Math.Min(selected, list.Items.Count - 1);
+        }
+
+        private void UpdateButtons(object sender = null, SelectionChangedEventArgs e = null)
+        {
+            if (_filling)
+            {
+                return;
+            }
+
+            int tab = Tab, row = Row;
+            RenameTabButton.IsEnabled = tab >= 0;
+            DeleteTabButton.IsEnabled = _layout.CanDeleteTab(tab);
+            TabUpButton.IsEnabled = _layout.CanMoveTab(tab, -1);
+            TabDownButton.IsEnabled = _layout.CanMoveTab(tab, 1);
+            RowUpButton.IsEnabled = _layout.CanMoveRow(tab, row, -1);
+            RowDownButton.IsEnabled = _layout.CanMoveRow(tab, row, 1);
+            bool unpair = _layout.CanUnpair(tab, row);
+            PairButton.Content = LocalizationManager.Get(unpair ? "Unpair" : "Pair with row below");
+            PairButton.IsEnabled = unpair || _layout.CanPair(tab, row);
+            HideButton.IsEnabled = row >= 0;
+            MoveToTabButton.IsEnabled = row >= 0 && TargetTab.SelectedItem != null;
+            TargetTab.IsEnabled = TargetTab.Items.Count > 0;
+            ShowPanelButton.IsEnabled = tab >= 0 && HiddenList.SelectedIndex >= 0;
+        }
+
+        /// <summary>A keyboard user whose button just greyed out carries on from the list it acted on.</summary>
+        private void KeepFocus(object button, ListBox list)
+        {
+            if (((UIElement) button).IsEnabled)
+            {
+                return;
+            }
+
+            Dispatcher.BeginInvoke(new Action(() =>
+            {
+                if (!((list.SelectedItem as UIElement)?.Focus() ?? false))
+                {
+                    list.Focus();
+                }
+            }), DispatcherPriority.Loaded);
+        }
+
+        private void TabList_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            if (!_filling)
+            {
+                ShowRows(0);
+            }
+        }
+
+        private void AddTab_Click(object sender, RoutedEventArgs e)
+        {
+            _layout.AddTab(LocalizationManager.Get("New tab"));
+            Refresh(_layout.Tabs.Count - 1, 0);
+            BeginRename();
+        }
+
+        private void RenameTab_Click(object sender, RoutedEventArgs e)
+        {
+            BeginRename();
+        }
+
+        /// <summary>Swaps the selected tab's name for a text box: Enter or leaving it renames, Escape keeps the old name.</summary>
+        private void BeginRename()
+        {
+            int tab = Tab;
+            if (tab < 0)
+            {
+                return;
+            }
+
+            var item = (ListBoxItem) TabList.Items[tab];
+            string oldName = (string) item.Content;
+            var box = new TextBox { Text = oldName };
+            AutomationProperties.SetName(box, LocalizationManager.Get("Tab name"));
+            // Preview, and handled: otherwise Escape also reaches the Cancel button and closes the window.
+            box.PreviewKeyDown += (sender, e) =>
+            {
+                if (e.Key == Key.Enter || e.Key == Key.Escape)
+                {
+                    EndRename(box, tab, oldName, e.Key == Key.Enter);
+                    item.Focus();
+                    e.Handled = true;
+                }
+            };
+            box.LostKeyboardFocus += (sender, e) => EndRename(box, tab, oldName, true);
+            item.Content = box;
+            _renameBox = box;
+            Dispatcher.BeginInvoke(new Action(() =>
+            {
+                box.Focus();
+                box.SelectAll();
+            }), DispatcherPriority.Loaded);
+        }
+
+        private void EndRename(TextBox box, int tab, string oldName, bool commit)
+        {
+            if (_renameBox != box)
+            {
+                return; // already ended: removing the box takes its focus away too
+            }
+
+            _renameBox = null;
+            // Unchanged text leaves a built-in tab's name translated; empty text is refused and keeps the old name.
+            if (commit && box.Text != oldName)
+            {
+                _layout.RenameTab(tab, box.Text);
+            }
+
+            // Only this item and the combo change: rebuilding the lists here would swallow the click that took the focus.
+            ((ListBoxItem) TabList.Items[tab]).Content = TabHeader(tab);
+            _filling = true;
+            FillTargetTabs();
+            _filling = false;
+            UpdateButtons();
+        }
+
+        private void DeleteTab_Click(object sender, RoutedEventArgs e)
+        {
+            int tab = Tab;
+            var answer = MessageBox.Show(this,
+                LocalizationManager.Format("Delete the tab \"{0}\"? Its panels will be hidden. You can add them back from Hidden panels.", TabHeader(tab)),
+                LocalizationManager.Get("Delete tab"), MessageBoxButton.YesNo, MessageBoxImage.Question);
+            if (answer == MessageBoxResult.Yes && _layout.DeleteTab(tab))
+            {
+                Refresh(Math.Max(0, tab - 1), 0);
+                KeepFocus(sender, TabList);
+            }
+        }
+
+        private void TabUp_Click(object sender, RoutedEventArgs e)
+        {
+            MoveTab(sender, -1);
+        }
+
+        private void TabDown_Click(object sender, RoutedEventArgs e)
+        {
+            MoveTab(sender, 1);
+        }
+
+        private void MoveTab(object sender, int delta)
+        {
+            int tab = Tab;
+            _layout.MoveTab(tab, delta);
+            Refresh(tab + delta, Row);
+            KeepFocus(sender, TabList);
+        }
+
+        private void RowUp_Click(object sender, RoutedEventArgs e)
+        {
+            MoveRow(sender, -1);
+        }
+
+        private void RowDown_Click(object sender, RoutedEventArgs e)
+        {
+            MoveRow(sender, 1);
+        }
+
+        private void MoveRow(object sender, int delta)
+        {
+            int row = Row;
+            _layout.MoveRow(Tab, row, delta);
+            ShowRows(row + delta);
+            KeepFocus(sender, RowList);
+        }
+
+        private void MoveToTab_Click(object sender, RoutedEventArgs e)
+        {
+            int row = Row;
+            _layout.MoveRowToTab(Tab, row, (int) ((ComboBoxItem) TargetTab.SelectedItem).Tag);
+            ShowRows(row);
+            KeepFocus(sender, RowList);
+        }
+
+        private void Pair_Click(object sender, RoutedEventArgs e)
+        {
+            int tab = Tab, row = Row;
+            if (_layout.CanUnpair(tab, row))
+            {
+                _layout.Unpair(tab, row);
+            }
+            else
+            {
+                _layout.Pair(tab, row);
+            }
+
+            ShowRows(row);
+            KeepFocus(sender, RowList);
+        }
+
+        private void Hide_Click(object sender, RoutedEventArgs e)
+        {
+            int row = Row;
+            _layout.HideRow(Tab, row);
+            Refresh(Tab, row);
+            KeepFocus(sender, RowList);
+        }
+
+        private void ShowPanel_Click(object sender, RoutedEventArgs e)
+        {
+            int tab = Tab;
+            _layout.ShowPanel(_layout.Hidden[HiddenList.SelectedIndex], tab);
+            Refresh(tab, _layout.Tabs[tab].Rows.Count - 1);
+            KeepFocus(sender, HiddenList);
+        }
+
+        private void Reset_Click(object sender, RoutedEventArgs e)
+        {
+            var answer = MessageBox.Show(this,
+                LocalizationManager.Get("Reset the window layout to the default? Your tabs, tab names and hidden panels are lost, and every row is expanded."),
+                LocalizationManager.Get("Reset layout"), MessageBoxButton.YesNo, MessageBoxImage.Question);
+            if (answer == MessageBoxResult.Yes)
+            {
+                _layout = CustomLayout.Default();
+                _apply(_layout.Clone());
+                Refresh(0, 0);
+            }
+        }
+
+        private void Apply_Click(object sender, RoutedEventArgs e)
+        {
+            _apply(_layout.Clone()); // a copy: further edits here must not reach the main window before Apply
+        }
+
+        private void Ok_Click(object sender, RoutedEventArgs e)
+        {
+            _apply(_layout.Clone());
+            Close();
+        }
+
+        private void Cancel_Click(object sender, RoutedEventArgs e)
+        {
+            Close();
+        }
+    }
+}

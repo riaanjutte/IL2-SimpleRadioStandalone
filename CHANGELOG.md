@@ -4,6 +4,7 @@
 
 ### Added
 
+- The ⚙ button at the right end of the tab strip opens a layout editor for the main window: add, rename, delete and reorder tabs, move panels between tabs, put two panels side by side or give each its own row, and hide panels you don't use. **Reset layout** goes back to the default. Not in the Classic theme.
 - On the General tab, the Server and Overlays section and the Favourites section each have a small arrow in their top-right corner that collapses or expands them. The window gets shorter on the General tab while a section is collapsed, and SRS remembers which sections are collapsed.
 - Settings › **VU Meter** has an **LED** choice: realistic LED bargraph meters with peak hold instead of the analogue dials. The Microphone and Speakers panels shrink to fit them.
 - The radio overlay shows **IL-2 IS FULLSCREEN** when IL-2 is set to fullscreen, because the overlay can't appear over the game in that mode. Hover over it for how to fix it.

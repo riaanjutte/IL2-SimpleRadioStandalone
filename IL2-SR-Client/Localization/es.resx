@@ -822,6 +822,69 @@
   <data name="Customise layout" xml:space="preserve">
     <value>Personalizar diseño</value>
   </data>
+  <data name="Tabs" xml:space="preserve">
+    <value>Pestañas</value>
+  </data>
+  <data name="Add tab" xml:space="preserve">
+    <value>Añadir pestaña</value>
+  </data>
+  <data name="Delete" xml:space="preserve">
+    <value>Eliminar</value>
+  </data>
+  <data name="Move up" xml:space="preserve">
+    <value>Subir</value>
+  </data>
+  <data name="Move down" xml:space="preserve">
+    <value>Bajar</value>
+  </data>
+  <data name="Panels on this tab" xml:space="preserve">
+    <value>Paneles de esta pestaña</value>
+  </data>
+  <data name="Move to tab" xml:space="preserve">
+    <value>Mover a la pestaña</value>
+  </data>
+  <data name="Target tab" xml:space="preserve">
+    <value>Pestaña de destino</value>
+  </data>
+  <data name="Pair with row below" xml:space="preserve">
+    <value>Emparejar con la fila de abajo</value>
+  </data>
+  <data name="Unpair" xml:space="preserve">
+    <value>Separar</value>
+  </data>
+  <data name="Hide" xml:space="preserve">
+    <value>Ocultar</value>
+  </data>
+  <data name="Hidden panels" xml:space="preserve">
+    <value>Paneles ocultos</value>
+  </data>
+  <data name="Add to this tab" xml:space="preserve">
+    <value>Añadir a esta pestaña</value>
+  </data>
+  <data name="Reset layout" xml:space="preserve">
+    <value>Restablecer diseño</value>
+  </data>
+  <data name="OK" xml:space="preserve">
+    <value>Aceptar</value>
+  </data>
+  <data name="Apply" xml:space="preserve">
+    <value>Aplicar</value>
+  </data>
+  <data name="New tab" xml:space="preserve">
+    <value>Nueva pestaña</value>
+  </data>
+  <data name="Tab name" xml:space="preserve">
+    <value>Nombre de la pestaña</value>
+  </data>
+  <data name="Delete tab" xml:space="preserve">
+    <value>Eliminar pestaña</value>
+  </data>
+  <data name="Delete the tab &quot;{0}&quot;? Its panels will be hidden. You can add them back from Hidden panels." xml:space="preserve">
+    <value>¿Eliminar la pestaña «{0}»? Sus paneles se ocultarán. Puedes volver a añadirlos desde Paneles ocultos.</value>
+  </data>
+  <data name="Reset the window layout to the default? Your tabs, tab names and hidden panels are lost, and every row is expanded." xml:space="preserve">
+    <value>¿Restablecer el diseño predeterminado de la ventana? Se perderán tus pestañas, sus nombres y los paneles ocultos, y todas las filas se expandirán.</value>
+  </data>
   <data name="IL-2 IS FULLSCREEN" xml:space="preserve">
     <value>IL-2 EN PANTALLA COMPLETA</value>
   </data>

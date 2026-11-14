@@ -309,5 +309,51 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Common.Tests.UI
             layout.HideRow(1, 1);
             Assert.IsTrue(CustomLayout.FillsTab(layout.Tabs[1]));
         }
+
+        [TestMethod]
+        public void EditorButtonRulesMatchWhatTheOperationsWouldDo()
+        {
+            var layout = CustomLayout.Default(); // general: [microphone,speakers] [server,overlays] [favourites]
+
+            Assert.IsFalse(layout.CanPair(0, 0), "a pair can't take a third panel");
+            Assert.IsFalse(layout.CanPair(0, 2), "nothing below the last row");
+            Assert.IsTrue(layout.CanUnpair(0, 1));
+            Assert.IsFalse(layout.CanUnpair(0, 2));
+            Assert.IsTrue(layout.CanPair(2, 0));
+            Assert.IsFalse(layout.CanPair(-1, 0));
+
+            Assert.IsFalse(layout.CanMoveRow(0, 0, -1));
+            Assert.IsTrue(layout.CanMoveRow(0, 0, 1));
+            Assert.IsFalse(layout.CanMoveRow(0, 2, 1));
+            Assert.IsFalse(layout.CanMoveRow(0, -1, 1), "no row selected");
+            Assert.IsFalse(layout.CanMoveTab(0, -1));
+            Assert.IsTrue(layout.CanMoveTab(3, -1));
+            Assert.IsFalse(layout.CanMoveTab(3, 1));
+
+            Assert.IsTrue(layout.CanDeleteTab(3));
+            Assert.IsFalse(layout.CanDeleteTab(4));
+            while (layout.Tabs.Count > 1) layout.DeleteTab(0);
+            Assert.IsFalse(layout.CanDeleteTab(0), "the last tab stays");
+            Assert.IsFalse(layout.DeleteTab(0));
+        }
+
+        [TestMethod]
+        public void TabToKeepFollowsABuiltInTabElseThePositionElseTheFirst()
+        {
+            var old = CustomLayout.Default();
+            old.AddTab("Mine");
+            var updated = old.Clone();
+            updated.MoveTab(2, -2); // settings first
+            updated.DeleteTab(1);   // general gone
+
+            Assert.AreEqual(0, CustomLayout.TabToKeep(old, 2, updated), "settings, wherever it went");
+            Assert.AreEqual(1, CustomLayout.TabToKeep(old, 1, updated), "controls");
+            Assert.AreEqual(0, CustomLayout.TabToKeep(old, 0, updated), "general was deleted");
+            Assert.AreEqual(2, CustomLayout.TabToKeep(old, 3, updated), "help");
+            Assert.AreEqual(0, CustomLayout.TabToKeep(old, 4, updated), "a custom tab: no index 4 any more");
+            Assert.AreEqual(4, CustomLayout.TabToKeep(old, 4, old.Clone()), "a custom tab keeps its position");
+            Assert.AreEqual(0, CustomLayout.TabToKeep(null, 2, updated), "the first layout");
+            Assert.AreEqual(0, CustomLayout.TabToKeep(old, -1, updated));
+        }
     }
 }

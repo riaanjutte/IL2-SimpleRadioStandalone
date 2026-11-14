@@ -2308,7 +2308,7 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI
         private void TabControl_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             // Combo boxes and lists inside the tabs raise SelectionChanged through the TabControl too.
-            if (ReferenceEquals(e.OriginalSource, TabControl))
+            if (ReferenceEquals(e.OriginalSource, TabControl) && !_rebuildingTabs)
             {
                 if (_layout != null)
                 {

@@ -307,6 +307,9 @@
     <Compile Include="UI\ClientWindow\AudioDeviceListItem.cs" />
     <Compile Include="UI\ClientWindow\CollapsedPanelsHeight.cs" />
     <Compile Include="UI\ClientWindow\CustomLayout.cs" />
+    <Compile Include="UI\ClientWindow\LayoutEditorWindow.xaml.cs">
+      <DependentUpon>LayoutEditorWindow.xaml</DependentUpon>
+    </Compile>
     <Compile Include="UI\ClientWindow\LedVuMeter.cs" />
     <Compile Include="UI\ClientWindow\LedVuMeterScale.cs" />
     <Compile Include="UI\Images.cs" />
@@ -368,6 +371,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="UI\ClientWindow\PilotRoster\PilotRosterWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UI\ClientWindow\LayoutEditorWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

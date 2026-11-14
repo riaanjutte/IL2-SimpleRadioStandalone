@@ -68,6 +68,15 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI.ClientWindow
             return tab.Rows.Count == 1 && tab.Rows[0].All(k => k == PanelKeys.Controls || k == PanelKeys.Help);
         }
 
+        /// <summary>The tab to show after switching layouts: the same built-in tab, else a custom tab's position, else the first.</summary>
+        public static int TabToKeep(CustomLayout old, int oldIndex, CustomLayout updated)
+        {
+            if (old == null || oldIndex < 0 || oldIndex >= old.Tabs.Count) return 0;
+            var builtIn = old.Tabs[oldIndex].BuiltIn;
+            if (builtIn != null) return Math.Max(0, updated.Tabs.FindIndex(t => t.BuiltIn == builtIn));
+            return oldIndex < updated.Tabs.Count ? oldIndex : 0;
+        }
+
         public static CustomLayout Default()
         {
             return new CustomLayout
@@ -178,28 +187,43 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI.ClientWindow
             return true;
         }
 
+        public bool CanDeleteTab(int tab)
+        {
+            return ValidTab(tab) && Tabs.Count > 1;
+        }
+
         public bool DeleteTab(int tab)
         {
-            if (!ValidTab(tab) || Tabs.Count <= 1) return false;
+            if (!CanDeleteTab(tab)) return false;
             Hidden.AddRange(Tabs[tab].Rows.SelectMany(r => r));
             Tabs.RemoveAt(tab);
             Normalise();
             return true;
         }
 
+        public bool CanMoveTab(int tab, int delta)
+        {
+            return ValidTab(tab) && ValidTab(tab + delta);
+        }
+
         public void MoveTab(int tab, int delta)
         {
             var target = tab + delta;
-            if (!ValidTab(tab) || !ValidTab(target)) return;
+            if (!CanMoveTab(tab, delta)) return;
             var moved = Tabs[tab];
             Tabs.RemoveAt(tab);
             Tabs.Insert(target, moved);
         }
 
+        public bool CanMoveRow(int tab, int row, int delta)
+        {
+            return ValidRow(tab, row) && ValidRow(tab, row + delta);
+        }
+
         public void MoveRow(int tab, int row, int delta)
         {
             var target = row + delta;
-            if (!ValidRow(tab, row) || !ValidRow(tab, target)) return;
+            if (!CanMoveRow(tab, row, delta)) return;
             var rows = Tabs[tab].Rows;
             var moved = rows[row];
             Collapsed.Remove(RowKey(moved));
@@ -216,11 +240,15 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI.ClientWindow
             Tabs[targetTab].Rows.Add(moved);
         }
 
+        public bool CanPair(int tab, int row)
+        {
+            return ValidRow(tab, row) && ValidRow(tab, row + 1) && Tabs[tab].Rows[row].Count == 1 && Tabs[tab].Rows[row + 1].Count == 1;
+        }
+
         public bool Pair(int tab, int row)
         {
-            if (!ValidRow(tab, row) || !ValidRow(tab, row + 1)) return false;
+            if (!CanPair(tab, row)) return false;
             var rows = Tabs[tab].Rows;
-            if (rows[row].Count != 1 || rows[row + 1].Count != 1) return false;
             Collapsed.Remove(RowKey(rows[row]));
             Collapsed.Remove(RowKey(rows[row + 1]));
             rows[row].Add(rows[row + 1][0]);
@@ -228,9 +256,14 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI.ClientWindow
             return true;
         }
 
+        public bool CanUnpair(int tab, int row)
+        {
+            return ValidRow(tab, row) && Tabs[tab].Rows[row].Count == 2;
+        }
+
         public void Unpair(int tab, int row)
         {
-            if (!ValidRow(tab, row) || Tabs[tab].Rows[row].Count != 2) return;
+            if (!CanUnpair(tab, row)) return;
             var rows = Tabs[tab].Rows;
             var pair = rows[row];
             Collapsed.Remove(RowKey(pair));

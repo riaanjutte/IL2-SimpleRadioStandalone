@@ -20,6 +20,9 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI
 
         private CustomLayout _layout;
 
+        // Set while ApplyLayout swaps the tabs, so the TabControl's selection changes don't resize the window.
+        private bool _rebuildingTabs;
+
         /// <summary>Called from the constructor after ApplyClassicThemeLayout.</summary>
         private void InitCustomLayout()
         {
@@ -30,6 +33,8 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI
                 return;
             }
 
+            CustomiseLayoutButton.Click += (sender, e) =>
+                new LayoutEditorWindow(_layout, ApplyLayout) { Owner = this, PanelName = PanelHeader }.ShowDialog();
             ServerOverlaysCollapseToggle.Visibility = Visibility.Collapsed;
             FavouritesCollapseToggle.Visibility = Visibility.Collapsed;
             ApplyLayout(CustomLayout.Load(
@@ -58,12 +63,41 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI
             }
         }
 
+        /// <summary>A panel's translated header, as its group box shows it.</summary>
+        private string PanelHeader(string key)
+        {
+            var panel = PanelFor(key) as HeaderedContentControl ?? OverlaysColumn.Children.OfType<GroupBox>().First();
+            return panel.Header as string;
+        }
+
         /// <summary>Rebuilds the tabs from the layout, keeping the shown tab where it still exists, and saves the layout.</summary>
         private void ApplyLayout(CustomLayout layout)
         {
-            _layout = layout;
-            int selected = TabControl.SelectedIndex;
+            layout.Normalise();
+            if (layout.Tabs.Count == 0)
+            {
+                layout = CustomLayout.Default(); // with no tab the panels would have nowhere to go
+            }
 
+            int selected = CustomLayout.TabToKeep(_layout, TabControl.SelectedIndex, layout);
+            _layout = layout;
+            _rebuildingTabs = true;
+            try
+            {
+                BuildTabs(layout, selected);
+            }
+            finally
+            {
+                _rebuildingTabs = false;
+            }
+
+            _globalSettings.SetClientSetting(GlobalSettingsKeys.CustomLayout, layout.Save());
+            // Measured once the new tab is laid out.
+            Dispatcher.BeginInvoke(new Action(ApplyPanelCollapse), DispatcherPriority.Loaded);
+        }
+
+        private void BuildTabs(CustomLayout layout, int selected)
+        {
             foreach (var key in PanelKeys.All)
             {
                 var panel = PanelFor(key);
@@ -111,9 +145,7 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI
                 HiddenPanelsHost.Children.Add(PanelFor(key));
             }
 
-            TabControl.SelectedIndex = Math.Max(0, Math.Min(selected, TabControl.Items.Count - 1));
-            _globalSettings.SetClientSetting(GlobalSettingsKeys.CustomLayout, layout.Save());
-            Dispatcher.BeginInvoke(new Action(ApplyPanelCollapse), DispatcherPriority.Loaded);
+            TabControl.SelectedIndex = selected;
         }
 
         private Grid BuildRow(List<string> row, bool fillsTab)
