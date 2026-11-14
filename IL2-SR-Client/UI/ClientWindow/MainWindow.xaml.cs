@@ -123,6 +123,7 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI
         private const string VuMeterStyleAuto = "Auto";
         private const string VuMeterStyleLight = "Light";
         private const string VuMeterStyleDark = "Dark";
+        private const string VuMeterStyleLed = "LED";
 
         private sealed class VuMeterStyleOption
         {
@@ -257,6 +258,7 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI
             InitVuMeterStylePicker();
             IL2_SR_Client.App.ApplyVuMeterStyle();
             ApplyClassicThemeLayout();
+            ApplyVuMeterKind();
             InitPanelCollapse();
 
             SpeakerBoost.Value = _globalSettings.GetClientSetting(GlobalSettingsKeys.SpeakerBoost).DoubleValue;
@@ -1010,7 +1012,8 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI
             {
                 new VuMeterStyleOption(VuMeterStyleAuto),
                 new VuMeterStyleOption(VuMeterStyleLight),
-                new VuMeterStyleOption(VuMeterStyleDark)
+                new VuMeterStyleOption(VuMeterStyleDark),
+                new VuMeterStyleOption(VuMeterStyleLed)
             };
 
             var currentStyle = CurrentVuMeterStyle();
@@ -1034,7 +1037,25 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI
                 return VuMeterStyleDark;
             }
 
+            if (normalizedStyle == NormalizeThemeName(VuMeterStyleLed))
+            {
+                return VuMeterStyleLed;
+            }
+
             return VuMeterStyleAuto;
+        }
+
+        /// <summary>Shows the LED meters or the analogue dials; the audio panels shrink to whichever is shown.</summary>
+        private void ApplyVuMeterKind()
+        {
+            bool led = !_classicLayout && CurrentVuMeterStyle() == VuMeterStyleLed; // Classic keeps its thin bars
+            var dialVisibility = led ? Visibility.Collapsed : Visibility.Visible;
+            var ledVisibility = led ? Visibility.Visible : Visibility.Collapsed;
+
+            Mic_VU.Visibility = dialVisibility;
+            Speaker_VU.Visibility = dialVisibility;
+            Mic_LED.Visibility = ledVisibility;
+            Speaker_LED.Visibility = ledVisibility;
         }
 
         private string CurrentTheme()
@@ -1144,6 +1165,7 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI
 
             _globalSettings.SetClientSetting(GlobalSettingsKeys.VuMeterStyle, selectedStyle);
             IL2_SR_Client.App.ApplyVuMeterStyle();
+            ApplyVuMeterKind();
         }
 
         private static string ResolveVuMeterStyleSelection(object selectedItem)

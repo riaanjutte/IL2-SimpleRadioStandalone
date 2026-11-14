@@ -5,6 +5,7 @@
 ### Added
 
 - On the General tab, the Server and Overlays section and the Favourites section each have a small arrow in their top-right corner that collapses or expands them. The window gets shorter on the General tab while a section is collapsed, and SRS remembers which sections are collapsed.
+- Settings › **VU Meter** has an **LED** choice: realistic LED bargraph meters with peak hold instead of the analogue dials. The Microphone and Speakers panels shrink to fit them.
 - The radio overlay shows **IL-2 IS FULLSCREEN** when IL-2 is set to fullscreen, because the overlay can't appear over the game in that mode. Hover over it for how to fix it.
 - Web server: `SRS_TRUSTED_PROXIES` names the reverse proxy in front of the admin UI. Failed logins are then limited and logged per browser rather than for the proxy, and the login cookie is marked secure when the proxy serves HTTPS.
 

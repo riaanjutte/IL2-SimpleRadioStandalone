@@ -810,6 +810,9 @@
   <data name="No RCI active" xml:space="preserve">
     <value>RCI non attivo</value>
   </data>
+  <data name="LED" xml:space="preserve">
+    <value>LED</value>
+  </data>
   <data name="Collapse" xml:space="preserve">
     <value>Comprimi</value>
   </data>

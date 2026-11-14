@@ -181,6 +181,11 @@
                                                  Maximum="18"
                                                  Minimum="-100"
                                                  ToolTip="{Binding Path=AudioInput.MicrophoneAvailable, Converter={StaticResource MicAvailabilityTooltipConverter}}" />
+                                    <clientWindow:LedVuMeter x:Name="Mic_LED"
+                                                             HorizontalAlignment="Center"
+                                                             Value="{Binding Value, ElementName=Mic_VU}"
+                                                             ToolTip="{Binding Path=AudioInput.MicrophoneAvailable, Converter={StaticResource MicAvailabilityTooltipConverter}}"
+                                                             Visibility="Collapsed" />
                                     <Button x:Name="Preview"
                                             Margin="0,8,0,0"
                                             HorizontalAlignment="Center"
@@ -220,6 +225,10 @@
                                                  Value="-100"
                                                  Maximum="18"
                                                  Minimum="-100" />
+                                    <clientWindow:LedVuMeter x:Name="Speaker_LED"
+                                                             HorizontalAlignment="Center"
+                                                             Value="{Binding Value, ElementName=Speaker_VU}"
+                                                             Visibility="Collapsed" />
                                     <Slider x:Name="SpeakerBoost"
                                             Width="150"
                                             Margin="0,8,0,0"
