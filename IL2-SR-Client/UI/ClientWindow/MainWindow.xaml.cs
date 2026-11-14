@@ -19,6 +19,7 @@ using System.Windows.Controls.Primitives;
 using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
+using System.Windows.Automation;
 using System.Windows.Threading;
 using Ciribob.IL2.SimpleRadio.Standalone.Client.Audio;
 using Ciribob.IL2.SimpleRadio.Standalone.Client.Audio.Managers;
@@ -1763,7 +1764,7 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI
             MessageHub.Instance.ClearSubscriptions();
             _il2RadioSyncManager.Stop();
 
-            var bounds = WindowState == WindowState.Normal ? new Rect(Left, Top, Width, Height) : RestoreBounds;
+            var bounds = WindowState == WindowState.Normal && !IsSnapped() ? new Rect(Left, Top, Width, Height) : RestoreBounds;
 
             _globalSettings.SetPositionSetting(GlobalSettingsKeys.ClientX, bounds.Left);
             _globalSettings.SetPositionSetting(GlobalSettingsKeys.ClientY, bounds.Top);
@@ -1895,13 +1896,15 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI
         private void UpdatePilotRosterAndRciVisibility(bool pilotRosterAvailable, bool showCombatBoxRci)
         {
             ShowPilotRoster.Visibility = Visibility.Visible;
-            // shortcut: the collapsed height isn't re-measured here, so an RCI panel appearing or going while
-            // collapsed leaves the General tab off by that panel's height until the next collapse or expand;
-            // call ApplyPanelCollapse here if players notice.
+            bool rciChanged = _showCombatBoxRci != showCombatBoxRci;
             _showCombatBoxRci = showCombatBoxRci;
             CombatBoxRciPanel.Visibility = showCombatBoxRci && ServerOverlaysCollapseToggle.IsChecked != true
                 ? Visibility.Visible
                 : Visibility.Collapsed;
+            if (rciChanged && ServerOverlaysCollapseToggle.IsChecked == true)
+            {
+                ApplyPanelCollapse(); // the collapsed height includes the RCI panel
+            }
 
             if (!pilotRosterAvailable && (_pilotRosterWindow?.IsUnavailableMode == false))
             {
@@ -2274,15 +2277,22 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI
             if (ReferenceEquals(e.OriginalSource, TabControl))
             {
                 ResizeForCollapsedPanels();
+                if (TabControl.SelectedIndex == 0)
+                {
+                    // Measure again once General is laid out: the RCI panel may have come or gone on another tab.
+                    Dispatcher.BeginInvoke(new Action(ApplyPanelCollapse), DispatcherPriority.Loaded);
+                }
             }
         }
 
         private void UpdatePanelCollapseToolTips()
         {
-            ServerOverlaysCollapseToggle.ToolTip =
-                LocalizationManager.Get(ServerOverlaysCollapseToggle.IsChecked == true ? "Expand" : "Collapse");
-            FavouritesCollapseToggle.ToolTip =
-                LocalizationManager.Get(FavouritesCollapseToggle.IsChecked == true ? "Expand" : "Collapse");
+            foreach (var toggle in new[] { ServerOverlaysCollapseToggle, FavouritesCollapseToggle })
+            {
+                string text = LocalizationManager.Get(toggle.IsChecked == true ? "Expand" : "Collapse");
+                toggle.ToolTip = text;
+                AutomationProperties.SetName(toggle, text); // the arrow has no text for screen readers otherwise
+            }
         }
 
         /// <summary>Hides the collapsed sections' contents, measures how much shorter that makes the General tab, and resizes.</summary>
@@ -2322,19 +2332,28 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI
 
         private void ResizeForCollapsedPanels()
         {
-            if (WindowState != WindowState.Normal)
+            if (WindowState != WindowState.Normal || IsSnapped())
             {
-                return; // a maximised window keeps its size; _heightReduction still describes its restore height
+                return; // a maximised or snapped window keeps its size; _heightReduction still describes its restore height
             }
 
-            bool onGeneralTab = TabControl.SelectedIndex == 0;
-            double normalHeight = Height + _heightReduction;
-            double minHeight = CollapsedPanelsHeight.WindowHeight(_normalMinHeight, _collapsedPanelsHeight, onGeneralTab, 0);
-            double height = CollapsedPanelsHeight.WindowHeight(normalHeight, _collapsedPanelsHeight, onGeneralTab, minHeight);
+            var size = CollapsedPanelsHeight.Resize(Height, _heightReduction, _collapsedPanelsHeight,
+                TabControl.SelectedIndex == 0, _normalMinHeight);
 
-            MinHeight = minHeight;
-            Height = height;
-            _heightReduction = normalHeight - height;
+            // MinHeight first: raising it above Height resizes the window on the spot.
+            MinHeight = size.MinHeight;
+            Height = size.Height;
+            // WPF rounds Height to device pixels, so use the height it applied or the saved height creeps.
+            _heightReduction = size.NormalHeight - Height;
+        }
+
+        /// <summary>Snapped to a screen edge (Aero Snap): reported as Normal, but Windows sets the size, like maximised.</summary>
+        private bool IsSnapped()
+        {
+            Rect restoreBounds = RestoreBounds;
+            return WindowState == WindowState.Normal &&
+                   !restoreBounds.IsEmpty &&
+                   Math.Abs(restoreBounds.Height - Height) > 1;
         }
 
         /// <summary>Classic: draws a group box as just its border, without the header bar.</summary>

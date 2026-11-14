@@ -5,9 +5,21 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI.ClientWindow
     /// <summary>Window heights when General-tab sections are collapsed: only the General tab gets shorter.</summary>
     internal static class CollapsedPanelsHeight
     {
-        public static double WindowHeight(double normalHeight, double collapsedHeight, bool onGeneralTab, double minHeight)
+        /// <param name="windowHeight">The window's height now.</param>
+        /// <param name="heightReduction">How much shorter than the player's normal height the window is now.</param>
+        /// <param name="collapsedHeight">The height the collapsed sections take off the General tab.</param>
+        /// <param name="normalMinHeight">The window's minimum height with nothing collapsed.</param>
+        public static (double NormalHeight, double MinHeight, double Height) Resize(
+            double windowHeight, double heightReduction, double collapsedHeight, bool onGeneralTab, double normalMinHeight)
         {
-            return onGeneralTab ? Math.Max(minHeight, normalHeight - collapsedHeight) : normalHeight;
+            double normalHeight = windowHeight + heightReduction;
+            if (!onGeneralTab)
+            {
+                return (normalHeight, normalMinHeight, normalHeight);
+            }
+
+            double minHeight = Math.Max(0, normalMinHeight - collapsedHeight);
+            return (normalHeight, minHeight, Math.Max(minHeight, normalHeight - collapsedHeight));
         }
     }
 }
