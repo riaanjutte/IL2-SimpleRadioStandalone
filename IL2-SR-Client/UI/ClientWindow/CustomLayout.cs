@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using Newtonsoft.Json;
+using NLog;
 
 namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI.ClientWindow
 {
@@ -41,6 +42,8 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI.ClientWindow
 
     internal sealed class CustomLayout
     {
+        private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
+
         public List<LayoutTab> Tabs { get; set; } = new List<LayoutTab>();
         public List<string> Hidden { get; set; } = new List<string>();
 
@@ -85,10 +88,17 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI.ClientWindow
                 try
                 {
                     layout = JsonConvert.DeserializeObject<CustomLayout>(Encoding.UTF8.GetString(Convert.FromBase64String(stored)));
-                    if (layout == null || layout.Tabs == null || layout.Tabs.Count == 0) layout = Default();
+                    layout?.Normalise();
                 }
-                catch (Exception)
+                catch (Exception ex)
                 {
+                    Logger.Warn(ex, "Saved window layout is unreadable, using the default layout");
+                    layout = null;
+                }
+
+                if (layout == null || layout.Tabs.Count == 0)
+                {
+                    if (layout != null) Logger.Warn("Saved window layout has no tabs, using the default layout");
                     layout = Default();
                 }
             }
@@ -111,12 +121,13 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI.ClientWindow
         public void Normalise()
         {
             Tabs = (Tabs ?? new List<LayoutTab>()).Where(t => t != null).ToList();
+            foreach (var tab in Tabs.Where(t => string.IsNullOrWhiteSpace(t.Name))) tab.Name = null;
+            // A custom tab with no name has nothing to show in the tab strip; its panels fall back to the first tab.
+            Tabs = Tabs.Where(t => t.BuiltIn != null || t.Name != null).ToList();
             var seen = new HashSet<string>();
 
             foreach (var tab in Tabs)
             {
-                if (string.IsNullOrWhiteSpace(tab.Name)) tab.Name = null;
-
                 var rows = new List<List<string>>();
                 foreach (var row in tab.Rows ?? new List<List<string>>())
                 {
@@ -139,10 +150,12 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI.ClientWindow
             Collapsed = new HashSet<string>((Collapsed ?? new HashSet<string>()).Where(rowKeys.Contains));
         }
 
-        public void AddTab(string name)
+        public bool AddTab(string name)
         {
-            Tabs.Add(new LayoutTab { Name = name });
+            if (string.IsNullOrWhiteSpace(name)) return false;
+            Tabs.Add(new LayoutTab { Name = name.Trim() });
             Normalise();
+            return true;
         }
 
         public bool RenameTab(int tab, string name)

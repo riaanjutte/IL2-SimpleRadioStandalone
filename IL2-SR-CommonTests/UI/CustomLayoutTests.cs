@@ -248,5 +248,38 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Common.Tests.UI
             Assert.AreEqual(0, layout.Hidden.Count);
             Assert.AreEqual(2, clone.Hidden.Count);
         }
+
+        [TestMethod]
+        public void StoredLayoutWithOnlyNullTabsFallsBackToDefault()
+        {
+            var stored = System.Convert.ToBase64String(System.Text.Encoding.UTF8.GetBytes("{\"Tabs\":[null]}"));
+
+            var layout = CustomLayout.Load(stored, false, false);
+
+            Assert.AreEqual(4, layout.Tabs.Count);
+            Assert.AreEqual("[microphone,speakers] [server,overlays] [favourites]", Rows(layout, 0));
+        }
+
+        [TestMethod]
+        public void AddTabRefusesABlankNameAndTrimsOthers()
+        {
+            var layout = CustomLayout.Default();
+
+            Assert.IsFalse(layout.AddTab(" "));
+            Assert.AreEqual(4, layout.Tabs.Count);
+            Assert.IsTrue(layout.AddTab(" Flight "));
+            Assert.AreEqual("Flight", layout.Tabs[4].Name);
+        }
+
+        [TestMethod]
+        public void NormaliseDropsACustomTabWithoutAName()
+        {
+            var layout = CustomLayout.Default();
+            layout.Tabs.Add(new LayoutTab());
+
+            layout.Normalise();
+
+            Assert.AreEqual(4, layout.Tabs.Count);
+        }
     }
 }
