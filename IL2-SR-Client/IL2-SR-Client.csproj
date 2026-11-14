@@ -302,6 +302,7 @@
     <Compile Include="Settings\RadioChannels\PresetChannel.cs" />
     <Compile Include="Settings\RadioChannels\IPresetChannelsStore.cs" />
     <Compile Include="UI\ClientWindow\AudioDeviceListItem.cs" />
+    <Compile Include="UI\ClientWindow\CollapsedPanelsHeight.cs" />
     <Compile Include="UI\Images.cs" />
     <Compile Include="UI\InputProfileWindow\InputProfileWindow.xaml.cs">
       <DependentUpon>InputProfileWindow.xaml</DependentUpon>
