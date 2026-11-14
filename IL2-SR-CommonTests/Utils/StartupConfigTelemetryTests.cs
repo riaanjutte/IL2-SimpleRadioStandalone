@@ -21,6 +21,25 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Common.Tests.Utils
             "[END]\r\n";
 
         [TestMethod]
+        public void ClientReadsFullscreenFromGraphicsSection()
+        {
+            Assert.IsTrue(ClientStartupConfigTelemetry.IsFullscreenInText(OriginalConfig));
+            Assert.IsFalse(ClientStartupConfigTelemetry.IsFullscreenInText(
+                OriginalConfig.Replace("fullscreen = 1", "fullscreen = 0")));
+            Assert.IsFalse(ClientStartupConfigTelemetry.IsFullscreenInText(
+                OriginalConfig.Replace("\tfullscreen = 1\r\n", string.Empty)));
+            Assert.IsFalse(ClientStartupConfigTelemetry.IsFullscreenInText(
+                "[KEY = other]\r\n\tfullscreen = 1\r\n[END]\r\n"));
+            Assert.IsFalse(ClientStartupConfigTelemetry.IsFullscreenInText(null));
+
+            WithTemporaryConfig(Encoding.UTF8.GetBytes(OriginalConfig), delegate(string path)
+            {
+                Assert.IsTrue(ClientStartupConfigTelemetry.IsFullscreen(path));
+            });
+            Assert.IsFalse(ClientStartupConfigTelemetry.IsFullscreen(Path.Combine(Path.GetTempPath(), Guid.NewGuid() + ".cfg")));
+        }
+
+        [TestMethod]
         public void ClientRepairPreservesNoBomAndCreatesExactBackup()
         {
             WithTemporaryConfig(new UTF8Encoding(false).GetBytes(OriginalConfig), delegate(string path)

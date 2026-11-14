@@ -816,6 +816,12 @@
   <data name="Expand" xml:space="preserve">
     <value>Ausklappen</value>
   </data>
+  <data name="IL-2 IS FULLSCREEN" xml:space="preserve">
+    <value>IL-2 IM VOLLBILD</value>
+  </data>
+  <data name="IL-2 is set to fullscreen, so this overlay can't show over the game. Turn off Fullscreen in IL-2's graphics settings and restart IL-2." xml:space="preserve">
+    <value>IL-2 ist auf Vollbild eingestellt, daher kann dieses Overlay nicht über dem Spiel erscheinen. Schalte Vollbild in den Grafikeinstellungen von IL-2 aus und starte IL-2 neu.</value>
+  </data>
   <data name="Friendly RCI active" xml:space="preserve">
     <value>RCI - Friendly only</value>
   </data>

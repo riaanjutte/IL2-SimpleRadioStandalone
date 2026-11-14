@@ -816,6 +816,12 @@
   <data name="Expand" xml:space="preserve">
     <value>Развернуть</value>
   </data>
+  <data name="IL-2 IS FULLSCREEN" xml:space="preserve">
+    <value>IL-2 В ПОЛНОЭКРАННОМ РЕЖИМЕ</value>
+  </data>
+  <data name="IL-2 is set to fullscreen, so this overlay can't show over the game. Turn off Fullscreen in IL-2's graphics settings and restart IL-2." xml:space="preserve">
+    <value>IL-2 запущен в полноэкранном режиме, поэтому этот оверлей не может отображаться поверх игры. Отключите полноэкранный режим в настройках графики IL-2 и перезапустите IL-2.</value>
+  </data>
   <data name="Friendly RCI active" xml:space="preserve">
     <value>RCI - только союзный</value>
   </data>
