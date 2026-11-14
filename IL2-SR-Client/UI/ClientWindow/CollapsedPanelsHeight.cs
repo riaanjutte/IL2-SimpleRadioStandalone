@@ -21,5 +21,14 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI.ClientWindow
             double minHeight = Math.Max(0, normalMinHeight - collapsedHeight);
             return (normalHeight, minHeight, Math.Max(minHeight, normalHeight - collapsedHeight));
         }
+
+        /// <summary>
+        /// Empty space at the bottom of a tab that collapsing sections frees. A tab whose content already
+        /// overflows the viewport frees nothing, so the window never shrinks for it.
+        /// </summary>
+        public static double FreedHeight(double viewportAtNormalHeight, double expandedContent, double collapsedContent)
+        {
+            return Math.Max(0, viewportAtNormalHeight - collapsedContent) - Math.Max(0, viewportAtNormalHeight - expandedContent);
+        }
     }
 }

@@ -74,5 +74,24 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Common.Tests.UI
             Assert.AreEqual(50, size.Height);
             Assert.AreEqual(30, CollapsedPanelsHeight.Resize(300, 0, 280, true, 310).Height);
         }
+
+        [TestMethod]
+        public void FreedHeightIsTheEmptySpaceThatCollapsingLeaves()
+        {
+            Assert.AreEqual(150, CollapsedPanelsHeight.FreedHeight(500, 400, 250));
+        }
+
+        [TestMethod]
+        public void FreedHeightIsZeroWhenTheTabAlreadyScrolls()
+        {
+            Assert.AreEqual(50, CollapsedPanelsHeight.FreedHeight(500, 700, 450));
+            Assert.AreEqual(0, CollapsedPanelsHeight.FreedHeight(500, 900, 600));
+        }
+
+        [TestMethod]
+        public void FreedHeightIsZeroWhenNothingIsCollapsed()
+        {
+            Assert.AreEqual(0, CollapsedPanelsHeight.FreedHeight(500, 400, 400));
+        }
     }
 }
