@@ -69,7 +69,18 @@
                     </Setter.Value>
                 </Setter>
             </Style>
+            <!-- The theme's buttons and combo boxes show no keyboard focus; here a keyboard user sees an outline. -->
+            <Style x:Key="EditorFocus">
+                <Setter Property="Control.Template">
+                    <Setter.Value>
+                        <ControlTemplate>
+                            <Rectangle Margin="-2" SnapsToDevicePixels="True" Stroke="{DynamicResource MilTextPrimaryBrush}" StrokeThickness="1" />
+                        </ControlTemplate>
+                    </Setter.Value>
+                </Setter>
+            </Style>
             <Style x:Key="EditorButton" TargetType="Button" BasedOn="{StaticResource {x:Type Button}}">
+                <Setter Property="FocusVisualStyle" Value="{StaticResource EditorFocus}" />
                 <Setter Property="Margin" Value="0,6,6,0" />
                 <Setter Property="Padding" Value="8,2" />
             </Style>
@@ -133,7 +144,7 @@
                             </WrapPanel>
                             <DockPanel>
                                 <Button x:Name="MoveToTabButton" DockPanel.Dock="Left" Content="Move to tab" Style="{StaticResource EditorButton}" Click="MoveToTab_Click" />
-                                <ComboBox x:Name="TargetTab" Margin="0,6,0,0" SelectionChanged="UpdateButtons" />
+                                <ComboBox x:Name="TargetTab" FocusVisualStyle="{StaticResource EditorFocus}" Margin="0,6,0,0" SelectionChanged="UpdateButtons" />
                             </DockPanel>
                         </StackPanel>
                         <ListBox x:Name="RowList" Style="{StaticResource EditorList}" SelectionChanged="UpdateButtons" />

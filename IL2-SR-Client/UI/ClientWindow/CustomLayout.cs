@@ -77,6 +77,15 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI.ClientWindow
             return oldIndex < updated.Tabs.Count ? oldIndex : 0;
         }
 
+        /// <summary>
+        /// The indices of a tab's rows the player can see: a row whose panels are all unavailable in this build
+        /// (RCI Controller without access keys) is left out.
+        /// </summary>
+        public static List<int> ShownRows(LayoutTab tab, Func<string, bool> available)
+        {
+            return Enumerable.Range(0, tab.Rows.Count).Where(r => tab.Rows[r].Any(available)).ToList();
+        }
+
         public static CustomLayout Default()
         {
             return new CustomLayout
@@ -242,7 +251,20 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI.ClientWindow
 
         public bool CanPair(int tab, int row)
         {
-            return ValidRow(tab, row) && ValidRow(tab, row + 1) && Tabs[tab].Rows[row].Count == 1 && Tabs[tab].Rows[row + 1].Count == 1;
+            return CanPair(tab, row, row + 1);
+        }
+
+        /// <param name="below">A later row of the same tab; rows in between (ones the player can't see) stay below the pair.</param>
+        public bool CanPair(int tab, int row, int below)
+        {
+            return below > row && ValidRow(tab, row) && ValidRow(tab, below) && Tabs[tab].Rows[row].Count == 1 && Tabs[tab].Rows[below].Count == 1;
+        }
+
+        public bool Pair(int tab, int row, int below)
+        {
+            if (!CanPair(tab, row, below)) return false;
+            MoveRow(tab, below, row + 1 - below);
+            return Pair(tab, row);
         }
 
         public bool Pair(int tab, int row)

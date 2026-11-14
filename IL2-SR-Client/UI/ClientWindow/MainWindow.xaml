@@ -505,11 +505,6 @@
                         <GroupBox x:Name="FavouritesGroupBox" Header="Favourites">
                             <clientWindow:FavouriteServersView DataContext="{Binding Path=FavouriteServersViewModel}" MaxHeight="230" />
                         </GroupBox>
-                        <ToggleButton x:Name="FavouritesCollapseToggle"
-                                      Margin="0,16,18,0"
-                                      Checked="PanelCollapseToggle_Changed"
-                                      Style="{StaticResource PanelCollapseToggleStyle}"
-                                      Unchecked="PanelCollapseToggle_Changed" />
                     </Grid>
 
                 </StackPanel>

@@ -5,6 +5,7 @@ using System.Windows;
 using System.Windows.Automation;
 using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
+using System.Windows.Media;
 using System.Windows.Threading;
 using Ciribob.IL2.SimpleRadio.Standalone.Client.Localization;
 using Ciribob.IL2.SimpleRadio.Standalone.Client.Settings;
@@ -34,9 +35,15 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI
             }
 
             CustomiseLayoutButton.Click += (sender, e) =>
-                new LayoutEditorWindow(_layout, ApplyLayout) { Owner = this, PanelName = PanelHeader }.ShowDialog();
+                new LayoutEditorWindow(_layout, ApplyLayout)
+                {
+                    Owner = this,
+                    PanelName = PanelHeader,
+                    // The panel's own rule (RCI Controller without access keys); the layout never sets a panel's Visibility.
+                    Available = key => PanelFor(key).Visibility == Visibility.Visible
+                }.ShowDialog();
             ServerOverlaysCollapseToggle.Visibility = Visibility.Collapsed;
-            FavouritesCollapseToggle.Visibility = Visibility.Collapsed;
+            TabControl.Loaded += (sender, e) => ReserveTabStripSpaceForCustomiseButton();
             ApplyLayout(CustomLayout.Load(
                 _globalSettings.GetClientSetting(GlobalSettingsKeys.CustomLayout).RawValue,
                 _globalSettings.GetClientSettingBool(GlobalSettingsKeys.ServerOverlaysCollapsed),
@@ -61,6 +68,35 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI
                 case PanelKeys.Help: return HelpPanel;
                 default: throw new ArgumentOutOfRangeException(nameof(key), key, "Unknown panel");
             }
+        }
+
+        /// <summary>The ⚙ button sits over the right end of the tab strip, so the strip wraps before reaching it.</summary>
+        private void ReserveTabStripSpaceForCustomiseButton()
+        {
+            var strip = FindDescendant<TabPanel>(TabControl);
+            if (strip == null)
+            {
+                return;
+            }
+
+            double reserve = CustomiseLayoutButton.Width + CustomiseLayoutButton.Margin.Right + 4;
+            var margin = strip.Margin;
+            strip.Margin = new Thickness(margin.Left, margin.Top, Math.Max(margin.Right, reserve), margin.Bottom);
+        }
+
+        private static T FindDescendant<T>(DependencyObject parent) where T : DependencyObject
+        {
+            for (int i = 0; i < VisualTreeHelper.GetChildrenCount(parent); i++)
+            {
+                var child = VisualTreeHelper.GetChild(parent, i);
+                var found = child as T ?? FindDescendant<T>(child);
+                if (found != null)
+                {
+                    return found;
+                }
+            }
+
+            return null;
         }
 
         /// <summary>A panel's translated header, as its group box shows it.</summary>
@@ -224,13 +260,8 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI
         {
             if (_layout == null)
             {
-                // Classic, or the window is still being built: the XAML arrows.
-                if (key == PanelKeys.Server || key == PanelKeys.Overlays)
-                {
-                    return ServerOverlaysCollapseToggle.IsChecked == true;
-                }
-
-                return key == PanelKeys.Favourites && FavouritesCollapseToggle.IsChecked == true;
+                // Classic, or the window is still being built: the XAML arrow.
+                return (key == PanelKeys.Server || key == PanelKeys.Overlays) && ServerOverlaysCollapseToggle.IsChecked == true;
             }
 
             var row = _layout.Tabs.SelectMany(t => t.Rows).FirstOrDefault(r => r.Contains(key));

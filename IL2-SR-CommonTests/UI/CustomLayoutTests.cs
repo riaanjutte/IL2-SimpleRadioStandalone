@@ -1,3 +1,4 @@
+using System;
 using System.Linq;
 using Ciribob.IL2.SimpleRadio.Standalone.Client.UI.ClientWindow;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -335,6 +336,30 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Common.Tests.UI
             while (layout.Tabs.Count > 1) layout.DeleteTab(0);
             Assert.IsFalse(layout.CanDeleteTab(0), "the last tab stays");
             Assert.IsFalse(layout.DeleteTab(0));
+        }
+
+        [TestMethod]
+        public void ShownRowsLeaveOutUnavailablePanelsAndPairActsOnTheNextShownRow()
+        {
+            var layout = CustomLayout.Default(); // settings: [globalSettings] [rciController] [audioOptions] [profile] [profileSettings]
+            Func<string, bool> available = k => k != PanelKeys.RciController;
+            var shown = CustomLayout.ShownRows(layout.Tabs[2], available);
+
+            CollectionAssert.AreEqual(new[] { 0, 2, 3, 4 }, shown);
+            CollectionAssert.AreEqual(new[] { 0, 1, 2 }, CustomLayout.ShownRows(layout.Tabs[0], available));
+
+            Assert.IsFalse(layout.CanPair(2, 0, 0), "a row can't pair with itself");
+            Assert.IsFalse(layout.CanPair(2, 2, 0), "only with a later row");
+            Assert.IsTrue(layout.Pair(2, 0, shown[1]));
+            Assert.AreEqual("[globalSettings,audioOptions] [rciController] [profile] [profileSettings]", Rows(layout, 2));
+
+            // Moving a shown row by the gap to the next shown one steps over the unavailable row.
+            layout.MoveRow(2, 2, 0 - 2);
+            Assert.AreEqual("[profile] [globalSettings,audioOptions] [rciController] [profileSettings]", Rows(layout, 2));
+            CollectionAssert.AreEqual(new[] { 0, 1, 3 }, CustomLayout.ShownRows(layout.Tabs[2], available));
+
+            layout.MoveRowToTab(2, 2, 1); // a row of only unavailable panels is not shown on its new tab either
+            CollectionAssert.AreEqual(new[] { 0 }, CustomLayout.ShownRows(layout.Tabs[1], available));
         }
 
         [TestMethod]

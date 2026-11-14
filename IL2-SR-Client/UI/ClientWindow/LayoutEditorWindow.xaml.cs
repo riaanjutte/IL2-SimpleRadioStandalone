@@ -19,6 +19,10 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI.ClientWindow
         private bool _filling;
         private TextBox _renameBox;
 
+        // Model indices of what the lists show: panels unavailable in this build are left out (see Available).
+        private List<int> _shownRows = new List<int>();
+        private List<string> _shownHidden = new List<string>();
+
         internal LayoutEditorWindow(CustomLayout layout, Action<CustomLayout> apply)
         {
             InitializeComponent();
@@ -31,14 +35,27 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI.ClientWindow
 
             _layout = layout.Clone();
             _apply = apply;
-            Loaded += (sender, e) => Refresh(0, 0);
+            Loaded += (sender, e) =>
+            {
+                Refresh(0, 0);
+                FocusSelected(TabList);
+            };
         }
 
         /// <summary>A panel's translated header, from the main window; set before the window is shown.</summary>
         internal Func<string, string> PanelName { get; set; } = key => key;
 
+        /// <summary>
+        /// Whether a panel can appear at all in this build (RCI Controller needs access keys), from the main window;
+        /// set before the window is shown. Unavailable panels stay in the layout but are left out of the lists.
+        /// </summary>
+        internal Func<string, bool> Available { get; set; } = key => true;
+
         private int Tab => TabList.SelectedIndex;
-        private int Row => RowList.SelectedIndex;
+
+        // The selected row as the list shows it, and as the layout holds it.
+        private int Shown => RowList.SelectedIndex;
+        private int Row => Shown < 0 ? -1 : _shownRows[Shown];
 
         private string TabHeader(int tab)
         {
@@ -49,17 +66,18 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI.ClientWindow
         {
             _filling = true;
             Fill(TabList, Enumerable.Range(0, _layout.Tabs.Count).Select(TabHeader), tab);
-            Fill(HiddenList, _layout.Hidden.Select(PanelName), HiddenList.SelectedIndex);
+            _shownHidden = _layout.Hidden.Where(Available).ToList();
+            Fill(HiddenList, _shownHidden.Select(PanelName), HiddenList.SelectedIndex);
             _filling = false;
             ShowRows(row);
         }
 
         /// <summary>Fills the selected tab's rows and the tabs its rows can move to.</summary>
-        private void ShowRows(int row)
+        private void ShowRows(int shown)
         {
             _filling = true;
-            var rows = Tab < 0 ? new List<List<string>>() : _layout.Tabs[Tab].Rows;
-            Fill(RowList, rows.Select(r => string.Join(" + ", r.Select(PanelName))), row);
+            _shownRows = Tab < 0 ? new List<int>() : CustomLayout.ShownRows(_layout.Tabs[Tab], Available);
+            Fill(RowList, _shownRows.Select(r => string.Join(" + ", _layout.Tabs[Tab].Rows[r].Where(Available).Select(PanelName))), shown);
             FillTargetTabs();
             _filling = false;
             UpdateButtons();
@@ -101,16 +119,17 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI.ClientWindow
                 return;
             }
 
-            int tab = Tab, row = Row;
+            int tab = Tab, shown = Shown, row = Row;
+            bool rowBelow = shown >= 0 && shown + 1 < _shownRows.Count;
             RenameTabButton.IsEnabled = tab >= 0;
             DeleteTabButton.IsEnabled = _layout.CanDeleteTab(tab);
             TabUpButton.IsEnabled = _layout.CanMoveTab(tab, -1);
             TabDownButton.IsEnabled = _layout.CanMoveTab(tab, 1);
-            RowUpButton.IsEnabled = _layout.CanMoveRow(tab, row, -1);
-            RowDownButton.IsEnabled = _layout.CanMoveRow(tab, row, 1);
+            RowUpButton.IsEnabled = shown > 0;
+            RowDownButton.IsEnabled = rowBelow;
             bool unpair = _layout.CanUnpair(tab, row);
             PairButton.Content = LocalizationManager.Get(unpair ? "Unpair" : "Pair with row below");
-            PairButton.IsEnabled = unpair || _layout.CanPair(tab, row);
+            PairButton.IsEnabled = unpair || rowBelow && _layout.CanPair(tab, row, _shownRows[shown + 1]);
             HideButton.IsEnabled = row >= 0;
             MoveToTabButton.IsEnabled = row >= 0 && TargetTab.SelectedItem != null;
             TargetTab.IsEnabled = TargetTab.Items.Count > 0;
@@ -120,11 +139,15 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI.ClientWindow
         /// <summary>A keyboard user whose button just greyed out carries on from the list it acted on.</summary>
         private void KeepFocus(object button, ListBox list)
         {
-            if (((UIElement) button).IsEnabled)
+            if (!((UIElement) button).IsEnabled)
             {
-                return;
+                FocusSelected(list);
             }
+        }
 
+        /// <summary>Focuses the list's selected item once it is laid out, else the list.</summary>
+        private void FocusSelected(ListBox list)
+        {
             Dispatcher.BeginInvoke(new Action(() =>
             {
                 if (!((list.SelectedItem as UIElement)?.Focus() ?? false))
@@ -257,61 +280,60 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI.ClientWindow
 
         private void MoveRow(object sender, int delta)
         {
-            int row = Row;
-            _layout.MoveRow(Tab, row, delta);
-            ShowRows(row + delta);
+            // Past any rows the player can't see, to where the neighbouring shown row is.
+            int shown = Shown, row = Row;
+            _layout.MoveRow(Tab, row, _shownRows[shown + delta] - row);
+            ShowRows(shown + delta);
             KeepFocus(sender, RowList);
         }
 
         private void MoveToTab_Click(object sender, RoutedEventArgs e)
         {
-            int row = Row;
-            _layout.MoveRowToTab(Tab, row, (int) ((ComboBoxItem) TargetTab.SelectedItem).Tag);
-            ShowRows(row);
+            _layout.MoveRowToTab(Tab, Row, (int) ((ComboBoxItem) TargetTab.SelectedItem).Tag);
+            ShowRows(Shown);
             KeepFocus(sender, RowList);
         }
 
         private void Pair_Click(object sender, RoutedEventArgs e)
         {
-            int tab = Tab, row = Row;
+            int tab = Tab, shown = Shown, row = Row;
             if (_layout.CanUnpair(tab, row))
             {
                 _layout.Unpair(tab, row);
             }
             else
             {
-                _layout.Pair(tab, row);
+                _layout.Pair(tab, row, _shownRows[shown + 1]); // the next row the player can see
             }
 
-            ShowRows(row);
+            ShowRows(shown);
             KeepFocus(sender, RowList);
         }
 
         private void Hide_Click(object sender, RoutedEventArgs e)
         {
-            int row = Row;
-            _layout.HideRow(Tab, row);
-            Refresh(Tab, row);
+            int shown = Shown;
+            _layout.HideRow(Tab, Row);
+            Refresh(Tab, shown);
             KeepFocus(sender, RowList);
         }
 
         private void ShowPanel_Click(object sender, RoutedEventArgs e)
         {
             int tab = Tab;
-            _layout.ShowPanel(_layout.Hidden[HiddenList.SelectedIndex], tab);
-            Refresh(tab, _layout.Tabs[tab].Rows.Count - 1);
+            _layout.ShowPanel(_shownHidden[HiddenList.SelectedIndex], tab);
+            Refresh(tab, int.MaxValue); // the panel's new row, at the end
             KeepFocus(sender, HiddenList);
         }
 
         private void Reset_Click(object sender, RoutedEventArgs e)
         {
             var answer = MessageBox.Show(this,
-                LocalizationManager.Get("Reset the window layout to the default? Your tabs, tab names and hidden panels are lost, and every row is expanded."),
+                LocalizationManager.Get("Reset the window layout to the default? Your tabs, tab names and hidden panels go back to the default, and every row is expanded, when you press OK or Apply."),
                 LocalizationManager.Get("Reset layout"), MessageBoxButton.YesNo, MessageBoxImage.Question);
             if (answer == MessageBoxResult.Yes)
             {
-                _layout = CustomLayout.Default();
-                _apply(_layout.Clone());
+                _layout = CustomLayout.Default(); // like any other edit: OK or Apply applies it, Cancel discards it
                 Refresh(0, 0);
             }
         }

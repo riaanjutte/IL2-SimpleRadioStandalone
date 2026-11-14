@@ -882,8 +882,8 @@
   <data name="Delete the tab &quot;{0}&quot;? Its panels will be hidden. You can add them back from Hidden panels." xml:space="preserve">
     <value>Delete the tab "{0}"? Its panels will be hidden. You can add them back from Hidden panels.</value>
   </data>
-  <data name="Reset the window layout to the default? Your tabs, tab names and hidden panels are lost, and every row is expanded." xml:space="preserve">
-    <value>Reset the window layout to the default? Your tabs, tab names and hidden panels are lost, and every row is expanded.</value>
+  <data name="Reset the window layout to the default? Your tabs, tab names and hidden panels go back to the default, and every row is expanded, when you press OK or Apply." xml:space="preserve">
+    <value>Reset the window layout to the default? Your tabs, tab names and hidden panels go back to the default, and every row is expanded, when you press OK or Apply.</value>
   </data>
   <data name="IL-2 IS FULLSCREEN" xml:space="preserve">
     <value>IL-2 IS FULLSCREEN</value>

@@ -2268,8 +2268,6 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI
 
             _initialisingPanelCollapse = true;
             ServerOverlaysCollapseToggle.IsChecked = _globalSettings.GetClientSettingBool(GlobalSettingsKeys.ServerOverlaysCollapsed);
-            FavouritesCollapseToggle.IsChecked = !_classicLayout &&
-                                                 _globalSettings.GetClientSettingBool(GlobalSettingsKeys.FavouritesCollapsed);
             _initialisingPanelCollapse = false;
 
             TabControl.SelectionChanged += TabControl_SelectionChanged;
@@ -2295,11 +2293,6 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI
 
             _globalSettings.SetClientSetting(GlobalSettingsKeys.ServerOverlaysCollapsed,
                 ServerOverlaysCollapseToggle.IsChecked == true);
-            if (!_classicLayout)
-            {
-                _globalSettings.SetClientSetting(GlobalSettingsKeys.FavouritesCollapsed,
-                    FavouritesCollapseToggle.IsChecked == true);
-            }
 
             UpdatePanelCollapseToolTips();
             ApplyPanelCollapse();
@@ -2327,10 +2320,7 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI
 
         private void UpdatePanelCollapseToolTips()
         {
-            foreach (var toggle in new[] { ServerOverlaysCollapseToggle, FavouritesCollapseToggle })
-            {
-                SetCollapseToolTip(toggle);
-            }
+            SetCollapseToolTip(ServerOverlaysCollapseToggle);
         }
 
         /// <summary>Hides the collapsed sections' contents, measures how much shorter that makes the shown tab, and resizes.</summary>
@@ -2353,30 +2343,24 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI
             }
 
             bool serverOverlaysCollapsed = ServerOverlaysCollapseToggle.IsChecked == true;
-            bool favouritesCollapsed = FavouritesCollapseToggle.IsChecked == true;
 
-            SetPanelContentVisibility(false, false);
+            SetPanelContentVisibility(false);
             GeneralLayout.UpdateLayout();
             double expandedHeight = GeneralLayout.DesiredSize.Height; // ActualHeight is stretched to the scroll viewport when the content is shorter
 
-            SetPanelContentVisibility(serverOverlaysCollapsed, favouritesCollapsed);
+            SetPanelContentVisibility(serverOverlaysCollapsed);
             GeneralLayout.UpdateLayout();
             _collapsedPanelsHeight = Math.Max(0, expandedHeight - GeneralLayout.DesiredSize.Height);
 
             ResizeForCollapsedPanels();
         }
 
-        private void SetPanelContentVisibility(bool serverOverlaysCollapsed, bool favouritesCollapsed)
+        private void SetPanelContentVisibility(bool serverOverlaysCollapsed)
         {
             var serverOverlaysVisibility = serverOverlaysCollapsed ? Visibility.Collapsed : Visibility.Visible;
             ServerLayout.Visibility = serverOverlaysVisibility;
             OverlaysLayout.Visibility = serverOverlaysVisibility;
             CombatBoxRciPanel.Visibility = _showCombatBoxRci && !serverOverlaysCollapsed ? Visibility.Visible : Visibility.Collapsed;
-
-            if (FavouritesGroupBox.Content is UIElement favourites)
-            {
-                favourites.Visibility = favouritesCollapsed ? Visibility.Collapsed : Visibility.Visible;
-            }
         }
 
         private void ResizeForCollapsedPanels()
