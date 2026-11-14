@@ -24,12 +24,5 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Common.Tests.UI
         {
             Assert.AreEqual(200, CollapsedPanelsHeight.WindowHeight(300, 250, true, 200));
         }
-
-        [TestMethod]
-        public void NormalHeightAddsTheCollapsedHeightBackOnTheGeneralTab()
-        {
-            Assert.AreEqual(650, CollapsedPanelsHeight.NormalHeight(400, 250, true));
-            Assert.AreEqual(650, CollapsedPanelsHeight.NormalHeight(650, 250, false));
-        }
     }
 }

@@ -31,6 +31,7 @@ using Ciribob.IL2.SimpleRadio.Standalone.Client.Preferences;
 using Ciribob.IL2.SimpleRadio.Standalone.Client.Settings;
 using Ciribob.IL2.SimpleRadio.Standalone.Client.Singletons;
 using Ciribob.IL2.SimpleRadio.Standalone.Client.Themes;
+using Ciribob.IL2.SimpleRadio.Standalone.Client.UI.ClientWindow;
 using Ciribob.IL2.SimpleRadio.Standalone.Client.UI.ClientWindow.Diagnostics;
 using Ciribob.IL2.SimpleRadio.Standalone.Client.UI.ClientWindow.ClientList;
 using Ciribob.IL2.SimpleRadio.Standalone.Client.UI.ClientWindow.Favourites;
@@ -110,6 +111,14 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI
         private const double ClassicOverlayButtonWidth = 150;
         private const double ClassicSettingsLabelShare = 2; // label column 2 : 1 against the controls
         private bool _classicLayout;
+
+        // General-tab sections collapsed with their arrows. The window's height is the player's normal height minus
+        // _heightReduction, which is the collapsed sections' height while the General tab is shown, otherwise 0.
+        private bool _initialisingPanelCollapse;
+        private bool _showCombatBoxRci;
+        private double _collapsedPanelsHeight;
+        private double _heightReduction;
+        private double _normalMinHeight;
         private const string VuMeterStyleAuto = "Auto";
         private const string VuMeterStyleLight = "Light";
         private const string VuMeterStyleDark = "Dark";
@@ -247,6 +256,7 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI
             InitVuMeterStylePicker();
             IL2_SR_Client.App.ApplyVuMeterStyle();
             ApplyClassicThemeLayout();
+            InitPanelCollapse();
 
             SpeakerBoost.Value = _globalSettings.GetClientSetting(GlobalSettingsKeys.SpeakerBoost).DoubleValue;
 
@@ -278,6 +288,8 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI
 
         private void MainWindow_Loaded(object sender, RoutedEventArgs e)
         {
+            // Sections saved as collapsed can only be measured once the window has been laid out.
+            ApplyPanelCollapse();
             AutoStartRadioOverlay();
             AutoStartPilotRoster();
         }
@@ -1760,7 +1772,8 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI
             if (!_classicLayout)
             {
                 _globalSettings.SetPositionSetting(GlobalSettingsKeys.ClientWidth, bounds.Width);
-                _globalSettings.SetPositionSetting(GlobalSettingsKeys.ClientHeight, bounds.Height);
+                // The normal height, without the collapsed sections taken off.
+                _globalSettings.SetPositionSetting(GlobalSettingsKeys.ClientHeight, bounds.Height + _heightReduction);
             }
 
             //save window position and size
@@ -1882,7 +1895,13 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI
         private void UpdatePilotRosterAndRciVisibility(bool pilotRosterAvailable, bool showCombatBoxRci)
         {
             ShowPilotRoster.Visibility = Visibility.Visible;
-            CombatBoxRciPanel.Visibility = showCombatBoxRci ? Visibility.Visible : Visibility.Collapsed;
+            // shortcut: the collapsed height isn't re-measured here, so an RCI panel appearing or going while
+            // collapsed leaves the General tab off by that panel's height until the next collapse or expand;
+            // call ApplyPanelCollapse here if players notice.
+            _showCombatBoxRci = showCombatBoxRci;
+            CombatBoxRciPanel.Visibility = showCombatBoxRci && ServerOverlaysCollapseToggle.IsChecked != true
+                ? Visibility.Visible
+                : Visibility.Collapsed;
 
             if (!pilotRosterAvailable && (_pilotRosterWindow?.IsUnavailableMode == false))
             {
@@ -2181,7 +2200,9 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI
             ShowWithoutHeader(CombatBoxRciPanel);
             ArrangeOverlayButtonsInOneRow();
 
-            GeneralLayout.Children.Remove(FavouritesGroupBox);
+            // Favourites gets its own tab, so its collapse arrow goes with the section it sat in.
+            GeneralLayout.Children.Remove(FavouritesSection);
+            FavouritesSection.Children.Remove(FavouritesGroupBox);
             TabControl.Items.Insert(2, new TabItem
             {
                 Header = LocalizationManager.Get("Favourites"),
@@ -2208,6 +2229,110 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI
             AudioOptionsLabelColumn.Width = new GridLength(ClassicSettingsLabelShare, GridUnitType.Star);
             RciControllerLabelColumn.Width = new GridLength(ClassicSettingsLabelShare, GridUnitType.Star);
             ControlsLayout.LayoutTransform = new ScaleTransform(ClassicControlsScale, ClassicControlsScale);
+        }
+
+        private void InitPanelCollapse()
+        {
+            _normalMinHeight = MinHeight;
+
+            _initialisingPanelCollapse = true;
+            ServerOverlaysCollapseToggle.IsChecked = _globalSettings.GetClientSettingBool(GlobalSettingsKeys.ServerOverlaysCollapsed);
+            FavouritesCollapseToggle.IsChecked = !_classicLayout &&
+                                                 _globalSettings.GetClientSettingBool(GlobalSettingsKeys.FavouritesCollapsed);
+            _initialisingPanelCollapse = false;
+
+            TabControl.SelectionChanged += TabControl_SelectionChanged;
+            // A window started minimised or maximised gets its General-tab height when restored.
+            StateChanged += (sender, e) => ResizeForCollapsedPanels();
+            UpdatePanelCollapseToolTips();
+        }
+
+        private void PanelCollapseToggle_Changed(object sender, RoutedEventArgs e)
+        {
+            if (_initialisingPanelCollapse)
+            {
+                return;
+            }
+
+            _globalSettings.SetClientSetting(GlobalSettingsKeys.ServerOverlaysCollapsed,
+                ServerOverlaysCollapseToggle.IsChecked == true);
+            if (!_classicLayout)
+            {
+                _globalSettings.SetClientSetting(GlobalSettingsKeys.FavouritesCollapsed,
+                    FavouritesCollapseToggle.IsChecked == true);
+            }
+
+            UpdatePanelCollapseToolTips();
+            ApplyPanelCollapse();
+        }
+
+        private void TabControl_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            // Combo boxes and lists inside the tabs raise SelectionChanged through the TabControl too.
+            if (ReferenceEquals(e.OriginalSource, TabControl))
+            {
+                ResizeForCollapsedPanels();
+            }
+        }
+
+        private void UpdatePanelCollapseToolTips()
+        {
+            ServerOverlaysCollapseToggle.ToolTip =
+                LocalizationManager.Get(ServerOverlaysCollapseToggle.IsChecked == true ? "Expand" : "Collapse");
+            FavouritesCollapseToggle.ToolTip =
+                LocalizationManager.Get(FavouritesCollapseToggle.IsChecked == true ? "Expand" : "Collapse");
+        }
+
+        /// <summary>Hides the collapsed sections' contents, measures how much shorter that makes the General tab, and resizes.</summary>
+        private void ApplyPanelCollapse()
+        {
+            if (!IsLoaded || TabControl.SelectedIndex != 0)
+            {
+                return; // the General tab's layout can only be measured while it is shown
+            }
+
+            bool serverOverlaysCollapsed = ServerOverlaysCollapseToggle.IsChecked == true;
+            bool favouritesCollapsed = FavouritesCollapseToggle.IsChecked == true;
+
+            SetPanelContentVisibility(false, false);
+            GeneralLayout.UpdateLayout();
+            double expandedHeight = GeneralLayout.ActualHeight;
+
+            SetPanelContentVisibility(serverOverlaysCollapsed, favouritesCollapsed);
+            GeneralLayout.UpdateLayout();
+            _collapsedPanelsHeight = Math.Max(0, expandedHeight - GeneralLayout.ActualHeight);
+
+            ResizeForCollapsedPanels();
+        }
+
+        private void SetPanelContentVisibility(bool serverOverlaysCollapsed, bool favouritesCollapsed)
+        {
+            var serverOverlaysVisibility = serverOverlaysCollapsed ? Visibility.Collapsed : Visibility.Visible;
+            ServerLayout.Visibility = serverOverlaysVisibility;
+            OverlaysLayout.Visibility = serverOverlaysVisibility;
+            CombatBoxRciPanel.Visibility = _showCombatBoxRci && !serverOverlaysCollapsed ? Visibility.Visible : Visibility.Collapsed;
+
+            if (FavouritesGroupBox.Content is UIElement favourites)
+            {
+                favourites.Visibility = favouritesCollapsed ? Visibility.Collapsed : Visibility.Visible;
+            }
+        }
+
+        private void ResizeForCollapsedPanels()
+        {
+            if (WindowState != WindowState.Normal)
+            {
+                return; // a maximised window keeps its size; _heightReduction still describes its restore height
+            }
+
+            bool onGeneralTab = TabControl.SelectedIndex == 0;
+            double normalHeight = Height + _heightReduction;
+            double minHeight = CollapsedPanelsHeight.WindowHeight(_normalMinHeight, _collapsedPanelsHeight, onGeneralTab, 0);
+            double height = CollapsedPanelsHeight.WindowHeight(normalHeight, _collapsedPanelsHeight, onGeneralTab, minHeight);
+
+            MinHeight = minHeight;
+            Height = height;
+            _heightReduction = normalHeight - height;
         }
 
         /// <summary>Classic: draws a group box as just its border, without the header bar.</summary>

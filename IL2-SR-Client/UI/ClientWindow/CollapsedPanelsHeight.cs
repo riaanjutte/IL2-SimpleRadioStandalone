@@ -9,10 +9,5 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI.ClientWindow
         {
             return onGeneralTab ? Math.Max(minHeight, normalHeight - collapsedHeight) : normalHeight;
         }
-
-        public static double NormalHeight(double windowHeight, double collapsedHeight, bool onGeneralTab)
-        {
-            return onGeneralTab ? windowHeight + collapsedHeight : windowHeight;
-        }
     }
 }

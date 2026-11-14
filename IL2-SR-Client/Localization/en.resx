@@ -810,6 +810,12 @@
   <data name="No RCI active" xml:space="preserve">
     <value>RCI not active</value>
   </data>
+  <data name="Collapse" xml:space="preserve">
+    <value>Collapse</value>
+  </data>
+  <data name="Expand" xml:space="preserve">
+    <value>Expand</value>
+  </data>
   <data name="Friendly RCI active" xml:space="preserve">
     <value>RCI - Friendly only</value>
   </data>
