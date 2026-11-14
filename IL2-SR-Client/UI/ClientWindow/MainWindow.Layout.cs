@@ -101,6 +101,13 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI
             foreach (var key in PanelKeys.All)
             {
                 var panel = PanelFor(key);
+                // Pinned: off every parent the panel would lose the window's DataContext for a moment, and its two-way
+                // bound pickers (devices, server address) could write the cleared selection back.
+                if (DataContext != null)
+                {
+                    panel.DataContext = DataContext;
+                }
+
                 if (panel.Parent is Panel parent)
                 {
                     parent.Children.Remove(panel);

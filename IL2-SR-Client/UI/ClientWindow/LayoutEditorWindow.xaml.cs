@@ -164,7 +164,11 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI.ClientWindow
             }
 
             var item = (ListBoxItem) TabList.Items[tab];
-            string oldName = (string) item.Content;
+            if (!(item.Content is string oldName))
+            {
+                return; // already being renamed
+            }
+
             var box = new TextBox { Text = oldName };
             AutomationProperties.SetName(box, LocalizationManager.Get("Tab name"));
             // Preview, and handled: otherwise Escape also reaches the Cancel button and closes the window.
@@ -180,6 +184,7 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI.ClientWindow
             box.LostKeyboardFocus += (sender, e) => EndRename(box, tab, oldName, true);
             item.Content = box;
             _renameBox = box;
+            TabList.ScrollIntoView(item);
             Dispatcher.BeginInvoke(new Action(() =>
             {
                 box.Focus();
