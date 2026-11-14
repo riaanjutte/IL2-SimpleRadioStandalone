@@ -89,6 +89,16 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Common.Tests.UI
         }
 
         [TestMethod]
+        public void APanelFillingItsTabGivesBackEverythingBelowItsHeader()
+        {
+            // Expanded, Controls or Help fills the viewport exactly; collapsed it is just its header bar.
+            Assert.AreEqual(440, CollapsedPanelsHeight.FreedHeight(500, 500, 60));
+            var size = CollapsedPanelsHeight.Resize(650, 0, 440, true, 560);
+            Assert.AreEqual(210, size.Height);
+            Assert.AreEqual(650, CollapsedPanelsHeight.Resize(size.Height, 650 - size.Height, 0, true, 560).Height);
+        }
+
+        [TestMethod]
         public void FreedHeightIsZeroWhenNothingIsCollapsed()
         {
             Assert.AreEqual(0, CollapsedPanelsHeight.FreedHeight(500, 400, 400));

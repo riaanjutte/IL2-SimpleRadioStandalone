@@ -96,7 +96,8 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI
                     content = new ScrollViewer
                     {
                         HorizontalScrollBarVisibility = ScrollBarVisibility.Disabled,
-                        VerticalScrollBarVisibility = ScrollBarVisibility.Auto,
+                        // Settings always showed its scroll bar; keep it so the tab looks as it did.
+                        VerticalScrollBarVisibility = tab.BuiltIn == "settings" ? ScrollBarVisibility.Visible : ScrollBarVisibility.Auto,
                         Content = rows
                     };
                 }
@@ -241,8 +242,20 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI
 
             var rows = _layout.Tabs[index].Rows;
             _collapsedPanelsHeight = 0;
-            // A tab that Controls or Help fills (no scroll viewer) has no empty space to give back.
-            if (tabItem.Content is ScrollViewer scroll && rows.Any(IsRowCollapsed))
+            if (!rows.Any(IsRowCollapsed))
+            {
+                // Nothing collapsed: the window keeps its normal height.
+            }
+            else if (tabItem.Content is Grid rowGrid)
+            {
+                // Controls or Help filling its tab: expanded it fills the whole viewport by definition, and collapsed
+                // it is top-aligned, so its height doesn't depend on the window's and the result can't swing.
+                SetRowsCollapsed(rows, true);
+                rowGrid.UpdateLayout();
+                double viewport = rowGrid.ActualHeight + _heightReduction;
+                _collapsedPanelsHeight = CollapsedPanelsHeight.FreedHeight(viewport, viewport, rowGrid.DesiredSize.Height);
+            }
+            else if (tabItem.Content is ScrollViewer scroll)
             {
                 var content = (FrameworkElement) scroll.Content;
                 SetRowsCollapsed(rows, false);
