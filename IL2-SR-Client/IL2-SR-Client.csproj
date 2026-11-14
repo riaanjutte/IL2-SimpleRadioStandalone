@@ -303,6 +303,7 @@
     <Compile Include="Settings\RadioChannels\IPresetChannelsStore.cs" />
     <Compile Include="UI\ClientWindow\AudioDeviceListItem.cs" />
     <Compile Include="UI\ClientWindow\CollapsedPanelsHeight.cs" />
+    <Compile Include="UI\ClientWindow\CustomLayout.cs" />
     <Compile Include="UI\ClientWindow\LedVuMeter.cs" />
     <Compile Include="UI\ClientWindow\LedVuMeterScale.cs" />
     <Compile Include="UI\Images.cs" />

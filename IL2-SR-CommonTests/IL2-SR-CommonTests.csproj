@@ -115,6 +115,7 @@
     <Compile Include="UI\ClientAdminPresentationTests.cs" />
     <Compile Include="UI\RadioOverlaySpeakerNameScrollTests.cs" />
     <Compile Include="UI\CollapsedPanelsHeightTests.cs" />
+    <Compile Include="UI\CustomLayoutTests.cs" />
     <Compile Include="UI\LedVuMeterRenderTests.cs" />
     <Compile Include="UI\LedVuMeterScaleTests.cs" />
     <Compile Include="UI\PilotRosterAccessPolicyTests.cs" />
