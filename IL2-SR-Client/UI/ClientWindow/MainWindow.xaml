@@ -41,12 +41,13 @@
                 <Setter Property="Margin" Value="0,11,18,0" />
                 <Setter Property="HorizontalAlignment" Value="Right" />
                 <Setter Property="VerticalAlignment" Value="Top" />
+                <Setter Property="Background" Value="{DynamicResource MilPanelFaceBrush}" />
                 <Setter Property="Cursor" Value="Hand" />
                 <Setter Property="Focusable" Value="False" />
                 <Setter Property="Template">
                     <Setter.Value>
                         <ControlTemplate TargetType="{x:Type ToggleButton}">
-                            <Border Background="{DynamicResource MilPanelFaceBrush}">
+                            <Border Background="{TemplateBinding Background}">
                                 <Path x:Name="Arrow"
                                       Width="8"
                                       Height="5"

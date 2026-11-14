@@ -2181,6 +2181,8 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI
             Mic_VU.Height = ClassicVuMeterHeight;
             Speaker_VU.Height = ClassicVuMeterHeight;
             ThreeDEffectsToggle.IsEnabled = false;
+            // Classic's header bar is coloured, unlike the panel face the arrow normally sits on.
+            ServerOverlaysCollapseToggle.Background = Brushes.Transparent;
             WeatheringEffectToggle.IsEnabled = false;
             WeatheringOpacitySlider.IsEnabled = false;
             VuMeterStylePicker.IsEnabled = false;
@@ -2296,11 +2298,11 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI
 
             SetPanelContentVisibility(false, false);
             GeneralLayout.UpdateLayout();
-            double expandedHeight = GeneralLayout.ActualHeight;
+            double expandedHeight = GeneralLayout.DesiredSize.Height; // ActualHeight is stretched to the scroll viewport when the content is shorter
 
             SetPanelContentVisibility(serverOverlaysCollapsed, favouritesCollapsed);
             GeneralLayout.UpdateLayout();
-            _collapsedPanelsHeight = Math.Max(0, expandedHeight - GeneralLayout.ActualHeight);
+            _collapsedPanelsHeight = Math.Max(0, expandedHeight - GeneralLayout.DesiredSize.Height);
 
             ResizeForCollapsedPanels();
         }
