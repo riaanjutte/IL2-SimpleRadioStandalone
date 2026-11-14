@@ -810,6 +810,12 @@
   <data name="No RCI active" xml:space="preserve">
     <value>RCI non attivo</value>
   </data>
+  <data name="IL-2 IS FULLSCREEN" xml:space="preserve">
+    <value>IL-2 A SCHERMO INTERO</value>
+  </data>
+  <data name="IL-2 is set to fullscreen, so this overlay can't show over the game. Turn off Fullscreen in IL-2's graphics settings and restart IL-2." xml:space="preserve">
+    <value>IL-2 è impostato a schermo intero, quindi questo overlay non può comparire sopra il gioco. Disattiva lo schermo intero nelle impostazioni grafiche di IL-2 e riavvia IL-2.</value>
+  </data>
   <data name="Friendly RCI active" xml:space="preserve">
     <value>RCI - Solo alleato</value>
   </data>

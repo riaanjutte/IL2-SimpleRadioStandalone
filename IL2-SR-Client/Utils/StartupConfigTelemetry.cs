@@ -17,6 +17,10 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.Utils
             @"^[ \t]*\[KEY[ \t]*=[ \t]*telemetrydevice[ \t]*\][ \t]*(?:\r\n|\n|\r)(?<body>.*?)(?<end>^[ \t]*\[END\][ \t]*(?:\r\n|\n|\r|$))",
             RegexOptions.IgnoreCase | RegexOptions.Multiline | RegexOptions.Singleline | RegexOptions.Compiled);
 
+        private static readonly Regex GraphicsSectionRegex = new Regex(
+            @"^[ \t]*\[KEY[ \t]*=[ \t]*graphics[ \t]*\][ \t]*(?:\r\n|\n|\r)(?<body>.*?)^[ \t]*\[END\]",
+            RegexOptions.IgnoreCase | RegexOptions.Multiline | RegexOptions.Singleline | RegexOptions.Compiled);
+
         private static readonly Regex SettingRegex = new Regex(
             @"^(?<indent>[ \t]*)(?<key>[A-Za-z_][A-Za-z0-9_]*)(?<spacing>[ \t]*=[ \t]*)(?<value>.*?)(?<tail>[ \t]*(?:[#;].*)?)$",
             RegexOptions.Compiled);
@@ -136,6 +140,45 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.Utils
             return string.IsNullOrWhiteSpace(cfgPath)
                    || !File.Exists(cfgPath)
                    || !IsHealthyConfig(ReadConfigFile(cfgPath).Text);
+        }
+
+        // IL-2's "fullscreen = 1" is exclusive fullscreen, which Windows overlays cannot draw over.
+        internal static bool IsFullscreen(string cfgPath)
+        {
+            try
+            {
+                return !string.IsNullOrWhiteSpace(cfgPath)
+                       && File.Exists(cfgPath)
+                       && IsFullscreenInText(ReadConfigFile(cfgPath).Text);
+            }
+            catch (IOException)
+            {
+                return false;
+            }
+            catch (UnauthorizedAccessException)
+            {
+                return false;
+            }
+        }
+
+        internal static bool IsFullscreenInText(string config)
+        {
+            Match section = GraphicsSectionRegex.Match(config ?? string.Empty);
+            if (!section.Success)
+            {
+                return false;
+            }
+
+            foreach (string line in section.Groups["body"].Value.Split(new[] { "\r\n", "\n", "\r" }, StringSplitOptions.None))
+            {
+                Match setting = SettingRegex.Match(line);
+                if (setting.Success && setting.Groups["key"].Value.Equals("fullscreen", StringComparison.OrdinalIgnoreCase))
+                {
+                    return setting.Groups["value"].Value.Trim() == "1";
+                }
+            }
+
+            return false;
         }
 
         internal static bool TryGetRecoveryBackupPath(string cfgPath, out string backupPath)
