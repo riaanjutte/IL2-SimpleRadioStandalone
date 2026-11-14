@@ -24,6 +24,51 @@
             <ResourceDictionary.MergedDictionaries>
                 <themes:ThemeControlsDictionary />
             </ResourceDictionary.MergedDictionaries>
+            <!-- The house list look (see ClientListWindow). The selection doesn't depend on focus, so it stays readable
+                 while a button has the focus; the item with keyboard focus gets an outline. -->
+            <Style x:Key="EditorList" TargetType="ListBox">
+                <Setter Property="Background" Value="{DynamicResource MilWellBrush}" />
+                <Setter Property="Foreground" Value="{DynamicResource MilTextPrimaryBrush}" />
+                <Setter Property="BorderBrush" Value="{DynamicResource MilBorderBrush}" />
+                <Setter Property="BorderThickness" Value="1" />
+                <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+                <Setter Property="ScrollViewer.HorizontalScrollBarVisibility" Value="Disabled" />
+                <Setter Property="ItemContainerStyle">
+                    <Setter.Value>
+                        <Style TargetType="ListBoxItem">
+                            <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+                            <Setter Property="Padding" Value="4,2" />
+                            <Setter Property="Background" Value="Transparent" />
+                            <Setter Property="Foreground" Value="{DynamicResource MilTextPrimaryBrush}" />
+                            <Setter Property="FocusVisualStyle" Value="{x:Null}" />
+                            <Setter Property="Template">
+                                <Setter.Value>
+                                    <ControlTemplate TargetType="ListBoxItem">
+                                        <Border x:Name="Bd"
+                                                Background="{TemplateBinding Background}"
+                                                BorderBrush="Transparent"
+                                                BorderThickness="1"
+                                                Padding="{TemplateBinding Padding}">
+                                            <ContentPresenter />
+                                        </Border>
+                                        <ControlTemplate.Triggers>
+                                            <Trigger Property="IsMouseOver" Value="True">
+                                                <Setter TargetName="Bd" Property="Background" Value="{DynamicResource MilRowAltBrush}" />
+                                            </Trigger>
+                                            <Trigger Property="IsSelected" Value="True">
+                                                <Setter TargetName="Bd" Property="Background" Value="{DynamicResource MilActionBrush}" />
+                                            </Trigger>
+                                            <Trigger Property="IsKeyboardFocusWithin" Value="True">
+                                                <Setter TargetName="Bd" Property="BorderBrush" Value="{DynamicResource MilTextPrimaryBrush}" />
+                                            </Trigger>
+                                        </ControlTemplate.Triggers>
+                                    </ControlTemplate>
+                                </Setter.Value>
+                            </Setter>
+                        </Style>
+                    </Setter.Value>
+                </Setter>
+            </Style>
             <Style x:Key="EditorButton" TargetType="Button" BasedOn="{StaticResource {x:Type Button}}">
                 <Setter Property="Margin" Value="0,6,6,0" />
                 <Setter Property="Padding" Value="8,2" />
@@ -67,7 +112,7 @@
                         <Button x:Name="TabUpButton" Content="Move up" Style="{StaticResource EditorButton}" Click="TabUp_Click" />
                         <Button x:Name="TabDownButton" Content="Move down" Style="{StaticResource EditorButton}" Click="TabDown_Click" />
                     </WrapPanel>
-                    <ListBox x:Name="TabList" SelectionChanged="TabList_SelectionChanged" />
+                    <ListBox x:Name="TabList" Style="{StaticResource EditorList}" SelectionChanged="TabList_SelectionChanged" />
                 </DockPanel>
             </GroupBox>
 
@@ -91,14 +136,14 @@
                                 <ComboBox x:Name="TargetTab" Margin="0,6,0,0" SelectionChanged="UpdateButtons" />
                             </DockPanel>
                         </StackPanel>
-                        <ListBox x:Name="RowList" SelectionChanged="UpdateButtons" />
+                        <ListBox x:Name="RowList" Style="{StaticResource EditorList}" SelectionChanged="UpdateButtons" />
                     </DockPanel>
                 </GroupBox>
 
                 <GroupBox Grid.Row="1" Header="Hidden panels" Margin="0,6,0,0">
                     <DockPanel>
                         <Button x:Name="ShowPanelButton" DockPanel.Dock="Bottom" HorizontalAlignment="Left" Content="Add to this tab" Style="{StaticResource EditorButton}" Click="ShowPanel_Click" />
-                        <ListBox x:Name="HiddenList" SelectionChanged="UpdateButtons" />
+                        <ListBox x:Name="HiddenList" Style="{StaticResource EditorList}" SelectionChanged="UpdateButtons" />
                     </DockPanel>
                 </GroupBox>
             </Grid>
