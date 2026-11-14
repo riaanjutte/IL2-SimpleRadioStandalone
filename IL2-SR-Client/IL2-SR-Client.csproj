@@ -251,6 +251,9 @@
     <Compile Include="Themes\ThemeControlsDictionary.cs" />
     <Compile Include="Settings\RciAccessCode.cs" />
     <Compile Include="Settings\RciControllerMode.cs" />
+    <Compile Include="UI\ClientWindow\MainWindow.Layout.cs">
+      <DependentUpon>MainWindow.xaml</DependentUpon>
+    </Compile>
     <Compile Include="UI\ClientWindow\MainWindow.RciController.cs">
       <DependentUpon>MainWindow.xaml</DependentUpon>
     </Compile>

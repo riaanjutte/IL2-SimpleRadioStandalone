@@ -113,8 +113,9 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI
         private const double ClassicSettingsLabelShare = 2; // label column 2 : 1 against the controls
         private bool _classicLayout;
 
-        // General-tab sections collapsed with their arrows. The window's height is the player's normal height minus
-        // _heightReduction, which is the collapsed sections' height while the General tab is shown, otherwise 0.
+        // Sections collapsed with their arrows. The window's height is the player's normal height minus _heightReduction:
+        // in Classic the collapsed sections' height while the General tab is shown, otherwise the empty space the
+        // shown tab's collapsed rows leave (see ApplyLayoutCollapse).
         private bool _initialisingPanelCollapse;
         private bool _showCombatBoxRci;
         private double _collapsedPanelsHeight;
@@ -258,6 +259,7 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI
             InitVuMeterStylePicker();
             IL2_SR_Client.App.ApplyVuMeterStyle();
             ApplyClassicThemeLayout();
+            InitCustomLayout();
             ApplyVuMeterKind();
             InitPanelCollapse();
 
@@ -1920,12 +1922,14 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI
             ShowPilotRoster.Visibility = Visibility.Visible;
             bool rciChanged = _showCombatBoxRci != showCombatBoxRci;
             _showCombatBoxRci = showCombatBoxRci;
-            CombatBoxRciPanel.Visibility = showCombatBoxRci && ServerOverlaysCollapseToggle.IsChecked != true
+            bool overlaysCollapsed = IsPanelCollapsed(PanelKeys.Overlays);
+            CombatBoxRciPanel.Visibility = showCombatBoxRci && !overlaysCollapsed
                 ? Visibility.Visible
                 : Visibility.Collapsed;
-            if (rciChanged && ServerOverlaysCollapseToggle.IsChecked == true)
+            // Classic's collapsed height includes the RCI panel; outside Classic the freed height depends on it too.
+            if (rciChanged && (overlaysCollapsed || _layout != null))
             {
-                ApplyPanelCollapse(); // the collapsed height includes the RCI panel
+                ApplyPanelCollapse();
             }
 
             if (!pilotRosterAvailable && (_pilotRosterWindow?.IsUnavailableMode == false))
@@ -2298,10 +2302,16 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI
             // Combo boxes and lists inside the tabs raise SelectionChanged through the TabControl too.
             if (ReferenceEquals(e.OriginalSource, TabControl))
             {
-                ResizeForCollapsedPanels();
-                if (TabControl.SelectedIndex == 0)
+                if (_layout != null)
                 {
-                    // Measure again once General is laid out: the RCI panel may have come or gone on another tab.
+                    // The shown tab's height as last measured, until it is measured again below.
+                    _collapsedPanelsHeight = (TabControl.SelectedItem as TabItem)?.Tag as double? ?? 0;
+                }
+
+                ResizeForCollapsedPanels();
+                if (_layout != null || TabControl.SelectedIndex == 0)
+                {
+                    // Measure again once the tab is laid out: the RCI panel may have come or gone on another tab.
                     Dispatcher.BeginInvoke(new Action(ApplyPanelCollapse), DispatcherPriority.Loaded);
                 }
             }
@@ -2311,16 +2321,25 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI
         {
             foreach (var toggle in new[] { ServerOverlaysCollapseToggle, FavouritesCollapseToggle })
             {
-                string text = LocalizationManager.Get(toggle.IsChecked == true ? "Expand" : "Collapse");
-                toggle.ToolTip = text;
-                AutomationProperties.SetName(toggle, text); // the arrow has no text for screen readers otherwise
+                SetCollapseToolTip(toggle);
             }
         }
 
-        /// <summary>Hides the collapsed sections' contents, measures how much shorter that makes the General tab, and resizes.</summary>
+        /// <summary>Hides the collapsed sections' contents, measures how much shorter that makes the shown tab, and resizes.</summary>
         private void ApplyPanelCollapse()
         {
-            if (!IsLoaded || TabControl.SelectedIndex != 0)
+            if (!IsLoaded)
+            {
+                return;
+            }
+
+            if (_layout != null)
+            {
+                ApplyLayoutCollapse();
+                return;
+            }
+
+            if (TabControl.SelectedIndex != 0)
             {
                 return; // the General tab's layout can only be measured while it is shown
             }
@@ -2359,8 +2378,9 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI
                 return; // a maximised or snapped window keeps its size; _heightReduction still describes its restore height
             }
 
+            // Outside Classic _collapsedPanelsHeight is always the shown tab's.
             var size = CollapsedPanelsHeight.Resize(Height, _heightReduction, _collapsedPanelsHeight,
-                TabControl.SelectedIndex == 0, _normalMinHeight);
+                _layout != null || TabControl.SelectedIndex == 0, _normalMinHeight);
 
             // MinHeight first: raising it above Height resizes the window on the spot.
             MinHeight = size.MinHeight;

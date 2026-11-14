@@ -149,6 +149,7 @@
             </DockPanel>
         </Border>
 
+        <Grid>
         <TabControl x:Name="TabControl">
         <TabItem Header="General">
             <ScrollViewer HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto">
@@ -159,7 +160,7 @@
                             <ColumnDefinition Width="*" />
                         </Grid.ColumnDefinitions>
 
-                        <GroupBox Grid.Column="0" Header="Microphone">
+                        <GroupBox x:Name="MicrophonePanel" Grid.Column="0" Header="Microphone">
                             <Grid x:Name="MicrophoneGrid">
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition Width="*" />
@@ -199,7 +200,7 @@
                             </Grid>
                         </GroupBox>
 
-                        <GroupBox Grid.Column="1" Header="Speakers &amp; Optional Mic Output">
+                        <GroupBox x:Name="SpeakersPanel" Grid.Column="1" Header="Speakers &amp; Optional Mic Output">
                             <Grid>
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition Width="*" />
@@ -252,7 +253,7 @@
                             <ColumnDefinition Width="*" />
                         </Grid.ColumnDefinitions>
 
-                        <GroupBox Grid.Column="0" Header="Server">
+                        <GroupBox x:Name="ServerPanel" Grid.Column="0" Header="Server">
                             <StackPanel x:Name="ServerLayout" HorizontalAlignment="Center">
                                 <ComboBox x:Name="ServerAddressPicker"
                                           Width="220"
@@ -788,7 +789,7 @@
         <TabItem Header="Settings">
             <ScrollViewer HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Visible">
                 <StackPanel Margin="10,0,10,0">
-                    <GroupBox Header="Global Settings">
+                    <GroupBox x:Name="GlobalSettingsPanel" Header="Global Settings">
 
                         <Grid>
                             <Grid.ColumnDefinitions>
@@ -1138,7 +1139,7 @@
                                        TextWrapping="Wrap" />
                         </Grid>
                     </GroupBox>
-                    <GroupBox Header="Audio Options">
+                    <GroupBox x:Name="AudioOptionsPanel" Header="Audio Options">
                         <Grid HorizontalAlignment="Center">
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition x:Name="AudioOptionsLabelColumn" Width="390" />
@@ -1205,7 +1206,7 @@
 
                         </Grid>
                     </GroupBox>
-                    <GroupBox Header="Profile">
+                    <GroupBox x:Name="ProfilePanel" Header="Profile">
                         <StackPanel Orientation="Vertical" HorizontalAlignment="Center" Margin="10">
                             <ComboBox x:Name="ControlsProfile"
                                    Width="200"
@@ -1219,7 +1220,7 @@
                             </StackPanel>
                         </StackPanel>
                     </GroupBox>
-                    <GroupBox Header="Profile Settings">
+                    <GroupBox x:Name="ProfileSettingsPanel" Header="Profile Settings">
                         <Grid>
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="2*" />
@@ -1521,7 +1522,7 @@
         </TabItem>
 
         <TabItem Header="Help">
-            <GroupBox Header="Help &amp; About">
+            <GroupBox x:Name="HelpPanel" Header="Help &amp; About">
                 <DockPanel x:Name="HelpLayout" SizeChanged="HelpLayout_SizeChanged">
                     <StackPanel DockPanel.Dock="Bottom"
                                 Margin="0,10,0,4"
@@ -1634,5 +1635,19 @@
         </TabItem>
 
     </TabControl>
+        <Button x:Name="CustomiseLayoutButton"
+                Width="30"
+                Height="28"
+                Margin="0,4,6,0"
+                Padding="0"
+                HorizontalAlignment="Right"
+                VerticalAlignment="Top"
+                Content="&#x2699;"
+                FontFamily="Segoe UI Symbol"
+                FontSize="16"
+                ToolTip="Customise layout" />
+        <!-- Panels left off every tab: kept in the window so their bindings, hotkeys and features keep working. -->
+        <Grid x:Name="HiddenPanelsHost" Visibility="Collapsed" />
+        </Grid>
     </DockPanel>
 </controls:MetroWindow>

@@ -281,5 +281,33 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Common.Tests.UI
 
             Assert.AreEqual(4, layout.Tabs.Count);
         }
+
+        [TestMethod]
+        public void HeaderTranslatesOnlyUnrenamedBuiltInTabs()
+        {
+            var layout = CustomLayout.Default();
+            layout.RenameTab(2, "General");
+            layout.AddTab("Help");
+
+            var headers = layout.Tabs.Select(t => CustomLayout.Header(t, s => "<" + s + ">")).ToArray();
+
+            CollectionAssert.AreEqual(new[] { "<General>", "<Controls>", "General", "<Help>", "Help" }, headers);
+        }
+
+        [TestMethod]
+        public void OnlyATabHoldingJustControlsOrHelpFillsTheTab()
+        {
+            CollectionAssert.AreEqual(new[] { false, true, false, true },
+                CustomLayout.Default().Tabs.Select(CustomLayout.FillsTab).ToArray());
+
+            var layout = CustomLayout.Default();
+            layout.MoveRowToTab(3, 0, 1);
+            layout.Pair(1, 0); // [controls,help]: still fills; Help's tab is now empty and does not
+            layout.MoveRowToTab(0, 2, 1); // favourites joins: two rows, so the tab scrolls
+
+            CollectionAssert.AreEqual(new[] { false, false, false, false }, layout.Tabs.Select(CustomLayout.FillsTab).ToArray());
+            layout.HideRow(1, 1);
+            Assert.IsTrue(CustomLayout.FillsTab(layout.Tabs[1]));
+        }
     }
 }

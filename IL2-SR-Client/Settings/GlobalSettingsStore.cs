@@ -104,7 +104,10 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.Settings
 
         // General-tab sections collapsed with their arrows.
         ServerOverlaysCollapsed,
-        FavouritesCollapsed
+        FavouritesCollapsed,
+
+        // The main window's tabs, rows and collapsed rows outside Classic (see CustomLayout).
+        CustomLayout
     }
 
     public enum InputBinding
@@ -366,6 +369,7 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.Settings
             {GlobalSettingsKeys.AutoConnectMismatchPrompt.ToString(), "true"},
             {GlobalSettingsKeys.ServerOverlaysCollapsed.ToString(), "false"},
             {GlobalSettingsKeys.FavouritesCollapsed.ToString(), "false"},
+            {GlobalSettingsKeys.CustomLayout.ToString(), ""},
             {GlobalSettingsKeys.RadioOverlayTaskbarHide.ToString(), "false"},
             {GlobalSettingsKeys.AutoStartRadioOverlay.ToString(), "true"},
             {GlobalSettingsKeys.AutoStartPilotRoster.ToString(), "false"},

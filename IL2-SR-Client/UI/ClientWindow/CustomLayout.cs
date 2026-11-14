@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Text;
 using Newtonsoft.Json;
@@ -53,6 +54,18 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI.ClientWindow
         public static string RowKey(IList<string> row)
         {
             return string.Join("+", row);
+        }
+
+        // A renamed or custom tab shows the player's name as typed; only built-in names are translated.
+        public static string Header(LayoutTab tab, Func<string, string> translate)
+        {
+            return tab.Name ?? translate(CultureInfo.InvariantCulture.TextInfo.ToTitleCase(tab.BuiltIn));
+        }
+
+        // Controls and Help fill their tab and scroll inside, so a tab holding only them is not wrapped in a scroll viewer.
+        public static bool FillsTab(LayoutTab tab)
+        {
+            return tab.Rows.Count == 1 && tab.Rows[0].All(k => k == PanelKeys.Controls || k == PanelKeys.Help);
         }
 
         public static CustomLayout Default()

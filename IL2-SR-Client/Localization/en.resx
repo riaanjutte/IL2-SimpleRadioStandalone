@@ -819,6 +819,9 @@
   <data name="Expand" xml:space="preserve">
     <value>Expand</value>
   </data>
+  <data name="Customise layout" xml:space="preserve">
+    <value>Customise layout</value>
+  </data>
   <data name="IL-2 IS FULLSCREEN" xml:space="preserve">
     <value>IL-2 IS FULLSCREEN</value>
   </data>
