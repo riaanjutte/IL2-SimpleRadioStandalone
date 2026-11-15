@@ -11,6 +11,7 @@
 
 ### Changed
 
+- Client: the tabs at the top of the main window are more compact, with smaller lettering, and still fit their names in every language.
 - Web server: panels in the IL-2 SRS theme have worn paint, with scratches, grime and dirt along the edges, and the whole theme uses the panels' olive grey.
 - Web server: confirmations such as "Saved Channel Limit." appear as a toast at the top of the page for a few seconds, instead of a line above the page content.
 - Web server: on a phone, the menu is a dropdown at the top of the page.

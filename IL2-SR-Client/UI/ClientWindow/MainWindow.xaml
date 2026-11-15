@@ -1631,15 +1631,15 @@
 
     </TabControl>
         <Button x:Name="CustomiseLayoutButton"
-                Width="30"
-                Height="28"
+                Width="24"
+                Height="22"
                 Margin="0,4,6,0"
                 Padding="0"
                 HorizontalAlignment="Right"
                 VerticalAlignment="Top"
                 Content="&#x2699;"
                 FontFamily="Segoe UI Symbol"
-                FontSize="16"
+                FontSize="13"
                 ToolTip="Customise layout" />
         <!-- Panels left off every tab: kept in the window so their bindings, hotkeys and features keep working. -->
         <Grid x:Name="HiddenPanelsHost" Visibility="Collapsed" />
