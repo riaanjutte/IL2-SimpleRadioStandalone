@@ -38,6 +38,8 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Common.Tests.UI
         {
             Assert.IsTrue(UiTheme.IsClassic("Classic"));
             Assert.IsTrue(UiTheme.IsClassic(" classic "));
+            // A hand-edited global.cfg can quote it; the palette loader already ignores the quotes.
+            Assert.IsTrue(UiTheme.IsClassic("\"Classic\""));
             Assert.IsFalse(UiTheme.IsClassic("Bakelite"));
             Assert.IsFalse(UiTheme.IsClassic(null));
         }
