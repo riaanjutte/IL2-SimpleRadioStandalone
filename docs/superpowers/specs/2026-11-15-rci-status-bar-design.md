@@ -13,7 +13,7 @@ wants it in a second status bar at the bottom of the main window, visible on eve
 - The "Combat Box RCI" box under Overlays is removed, with the window re-measuring it caused and Classic's
   header-less styling of it. Classic gets the same bar in its own colours.
 - Unchanged: the radio overlay's RCI indicator, and the RCI Controller switch and access code in Settings.
-- The bar sits outside the tabs, so the window grows by its height (about 22 px) while it shows.
+- The bar sits outside the tabs, so the window grows by its height (about 25 px) while it shows: the fitted height is re-measured when the bar appears or goes.
 
 **Approaches considered:** only one fits. Keeping the box inside a panel can't make it visible on every tab; a
 separate floating window would be more to manage than the status line the player asked for.

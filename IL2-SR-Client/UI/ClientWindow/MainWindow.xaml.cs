@@ -1919,7 +1919,13 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI
         private void UpdatePilotRosterAndRciVisibility(bool pilotRosterAvailable, bool showCombatBoxRci)
         {
             ShowPilotRoster.Visibility = Visibility.Visible;
-            RciStatusPanel.Visibility = showCombatBoxRci ? Visibility.Visible : Visibility.Collapsed;
+            var rciVisibility = showCombatBoxRci ? Visibility.Visible : Visibility.Collapsed;
+            if (RciStatusPanel.Visibility != rciVisibility)
+            {
+                RciStatusPanel.Visibility = rciVisibility;
+                // The bar takes its height from the tabs: re-fit the window once the new viewport is laid out.
+                Dispatcher.BeginInvoke(new Action(ApplyPanelCollapse), DispatcherPriority.Loaded);
+            }
 
             if (!pilotRosterAvailable && (_pilotRosterWindow?.IsUnavailableMode == false))
             {
