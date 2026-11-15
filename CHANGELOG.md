@@ -12,7 +12,8 @@
 ### Changed
 
 - Client: the tabs at the top of the main window are more compact, with smaller lettering, and still fit their names in every language.
-- Client: the Combat Box RCI status moved from a box under Overlays to its own bar just above the status bar, so it shows on every tab. It appears only while connected to Combat Box (`srs.combatbox.net`).
+- Client: the main window can be made narrower, down to 400 pixels. The Settings labels share the width with their switches, and the Controls table scrolls sideways when it doesn't fit.
+- Client: the Combat Box RCI status moved from a box under Overlays to its own bar just above the status bar, so it shows on every tab. It appears only while connected to Combat Box (`srs.combatbox.net`). It uses the status bar's lamp and lettering.
 - Web server: panels in the IL-2 SRS theme have worn paint, with scratches, grime and dirt along the edges, and the whole theme uses the panels' olive grey.
 - Web server: confirmations such as "Saved Channel Limit." appear as a toast at the top of the page for a few seconds, instead of a line above the page content.
 - Web server: on a phone, the menu is a dropdown at the top of the page.

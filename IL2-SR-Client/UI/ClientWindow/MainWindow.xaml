@@ -11,7 +11,7 @@
                       xmlns:converters="clr-namespace:Ciribob.IL2.SimpleRadio.Standalone.Client.Utils.ValueConverters"
                       Title="IL2-SRS Client"
                       Width="700"
-                      MinWidth="640"
+                      MinWidth="400"
                       Height="650"
                       MinHeight="560"
                       Background="{DynamicResource MilWindowBackgroundBrush}"
@@ -156,27 +156,25 @@
                 Background="{DynamicResource MilWellBrush}"
                 BorderBrush="{DynamicResource MilBorderBrush}"
                 BorderThickness="0,1,0,0">
+            <!-- Same lamp and lettering as the status bar below; the lamp takes the RCI state's colour. -->
             <StackPanel Margin="10,3" Orientation="Horizontal">
-                <Grid Width="160" Height="18">
-                    <Border x:Name="RciStatusIndicator"
-                            Background="{DynamicResource MilRciInactiveBackgroundBrush}"
-                            BorderBrush="#666"
-                            BorderThickness="1" />
-                    <TextBlock x:Name="RciStatusLabel"
-                               HorizontalAlignment="Center"
-                               VerticalAlignment="Center"
-                               FontFamily="Courier New"
-                               FontSize="12"
-                               FontWeight="Bold"
-                               Foreground="{DynamicResource MilRciInactiveTextBrush}"
-                               Text="RCI" />
+                <Grid Width="13" Height="13" VerticalAlignment="Center">
+                    <Ellipse Fill="{DynamicResource MilLampBezelBrush}" />
+                    <Ellipse x:Name="RciStatusIndicator" Margin="2" Fill="{DynamicResource MilLedOffBrush}" />
+                    <Ellipse Margin="2" Fill="{DynamicResource MilLampGlassBrush}" />
                 </Grid>
-                <TextBlock x:Name="RciCallsignLabel"
-                           Margin="10,0,0,0"
+                <TextBlock x:Name="RciStatusLabel"
+                           Margin="3,0,0,0"
                            VerticalAlignment="Center"
-                           FontFamily="Courier New"
-                           FontSize="12"
-                           FontWeight="Bold"
+                           FontFamily="{StaticResource MilFontMono}"
+                           FontSize="13"
+                           Foreground="{DynamicResource MilTextSecondaryBrush}"
+                           Text="RCI" />
+                <TextBlock x:Name="RciCallsignLabel"
+                           Margin="12,0,0,0"
+                           VerticalAlignment="Center"
+                           FontFamily="{StaticResource MilFontMono}"
+                           FontSize="13"
                            Foreground="{DynamicResource MilTextPrimaryBrush}"
                            TextTrimming="CharacterEllipsis"
                            Visibility="Collapsed" />
@@ -505,7 +503,7 @@
         <TabItem Header="Controls">
             <GroupBox x:Name="ControlsGroupBox" Header="Controls">
 
-                <ScrollViewer HorizontalScrollBarVisibility="Hidden" VerticalScrollBarVisibility="Visible">
+                <ScrollViewer HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Visible">
                     <StackPanel x:Name="ControlsLayout" HorizontalAlignment="Center">
                         <Button Width="320"
                                 Padding="10,4"
@@ -779,7 +777,7 @@
 
                         <Grid>
                             <Grid.ColumnDefinitions>
-                                <ColumnDefinition x:Name="GlobalSettingsLabelColumn" Width="390" />
+                                <ColumnDefinition x:Name="GlobalSettingsLabelColumn" Width="2*" MaxWidth="390" />
                                 <ColumnDefinition />
 
                             </Grid.ColumnDefinitions>
@@ -1067,7 +1065,7 @@
                     <GroupBox x:Name="RciControllerGroup" Header="RCI Controller">
                         <Grid HorizontalAlignment="Center">
                             <Grid.ColumnDefinitions>
-                                <ColumnDefinition x:Name="RciControllerLabelColumn" Width="390" />
+                                <ColumnDefinition x:Name="RciControllerLabelColumn" Width="2*" MaxWidth="390" />
                                 <ColumnDefinition />
                             </Grid.ColumnDefinitions>
                             <Grid.RowDefinitions>
@@ -1128,7 +1126,7 @@
                     <GroupBox x:Name="AudioOptionsPanel" Header="Audio Options">
                         <Grid HorizontalAlignment="Center">
                             <Grid.ColumnDefinitions>
-                                <ColumnDefinition x:Name="AudioOptionsLabelColumn" Width="390" />
+                                <ColumnDefinition x:Name="AudioOptionsLabelColumn" Width="2*" MaxWidth="390" />
                                 <ColumnDefinition />
                             </Grid.ColumnDefinitions>
                             <Grid.RowDefinitions>

@@ -1969,14 +1969,15 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI
         private void ApplyRciDisplayState(RciDisplayState displayState)
         {
             RciStatusLabel.Text = displayState.StatusText;
-            // The coloured RCI states are the same in every theme; the inactive state follows the theme's status panels.
-            var inactive = displayState.Status == RciStatus.None;
-            RciStatusLabel.Foreground = inactive
-                ? GetConnectionStatusBrush("MilRciInactiveTextBrush", displayState.MainWindowStatusForeground)
-                : displayState.MainWindowStatusForeground;
-            RciStatusIndicator.Background = inactive
-                ? GetConnectionStatusBrush("MilRciInactiveBackgroundBrush", displayState.StatusBackground)
-                : displayState.StatusBackground;
+            // The coloured RCI states are the same in every theme; with no RCI the lamp is off, like the status bar's.
+            if (displayState.Status == RciStatus.None)
+            {
+                RciStatusIndicator.SetResourceReference(System.Windows.Shapes.Shape.FillProperty, "MilLedOffBrush");
+            }
+            else
+            {
+                RciStatusIndicator.Fill = displayState.StatusBackground;
+            }
             RciCallsignLabel.Text = displayState.RcoOnDutyText;
             RciCallsignLabel.Visibility = displayState.HasRcoOnDuty
                 ? Visibility.Visible
