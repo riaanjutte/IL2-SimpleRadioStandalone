@@ -128,7 +128,8 @@
                            FontFamily="{StaticResource MilFontMono}" FontSize="13"
                            Foreground="{DynamicResource MilTextSecondaryBrush}" />
                 </StackPanel>
-                <StackPanel x:Name="StatusBarRight" DockPanel.Dock="Right" HorizontalAlignment="Right" Orientation="Horizontal">
+                <!-- SizeChanged here too: the client count or profile name can widen this half without the dock resizing. -->
+                <StackPanel x:Name="StatusBarRight" DockPanel.Dock="Right" HorizontalAlignment="Right" Orientation="Horizontal" SizeChanged="StatusBarDock_SizeChanged">
                     <Label Content="Connected Clients:" Padding="2,0"
                            FontFamily="{StaticResource MilFontMono}" FontSize="13"
                            Foreground="{DynamicResource MilTextSecondaryBrush}" />
@@ -157,7 +158,8 @@
                 BorderBrush="{DynamicResource MilBorderBrush}"
                 BorderThickness="0,1,0,0">
             <!-- Same lamp and lettering as the status bar below; the lamp takes the RCI state's colour. -->
-            <StackPanel Margin="10,3" Orientation="Horizontal">
+            <!-- DockPanel so the callsign gets only the width left and its ellipsis can apply. -->
+            <DockPanel Margin="10,3" LastChildFill="True">
                 <Grid Width="13" Height="13" VerticalAlignment="Center">
                     <Ellipse Fill="{DynamicResource MilLampBezelBrush}" />
                     <Ellipse x:Name="RciStatusIndicator" Margin="2" Fill="{DynamicResource MilLedOffBrush}" />
@@ -178,7 +180,7 @@
                            Foreground="{DynamicResource MilTextPrimaryBrush}"
                            TextTrimming="CharacterEllipsis"
                            Visibility="Collapsed" />
-            </StackPanel>
+            </DockPanel>
         </Border>
 
         <Grid>
