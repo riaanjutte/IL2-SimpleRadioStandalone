@@ -89,8 +89,8 @@
                 Background="{DynamicResource MilWellBrush}"
                 BorderBrush="{DynamicResource MilBorderBrush}"
                 BorderThickness="0,1,0,0">
-            <DockPanel Margin="10,3" LastChildFill="False">
-                <StackPanel DockPanel.Dock="Left" Orientation="Horizontal">
+            <DockPanel x:Name="StatusBarDock" Margin="10,3" LastChildFill="False" SizeChanged="StatusBarDock_SizeChanged">
+                <StackPanel x:Name="StatusBarLeft" DockPanel.Dock="Left" Orientation="Horizontal">
                     <Grid Width="13" Height="13" VerticalAlignment="Center">
                         <Ellipse Fill="{DynamicResource MilLampBezelBrush}" />
                         <Ellipse Margin="2"
@@ -128,7 +128,7 @@
                            FontFamily="{StaticResource MilFontMono}" FontSize="13"
                            Foreground="{DynamicResource MilTextSecondaryBrush}" />
                 </StackPanel>
-                <StackPanel DockPanel.Dock="Right" Orientation="Horizontal">
+                <StackPanel x:Name="StatusBarRight" DockPanel.Dock="Right" HorizontalAlignment="Right" Orientation="Horizontal">
                     <Label Content="Connected Clients:" Padding="2,0"
                            FontFamily="{StaticResource MilFontMono}" FontSize="13"
                            Foreground="{DynamicResource MilTextSecondaryBrush}" />

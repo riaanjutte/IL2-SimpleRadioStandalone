@@ -1966,6 +1966,27 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI
                 Clients.GetFriendlyRciCallsign(ClientState.PlayerGameState.coalition)));
         }
 
+        /// <summary>A narrow window puts the status bar's right-hand part on a second line, right-aligned.</summary>
+        private void StatusBarDock_SizeChanged(object sender, SizeChangedEventArgs e)
+        {
+            // DesiredSize is capped at the width the panel was given, so measure each part without a limit.
+            var unlimited = new Size(double.PositiveInfinity, double.PositiveInfinity);
+            StatusBarLeft.Measure(unlimited);
+            StatusBarRight.Measure(unlimited);
+            bool fits = StatusBarLeft.DesiredSize.Width + StatusBarRight.DesiredSize.Width <= StatusBarDock.ActualWidth;
+            StatusBarDock.InvalidateMeasure();
+            var leftDock = fits ? Dock.Left : Dock.Top;
+            if (DockPanel.GetDock(StatusBarLeft) == leftDock)
+            {
+                return;
+            }
+
+            DockPanel.SetDock(StatusBarLeft, leftDock);
+            DockPanel.SetDock(StatusBarRight, fits ? Dock.Right : Dock.Top);
+            // The extra line comes out of the tabs: re-fit the window once it is laid out.
+            Dispatcher.BeginInvoke(new Action(ApplyPanelCollapse), DispatcherPriority.Loaded);
+        }
+
         private void ApplyRciDisplayState(RciDisplayState displayState)
         {
             RciStatusLabel.Text = displayState.StatusText;
