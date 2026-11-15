@@ -117,7 +117,6 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI
         // in Classic the collapsed sections' height while the General tab is shown, otherwise the empty space at the
         // bottom of the shown tab (see ApplyLayoutCollapse).
         private bool _initialisingPanelCollapse;
-        private bool _showCombatBoxRci;
         private double _collapsedPanelsHeight;
         private double _heightReduction;
         private double _normalMinHeight;
@@ -1920,17 +1919,7 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI
         private void UpdatePilotRosterAndRciVisibility(bool pilotRosterAvailable, bool showCombatBoxRci)
         {
             ShowPilotRoster.Visibility = Visibility.Visible;
-            bool rciChanged = _showCombatBoxRci != showCombatBoxRci;
-            _showCombatBoxRci = showCombatBoxRci;
-            bool overlaysCollapsed = IsPanelCollapsed(PanelKeys.Overlays);
-            CombatBoxRciPanel.Visibility = showCombatBoxRci && !overlaysCollapsed
-                ? Visibility.Visible
-                : Visibility.Collapsed;
-            // Classic's collapsed height includes the RCI panel; outside Classic the freed height depends on it too.
-            if (rciChanged && (overlaysCollapsed || _layout != null))
-            {
-                ApplyPanelCollapse();
-            }
+            RciStatusPanel.Visibility = showCombatBoxRci ? Visibility.Visible : Visibility.Collapsed;
 
             if (!pilotRosterAvailable && (_pilotRosterWindow?.IsUnavailableMode == false))
             {
@@ -1959,7 +1948,6 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI
 
         private void UpdateRciStatusIndicator(bool showRciStatus)
         {
-            RciStatusPanel.Visibility = showRciStatus ? Visibility.Visible : Visibility.Collapsed;
             if (!showRciStatus)
             {
                 ApplyRciDisplayState(RciDisplayState.Create(RciStatus.None, string.Empty));
@@ -2228,7 +2216,6 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI
             OverlaysColumn.Margin = new Thickness(5, 0, 5, 5);
             ArrangeMicrophonePanelInOneRow();
             ArrangeServerPanelInTwoColumns();
-            ShowWithoutHeader(CombatBoxRciPanel);
             ArrangeOverlayButtonsInOneRow();
 
             // Favourites gets its own tab, so its collapse arrow goes with the section it sat in.
@@ -2360,7 +2347,6 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI
             var serverOverlaysVisibility = serverOverlaysCollapsed ? Visibility.Collapsed : Visibility.Visible;
             ServerLayout.Visibility = serverOverlaysVisibility;
             OverlaysLayout.Visibility = serverOverlaysVisibility;
-            CombatBoxRciPanel.Visibility = _showCombatBoxRci && !serverOverlaysCollapsed ? Visibility.Visible : Visibility.Collapsed;
         }
 
         private void ResizeForCollapsedPanels()
@@ -2388,22 +2374,6 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI
             return WindowState == WindowState.Normal &&
                    !restoreBounds.IsEmpty &&
                    Math.Abs(restoreBounds.Height - Height) > 1;
-        }
-
-        /// <summary>Classic: draws a group box as just its border, without the header bar.</summary>
-        private static void ShowWithoutHeader(GroupBox groupBox)
-        {
-            var border = new FrameworkElementFactory(typeof(Border));
-            border.SetValue(Border.BorderBrushProperty, new TemplateBindingExtension(Control.BorderBrushProperty));
-            border.SetValue(Border.BorderThicknessProperty, new TemplateBindingExtension(Control.BorderThicknessProperty));
-            // No fill: MahApps uses the group box background for the header bar colour.
-            border.SetValue(Border.BackgroundProperty, Brushes.Transparent);
-
-            var content = new FrameworkElementFactory(typeof(ContentPresenter));
-            content.SetValue(FrameworkElement.MarginProperty, new TemplateBindingExtension(Control.PaddingProperty));
-            border.AppendChild(content);
-
-            groupBox.Template = new ControlTemplate(typeof(GroupBox)) { VisualTree = border };
         }
 
         /// <summary>Classic: microphone, VU bar and audio preview button on one row.</summary>

@@ -149,6 +149,40 @@
             </DockPanel>
         </Border>
 
+        <!-- Combat Box RCI: shown only while connected to srs.combatbox.net (ShouldShowRciStatus). -->
+        <Border x:Name="RciStatusPanel"
+                DockPanel.Dock="Bottom"
+                Visibility="Collapsed"
+                Background="{DynamicResource MilWellBrush}"
+                BorderBrush="{DynamicResource MilBorderBrush}"
+                BorderThickness="0,1,0,0">
+            <StackPanel Margin="10,3" Orientation="Horizontal">
+                <Grid Width="160" Height="18">
+                    <Border x:Name="RciStatusIndicator"
+                            Background="{DynamicResource MilRciInactiveBackgroundBrush}"
+                            BorderBrush="#666"
+                            BorderThickness="1" />
+                    <TextBlock x:Name="RciStatusLabel"
+                               HorizontalAlignment="Center"
+                               VerticalAlignment="Center"
+                               FontFamily="Courier New"
+                               FontSize="12"
+                               FontWeight="Bold"
+                               Foreground="{DynamicResource MilRciInactiveTextBrush}"
+                               Text="RCI" />
+                </Grid>
+                <TextBlock x:Name="RciCallsignLabel"
+                           Margin="10,0,0,0"
+                           VerticalAlignment="Center"
+                           FontFamily="Courier New"
+                           FontSize="12"
+                           FontWeight="Bold"
+                           Foreground="{DynamicResource MilTextPrimaryBrush}"
+                           TextTrimming="CharacterEllipsis"
+                           Visibility="Collapsed" />
+            </StackPanel>
+        </Border>
+
         <Grid>
         <TabControl x:Name="TabControl">
         <TabItem Header="General">
@@ -381,11 +415,6 @@
                         <Grid x:Name="OverlaysColumn"
                               Grid.Column="1"
                               Margin="0,5,0,5">
-                            <Grid.RowDefinitions>
-                                <RowDefinition Height="*" />
-                                <RowDefinition Height="Auto" />
-                            </Grid.RowDefinitions>
-
                             <GroupBox Grid.Row="0" Header="Overlays" Margin="0">
                                 <StackPanel x:Name="OverlaysLayout"
                                             HorizontalAlignment="Center"
@@ -453,44 +482,6 @@
                                                 Value="1.0"
                                                 ValueChanged="PilotRosterOpacitySlider_ValueChanged" />
                                     </Grid>
-                                </StackPanel>
-                            </GroupBox>
-
-                            <GroupBox x:Name="CombatBoxRciPanel"
-                                      Grid.Row="1"
-                                      Header="Combat Box RCI"
-                                      Margin="0"
-                                      Visibility="Collapsed">
-                                <StackPanel x:Name="RciStatusPanel"
-                                            Margin="0,4,0,5"
-                                            HorizontalAlignment="Center"
-                                            Visibility="Collapsed">
-                                    <Grid Width="220"
-                                          Height="18">
-                                        <Border x:Name="RciStatusIndicator"
-                                                Background="{DynamicResource MilRciInactiveBackgroundBrush}"
-                                                BorderBrush="#666"
-                                                BorderThickness="1" />
-                                        <TextBlock x:Name="RciStatusLabel"
-                                                   HorizontalAlignment="Center"
-                                                   VerticalAlignment="Center"
-                                                   FontFamily="Courier New"
-                                                   FontSize="12"
-                                                   FontWeight="Bold"
-                                                   Foreground="{DynamicResource MilRciInactiveTextBrush}"
-                                                   Text="RCI" />
-                                    </Grid>
-                                    <TextBlock x:Name="RciCallsignLabel"
-                                               Width="220"
-                                               Margin="0,2,0,0"
-                                               HorizontalAlignment="Center"
-                                               FontFamily="Courier New"
-                                               FontSize="12"
-                                               FontWeight="Bold"
-                                               Foreground="{StaticResource ForegroundBrush}"
-                                               TextAlignment="Center"
-                                               TextTrimming="CharacterEllipsis"
-                                               Visibility="Collapsed" />
                                 </StackPanel>
                             </GroupBox>
 

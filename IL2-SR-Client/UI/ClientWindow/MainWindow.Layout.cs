@@ -286,7 +286,6 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI
             if (key == PanelKeys.Overlays)
             {
                 OverlaysLayout.Visibility = visibility;
-                CombatBoxRciPanel.Visibility = _showCombatBoxRci && !collapsed ? Visibility.Visible : Visibility.Collapsed;
             }
             else if (((GroupBox) panel).Content is UIElement content)
             {
