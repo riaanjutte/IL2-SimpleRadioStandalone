@@ -72,12 +72,13 @@ Settings (Global Settings, RCI Controller, Audio Options, Profile, Profile Setti
   including every row of the default layout. It collapses the whole row to its header bars, as the current
   Server/Overlays arrow does.
 - Collapsed rows are saved with the layout, keyed by the panels in the row, so a re-paired row starts expanded.
-- The window shrinks on whichever tab is shown by the empty space collapsing leaves at the bottom of that tab, never
-  more: a tab whose content still overflows after collapsing doesn't shrink at all, and the window never shrinks
-  below what the tab's content needs. It returns to the player's normal height on a tab with nothing collapsed.
-  *(My call: the reviewer found that taking off the full collapsed height would shrink the always-scrolling
-  Settings tab, and the Controls and Help panels that fill their tab, towards zero height.)* The existing rules stay:
-  the saved height is the normal height, maximised and snapped windows aren't resized.
+- The window fits whichever tab is shown: it shrinks by the empty space at the bottom of that tab, whether panels were
+  moved to other tabs or rows collapsed, never more. A tab whose content fills or overflows (Settings, Controls, Help
+  expanded) keeps the player's normal height, and the window never shrinks below what the tab's content needs. The
+  minimum height drops by the same amount, so the player can still drag a fitted window smaller (the tab then
+  scrolls). *(Changed 2026-11-15 at the player's request: originally only the space freed by collapsing was given
+  back, which left empty space under a tab whose panels had moved elsewhere.)* The existing rules stay: the saved
+  height is the normal height, maximised and snapped windows aren't resized.
 - Reset layout also expands every row.
 - The two existing settings (`ServerOverlaysCollapsed`, `FavouritesCollapsed`) are read once to seed the collapsed
   state of the matching default rows. After that the custom layout only uses its own saved state (see Classic for

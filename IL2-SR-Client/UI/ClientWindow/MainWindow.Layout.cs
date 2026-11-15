@@ -295,7 +295,8 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI
         }
 
         /// <summary>
-        /// Measures the empty space the collapsed rows leave at the bottom of the shown tab and shrinks the window by it.
+        /// Measures the empty space at the bottom of the shown tab (panels moved elsewhere, rows collapsed) and shrinks
+        /// the window by it, so the window fits the tab; a tab that fills or overflows keeps the normal height.
         /// </summary>
         private void ApplyLayoutCollapse()
         {
@@ -312,43 +313,28 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI
 
             var rows = _layout.Tabs[index].Rows;
             _collapsedPanelsHeight = 0;
-            if (!rows.Any(IsRowCollapsed))
+            if (tabItem.Content is Grid rowGrid)
             {
-                // Nothing collapsed: the window keeps its normal height.
-            }
-            else if (tabItem.Content is Grid rowGrid)
-            {
-                // Controls or Help filling its tab: expanded it fills the whole viewport by definition, and collapsed
-                // it is top-aligned, so its height doesn't depend on the window's and the result can't swing.
-                SetRowsCollapsed(rows, true);
-                rowGrid.UpdateLayout();
-                double viewport = rowGrid.ActualHeight + _heightReduction;
-                _collapsedPanelsHeight = CollapsedPanelsHeight.FreedHeight(viewport, viewport, rowGrid.DesiredSize.Height);
+                // Controls or Help filling its tab: expanded it fills the whole viewport, so only collapsing it frees
+                // space. Collapsed it is top-aligned, so its height doesn't depend on the window's and can't swing.
+                if (rows.Any(IsRowCollapsed))
+                {
+                    rowGrid.UpdateLayout();
+                    _collapsedPanelsHeight = CollapsedPanelsHeight.EmptyHeight(
+                        rowGrid.ActualHeight + _heightReduction, rowGrid.DesiredSize.Height);
+                }
             }
             else if (tabItem.Content is ScrollViewer scroll)
             {
+                // The content is measured at its natural height whatever the window's, so this can't swing either.
                 var content = (FrameworkElement) scroll.Content;
-                SetRowsCollapsed(rows, false);
                 content.UpdateLayout();
-                double expandedHeight = content.DesiredSize.Height;
-
-                SetRowsCollapsed(rows, true);
-                content.UpdateLayout();
-                _collapsedPanelsHeight = CollapsedPanelsHeight.FreedHeight(
-                    scroll.ViewportHeight + _heightReduction, expandedHeight, content.DesiredSize.Height);
+                _collapsedPanelsHeight = CollapsedPanelsHeight.EmptyHeight(
+                    scroll.ViewportHeight + _heightReduction, content.DesiredSize.Height);
             }
 
             tabItem.Tag = _collapsedPanelsHeight; // used straight away when this tab is shown again
             ResizeForCollapsedPanels();
-        }
-
-        /// <param name="saved">true: as saved in the layout; false: all expanded.</param>
-        private void SetRowsCollapsed(IEnumerable<List<string>> rows, bool saved)
-        {
-            foreach (var row in rows)
-            {
-                SetRowCollapsed(row, saved && IsRowCollapsed(row));
-            }
         }
 
         private static void SetCollapseToolTip(ToggleButton toggle)

@@ -23,12 +23,13 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI.ClientWindow
         }
 
         /// <summary>
-        /// Empty space at the bottom of a tab that collapsing sections frees. A tab whose content already
-        /// overflows the viewport frees nothing, so the window never shrinks for it.
+        /// Empty space below a tab's content at the player's normal height, which the window gives back. A tab whose
+        /// content fills or overflows the viewport gives nothing, so it keeps the normal height.
         /// </summary>
-        public static double FreedHeight(double viewportAtNormalHeight, double expandedContent, double collapsedContent)
+        public static double EmptyHeight(double viewportAtNormalHeight, double content)
         {
-            return Math.Max(0, viewportAtNormalHeight - collapsedContent) - Math.Max(0, viewportAtNormalHeight - expandedContent);
+            // One whole pixel of slack: the window height is rounded to screen pixels, and a fraction short shows a scroll bar.
+            return Math.Max(0, Math.Floor(viewportAtNormalHeight - content) - 1);
         }
     }
 }

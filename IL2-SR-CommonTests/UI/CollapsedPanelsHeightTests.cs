@@ -76,32 +76,44 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Common.Tests.UI
         }
 
         [TestMethod]
-        public void FreedHeightIsTheEmptySpaceThatCollapsingLeaves()
+        public void EmptyHeightIsTheSpaceBelowTheTabsContent()
         {
-            Assert.AreEqual(150, CollapsedPanelsHeight.FreedHeight(500, 400, 250));
+            // A tab whose panels moved elsewhere, or whose rows are collapsed, gives it back, less one pixel of slack.
+            Assert.AreEqual(249, CollapsedPanelsHeight.EmptyHeight(500, 250));
         }
 
         [TestMethod]
-        public void FreedHeightIsZeroWhenTheTabAlreadyScrolls()
+        public void EmptyHeightLeavesSlackForPixelRounding()
         {
-            Assert.AreEqual(50, CollapsedPanelsHeight.FreedHeight(500, 700, 450));
-            Assert.AreEqual(0, CollapsedPanelsHeight.FreedHeight(500, 900, 600));
+            // The window height is rounded to whole screen pixels; a fraction short of the content shows a scroll bar.
+            Assert.AreEqual(248, CollapsedPanelsHeight.EmptyHeight(500, 250.4));
+        }
+
+        [TestMethod]
+        public void EmptyHeightIsZeroWhenTheContentFillsOrOverflows()
+        {
+            Assert.AreEqual(0, CollapsedPanelsHeight.EmptyHeight(500, 500));
+            Assert.AreEqual(0, CollapsedPanelsHeight.EmptyHeight(500, 499.5));
+            Assert.AreEqual(0, CollapsedPanelsHeight.EmptyHeight(500, 900));
         }
 
         [TestMethod]
         public void APanelFillingItsTabGivesBackEverythingBelowItsHeader()
         {
             // Expanded, Controls or Help fills the viewport exactly; collapsed it is just its header bar.
-            Assert.AreEqual(440, CollapsedPanelsHeight.FreedHeight(500, 500, 60));
-            var size = CollapsedPanelsHeight.Resize(650, 0, 440, true, 560);
-            Assert.AreEqual(210, size.Height);
+            Assert.AreEqual(439, CollapsedPanelsHeight.EmptyHeight(500, 60));
+            var size = CollapsedPanelsHeight.Resize(650, 0, 439, true, 560);
+            Assert.AreEqual(211, size.Height);
             Assert.AreEqual(650, CollapsedPanelsHeight.Resize(size.Height, 650 - size.Height, 0, true, 560).Height);
         }
 
         [TestMethod]
-        public void FreedHeightIsZeroWhenNothingIsCollapsed()
+        public void AFittedWindowCanStillBeDraggedSmaller()
         {
-            Assert.AreEqual(0, CollapsedPanelsHeight.FreedHeight(500, 400, 400));
+            // General fitted from 700 to 401: the minimum drops by the same amount, so the player can drag below it.
+            var size = CollapsedPanelsHeight.Resize(700, 0, CollapsedPanelsHeight.EmptyHeight(560, 260), true, 560);
+            Assert.AreEqual(401, size.Height);
+            Assert.AreEqual(261, size.MinHeight);
         }
     }
 }

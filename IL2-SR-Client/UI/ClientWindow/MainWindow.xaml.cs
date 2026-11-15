@@ -114,8 +114,8 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI
         private bool _classicLayout;
 
         // Sections collapsed with their arrows. The window's height is the player's normal height minus _heightReduction:
-        // in Classic the collapsed sections' height while the General tab is shown, otherwise the empty space the
-        // shown tab's collapsed rows leave (see ApplyLayoutCollapse).
+        // in Classic the collapsed sections' height while the General tab is shown, otherwise the empty space at the
+        // bottom of the shown tab (see ApplyLayoutCollapse).
         private bool _initialisingPanelCollapse;
         private bool _showCombatBoxRci;
         private double _collapsedPanelsHeight;
