@@ -19,6 +19,7 @@ using System.Windows.Controls.Primitives;
 using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
+using System.Windows.Automation;
 using System.Windows.Threading;
 using Ciribob.IL2.SimpleRadio.Standalone.Client.Audio;
 using Ciribob.IL2.SimpleRadio.Standalone.Client.Audio.Managers;
@@ -31,6 +32,7 @@ using Ciribob.IL2.SimpleRadio.Standalone.Client.Preferences;
 using Ciribob.IL2.SimpleRadio.Standalone.Client.Settings;
 using Ciribob.IL2.SimpleRadio.Standalone.Client.Singletons;
 using Ciribob.IL2.SimpleRadio.Standalone.Client.Themes;
+using Ciribob.IL2.SimpleRadio.Standalone.Client.UI.ClientWindow;
 using Ciribob.IL2.SimpleRadio.Standalone.Client.UI.ClientWindow.Diagnostics;
 using Ciribob.IL2.SimpleRadio.Standalone.Client.UI.ClientWindow.ClientList;
 using Ciribob.IL2.SimpleRadio.Standalone.Client.UI.ClientWindow.Favourites;
@@ -110,9 +112,18 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI
         private const double ClassicOverlayButtonWidth = 150;
         private const double ClassicSettingsLabelShare = 2; // label column 2 : 1 against the controls
         private bool _classicLayout;
+
+        // Sections collapsed with their arrows. The window's height is the player's normal height minus _heightReduction:
+        // in Classic the collapsed sections' height while the General tab is shown, otherwise the empty space at the
+        // bottom of the shown tab (see ApplyLayoutCollapse).
+        private bool _initialisingPanelCollapse;
+        private double _collapsedPanelsHeight;
+        private double _heightReduction;
+        private double _normalMinHeight;
         private const string VuMeterStyleAuto = "Auto";
         private const string VuMeterStyleLight = "Light";
         private const string VuMeterStyleDark = "Dark";
+        private const string VuMeterStyleLed = "LED";
 
         private sealed class VuMeterStyleOption
         {
@@ -247,6 +258,9 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI
             InitVuMeterStylePicker();
             IL2_SR_Client.App.ApplyVuMeterStyle();
             ApplyClassicThemeLayout();
+            InitCustomLayout();
+            ApplyVuMeterKind();
+            InitPanelCollapse();
 
             SpeakerBoost.Value = _globalSettings.GetClientSetting(GlobalSettingsKeys.SpeakerBoost).DoubleValue;
 
@@ -278,6 +292,8 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI
 
         private void MainWindow_Loaded(object sender, RoutedEventArgs e)
         {
+            // Sections saved as collapsed can only be measured once the window has been laid out.
+            ApplyPanelCollapse();
             AutoStartRadioOverlay();
             AutoStartPilotRoster();
         }
@@ -997,7 +1013,8 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI
             {
                 new VuMeterStyleOption(VuMeterStyleAuto),
                 new VuMeterStyleOption(VuMeterStyleLight),
-                new VuMeterStyleOption(VuMeterStyleDark)
+                new VuMeterStyleOption(VuMeterStyleDark),
+                new VuMeterStyleOption(VuMeterStyleLed)
             };
 
             var currentStyle = CurrentVuMeterStyle();
@@ -1021,7 +1038,25 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI
                 return VuMeterStyleDark;
             }
 
+            if (normalizedStyle == NormalizeThemeName(VuMeterStyleLed))
+            {
+                return VuMeterStyleLed;
+            }
+
             return VuMeterStyleAuto;
+        }
+
+        /// <summary>Shows the LED meters or the analogue dials; the audio panels shrink to whichever is shown.</summary>
+        private void ApplyVuMeterKind()
+        {
+            bool led = !_classicLayout && CurrentVuMeterStyle() == VuMeterStyleLed; // Classic keeps its thin bars
+            var dialVisibility = led ? Visibility.Collapsed : Visibility.Visible;
+            var ledVisibility = led ? Visibility.Visible : Visibility.Collapsed;
+
+            Mic_VU.Visibility = dialVisibility;
+            Speaker_VU.Visibility = dialVisibility;
+            Mic_LED.Visibility = ledVisibility;
+            Speaker_LED.Visibility = ledVisibility;
         }
 
         private string CurrentTheme()
@@ -1131,6 +1166,7 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI
 
             _globalSettings.SetClientSetting(GlobalSettingsKeys.VuMeterStyle, selectedStyle);
             IL2_SR_Client.App.ApplyVuMeterStyle();
+            ApplyVuMeterKind();
         }
 
         private static string ResolveVuMeterStyleSelection(object selectedItem)
@@ -1751,7 +1787,7 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI
             MessageHub.Instance.ClearSubscriptions();
             _il2RadioSyncManager.Stop();
 
-            var bounds = WindowState == WindowState.Normal ? new Rect(Left, Top, Width, Height) : RestoreBounds;
+            var bounds = WindowState == WindowState.Normal && !IsSnapped() ? new Rect(Left, Top, Width, Height) : RestoreBounds;
 
             _globalSettings.SetPositionSetting(GlobalSettingsKeys.ClientX, bounds.Left);
             _globalSettings.SetPositionSetting(GlobalSettingsKeys.ClientY, bounds.Top);
@@ -1760,7 +1796,8 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI
             if (!_classicLayout)
             {
                 _globalSettings.SetPositionSetting(GlobalSettingsKeys.ClientWidth, bounds.Width);
-                _globalSettings.SetPositionSetting(GlobalSettingsKeys.ClientHeight, bounds.Height);
+                // The normal height, without the collapsed sections taken off.
+                _globalSettings.SetPositionSetting(GlobalSettingsKeys.ClientHeight, bounds.Height + _heightReduction);
             }
 
             //save window position and size
@@ -1882,7 +1919,13 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI
         private void UpdatePilotRosterAndRciVisibility(bool pilotRosterAvailable, bool showCombatBoxRci)
         {
             ShowPilotRoster.Visibility = Visibility.Visible;
-            CombatBoxRciPanel.Visibility = showCombatBoxRci ? Visibility.Visible : Visibility.Collapsed;
+            var rciVisibility = showCombatBoxRci ? Visibility.Visible : Visibility.Collapsed;
+            if (RciStatusPanel.Visibility != rciVisibility)
+            {
+                RciStatusPanel.Visibility = rciVisibility;
+                // The bar takes its height from the tabs: re-fit the window once the new viewport is laid out.
+                Dispatcher.BeginInvoke(new Action(ApplyPanelCollapse), DispatcherPriority.Loaded);
+            }
 
             if (!pilotRosterAvailable && (_pilotRosterWindow?.IsUnavailableMode == false))
             {
@@ -1911,7 +1954,6 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI
 
         private void UpdateRciStatusIndicator(bool showRciStatus)
         {
-            RciStatusPanel.Visibility = showRciStatus ? Visibility.Visible : Visibility.Collapsed;
             if (!showRciStatus)
             {
                 ApplyRciDisplayState(RciDisplayState.Create(RciStatus.None, string.Empty));
@@ -1924,17 +1966,39 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI
                 Clients.GetFriendlyRciCallsign(ClientState.PlayerGameState.coalition)));
         }
 
+        /// <summary>A narrow window puts the status bar's right-hand part on a second line, right-aligned.</summary>
+        private void StatusBarDock_SizeChanged(object sender, SizeChangedEventArgs e)
+        {
+            // DesiredSize is capped at the width the panel was given, so measure each part without a limit.
+            var unlimited = new Size(double.PositiveInfinity, double.PositiveInfinity);
+            StatusBarLeft.Measure(unlimited);
+            StatusBarRight.Measure(unlimited);
+            bool fits = StatusBarLeft.DesiredSize.Width + StatusBarRight.DesiredSize.Width <= StatusBarDock.ActualWidth;
+            StatusBarDock.InvalidateMeasure();
+            var leftDock = fits ? Dock.Left : Dock.Top;
+            if (DockPanel.GetDock(StatusBarLeft) == leftDock)
+            {
+                return;
+            }
+
+            DockPanel.SetDock(StatusBarLeft, leftDock);
+            DockPanel.SetDock(StatusBarRight, fits ? Dock.Right : Dock.Top);
+            // The extra line comes out of the tabs: re-fit the window once it is laid out.
+            Dispatcher.BeginInvoke(new Action(ApplyPanelCollapse), DispatcherPriority.Loaded);
+        }
+
         private void ApplyRciDisplayState(RciDisplayState displayState)
         {
             RciStatusLabel.Text = displayState.StatusText;
-            // The coloured RCI states are the same in every theme; the inactive state follows the theme's status panels.
-            var inactive = displayState.Status == RciStatus.None;
-            RciStatusLabel.Foreground = inactive
-                ? GetConnectionStatusBrush("MilRciInactiveTextBrush", displayState.MainWindowStatusForeground)
-                : displayState.MainWindowStatusForeground;
-            RciStatusIndicator.Background = inactive
-                ? GetConnectionStatusBrush("MilRciInactiveBackgroundBrush", displayState.StatusBackground)
-                : displayState.StatusBackground;
+            // The coloured RCI states are the same in every theme; with no RCI the lamp is off, like the status bar's.
+            if (displayState.Status == RciStatus.None)
+            {
+                RciStatusIndicator.SetResourceReference(System.Windows.Shapes.Shape.FillProperty, "MilLedOffBrush");
+            }
+            else
+            {
+                RciStatusIndicator.Fill = displayState.StatusBackground;
+            }
             RciCallsignLabel.Text = displayState.RcoOnDutyText;
             RciCallsignLabel.Visibility = displayState.HasRcoOnDuty
                 ? Visibility.Visible
@@ -2162,6 +2226,8 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI
             Mic_VU.Height = ClassicVuMeterHeight;
             Speaker_VU.Height = ClassicVuMeterHeight;
             ThreeDEffectsToggle.IsEnabled = false;
+            // Classic's header bar is coloured, unlike the panel face the arrow normally sits on.
+            ServerOverlaysCollapseToggle.Background = Brushes.Transparent;
             WeatheringEffectToggle.IsEnabled = false;
             WeatheringOpacitySlider.IsEnabled = false;
             VuMeterStylePicker.IsEnabled = false;
@@ -2178,10 +2244,11 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI
             OverlaysColumn.Margin = new Thickness(5, 0, 5, 5);
             ArrangeMicrophonePanelInOneRow();
             ArrangeServerPanelInTwoColumns();
-            ShowWithoutHeader(CombatBoxRciPanel);
             ArrangeOverlayButtonsInOneRow();
 
-            GeneralLayout.Children.Remove(FavouritesGroupBox);
+            // Favourites gets its own tab, so its collapse arrow goes with the section it sat in.
+            GeneralLayout.Children.Remove(FavouritesSection);
+            FavouritesSection.Children.Remove(FavouritesGroupBox);
             TabControl.Items.Insert(2, new TabItem
             {
                 Header = LocalizationManager.Get("Favourites"),
@@ -2210,20 +2277,131 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI
             ControlsLayout.LayoutTransform = new ScaleTransform(ClassicControlsScale, ClassicControlsScale);
         }
 
-        /// <summary>Classic: draws a group box as just its border, without the header bar.</summary>
-        private static void ShowWithoutHeader(GroupBox groupBox)
+        private void InitPanelCollapse()
         {
-            var border = new FrameworkElementFactory(typeof(Border));
-            border.SetValue(Border.BorderBrushProperty, new TemplateBindingExtension(Control.BorderBrushProperty));
-            border.SetValue(Border.BorderThicknessProperty, new TemplateBindingExtension(Control.BorderThicknessProperty));
-            // No fill: MahApps uses the group box background for the header bar colour.
-            border.SetValue(Border.BackgroundProperty, Brushes.Transparent);
+            _normalMinHeight = MinHeight;
 
-            var content = new FrameworkElementFactory(typeof(ContentPresenter));
-            content.SetValue(FrameworkElement.MarginProperty, new TemplateBindingExtension(Control.PaddingProperty));
-            border.AppendChild(content);
+            _initialisingPanelCollapse = true;
+            ServerOverlaysCollapseToggle.IsChecked = _globalSettings.GetClientSettingBool(GlobalSettingsKeys.ServerOverlaysCollapsed);
+            _initialisingPanelCollapse = false;
 
-            groupBox.Template = new ControlTemplate(typeof(GroupBox)) { VisualTree = border };
+            TabControl.SelectionChanged += TabControl_SelectionChanged;
+            // A window started minimised or maximised gets its General-tab height when restored.
+            StateChanged += (sender, e) =>
+            {
+                ResizeForCollapsedPanels();
+                if (_layout != null)
+                {
+                    // Outside Classic rows collapsed while maximised were not measured.
+                    Dispatcher.BeginInvoke(new Action(ApplyPanelCollapse), DispatcherPriority.Loaded);
+                }
+            };
+            UpdatePanelCollapseToolTips();
+        }
+
+        private void PanelCollapseToggle_Changed(object sender, RoutedEventArgs e)
+        {
+            if (_initialisingPanelCollapse)
+            {
+                return;
+            }
+
+            _globalSettings.SetClientSetting(GlobalSettingsKeys.ServerOverlaysCollapsed,
+                ServerOverlaysCollapseToggle.IsChecked == true);
+
+            UpdatePanelCollapseToolTips();
+            ApplyPanelCollapse();
+        }
+
+        private void TabControl_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            // Combo boxes and lists inside the tabs raise SelectionChanged through the TabControl too.
+            if (ReferenceEquals(e.OriginalSource, TabControl) && !_rebuildingTabs)
+            {
+                if (_layout != null)
+                {
+                    // The shown tab's height as last measured, until it is measured again below.
+                    _collapsedPanelsHeight = (TabControl.SelectedItem as TabItem)?.Tag as double? ?? 0;
+                }
+
+                ResizeForCollapsedPanels();
+                if (_layout != null || TabControl.SelectedIndex == 0)
+                {
+                    // Measure again once the tab is laid out: the RCI panel may have come or gone on another tab.
+                    Dispatcher.BeginInvoke(new Action(ApplyPanelCollapse), DispatcherPriority.Loaded);
+                }
+            }
+        }
+
+        private void UpdatePanelCollapseToolTips()
+        {
+            SetCollapseToolTip(ServerOverlaysCollapseToggle);
+        }
+
+        /// <summary>Hides the collapsed sections' contents, measures how much shorter that makes the shown tab, and resizes.</summary>
+        private void ApplyPanelCollapse()
+        {
+            if (!IsLoaded)
+            {
+                return;
+            }
+
+            if (_layout != null)
+            {
+                ApplyLayoutCollapse();
+                return;
+            }
+
+            if (TabControl.SelectedIndex != 0)
+            {
+                return; // the General tab's layout can only be measured while it is shown
+            }
+
+            bool serverOverlaysCollapsed = ServerOverlaysCollapseToggle.IsChecked == true;
+
+            SetPanelContentVisibility(false);
+            GeneralLayout.UpdateLayout();
+            double expandedHeight = GeneralLayout.DesiredSize.Height; // ActualHeight is stretched to the scroll viewport when the content is shorter
+
+            SetPanelContentVisibility(serverOverlaysCollapsed);
+            GeneralLayout.UpdateLayout();
+            _collapsedPanelsHeight = Math.Max(0, expandedHeight - GeneralLayout.DesiredSize.Height);
+
+            ResizeForCollapsedPanels();
+        }
+
+        private void SetPanelContentVisibility(bool serverOverlaysCollapsed)
+        {
+            var serverOverlaysVisibility = serverOverlaysCollapsed ? Visibility.Collapsed : Visibility.Visible;
+            ServerLayout.Visibility = serverOverlaysVisibility;
+            OverlaysLayout.Visibility = serverOverlaysVisibility;
+        }
+
+        private void ResizeForCollapsedPanels()
+        {
+            if (WindowState != WindowState.Normal || IsSnapped())
+            {
+                return; // a maximised or snapped window keeps its size; _heightReduction still describes its restore height
+            }
+
+            // Outside Classic _collapsedPanelsHeight is always the shown tab's.
+            var size = CollapsedPanelsHeight.Resize(Height, _heightReduction, _collapsedPanelsHeight,
+                _layout != null || TabControl.SelectedIndex == 0, _normalMinHeight);
+
+            // MinHeight first: raising it above Height resizes the window on the spot.
+            MinHeight = size.MinHeight;
+            Height = size.Height;
+            // WPF rounds Height to device pixels, so use the height it applied or the saved height creeps.
+            _heightReduction = size.NormalHeight - Height;
+        }
+
+        /// <summary>Snapped to a screen edge (Aero Snap): reported as Normal, but Windows sets the size, like maximised.</summary>
+        private bool IsSnapped()
+        {
+            Rect restoreBounds = RestoreBounds;
+            return WindowState == WindowState.Normal &&
+                   !restoreBounds.IsEmpty &&
+                   Math.Abs(restoreBounds.Height - Height) > 1;
         }
 
         /// <summary>Classic: microphone, VU bar and audio preview button on one row.</summary>

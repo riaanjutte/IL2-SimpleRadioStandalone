@@ -29,6 +29,8 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI
             ChannelSelector.IsEnabled = false;
             Reload();
 
+            // Loaded fires again each time the panel's tab is shown or the layout moves it.
+            ChannelSelector.ValueChanged -= ChannelSelector_SelectionChanged;
             ChannelSelector.ValueChanged += ChannelSelector_SelectionChanged;
         }
 

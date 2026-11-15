@@ -810,6 +810,87 @@
   <data name="No RCI active" xml:space="preserve">
     <value>RCI nicht aktiv</value>
   </data>
+  <data name="LED" xml:space="preserve">
+    <value>LED</value>
+  </data>
+  <data name="Collapse" xml:space="preserve">
+    <value>Einklappen</value>
+  </data>
+  <data name="Expand" xml:space="preserve">
+    <value>Ausklappen</value>
+  </data>
+  <data name="Customise layout" xml:space="preserve">
+    <value>Layout anpassen</value>
+  </data>
+  <data name="Tabs" xml:space="preserve">
+    <value>Tabs</value>
+  </data>
+  <data name="Add tab" xml:space="preserve">
+    <value>Tab hinzufügen</value>
+  </data>
+  <data name="Delete" xml:space="preserve">
+    <value>Löschen</value>
+  </data>
+  <data name="Move up" xml:space="preserve">
+    <value>Nach oben</value>
+  </data>
+  <data name="Move down" xml:space="preserve">
+    <value>Nach unten</value>
+  </data>
+  <data name="Panels on this tab" xml:space="preserve">
+    <value>Bereiche auf diesem Tab</value>
+  </data>
+  <data name="Move to tab" xml:space="preserve">
+    <value>Auf Tab verschieben</value>
+  </data>
+  <data name="Target tab" xml:space="preserve">
+    <value>Ziel-Tab</value>
+  </data>
+  <data name="Pair with row below" xml:space="preserve">
+    <value>Mit Zeile darunter koppeln</value>
+  </data>
+  <data name="Unpair" xml:space="preserve">
+    <value>Entkoppeln</value>
+  </data>
+  <data name="Hide" xml:space="preserve">
+    <value>Ausblenden</value>
+  </data>
+  <data name="Hidden panels" xml:space="preserve">
+    <value>Ausgeblendete Bereiche</value>
+  </data>
+  <data name="Add to this tab" xml:space="preserve">
+    <value>Zu diesem Tab hinzufügen</value>
+  </data>
+  <data name="Reset layout" xml:space="preserve">
+    <value>Layout zurücksetzen</value>
+  </data>
+  <data name="OK" xml:space="preserve">
+    <value>OK</value>
+  </data>
+  <data name="Apply" xml:space="preserve">
+    <value>Übernehmen</value>
+  </data>
+  <data name="New tab" xml:space="preserve">
+    <value>Neuer Tab</value>
+  </data>
+  <data name="Tab name" xml:space="preserve">
+    <value>Name des Tabs</value>
+  </data>
+  <data name="Delete tab" xml:space="preserve">
+    <value>Tab löschen</value>
+  </data>
+  <data name="Delete the tab &quot;{0}&quot;? Its panels will be hidden. You can add them back from Hidden panels." xml:space="preserve">
+    <value>Den Tab „{0}“ löschen? Seine Bereiche werden ausgeblendet. Unter „Ausgeblendete Bereiche“ kannst du sie wieder hinzufügen.</value>
+  </data>
+  <data name="Reset the window layout to the default? Your tabs, tab names and hidden panels go back to the default, and every row is expanded, when you press OK or Apply." xml:space="preserve">
+    <value>Das Fensterlayout auf den Standard zurücksetzen? Deine Tabs, ihre Namen und ausgeblendeten Bereiche werden zurückgesetzt und alle Zeilen ausgeklappt, sobald du OK oder Übernehmen drückst.</value>
+  </data>
+  <data name="IL-2 IS FULLSCREEN" xml:space="preserve">
+    <value>IL-2 IM VOLLBILD</value>
+  </data>
+  <data name="IL-2 is set to fullscreen, so this overlay can't show over the game. Turn off Fullscreen in IL-2's graphics settings and restart IL-2." xml:space="preserve">
+    <value>IL-2 ist auf Vollbild eingestellt, daher kann dieses Overlay nicht über dem Spiel erscheinen. Schalte Vollbild in den Grafikeinstellungen von IL-2 aus und starte IL-2 neu.</value>
+  </data>
   <data name="Friendly RCI active" xml:space="preserve">
     <value>RCI - Friendly only</value>
   </data>

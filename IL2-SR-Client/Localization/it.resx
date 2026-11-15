@@ -810,6 +810,87 @@
   <data name="No RCI active" xml:space="preserve">
     <value>RCI non attivo</value>
   </data>
+  <data name="LED" xml:space="preserve">
+    <value>LED</value>
+  </data>
+  <data name="Collapse" xml:space="preserve">
+    <value>Comprimi</value>
+  </data>
+  <data name="Expand" xml:space="preserve">
+    <value>Espandi</value>
+  </data>
+  <data name="Customise layout" xml:space="preserve">
+    <value>Personalizza layout</value>
+  </data>
+  <data name="Tabs" xml:space="preserve">
+    <value>Schede</value>
+  </data>
+  <data name="Add tab" xml:space="preserve">
+    <value>Aggiungi scheda</value>
+  </data>
+  <data name="Delete" xml:space="preserve">
+    <value>Elimina</value>
+  </data>
+  <data name="Move up" xml:space="preserve">
+    <value>Sposta su</value>
+  </data>
+  <data name="Move down" xml:space="preserve">
+    <value>Sposta giù</value>
+  </data>
+  <data name="Panels on this tab" xml:space="preserve">
+    <value>Pannelli in questa scheda</value>
+  </data>
+  <data name="Move to tab" xml:space="preserve">
+    <value>Sposta nella scheda</value>
+  </data>
+  <data name="Target tab" xml:space="preserve">
+    <value>Scheda di destinazione</value>
+  </data>
+  <data name="Pair with row below" xml:space="preserve">
+    <value>Affianca alla riga sotto</value>
+  </data>
+  <data name="Unpair" xml:space="preserve">
+    <value>Separa</value>
+  </data>
+  <data name="Hide" xml:space="preserve">
+    <value>Nascondi</value>
+  </data>
+  <data name="Hidden panels" xml:space="preserve">
+    <value>Pannelli nascosti</value>
+  </data>
+  <data name="Add to this tab" xml:space="preserve">
+    <value>Aggiungi a questa scheda</value>
+  </data>
+  <data name="Reset layout" xml:space="preserve">
+    <value>Ripristina layout</value>
+  </data>
+  <data name="OK" xml:space="preserve">
+    <value>OK</value>
+  </data>
+  <data name="Apply" xml:space="preserve">
+    <value>Applica</value>
+  </data>
+  <data name="New tab" xml:space="preserve">
+    <value>Nuova scheda</value>
+  </data>
+  <data name="Tab name" xml:space="preserve">
+    <value>Nome della scheda</value>
+  </data>
+  <data name="Delete tab" xml:space="preserve">
+    <value>Elimina scheda</value>
+  </data>
+  <data name="Delete the tab &quot;{0}&quot;? Its panels will be hidden. You can add them back from Hidden panels." xml:space="preserve">
+    <value>Eliminare la scheda «{0}»? I suoi pannelli verranno nascosti. Puoi aggiungerli di nuovo da Pannelli nascosti.</value>
+  </data>
+  <data name="Reset the window layout to the default? Your tabs, tab names and hidden panels go back to the default, and every row is expanded, when you press OK or Apply." xml:space="preserve">
+    <value>Ripristinare il layout predefinito della finestra? Le tue schede, i loro nomi e i pannelli nascosti tornano a quelli predefiniti, e tutte le righe vengono espanse, quando premi OK o Applica.</value>
+  </data>
+  <data name="IL-2 IS FULLSCREEN" xml:space="preserve">
+    <value>IL-2 A SCHERMO INTERO</value>
+  </data>
+  <data name="IL-2 is set to fullscreen, so this overlay can't show over the game. Turn off Fullscreen in IL-2's graphics settings and restart IL-2." xml:space="preserve">
+    <value>IL-2 è impostato a schermo intero, quindi questo overlay non può comparire sopra il gioco. Disattiva lo schermo intero nelle impostazioni grafiche di IL-2 e riavvia IL-2.</value>
+  </data>
   <data name="Friendly RCI active" xml:space="preserve">
     <value>RCI - Solo alleato</value>
   </data>

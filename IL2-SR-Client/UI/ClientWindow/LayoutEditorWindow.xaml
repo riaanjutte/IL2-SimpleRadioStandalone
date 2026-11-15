@@ -1,0 +1,163 @@
+<controls:MetroWindow x:Class="Ciribob.IL2.SimpleRadio.Standalone.Client.UI.ClientWindow.LayoutEditorWindow"
+                      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                      xmlns:themes="clr-namespace:Ciribob.IL2.SimpleRadio.Standalone.Client.Themes"
+                      xmlns:controls="clr-namespace:MahApps.Metro.Controls;assembly=MahApps.Metro"
+                      Title="Customise layout"
+                      Width="780"
+                      Height="580"
+                      MinWidth="640"
+                      MinHeight="460"
+                      WindowStartupLocation="CenterOwner"
+                      ResizeMode="CanResizeWithGrip"
+                      ShowInTaskbar="False"
+                      Background="{DynamicResource MilWindowBackgroundBrush}"
+                      Foreground="{DynamicResource MilTextPrimaryBrush}"
+                      FontSize="14"
+                      WindowTitleBrush="{DynamicResource MilChromeBrush}"
+                      NonActiveWindowTitleBrush="{DynamicResource MilChromeBrush}"
+                      GlowBrush="{DynamicResource MilBorderBrush}"
+                      NonActiveGlowBrush="{DynamicResource MilChromeBrush}"
+                      TitleCharacterCasing="Upper">
+    <controls:MetroWindow.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <themes:ThemeControlsDictionary />
+            </ResourceDictionary.MergedDictionaries>
+            <!-- The house list look (see ClientListWindow). The selection doesn't depend on focus, so it stays readable
+                 while a button has the focus; the item with keyboard focus gets an outline. -->
+            <Style x:Key="EditorList" TargetType="ListBox">
+                <Setter Property="Background" Value="{DynamicResource MilWellBrush}" />
+                <Setter Property="Foreground" Value="{DynamicResource MilTextPrimaryBrush}" />
+                <Setter Property="BorderBrush" Value="{DynamicResource MilBorderBrush}" />
+                <Setter Property="BorderThickness" Value="1" />
+                <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+                <Setter Property="ScrollViewer.HorizontalScrollBarVisibility" Value="Disabled" />
+                <Setter Property="ItemContainerStyle">
+                    <Setter.Value>
+                        <Style TargetType="ListBoxItem">
+                            <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+                            <Setter Property="Padding" Value="4,2" />
+                            <Setter Property="Background" Value="Transparent" />
+                            <Setter Property="Foreground" Value="{DynamicResource MilTextPrimaryBrush}" />
+                            <Setter Property="FocusVisualStyle" Value="{x:Null}" />
+                            <Setter Property="Template">
+                                <Setter.Value>
+                                    <ControlTemplate TargetType="ListBoxItem">
+                                        <Border x:Name="Bd"
+                                                Background="{TemplateBinding Background}"
+                                                BorderBrush="Transparent"
+                                                BorderThickness="1"
+                                                Padding="{TemplateBinding Padding}">
+                                            <ContentPresenter />
+                                        </Border>
+                                        <ControlTemplate.Triggers>
+                                            <Trigger Property="IsMouseOver" Value="True">
+                                                <Setter TargetName="Bd" Property="Background" Value="{DynamicResource MilRowAltBrush}" />
+                                            </Trigger>
+                                            <Trigger Property="IsSelected" Value="True">
+                                                <Setter TargetName="Bd" Property="Background" Value="{DynamicResource MilActionBrush}" />
+                                            </Trigger>
+                                            <Trigger Property="IsKeyboardFocusWithin" Value="True">
+                                                <Setter TargetName="Bd" Property="BorderBrush" Value="{DynamicResource MilTextPrimaryBrush}" />
+                                            </Trigger>
+                                        </ControlTemplate.Triggers>
+                                    </ControlTemplate>
+                                </Setter.Value>
+                            </Setter>
+                        </Style>
+                    </Setter.Value>
+                </Setter>
+            </Style>
+            <!-- The theme's buttons and combo boxes show no keyboard focus; here a keyboard user sees an outline. -->
+            <Style x:Key="EditorFocus">
+                <Setter Property="Control.Template">
+                    <Setter.Value>
+                        <ControlTemplate>
+                            <Rectangle Margin="-2" SnapsToDevicePixels="True" Stroke="{DynamicResource MilTextPrimaryBrush}" StrokeThickness="1" />
+                        </ControlTemplate>
+                    </Setter.Value>
+                </Setter>
+            </Style>
+            <Style x:Key="EditorButton" TargetType="Button" BasedOn="{StaticResource {x:Type Button}}">
+                <Setter Property="FocusVisualStyle" Value="{StaticResource EditorFocus}" />
+                <Setter Property="Margin" Value="0,6,6,0" />
+                <Setter Property="Padding" Value="8,2" />
+            </Style>
+        </ResourceDictionary>
+    </controls:MetroWindow.Resources>
+
+    <controls:MetroWindow.TitleTemplate>
+        <DataTemplate>
+            <TextBlock Margin="8,0,8,0"
+                       VerticalAlignment="Center"
+                       FontFamily="{StaticResource MilFontStencil}"
+                       FontSize="17"
+                       Foreground="{DynamicResource MilTitleTextBrush}"
+                       Text="{Binding Converter={StaticResource MilUpperConverter}}" />
+        </DataTemplate>
+    </controls:MetroWindow.TitleTemplate>
+
+    <DockPanel Margin="6,2,6,6">
+        <Grid DockPanel.Dock="Bottom" Margin="0,4,0,0">
+            <Button x:Name="ResetButton" Content="Reset layout" HorizontalAlignment="Left" Style="{StaticResource EditorButton}" Click="Reset_Click" />
+            <StackPanel HorizontalAlignment="Right" Orientation="Horizontal">
+                <Button Content="OK" MinWidth="90" Style="{StaticResource EditorButton}" Click="Ok_Click" />
+                <Button Content="Apply" MinWidth="90" Style="{StaticResource EditorButton}" Click="Apply_Click" />
+                <Button Content="Cancel" MinWidth="90" IsCancel="True" Style="{StaticResource EditorButton}" Margin="0,6,0,0" Click="Cancel_Click" />
+            </StackPanel>
+        </Grid>
+
+        <Grid>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="2*" />
+                <ColumnDefinition Width="3*" />
+            </Grid.ColumnDefinitions>
+
+            <GroupBox Header="Tabs" Margin="0,0,3,0">
+                <DockPanel>
+                    <WrapPanel DockPanel.Dock="Bottom">
+                        <Button x:Name="AddTabButton" Content="Add tab" Style="{StaticResource EditorButton}" Click="AddTab_Click" />
+                        <Button x:Name="RenameTabButton" Content="Rename" Style="{StaticResource EditorButton}" Click="RenameTab_Click" />
+                        <Button x:Name="DeleteTabButton" Content="Delete" Style="{StaticResource EditorButton}" Click="DeleteTab_Click" />
+                        <Button x:Name="TabUpButton" Content="Move up" Style="{StaticResource EditorButton}" Click="TabUp_Click" />
+                        <Button x:Name="TabDownButton" Content="Move down" Style="{StaticResource EditorButton}" Click="TabDown_Click" />
+                    </WrapPanel>
+                    <ListBox x:Name="TabList" Style="{StaticResource EditorList}" SelectionChanged="TabList_SelectionChanged" />
+                </DockPanel>
+            </GroupBox>
+
+            <Grid Grid.Column="1" Margin="3,0,0,0">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="3*" />
+                    <RowDefinition Height="2*" />
+                </Grid.RowDefinitions>
+
+                <GroupBox Header="Panels on this tab" Margin="0,0,0,3">
+                    <DockPanel>
+                        <StackPanel DockPanel.Dock="Bottom">
+                            <WrapPanel>
+                                <Button x:Name="RowUpButton" Content="Move up" Style="{StaticResource EditorButton}" Click="RowUp_Click" />
+                                <Button x:Name="RowDownButton" Content="Move down" Style="{StaticResource EditorButton}" Click="RowDown_Click" />
+                                <Button x:Name="PairButton" Style="{StaticResource EditorButton}" Click="Pair_Click" />
+                                <Button x:Name="HideButton" Content="Hide" Style="{StaticResource EditorButton}" Click="Hide_Click" />
+                            </WrapPanel>
+                            <DockPanel>
+                                <Button x:Name="MoveToTabButton" DockPanel.Dock="Left" Content="Move to tab" Style="{StaticResource EditorButton}" Click="MoveToTab_Click" />
+                                <ComboBox x:Name="TargetTab" FocusVisualStyle="{StaticResource EditorFocus}" Margin="0,6,0,0" SelectionChanged="UpdateButtons" />
+                            </DockPanel>
+                        </StackPanel>
+                        <ListBox x:Name="RowList" Style="{StaticResource EditorList}" SelectionChanged="UpdateButtons" />
+                    </DockPanel>
+                </GroupBox>
+
+                <GroupBox Grid.Row="1" Header="Hidden panels" Margin="0,3,0,0">
+                    <DockPanel>
+                        <Button x:Name="ShowPanelButton" DockPanel.Dock="Bottom" HorizontalAlignment="Left" Content="Add to this tab" Style="{StaticResource EditorButton}" Click="ShowPanel_Click" />
+                        <ListBox x:Name="HiddenList" Style="{StaticResource EditorList}" SelectionChanged="UpdateButtons" />
+                    </DockPanel>
+                </GroupBox>
+            </Grid>
+        </Grid>
+    </DockPanel>
+</controls:MetroWindow>

@@ -54,8 +54,6 @@
     <SolidColorBrush x:Key="MilStatusErrorBackgroundBrush" Color="#FBEAE8" />
     <SolidColorBrush x:Key="MilStatusConnectedTextBrush" Color="#007A00" />
     <SolidColorBrush x:Key="MilStatusErrorTextBrush" Color="#C00000" />
-    <SolidColorBrush x:Key="MilRciInactiveBackgroundBrush" Color="#F7F7F7" />
-    <SolidColorBrush x:Key="MilRciInactiveTextBrush" Color="#7F7F7F" />
 
     <!-- 1.0.2.0 used the MahApps default font in windows; the overlay sets Courier New itself. -->
     <FontFamily x:Key="MilFontStencil">Segoe UI</FontFamily>

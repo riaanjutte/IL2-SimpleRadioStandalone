@@ -100,7 +100,14 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.Settings
         // RCI Controller mode (see RciControllerMode): switched on in Settings, unlocked by a personal access
         // code from the Combat Box RCI dashboard.
         RciControllerEnabled,
-        RciAccessCode
+        RciAccessCode,
+
+        // General-tab sections collapsed with their arrows.
+        ServerOverlaysCollapsed,
+        FavouritesCollapsed,
+
+        // The main window's tabs, rows and collapsed rows outside Classic (see CustomLayout).
+        CustomLayout
     }
 
     public enum InputBinding
@@ -360,6 +367,9 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.Settings
         {
             {GlobalSettingsKeys.AutoConnectPrompt.ToString(), "false"},
             {GlobalSettingsKeys.AutoConnectMismatchPrompt.ToString(), "true"},
+            {GlobalSettingsKeys.ServerOverlaysCollapsed.ToString(), "false"},
+            {GlobalSettingsKeys.FavouritesCollapsed.ToString(), "false"},
+            {GlobalSettingsKeys.CustomLayout.ToString(), ""},
             {GlobalSettingsKeys.RadioOverlayTaskbarHide.ToString(), "false"},
             {GlobalSettingsKeys.AutoStartRadioOverlay.ToString(), "true"},
             {GlobalSettingsKeys.AutoStartPilotRoster.ToString(), "false"},

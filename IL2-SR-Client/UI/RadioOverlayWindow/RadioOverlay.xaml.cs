@@ -1,9 +1,11 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Threading;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -16,6 +18,7 @@ using NLog;
 using Ciribob.IL2.SimpleRadio.Standalone.Client.Settings;
 using Ciribob.IL2.SimpleRadio.Standalone.Client.Singletons;
 using Ciribob.IL2.SimpleRadio.Standalone.Client.UI;
+using Ciribob.IL2.SimpleRadio.Standalone.Client.UI.ClientWindow.Diagnostics;
 using Ciribob.IL2.SimpleRadio.Standalone.Client.UI.RadioOverlayWindow;
 using Ciribob.IL2.SimpleRadio.Standalone.Client.Utils;
 using Ciribob.IL2.SimpleRadio.Standalone.Common;
@@ -33,6 +36,9 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Overlay
 
         private readonly DispatcherTimer _telemetryUpdateTimer;
         private readonly DispatcherTimer _focusTimer;
+        private readonly DispatcherTimer _fullscreenCheckTimer;
+        private List<string> _fullscreenCheckConfigPaths;
+        private bool _fullscreenCheckRunning;
         private Timer _fastUpdateTimer;
         private int _fastApplyQueued;
         private OverlayFastSnapshot _latestFastSnapshot;
@@ -139,6 +145,63 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Overlay
             };
             _focusTimer.Tick += FocusRefresh;
             _focusTimer.Start();
+
+            _fullscreenCheckTimer = new DispatcherTimer(DispatcherPriority.Background, Dispatcher)
+            {
+                Interval = TimeSpan.FromSeconds(5)
+            };
+            _fullscreenCheckTimer.Tick += FullscreenCheckRefresh;
+            _fullscreenCheckTimer.Start();
+            FullscreenCheckRefresh(null, null);
+        }
+
+        private async void FullscreenCheckRefresh(object sender, EventArgs e)
+        {
+            if (_fullscreenCheckRunning)
+            {
+                return;
+            }
+
+            _fullscreenCheckRunning = true;
+            try
+            {
+                bool fullscreen = await Task.Run(() => IsIL2Fullscreen());
+                var visibility = fullscreen ? Visibility.Visible : Visibility.Collapsed;
+                if (FullscreenWarningPlate.Visibility != visibility)
+                {
+                    FullscreenWarningPlate.Visibility = visibility;
+                    UpdateOverlayMinimumHeight();
+                }
+            }
+            catch (Exception ex)
+            {
+                Logger.Warn(ex, "Failed to check whether IL-2 is set to fullscreen");
+            }
+            finally
+            {
+                _fullscreenCheckRunning = false;
+            }
+        }
+
+        private bool IsIL2Fullscreen()
+        {
+            if (_fullscreenCheckConfigPaths == null)
+            {
+                // shortcut: installs are found once (discovery scans the registry and Steam), so if IL-2 wasn't running yet,
+                // any fullscreen install warns; re-discover when IL-2 starts if players with two installs get false warnings.
+                List<TelemetryDiagnosticContext> contexts = TelemetryDiagnosticsService.BuildContexts()
+                    .Where(context => !string.IsNullOrWhiteSpace(context.StartupConfigPath))
+                    .ToList();
+                List<TelemetryDiagnosticContext> running = contexts
+                    .Where(context => context.DetectionSource.IndexOf("running process", StringComparison.OrdinalIgnoreCase) >= 0)
+                    .ToList();
+                _fullscreenCheckConfigPaths = (running.Count > 0 ? running : contexts)
+                    .Select(context => context.StartupConfigPath)
+                    .Distinct(StringComparer.OrdinalIgnoreCase)
+                    .ToList();
+            }
+
+            return _fullscreenCheckConfigPaths.Any(StartupConfigTelemetry.IsFullscreen);
         }
 
         private void ConnectionScrewButton_Click(object sender, RoutedEventArgs e)
@@ -809,6 +872,7 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Overlay
             _fastUpdateTimer = null;
             _telemetryUpdateTimer.Stop();
             _focusTimer.Stop();
+            _fullscreenCheckTimer.Stop();
             _overlayTestTimer?.Stop();
             _connectionScrewFeedbackTimer.Stop();
         }
