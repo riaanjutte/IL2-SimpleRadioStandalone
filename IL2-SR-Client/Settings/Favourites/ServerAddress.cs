@@ -46,23 +46,6 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI
             }
         }
 
-        private string _eamCoalitionPassword;
-        public string EAMCoalitionPassword
-        {
-            get
-            {
-                return _eamCoalitionPassword;
-            }
-            set
-            {
-                if (_eamCoalitionPassword != value)
-                {
-                    _eamCoalitionPassword = value;
-                    OnPropertyChanged();
-                }
-            }
-        }
-
         private bool _isDefault;
         public bool IsDefault
         {

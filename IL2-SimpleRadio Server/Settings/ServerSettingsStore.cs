@@ -46,7 +46,6 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Server.Settings
                 _configuration = new Configuration();
                 _configuration.Add(new Section("General Settings"));
                 _configuration.Add(new Section("Server Settings"));
-                _configuration.Add(new Section("External AWACS Mode Settings"));
 
                 Save();
             }
@@ -72,7 +71,6 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Server.Settings
                 _configuration = new Configuration();
                 _configuration.Add(new Section("General Settings"));
                 _configuration.Add(new Section("Server Settings"));
-                _configuration.Add(new Section("External AWACS Mode Settings"));
 
                 Save();
             }
@@ -128,16 +126,6 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Server.Settings
         public void SetServerSetting(ServerSettingsKeys key, string value)
         {
             SetSetting("Server Settings", key.ToString(), value?.Trim());
-        }
-
-        public Setting GetExternalAWACSModeSetting(ServerSettingsKeys key)
-        {
-            return GetSetting("External AWACS Mode Settings", key.ToString());
-        }
-
-        public void SetExternalAWACSModeSetting(ServerSettingsKeys key, string value)
-        {
-            SetSetting("External AWACS Mode Settings", key.ToString(), value);
         }
 
         private Setting GetSetting(string section, string setting)
@@ -253,7 +241,6 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Server.Settings
         {
             bool changed = EnsureSection("General Settings") |
                            EnsureSection("Server Settings") |
-                           EnsureSection("External AWACS Mode Settings") |
                            EnsureSection(ChannelNameSettings.SectionName);
 
             foreach (KeyValuePair<string, string> defaultSetting in DefaultServerSettings.Defaults)

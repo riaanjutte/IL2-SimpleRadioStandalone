@@ -168,7 +168,6 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.Singletons
             _timer.Tick += (s, e) => {
                 NotifyPropertyChanged("IsGameConnected");
                 NotifyPropertyChanged("IsLotATCConnected");
-                NotifyPropertyChanged("ExternalAWACSModeConnected");
             };
             _timer.Start();
 
