@@ -43,6 +43,8 @@ Create UTF-8 JSON with a top-level `players` array:
 
 Send the complete recognizable airfield name. Current clients map known Great Battles names and common variants to stable three-letter codes, while preserving the supplied name in a tooltip. The lookup ignores case, accents, punctuation, historical field prefixes such as `B-78`, and operational suffixes such as `BSP` or `FSP`. Unknown fields use a deterministic three-letter fallback, so no server-side code table is required.
 
+For a player who spawned in the air, send `"airfield": "Air start"`; clients show it as `AST`. `Air spawn` and `In air` are accepted too. The mission log marks an air start in the `INAIR:` field of the player's `AType:10` spawn line.
+
 ## Configure the server
 
 Stop the SRS server and add the path under `[General Settings]`:
