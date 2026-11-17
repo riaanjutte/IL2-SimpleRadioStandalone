@@ -41,6 +41,16 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Common.Tests.Helpers
         }
 
         [TestMethod]
+        public void AirStartsHaveTheirOwnCode()
+        {
+            Assert.AreEqual("AST", AirfieldCodeLookup.GetCode("Air start"));
+            Assert.AreEqual("AST", AirfieldCodeLookup.GetCode("AIRSTART"));
+            Assert.AreEqual("AST", AirfieldCodeLookup.GetCode("Air spawn"));
+            Assert.AreEqual("AST", AirfieldCodeLookup.GetCode("in-air"));
+            Assert.AreEqual("AIR", AirfieldCodeLookup.GetCode("Airaines"));
+        }
+
+        [TestMethod]
         public void EmbeddedTableLoadsAndContainsAllGreatBattlesMapEntries()
         {
             Assert.IsTrue(AirfieldCodeLookup.KnownEntryCount >= 794);
