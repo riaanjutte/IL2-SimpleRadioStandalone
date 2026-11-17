@@ -156,8 +156,6 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI
         private const double DefaultClientHeight = 650;
         private const double DefaultRadioX = 300;
         private const double DefaultRadioY = 300;
-        private const double DefaultAwacsX = 300;
-        private const double DefaultAwacsY = 300;
         private const double DefaultPilotRosterX = 360;
         private const double DefaultPilotRosterY = 260;
         private const double DefaultPilotRosterWidth = 560;
@@ -198,9 +196,6 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI
             UpdatePilotRosterAndRciVisibility(false, false);
             LocalizationManager.LocalizeFlowDocument(AboutFlowDocument);
             Loaded += MainWindow_Loaded;
-
-            // Initialize ToolTip controls
-            ToolTips.Init();
 
             // Initialize images/icons
             Images.Init();
@@ -377,14 +372,11 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI
 
             bool mainWindowVisible = false;
             bool radioWindowVisible = false;
-            bool awacsWindowVisible = false;
 
             int mainWindowX = ToScreenCoordinate(_globalSettings.GetFinitePositionSetting(GlobalSettingsKeys.ClientX, DefaultClientX));
             int mainWindowY = ToScreenCoordinate(_globalSettings.GetFinitePositionSetting(GlobalSettingsKeys.ClientY, DefaultClientY));
             int radioWindowX = ToScreenCoordinate(_globalSettings.GetFinitePositionSetting(GlobalSettingsKeys.RadioX, DefaultRadioX));
             int radioWindowY = ToScreenCoordinate(_globalSettings.GetFinitePositionSetting(GlobalSettingsKeys.RadioY, DefaultRadioY));
-            int awacsWindowX = ToScreenCoordinate(_globalSettings.GetFinitePositionSetting(GlobalSettingsKeys.AwacsX, DefaultAwacsX));
-            int awacsWindowY = ToScreenCoordinate(_globalSettings.GetFinitePositionSetting(GlobalSettingsKeys.AwacsY, DefaultAwacsY));
             double pilotRosterWidth = _globalSettings.GetFinitePositionSetting(GlobalSettingsKeys.PilotRosterWidth, DefaultPilotRosterWidth);
             double pilotRosterHeight = _globalSettings.GetFinitePositionSetting(GlobalSettingsKeys.PilotRosterHeight, DefaultPilotRosterHeight);
             double pilotRosterX = _globalSettings.GetFinitePositionSetting(GlobalSettingsKeys.PilotRosterX, DefaultPilotRosterX);
@@ -392,7 +384,6 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI
 
             Logger.Info($"Checking window visibility for main client window {{X={mainWindowX},Y={mainWindowY}}}");
             Logger.Info($"Checking window visibility for radio overlay {{X={radioWindowX},Y={radioWindowY}}}");
-            Logger.Info($"Checking window visibility for AWACS overlay {{X={awacsWindowX},Y={awacsWindowY}}}");
             Logger.Info($"Checking window visibility for pilot roster {{X={pilotRosterX},Y={pilotRosterY},Width={pilotRosterWidth},Height={pilotRosterHeight}}}");
 
             foreach (System.Windows.Forms.Screen screen in System.Windows.Forms.Screen.AllScreens)
@@ -408,11 +399,6 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI
                 {
                     Logger.Info($"Radio overlay {{X={radioWindowX},Y={radioWindowY}}} is visible on {(screen.Primary ? "primary " : "")}screen {screen.DeviceName} with bounds {screen.Bounds}");
                     radioWindowVisible = true;
-                }
-                if (screen.Bounds.Contains(awacsWindowX, awacsWindowY))
-                {
-                    Logger.Info($"AWACS overlay {{X={awacsWindowX},Y={awacsWindowY}}} is visible on {(screen.Primary ? "primary " : "")}screen {screen.DeviceName} with bounds {screen.Bounds}");
-                    awacsWindowVisible = true;
                 }
             }
 
@@ -461,20 +447,6 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI
                     _radioOverlayWindow.Left = DefaultRadioX;
                     _radioOverlayWindow.Top = DefaultRadioY;
                 }
-            }
-
-            if (!awacsWindowVisible)
-            {
-                MessageBox.Show(this,
-                    "The SRS AWACS overlay is no longer visible likely due to a monitor reconfiguration.\n\nThe position will be reset to default to fix this issue",
-                    "SRS window position reset",
-                    MessageBoxButton.OK,
-                    MessageBoxImage.Warning);
-
-                Logger.Warn($"AWACS overlay window outside visible area of monitors, resetting position ({awacsWindowX},{awacsWindowY}) to defaults");
-
-                _globalSettings.SetPositionSetting(GlobalSettingsKeys.AwacsX, DefaultAwacsX);
-                _globalSettings.SetPositionSetting(GlobalSettingsKeys.AwacsY, DefaultAwacsY);
             }
 
             if (!pilotRosterVisible)

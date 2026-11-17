@@ -39,7 +39,7 @@ ASSIGNED_CALLSIGNS_JSON_FILE=
 2=Tower/ATC
 ```
 
-The generated file can also contain an empty `[External AWACS Mode Settings]` section and reserved DServer RCon keys. Those integrations are not required by the current server and should not be relied upon as active features.
+A file written by an older server can contain an empty `[External AWACS Mode Settings]` section. It is left over from DCS-SRS and is ignored: IL-2 SRS has no EAM coalition passwords, because each player's side comes from the game, and `COALITION_AUDIO_SECURITY` keeps the sides apart. The file can also contain reserved DServer RCon keys. Those are not required by the current server and should not be relied upon as active features.
 
 ## Server Settings
 

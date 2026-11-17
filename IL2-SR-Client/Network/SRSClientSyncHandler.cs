@@ -23,7 +23,6 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.Network
     public class SRSClientSyncHandler
     {
         public delegate void ConnectCallback(bool result, bool connectionError, string connection);
-        public delegate void ExternalAWACSModeConnectCallback(bool result, int coalition);
         public delegate void UpdateUICallback();
 
         private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
@@ -39,7 +38,6 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.Network
         /// disconnect by this client. Read by the connect callback to decide whether to reconnect.
         /// </summary>
         public bool ConnectionLost { get; private set; }
-        private ExternalAWACSModeConnectCallback _externalAWACSModeCallback;
         private UpdateUICallback _updateUICallback;
         private IPEndPoint _serverEndpoint;
         private TcpClient _tcpClient;
@@ -168,18 +166,6 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.Network
             catch (Exception ex)
             {
                  Logger.Error(ex, "Failed to update UI after connection callback (result {result}, connectionError {connectionError})", result, connectionError);
-            }
-        }
-
-        private void CallExternalAWACSModeOnMain(bool result, int coalition)
-        {
-            try
-            {
-                Application.Current.Dispatcher.Invoke(DispatcherPriority.Background,
-                    new ThreadStart(delegate { _externalAWACSModeCallback(result, coalition); }));
-            }
-            catch (Exception ex)
-            {
             }
         }
 
