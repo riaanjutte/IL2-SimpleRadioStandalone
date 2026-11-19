@@ -357,6 +357,8 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI
                 {
                     _layout.ResetSplit(row);
                     store();
+                    // Else the second press also starts a drag, and a pointer that moves a pixel undoes the reset.
+                    e.Handled = true;
                 };
                 grid.Children.Add(divider);
             }
