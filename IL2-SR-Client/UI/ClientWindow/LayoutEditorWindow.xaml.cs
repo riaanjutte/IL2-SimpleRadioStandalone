@@ -56,6 +56,19 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI.ClientWindow
             }
         }
 
+        /// <summary>A divider moved in the main window while the editor is open; null shares make the row equal again.</summary>
+        internal void SetSplit(string rowKey, double[] shares)
+        {
+            if (shares == null)
+            {
+                _layout.Splits.Remove(rowKey);
+            }
+            else
+            {
+                _layout.Splits[rowKey] = (double[]) shares.Clone();
+            }
+        }
+
         /// <summary>A panel's translated header, from the main window; set before the window is shown.</summary>
         internal Func<string, string> PanelName { get; set; } = key => key;
 

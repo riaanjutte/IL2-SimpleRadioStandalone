@@ -858,6 +858,9 @@
   <data name="{0} (fit)" xml:space="preserve">
     <value>{0} (ajusté)</value>
   </data>
+  <data name="Drag to resize the panels. Double-click to make them equal." xml:space="preserve">
+    <value>Faites glisser pour redimensionner les panneaux. Double-cliquez pour les égaliser.</value>
+  </data>
   <data name="Hide" xml:space="preserve">
     <value>Masquer</value>
   </data>

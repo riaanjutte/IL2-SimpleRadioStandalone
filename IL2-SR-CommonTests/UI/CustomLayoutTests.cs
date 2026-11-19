@@ -313,7 +313,7 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Common.Tests.UI
 
             Assert.AreEqual(2, columns.Count);
             Assert.IsNull(columns[0]);
-            Assert.AreEqual(1d, columns[1]);
+            Assert.AreEqual(0.5, columns[1]);
         }
 
         [TestMethod]
@@ -326,7 +326,7 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Common.Tests.UI
 
             var columns = layout.Columns(layout.Tabs[2].Rows[0], k => k != PanelKeys.RciController);
 
-            CollectionAssert.AreEqual(new double?[] { 1d, 1d }, columns);
+            CollectionAssert.AreEqual(new double?[] { 1d / 3, 1d / 3 }, columns);
         }
 
         [TestMethod]
@@ -341,6 +341,84 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Common.Tests.UI
             var loaded = CustomLayout.Load(layout.Save(), false, false);
 
             CollectionAssert.AreEqual(new[] { "server" }, loaded.Fit.ToArray());
+        }
+
+        private static void AssertShares(double[] expected, double[] actual)
+        {
+            Assert.AreEqual(expected.Length, actual.Length);
+            for (int i = 0; i < expected.Length; i++) Assert.AreEqual(expected[i], actual[i], 1e-9, "share " + i);
+        }
+
+        [TestMethod]
+        public void SharesAreEqualUntilADividerIsDragged()
+        {
+            var layout = CustomLayout.Default();
+            layout.Join(0, 1); // [server,overlays,favourites]
+            var row = layout.Tabs[0].Rows[1];
+
+            AssertShares(new[] { 1d / 3, 1d / 3, 1d / 3 }, layout.Shares(row));
+
+            layout.SetSplit(row, 0, 1, 300, 100);
+            AssertShares(new[] { 0.5, 1d / 6, 1d / 3 }, layout.Shares(row));
+            AssertShares(new[] { 0.5, 1d / 6, 1d / 3 }, layout.Columns(row, k => true).Select(c => c.Value).ToArray());
+        }
+
+        [TestMethod]
+        public void ADividerCannotTakeAPanelBelowTheMinimumShare()
+        {
+            var layout = CustomLayout.Default();
+            var row = layout.Tabs[0].Rows[1]; // [server,overlays]
+
+            layout.SetSplit(row, 0, 1, 990, 10);
+            AssertShares(new[] { 0.85, 0.15 }, layout.Shares(row));
+
+            layout.SetSplit(row, 0, 1, 0, 0);
+            AssertShares(new[] { 0.85, 0.15 }, layout.Shares(row));
+
+            layout.ResetSplit(row);
+            AssertShares(new[] { 0.5, 0.5 }, layout.Shares(row));
+        }
+
+        [TestMethod]
+        public void NormaliseDropsSplitsThatAreStaleOrOutOfRange()
+        {
+            var layout = CustomLayout.Default();
+            layout.Splits["microphone+speakers"] = new[] { 0.95, 0.05 };
+            layout.Splits["server+overlays"] = new[] { 0.4, 0.3, 0.3 };
+            layout.Splits["favourites"] = new[] { double.NaN };
+            layout.Splits["help+controls"] = new[] { 0.5, 0.5 };
+
+            layout.Normalise();
+
+            Assert.AreEqual(0, layout.Splits.Count);
+        }
+
+        [TestMethod]
+        public void ASplitSurvivesSaveAndIsDroppedWhenItsRowChanges()
+        {
+            var layout = CustomLayout.Default();
+            layout.SetSplit(layout.Tabs[0].Rows[1], 0, 1, 100, 300);
+
+            var loaded = CustomLayout.Load(layout.Save(), false, false);
+            AssertShares(new[] { 0.25, 0.75 }, loaded.Shares(loaded.Tabs[0].Rows[1]));
+
+            loaded.Split(0, 1);
+            loaded.Normalise();
+            Assert.AreEqual(0, loaded.Splits.Count);
+        }
+
+        [TestMethod]
+        public void ALayoutSavedWithoutFitOrSplitsLoadsAsBefore()
+        {
+            // What 1.0.5.1 writes: no Fit, no Splits.
+            const string json = "{\"Tabs\":[{\"BuiltIn\":\"general\",\"Name\":null,\"Rows\":[[\"microphone\",\"speakers\"],[\"server\",\"overlays\"]]}],\"Hidden\":[],\"Collapsed\":[]}";
+            var stored = Convert.ToBase64String(System.Text.Encoding.UTF8.GetBytes(json));
+
+            var layout = CustomLayout.Load(stored, false, false);
+
+            Assert.AreEqual(0, layout.Fit.Count);
+            Assert.AreEqual(0, layout.Splits.Count);
+            CollectionAssert.AreEqual(new double?[] { 0.5, 0.5 }, layout.Columns(layout.Tabs[0].Rows[0], k => true));
         }
 
         [TestMethod]

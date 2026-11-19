@@ -45,6 +45,9 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI.ClientWindow
     {
         public const int MaxPanelsPerRow = 3;
 
+        // The least of a row's width a divider can leave a panel
+        public const double MinShare = 0.15;
+
         private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
 
         public List<LayoutTab> Tabs { get; set; } = new List<LayoutTab>();
@@ -55,6 +58,9 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI.ClientWindow
 
         // Panels that take only the width their controls need
         public HashSet<string> Fit { get; set; } = new HashSet<string>();
+
+        // Row key to each panel's share of the row's width, summing to 1; a row without an entry is divided equally
+        public Dictionary<string, double[]> Splits { get; set; } = new Dictionary<string, double[]>();
 
         public static string RowKey(IList<string> row)
         {
@@ -97,7 +103,38 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI.ClientWindow
         /// </summary>
         public List<double?> Columns(IList<string> row, Func<string, bool> shown)
         {
-            return row.Where(shown).Select(k => Fit.Contains(k) ? (double?) null : 1d).ToList();
+            var shares = Shares(row);
+            return Enumerable.Range(0, row.Count).Where(i => shown(row[i]))
+                .Select(i => Fit.Contains(row[i]) ? (double?) null : shares[i]).ToList();
+        }
+
+        /// <summary>Each panel's share of the row's width: as a divider left them, else equal.</summary>
+        public double[] Shares(IList<string> row)
+        {
+            double[] stored;
+            return Splits.TryGetValue(RowKey(row), out stored) && stored.Length == row.Count
+                ? (double[]) stored.Clone()
+                : Enumerable.Repeat(1d / row.Count, row.Count).ToArray();
+        }
+
+        /// <summary>
+        /// A divider between two panels of a row was moved: divides their combined share by the widths it left them,
+        /// keeping each at MinShare or more. The row's other panels keep theirs.
+        /// </summary>
+        public void SetSplit(IList<string> row, int left, int right, double leftWidth, double rightWidth)
+        {
+            double width = leftWidth + rightWidth;
+            if (!(width > 0)) return;
+            var shares = Shares(row);
+            double both = shares[left] + shares[right];
+            shares[left] = Math.Max(MinShare, Math.Min(both - MinShare, both * leftWidth / width));
+            shares[right] = both - shares[left];
+            Splits[RowKey(row)] = shares;
+        }
+
+        public void ResetSplit(IList<string> row)
+        {
+            Splits.Remove(RowKey(row));
         }
 
         public static CustomLayout Default()
@@ -195,6 +232,17 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI.ClientWindow
 
             var rowKeys = new HashSet<string>(Tabs.SelectMany(t => t.Rows).Select(RowKey));
             Collapsed = new HashSet<string>((Collapsed ?? new HashSet<string>()).Where(rowKeys.Contains));
+
+            // A split whose row changed is dropped, as is one only a hand-edited file can hold.
+            var panelCounts = Tabs.SelectMany(t => t.Rows).ToDictionary(RowKey, r => r.Count);
+            Splits = (Splits ?? new Dictionary<string, double[]>())
+                .Where(s =>
+                {
+                    int count;
+                    return s.Value != null && panelCounts.TryGetValue(s.Key, out count) && s.Value.Length == count &&
+                           s.Value.All(share => share >= MinShare - 1e-6) && Math.Abs(s.Value.Sum() - 1) < 1e-6;
+                })
+                .ToDictionary(s => s.Key, s => s.Value);
         }
 
         public bool AddTab(string name)

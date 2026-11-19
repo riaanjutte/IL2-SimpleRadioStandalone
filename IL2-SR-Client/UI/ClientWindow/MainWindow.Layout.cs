@@ -5,6 +5,7 @@ using System.Windows;
 using System.Windows.Automation;
 using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
+using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Threading;
 using Ciribob.IL2.SimpleRadio.Standalone.Client.Localization;
@@ -241,6 +242,7 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI
             }
 
             grid.Visibility = shown.Count > 0 ? Visibility.Visible : Visibility.Collapsed;
+            AddDividers(grid, row);
 
             bool collapsed = IsRowCollapsed(row);
             SetRowCollapsed(row, collapsed);
@@ -273,6 +275,91 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI
             };
             grid.Children.Add(toggle);
             return grid;
+        }
+
+        /// <summary>
+        /// A draggable divider between neighbouring panels of a row, unless one of them is fit to its content. The
+        /// split is saved when the drag ends; double-click makes the row's panels equal again.
+        /// </summary>
+        private void AddDividers(Grid grid, List<string> row)
+        {
+            Func<string, bool> isShown = key => PanelFor(key).Visibility == Visibility.Visible;
+            var keys = row.Where(isShown).ToList();
+            string text = LocalizationManager.Get("Drag to resize the panels. Double-click to make them equal.");
+
+            Action store = () =>
+            {
+                // From the stored shares, so a drag past the limit snaps back to it.
+                var weights = _layout.Columns(row, isShown);
+                for (int c = 0; c < weights.Count; c++)
+                {
+                    if (weights[c] != null)
+                    {
+                        grid.ColumnDefinitions[c].Width = new GridLength(weights[c].Value, GridUnitType.Star);
+                    }
+                }
+
+                _globalSettings.SetClientSetting(GlobalSettingsKeys.CustomLayout, _layout.Save());
+                double[] shares;
+                _layout.Splits.TryGetValue(CustomLayout.RowKey(row), out shares);
+                _layoutEditor?.SetSplit(CustomLayout.RowKey(row), shares); // else its OK or Apply would undo this
+                // A new width can change the row's height.
+                Dispatcher.BeginInvoke(new Action(ApplyPanelCollapse), DispatcherPriority.Loaded);
+            };
+
+            for (int i = 0; i + 1 < keys.Count; i++)
+            {
+                if (_layout.Fit.Contains(keys[i]) || _layout.Fit.Contains(keys[i + 1]))
+                {
+                    continue;
+                }
+
+                int column = i, left = row.IndexOf(keys[i]), right = row.IndexOf(keys[i + 1]);
+                var divider = new GridSplitter
+                {
+                    // Centred on the gap between the two panels.
+                    Width = 6,
+                    Margin = new Thickness(0, 0, -3, 0),
+                    HorizontalAlignment = HorizontalAlignment.Right,
+                    VerticalAlignment = VerticalAlignment.Stretch,
+                    Background = Brushes.Transparent,
+                    ResizeDirection = GridResizeDirection.Columns,
+                    ResizeBehavior = GridResizeBehavior.CurrentAndNext,
+                    Cursor = Cursors.SizeWE,
+                    KeyboardIncrement = 10,
+                    ToolTip = text
+                };
+                AutomationProperties.SetName(divider, text);
+                Grid.SetColumn(divider, column);
+
+                Action moved = () =>
+                {
+                    _layout.SetSplit(row, left, right,
+                        grid.ColumnDefinitions[column].ActualWidth, grid.ColumnDefinitions[column + 1].ActualWidth);
+                    store();
+                };
+                divider.DragCompleted += (sender, e) =>
+                {
+                    if (e.HorizontalChange != 0) // a plain click is not a move
+                    {
+                        moved();
+                    }
+                };
+                // The arrow keys move a focused divider without any drag event.
+                divider.KeyUp += (sender, e) =>
+                {
+                    if (e.Key == Key.Left || e.Key == Key.Right)
+                    {
+                        moved();
+                    }
+                };
+                divider.MouseDoubleClick += (sender, e) =>
+                {
+                    _layout.ResetSplit(row);
+                    store();
+                };
+                grid.Children.Add(divider);
+            }
         }
 
         private bool IsRowCollapsed(IList<string> row)

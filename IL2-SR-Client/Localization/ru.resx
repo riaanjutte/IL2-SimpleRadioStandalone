@@ -858,6 +858,9 @@
   <data name="{0} (fit)" xml:space="preserve">
     <value>{0} (по содержимому)</value>
   </data>
+  <data name="Drag to resize the panels. Double-click to make them equal." xml:space="preserve">
+    <value>Перетащите, чтобы изменить размер панелей. Двойной щелчок делает их равными.</value>
+  </data>
   <data name="Hide" xml:space="preserve">
     <value>Скрыть</value>
   </data>
