@@ -21,6 +21,9 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI
 
         private CustomLayout _layout;
 
+        // The open layout editor, if any.
+        private LayoutEditorWindow _layoutEditor;
+
         // Set while ApplyLayout swaps the tabs, so the TabControl's selection changes don't resize the window.
         private bool _rebuildingTabs;
 
@@ -35,13 +38,24 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI
             }
 
             CustomiseLayoutButton.Click += (sender, e) =>
-                new LayoutEditorWindow(_layout, ApplyLayout)
+            {
+                // Not modal, so the main window stays usable; one editor at a time.
+                if (_layoutEditor != null)
+                {
+                    _layoutEditor.Activate();
+                    return;
+                }
+
+                _layoutEditor = new LayoutEditorWindow(_layout, ApplyLayout)
                 {
                     Owner = this,
                     PanelName = PanelHeader,
                     // The panel's own rule (RCI Controller without access keys); the layout never sets a panel's Visibility.
                     Available = key => PanelFor(key).Visibility == Visibility.Visible
-                }.ShowDialog();
+                };
+                _layoutEditor.Closed += (s, args) => _layoutEditor = null;
+                _layoutEditor.Show();
+            };
             ServerOverlaysCollapseToggle.Visibility = Visibility.Collapsed;
             TabControl.Loaded += (sender, e) => ReserveTabStripSpaceForCustomiseButton();
             ApplyLayout(CustomLayout.Load(
@@ -243,6 +257,7 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI
                 }
 
                 _globalSettings.SetClientSetting(GlobalSettingsKeys.CustomLayout, _layout.Save());
+                _layoutEditor?.SetRowCollapsed(CustomLayout.RowKey(row), nowCollapsed); // else its OK or Apply would undo this
                 SetRowCollapsed(row, nowCollapsed);
                 SetCollapseToolTip(toggle);
                 ApplyPanelCollapse();

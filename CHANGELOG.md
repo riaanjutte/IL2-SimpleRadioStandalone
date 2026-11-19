@@ -12,6 +12,7 @@
 
 ### Changed
 
+- Client: the layout editor no longer blocks the main window, so you can keep using SRS while it is open. Pressing ⚙ again brings the open editor to the front.
 - Client: in the layout editor, **Other panels** (formerly Hidden panels) also lists the panels on other tabs, so **Add to this tab** can bring a panel from any tab to the one selected. A panel taken from a pair leaves its partner on a row of its own.
 - Client: the tabs at the top of the main window are more compact, with smaller lettering, and still fit their names in every language.
 - Client: the main window can be made narrower, down to 400 pixels. The Settings labels share the width with their switches, the Controls table scrolls sideways when it doesn't fit, and the status bar moves its right-hand part to a second line.

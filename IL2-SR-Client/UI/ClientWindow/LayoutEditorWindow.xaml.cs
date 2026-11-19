@@ -43,6 +43,19 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI.ClientWindow
             };
         }
 
+        /// <summary>A row collapsed or expanded in the main window while the editor is open; a row the edit removed is dropped on apply.</summary>
+        internal void SetRowCollapsed(string rowKey, bool collapsed)
+        {
+            if (collapsed)
+            {
+                _layout.Collapsed.Add(rowKey);
+            }
+            else
+            {
+                _layout.Collapsed.Remove(rowKey);
+            }
+        }
+
         /// <summary>A panel's translated header, from the main window; set before the window is shown.</summary>
         internal Func<string, string> PanelName { get; set; } = key => key;
 
