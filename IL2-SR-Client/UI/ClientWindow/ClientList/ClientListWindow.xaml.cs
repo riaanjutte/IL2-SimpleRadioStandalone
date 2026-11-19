@@ -30,6 +30,7 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI.ClientWindow.ClientList
         public ClientListWindow()
         {
             InitializeComponent();
+            UiScale.Apply(this);
             LocalizationManager.LocalizeElement(this);
             RestoreWindowBounds();
             ClientList.ItemsSource = _clientList;

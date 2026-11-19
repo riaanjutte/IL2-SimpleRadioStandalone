@@ -433,7 +433,7 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI
                 {
                     rowGrid.UpdateLayout();
                     _collapsedPanelsHeight = CollapsedPanelsHeight.EmptyHeight(
-                        rowGrid.ActualHeight + _heightReduction, rowGrid.DesiredSize.Height);
+                        rowGrid.ActualHeight, _heightReduction, rowGrid.DesiredSize.Height, UiScale.Of(this));
                 }
             }
             else if (tabItem.Content is ScrollViewer scroll)
@@ -442,7 +442,7 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI
                 var content = (FrameworkElement) scroll.Content;
                 content.UpdateLayout();
                 _collapsedPanelsHeight = CollapsedPanelsHeight.EmptyHeight(
-                    scroll.ViewportHeight + _heightReduction, content.DesiredSize.Height);
+                    scroll.ViewportHeight, _heightReduction, content.DesiredSize.Height, UiScale.Of(this));
             }
 
             tabItem.Tag = _collapsedPanelsHeight; // used straight away when this tab is shown again

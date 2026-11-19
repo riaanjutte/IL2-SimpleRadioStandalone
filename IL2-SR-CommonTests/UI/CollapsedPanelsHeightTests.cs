@@ -108,6 +108,17 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Common.Tests.UI
         }
 
         [TestMethod]
+        public void EmptyHeightOfScaledContentIsInWindowUnits()
+        {
+            // Text size 130%: the content measures 400 of its own units in a 500-unit viewport, and the window is
+            // already 130 window units (100 content units) shorter than normal. 199 content units are empty.
+            Assert.AreEqual(199 * 1.3, CollapsedPanelsHeight.EmptyHeight(500, 130, 400, 1.3), 1e-9);
+            // At the normal size it is the plain calculation.
+            Assert.AreEqual(CollapsedPanelsHeight.EmptyHeight(600, 400), CollapsedPanelsHeight.EmptyHeight(500, 100, 400, 1));
+            Assert.AreEqual(0, CollapsedPanelsHeight.EmptyHeight(500, 0, 900, 1.3));
+        }
+
+        [TestMethod]
         public void AFittedWindowCanStillBeDraggedSmaller()
         {
             // General fitted from 700 to 401: the minimum drops by the same amount, so the player can drag below it.

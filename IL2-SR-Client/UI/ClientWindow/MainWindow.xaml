@@ -801,6 +801,7 @@
                                 <RowDefinition />
                                 <RowDefinition />
                                 <RowDefinition />
+                                <RowDefinition />
                             </Grid.RowDefinitions>
 
                             <Label Grid.Row="0"
@@ -1020,23 +1021,37 @@
                                    Grid.Column="0"
                                    HorizontalContentAlignment="Center"
                                    VerticalContentAlignment="Center"
+                                   Content="Text size" />
+
+                            <ComboBox Name="TextSizePicker"
+                                      Grid.Row="15"
+                                      Grid.Column="1"
+                                      HorizontalContentAlignment="Center"
+                                      VerticalContentAlignment="Center"
+                                      ToolTip="Makes the text and controls in the SRS windows larger. To resize the radio overlay, drag its corner."
+                                      SelectionChanged="TextSizePicker_SelectionChanged" />
+
+                            <Label Grid.Row="16"
+                                   Grid.Column="0"
+                                   HorizontalContentAlignment="Center"
+                                   VerticalContentAlignment="Center"
                                    Content="3D Effects" />
 
                             <ToggleButton Name="ThreeDEffectsToggle"
-                                          Grid.Row="15"
+                                          Grid.Row="16"
                                           Grid.Column="1"
                                           HorizontalContentAlignment="Center"
                                           VerticalContentAlignment="Center"
                                           Click="ThreeDEffectsToggle_Click">
                             </ToggleButton>
 
-                            <Label Grid.Row="16"
+                            <Label Grid.Row="17"
                                    Grid.Column="0"
                                    HorizontalContentAlignment="Center"
                                    VerticalContentAlignment="Center"
                                    Content="Weathering" />
 
-                            <Grid Grid.Row="16"
+                            <Grid Grid.Row="17"
                                   Grid.Column="1"
                                   HorizontalAlignment="Stretch">
                                 <Grid.ColumnDefinitions>

@@ -40,6 +40,7 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI.ClientWindow.PilotRoster
             IsUnavailableMode = showUnavailableMessage;
             _manuallySized = _globalSettings.GetClientSettingBool(GlobalSettingsKeys.PilotRosterUserResized);
             InitializeComponent();
+            UiScale.Apply(this);
             _fitHeightMenuItem.Click += FitHeightMenuItem_Click;
             RosterFrame.ContextMenu = new ContextMenu { Items = { _fitHeightMenuItem } };
             LocalizationManager.LocalizeElement(this);
@@ -259,11 +260,13 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI.ClientWindow.PilotRoster
 
             var currentBounds = new Rect(Left, Top, Width, Height);
             var workArea = GetCurrentWorkArea(currentBounds);
-            var rosterChromeHeight = Math.Max(0, ActualHeight - PilotList.ActualHeight);
-            var desiredHeight = rosterChromeHeight + PilotList.ColumnHeaderHeight
-                                + _pilotRoster.Count * PilotList.RowHeight
-                                + PilotList.BorderThickness.Top + PilotList.BorderThickness.Bottom
-                                + RosterGridHeightSafetyPadding;
+            // The list is measured in the content's units; the window's are bigger by the Text size setting.
+            double scale = UiScale.Of(this);
+            var rosterChromeHeight = Math.Max(0, ActualHeight / scale - PilotList.ActualHeight);
+            var desiredHeight = (rosterChromeHeight + PilotList.ColumnHeaderHeight
+                                 + _pilotRoster.Count * PilotList.RowHeight
+                                 + PilotList.BorderThickness.Top + PilotList.BorderThickness.Bottom
+                                 + RosterGridHeightSafetyPadding) * scale;
             var fittedBounds = PilotRosterScreenBounds.FitHeightToContent(
                 currentBounds,
                 workArea,

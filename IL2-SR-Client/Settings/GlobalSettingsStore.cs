@@ -85,6 +85,7 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.Settings
         Language,
         Theme,
         VuMeterStyle,
+        TextSize, // percent, see UiScale
         ThreeDEffectsEnabled,
 
         CommunityRecommendedSettingsChoice,
@@ -449,6 +450,7 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.Settings
             {GlobalSettingsKeys.Language.ToString(), "" },
             {GlobalSettingsKeys.Theme.ToString(), "Bakelite" },
             {GlobalSettingsKeys.VuMeterStyle.ToString(), "Auto" },
+            {GlobalSettingsKeys.TextSize.ToString(), "100" },
             {GlobalSettingsKeys.ThreeDEffectsEnabled.ToString(), "true" },
             {GlobalSettingsKeys.CommunityRecommendedSettingsChoice.ToString(), "" },
 

@@ -27,6 +27,7 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI.ClientWindow
         internal LayoutEditorWindow(CustomLayout layout, Action<CustomLayout> apply)
         {
             InitializeComponent();
+            UiScale.Apply(this);
             // Before the lists are filled: tab names are the player's own and must not be looked up as translations.
             LocalizationManager.LocalizeElement(this);
             AutomationProperties.SetName(TabList, LocalizationManager.Get("Tabs"));

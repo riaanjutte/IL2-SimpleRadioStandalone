@@ -31,5 +31,14 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI.ClientWindow
             // One whole pixel of slack: the window height is rounded to screen pixels, and a fraction short shows a scroll bar.
             return Math.Max(0, Math.Floor(viewportAtNormalHeight - content) - 1);
         }
+
+        /// <summary>
+        /// The same for content scaled by the Text size setting. The viewport and the content are measured in the
+        /// content's own units; the height reduction and the result are in the window's.
+        /// </summary>
+        public static double EmptyHeight(double viewport, double heightReduction, double content, double scale)
+        {
+            return EmptyHeight(viewport + heightReduction / scale, content) * scale;
+        }
     }
 }

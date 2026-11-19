@@ -251,11 +251,13 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI
             InitOverlayOpacitySliders();
             InitWeatheringControls();
             InitVuMeterStylePicker();
+            InitTextSizePicker();
             IL2_SR_Client.App.ApplyVuMeterStyle();
             ApplyClassicThemeLayout();
             InitCustomLayout();
             ApplyVuMeterKind();
             InitPanelCollapse();
+            ApplyUiScale();
 
             SpeakerBoost.Value = _globalSettings.GetClientSetting(GlobalSettingsKeys.SpeakerBoost).DoubleValue;
 
@@ -1126,6 +1128,45 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI
                     RestartClient("theme change");
                 }
             }
+        }
+
+        private void InitTextSizePicker()
+        {
+            TextSizePicker.ItemsSource = UiScale.Percents.Select(percent => percent + "%").ToArray();
+            TextSizePicker.SelectedIndex = Array.IndexOf(UiScale.Percents, (int) Math.Round(UiScale.Current * 100));
+        }
+
+        private void TextSizePicker_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            int index = TextSizePicker.SelectedIndex;
+            if (index < 0 || UiScale.Percents[index] == (int) Math.Round(UiScale.Current * 100))
+            {
+                return; // being filled, or no change
+            }
+
+            _globalSettings.SetClientSetting(GlobalSettingsKeys.TextSize, UiScale.Percents[index].ToString());
+            ApplyUiScale();
+            UiScale.ApplyToOpenWindows();
+        }
+
+        /// <summary>
+        /// Applies the Text size setting to the window's content. The window keeps its size and its minimum size
+        /// grows; Classic's fixed-size window grows with its content instead.
+        /// </summary>
+        private void ApplyUiScale()
+        {
+            double ratio = UiScale.Current / UiScale.Of(this);
+            double normalHeight = (Height + _heightReduction) * (_classicLayout ? ratio : 1);
+            UiScale.Apply(this, _classicLayout);
+            _normalMinHeight *= ratio;
+            // The player's normal height stays, unless the bigger content needs more than that.
+            _heightReduction = Math.Max(normalHeight, _normalMinHeight) - Height;
+            foreach (var tab in TabControl.Items.OfType<TabItem>())
+            {
+                tab.Tag = null; // a height measured at the old scale
+            }
+
+            Dispatcher.BeginInvoke(new Action(ApplyPanelCollapse), DispatcherPriority.Loaded);
         }
 
         private void VuMeterStylePicker_SelectionChanged(object sender, SelectionChangedEventArgs e)
@@ -2337,7 +2378,8 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI
 
             SetPanelContentVisibility(serverOverlaysCollapsed);
             GeneralLayout.UpdateLayout();
-            _collapsedPanelsHeight = Math.Max(0, expandedHeight - GeneralLayout.DesiredSize.Height);
+            // Measured in the content's units; the window's are bigger by the Text size setting.
+            _collapsedPanelsHeight = Math.Max(0, expandedHeight - GeneralLayout.DesiredSize.Height) * UiScale.Of(this);
 
             ResizeForCollapsedPanels();
         }

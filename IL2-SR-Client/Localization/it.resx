@@ -225,6 +225,12 @@
   <data name="VU Meter" xml:space="preserve">
     <value>Indicatore VU</value>
   </data>
+  <data name="Text size" xml:space="preserve">
+    <value>Dimensione del testo</value>
+  </data>
+  <data name="Makes the text and controls in the SRS windows larger. To resize the radio overlay, drag its corner." xml:space="preserve">
+    <value>Ingrandisce il testo e i controlli delle finestre di SRS. Per ridimensionare l’overlay radio, trascina il suo angolo.</value>
+  </data>
   <data name="Auto" xml:space="preserve">
     <value>Auto</value>
   </data>

@@ -225,6 +225,12 @@
   <data name="VU Meter" xml:space="preserve">
     <value>VU-индикатор</value>
   </data>
+  <data name="Text size" xml:space="preserve">
+    <value>Размер текста</value>
+  </data>
+  <data name="Makes the text and controls in the SRS windows larger. To resize the radio overlay, drag its corner." xml:space="preserve">
+    <value>Увеличивает текст и элементы управления в окнах SRS. Чтобы изменить размер радио-оверлея, потяните за его угол.</value>
+  </data>
   <data name="Auto" xml:space="preserve">
     <value>Авто</value>
   </data>

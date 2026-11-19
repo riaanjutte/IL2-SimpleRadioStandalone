@@ -102,6 +102,7 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI.ClientWindow.Diagnostics
             builder.AppendLine("Language: " + EmptyIfNull(settings.GetClientSetting(GlobalSettingsKeys.Language).RawValue));
             builder.AppendLine("Theme: " + EmptyIfNull(settings.GetClientSetting(GlobalSettingsKeys.Theme).RawValue));
             builder.AppendLine("VU meter: " + EmptyIfNull(settings.GetClientSetting(GlobalSettingsKeys.VuMeterStyle).RawValue));
+            builder.AppendLine("Text size: " + EmptyIfNull(settings.GetClientSetting(GlobalSettingsKeys.TextSize).RawValue));
             builder.AppendLine("3D effects enabled: " + settings.GetClientSettingBool(GlobalSettingsKeys.ThreeDEffectsEnabled));
             builder.AppendLine("Weathering enabled: " + settings.GetClientSettingBool(GlobalSettingsKeys.WeatheringEnabled));
             builder.AppendLine("Weathering opacity: " + settings.GetClientSetting(GlobalSettingsKeys.WeatheringOpacity).RawValue);
