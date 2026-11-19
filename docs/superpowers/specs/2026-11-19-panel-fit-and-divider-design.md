@@ -47,7 +47,8 @@ the divider as well for rows where the panels should not be content-sized.
 - `Splits`: row key (as `RowKey`, e.g. `server+favourites`) to one share per panel of that row, summing to 1,
   each at least 0.15. No entry means equal shares.
 - `Normalise` drops unknown panel keys from `Fit`, drops `Splits` entries whose row no longer exists or whose
-  count does not match the row, and clamps shares into range. `Default()` has neither, so **Reset layout** clears both.
+  count does not match the row or whose shares are out of range (only a hand-edited file can hold those); the
+  row is then equal again. `Default()` has neither, so **Reset layout** clears both.
 - An older saved layout without these fields loads as today (no fit, 50/50).
 
 **Row widths (main window, `BuildRow`)**
@@ -66,6 +67,8 @@ the divider as well for rows where the panels should not be content-sized.
   the editor is open.
 - Dragging moves width between the two panels beside the divider only; on release the shares are clamped,
   stored in `Splits` and saved. Double-click resets the whole row to equal shares.
+- The divider can also be focused and moved with the Left and Right arrow keys, and carries a tooltip that
+  says how to use it.
 - Like the collapse arrows, a change made while the editor is open is passed to the editor's copy of the
   layout, so its OK or Apply keeps it.
 
@@ -84,7 +87,8 @@ the divider as well for rows where the panels should not be content-sized.
 **Text**
 
 "Fit to content:", "{0} (fit)", "Join with row below" and "Split row" in all six `.resx` files, replacing
-"Pair with row below" and "Unpair"; plus a changelog line.
+"Pair with row below" and "Unpair"; the divider's tooltip, "Drag to resize the panels. Double-click to make
+them equal."; plus a changelog line.
 
 ## My calls (not decisions the player made)
 
