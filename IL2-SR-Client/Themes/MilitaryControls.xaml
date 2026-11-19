@@ -615,8 +615,10 @@
                                          HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="0,0,5,5"
                                          Opacity="{DynamicResource ThreeDScrewOpacity}" />
 
-                                <DockPanel Margin="20,6,20,10">
-                                    <DockPanel DockPanel.Dock="Top" Margin="0,2,0,6" LastChildFill="True">
+                                <!-- The header clears the corner screws; the content below them runs closer to the
+                                     edges, so a narrow panel clips its controls later. -->
+                                <DockPanel Margin="0,6,0,10">
+                                    <DockPanel DockPanel.Dock="Top" Margin="20,2,20,6" LastChildFill="True">
                                         <ContentPresenter DockPanel.Dock="Left"
                                                           ContentSource="Header"
                                                           VerticalAlignment="Center"
@@ -636,7 +638,7 @@
                                             <Border Height="1" Background="{DynamicResource ThreeDSoftHighlightBrush}" />
                                         </StackPanel>
                                     </DockPanel>
-                                    <ContentPresenter Margin="2,0,2,2" />
+                                    <ContentPresenter Margin="8,0,8,2" />
                                 </DockPanel>
                             </Grid>
                         </Border>

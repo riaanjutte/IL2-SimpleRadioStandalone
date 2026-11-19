@@ -1193,13 +1193,13 @@
                         </Grid>
                     </GroupBox>
                     <GroupBox x:Name="ProfilePanel" Header="Profile">
-                        <StackPanel Orientation="Vertical" HorizontalAlignment="Center" Margin="10">
+                        <StackPanel Orientation="Vertical" HorizontalAlignment="Center" Margin="0,10">
                             <ComboBox x:Name="ControlsProfile"
                                    Width="200"
                                    HorizontalAlignment="Center"
                                    VerticalAlignment="Top" Margin="5"  Padding="5" />
                             <!-- Wraps: in a narrow panel a single line would clip at both ends. -->
-                            <WrapPanel HorizontalAlignment="Center" Margin="10">
+                            <WrapPanel HorizontalAlignment="Center" Margin="0,10">
                                 <Button Margin="5" Padding="5" Content="Create Profile" Click="CreateProfile" />
                                 <Button Margin="5" Padding="5" Content="Copy Profile" Click="CopyProfile" />
                                 <Button  Margin="5"  Padding="5" Content="Rename Profile" Click="RenameProfile" />
