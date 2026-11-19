@@ -89,12 +89,62 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI.ClientWindow
         {
             _filling = true;
             _shownRows = Tab < 0 ? new List<int>() : CustomLayout.ShownRows(_layout.Tabs[Tab], Available);
-            Fill(RowList, _shownRows.Select(r => string.Join(" + ", _layout.Tabs[Tab].Rows[r].Where(Available).Select(PanelName))), shown);
+            Fill(RowList, _shownRows.Select(RowName), shown);
             FillTargetTabs();
             _panelsToAdd = _layout.PanelsToAdd(Tab).Where(p => Available(p.Key)).ToList();
             Fill(HiddenList, _panelsToAdd.Select(PanelToAddName), HiddenList.SelectedIndex);
             _filling = false;
             UpdateButtons();
+        }
+
+        /// <summary>A row of the selected tab as the list shows it, e.g. "Server (fit) + Favourites".</summary>
+        private string RowName(int row)
+        {
+            return string.Join(" + ", _layout.Tabs[Tab].Rows[row].Where(Available).Select(key =>
+                _layout.Fit.Contains(key) ? LocalizationManager.Format("{0} (fit)", PanelName(key)) : PanelName(key)));
+        }
+
+        /// <summary>One "fit to content" checkbox per panel of the selected row.</summary>
+        private void FillFitBoxes()
+        {
+            FitBoxes.Children.Clear();
+            int tab = Tab, shown = Shown, row = Row;
+            if (row < 0)
+            {
+                return;
+            }
+
+            string label = LocalizationManager.Get("Fit to content:");
+            FitBoxes.Children.Add(new TextBlock { Text = label, VerticalAlignment = VerticalAlignment.Center, Margin = new Thickness(0, 0, 8, 0) });
+            foreach (var key in _layout.Tabs[tab].Rows[row].Where(Available))
+            {
+                var box = new CheckBox
+                {
+                    Content = PanelName(key),
+                    IsChecked = _layout.Fit.Contains(key),
+                    VerticalAlignment = VerticalAlignment.Center,
+                    Margin = new Thickness(0, 0, 12, 0)
+                };
+                AutomationProperties.SetName(box, label + " " + PanelName(key));
+                // Checked and Unchecked, not Click: a screen reader toggles the box without a click.
+                RoutedEventHandler changed = (sender, e) =>
+                {
+                    if (box.IsChecked == true)
+                    {
+                        _layout.Fit.Add(key);
+                    }
+                    else
+                    {
+                        _layout.Fit.Remove(key);
+                    }
+
+                    // Only this item: rebuilding the list here would move the selection and take the box away.
+                    ((ListBoxItem) RowList.Items[shown]).Content = RowName(row);
+                };
+                box.Checked += changed;
+                box.Unchecked += changed;
+                FitBoxes.Children.Add(box);
+            }
         }
 
         private string PanelToAddName(KeyValuePair<string, int> panel)
@@ -154,6 +204,7 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI.ClientWindow
             MoveToTabButton.IsEnabled = row >= 0 && TargetTab.SelectedItem != null;
             TargetTab.IsEnabled = TargetTab.Items.Count > 0;
             ShowPanelButton.IsEnabled = tab >= 0 && HiddenList.SelectedIndex >= 0;
+            FillFitBoxes();
         }
 
         /// <summary>A keyboard user whose button just greyed out carries on from the list it acted on.</summary>

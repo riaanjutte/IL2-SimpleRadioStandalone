@@ -53,6 +53,9 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI.ClientWindow
         // Row keys, see RowKey
         public HashSet<string> Collapsed { get; set; } = new HashSet<string>();
 
+        // Panels that take only the width their controls need
+        public HashSet<string> Fit { get; set; } = new HashSet<string>();
+
         public static string RowKey(IList<string> row)
         {
             return string.Join("+", row);
@@ -86,6 +89,15 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI.ClientWindow
         public static List<int> ShownRows(LayoutTab tab, Func<string, bool> available)
         {
             return Enumerable.Range(0, tab.Rows.Count).Where(r => tab.Rows[r].Any(available)).ToList();
+        }
+
+        /// <summary>
+        /// A row's grid columns, one per panel the player can see: null for a fit panel (as wide as its content),
+        /// else the star weight it shares the remaining width by.
+        /// </summary>
+        public List<double?> Columns(IList<string> row, Func<string, bool> shown)
+        {
+            return row.Where(shown).Select(k => Fit.Contains(k) ? (double?) null : 1d).ToList();
         }
 
         public static CustomLayout Default()
@@ -178,6 +190,8 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI.ClientWindow
                 foreach (var key in PanelKeys.All.Where(k => !seen.Contains(k)))
                     Tabs[0].Rows.Add(new List<string> { key });
             }
+
+            Fit = new HashSet<string>((Fit ?? new HashSet<string>()).Where(PanelKeys.All.Contains));
 
             var rowKeys = new HashSet<string>(Tabs.SelectMany(t => t.Rows).Select(RowKey));
             Collapsed = new HashSet<string>((Collapsed ?? new HashSet<string>()).Where(rowKeys.Contains));

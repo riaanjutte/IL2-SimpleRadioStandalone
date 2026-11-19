@@ -304,6 +304,46 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Common.Tests.UI
         }
 
         [TestMethod]
+        public void ColumnsAreAutoForFitPanelsAndStarForTheRest()
+        {
+            var layout = CustomLayout.Default();
+            layout.Fit.Add("server");
+
+            var columns = layout.Columns(layout.Tabs[0].Rows[1], k => true); // [server,overlays]
+
+            Assert.AreEqual(2, columns.Count);
+            Assert.IsNull(columns[0]);
+            Assert.AreEqual(1d, columns[1]);
+        }
+
+        [TestMethod]
+        public void ColumnsLeaveOutPanelsThatAreNotShown()
+        {
+            var layout = CustomLayout.Default();
+            layout.Join(2, 0); // settings: [globalSettings,rciController] ...
+            layout.Join(2, 0); // [globalSettings,rciController,audioOptions]
+            layout.Fit.Add("rciController");
+
+            var columns = layout.Columns(layout.Tabs[2].Rows[0], k => k != PanelKeys.RciController);
+
+            CollectionAssert.AreEqual(new double?[] { 1d, 1d }, columns);
+        }
+
+        [TestMethod]
+        public void FitSurvivesSaveAndMovesButNormaliseDropsUnknownKeys()
+        {
+            var layout = CustomLayout.Default();
+            layout.Fit.Add("server");
+            layout.Fit.Add("nonsense");
+            layout.Split(0, 1);
+            layout.MoveRowToTab(0, 1, 1);
+
+            var loaded = CustomLayout.Load(layout.Save(), false, false);
+
+            CollectionAssert.AreEqual(new[] { "server" }, loaded.Fit.ToArray());
+        }
+
+        [TestMethod]
         public void RenamingToBlankIsRefused()
         {
             var layout = CustomLayout.Default();

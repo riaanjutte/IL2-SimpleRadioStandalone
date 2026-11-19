@@ -211,7 +211,16 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI
             var panels = row.Select(PanelFor).ToList();
             // A panel hidden by its own rule (RCI Controller without access keys) leaves the whole row to the other.
             var shown = panels.Where(p => p.Visibility == Visibility.Visible).ToList();
-            for (int i = 0; i < Math.Max(1, shown.Count); i++)
+            // A fit panel is as wide as its controls; the others share what is left.
+            foreach (var weight in _layout.Columns(row, key => PanelFor(key).Visibility == Visibility.Visible))
+            {
+                grid.ColumnDefinitions.Add(new ColumnDefinition
+                {
+                    Width = weight == null ? GridLength.Auto : new GridLength(weight.Value, GridUnitType.Star)
+                });
+            }
+
+            if (grid.ColumnDefinitions.Count == 0)
             {
                 grid.ColumnDefinitions.Add(new ColumnDefinition());
             }

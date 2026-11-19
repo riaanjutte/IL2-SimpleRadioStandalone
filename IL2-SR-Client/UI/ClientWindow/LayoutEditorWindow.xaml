@@ -143,6 +143,7 @@
                                 <Button x:Name="SplitButton" Content="Split row" Style="{StaticResource EditorButton}" Click="Split_Click" />
                                 <Button x:Name="HideButton" Content="Hide" Style="{StaticResource EditorButton}" Click="Hide_Click" />
                             </WrapPanel>
+                            <WrapPanel x:Name="FitBoxes" Margin="0,6,0,0" />
                             <DockPanel>
                                 <Button x:Name="MoveToTabButton" DockPanel.Dock="Left" Content="Move to tab" Style="{StaticResource EditorButton}" Click="MoveToTab_Click" />
                                 <ComboBox x:Name="TargetTab" FocusVisualStyle="{StaticResource EditorFocus}" Margin="0,6,0,0" SelectionChanged="UpdateButtons" />

@@ -852,6 +852,12 @@
   <data name="Split row" xml:space="preserve">
     <value>Split row</value>
   </data>
+  <data name="Fit to content:" xml:space="preserve">
+    <value>Fit to content:</value>
+  </data>
+  <data name="{0} (fit)" xml:space="preserve">
+    <value>{0} (fit)</value>
+  </data>
   <data name="Hide" xml:space="preserve">
     <value>Hide</value>
   </data>
