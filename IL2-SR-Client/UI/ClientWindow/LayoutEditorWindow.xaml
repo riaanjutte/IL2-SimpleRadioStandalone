@@ -139,7 +139,8 @@
                             <WrapPanel>
                                 <Button x:Name="RowUpButton" Content="Move up" Style="{StaticResource EditorButton}" Click="RowUp_Click" />
                                 <Button x:Name="RowDownButton" Content="Move down" Style="{StaticResource EditorButton}" Click="RowDown_Click" />
-                                <Button x:Name="PairButton" Style="{StaticResource EditorButton}" Click="Pair_Click" />
+                                <Button x:Name="JoinButton" Content="Join with row below" Style="{StaticResource EditorButton}" Click="Join_Click" />
+                                <Button x:Name="SplitButton" Content="Split row" Style="{StaticResource EditorButton}" Click="Split_Click" />
                                 <Button x:Name="HideButton" Content="Hide" Style="{StaticResource EditorButton}" Click="Hide_Click" />
                             </WrapPanel>
                             <DockPanel>

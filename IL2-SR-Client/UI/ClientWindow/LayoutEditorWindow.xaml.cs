@@ -148,9 +148,8 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI.ClientWindow
             TabDownButton.IsEnabled = _layout.CanMoveTab(tab, 1);
             RowUpButton.IsEnabled = shown > 0;
             RowDownButton.IsEnabled = rowBelow;
-            bool unpair = _layout.CanUnpair(tab, row);
-            PairButton.Content = LocalizationManager.Get(unpair ? "Unpair" : "Pair with row below");
-            PairButton.IsEnabled = unpair || rowBelow && _layout.CanPair(tab, row, _shownRows[shown + 1]);
+            JoinButton.IsEnabled = rowBelow && _layout.CanJoin(tab, row, _shownRows[shown + 1]);
+            SplitButton.IsEnabled = _layout.CanSplit(tab, row);
             HideButton.IsEnabled = row >= 0;
             MoveToTabButton.IsEnabled = row >= 0 && TargetTab.SelectedItem != null;
             TargetTab.IsEnabled = TargetTab.Items.Count > 0;
@@ -320,18 +319,18 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI.ClientWindow
             KeepFocus(sender, RowList);
         }
 
-        private void Pair_Click(object sender, RoutedEventArgs e)
+        private void Join_Click(object sender, RoutedEventArgs e)
         {
-            int tab = Tab, shown = Shown, row = Row;
-            if (_layout.CanUnpair(tab, row))
-            {
-                _layout.Unpair(tab, row);
-            }
-            else
-            {
-                _layout.Pair(tab, row, _shownRows[shown + 1]); // the next row the player can see
-            }
+            int shown = Shown;
+            _layout.Join(Tab, Row, _shownRows[shown + 1]); // the next row the player can see
+            ShowRows(shown);
+            KeepFocus(sender, RowList);
+        }
 
+        private void Split_Click(object sender, RoutedEventArgs e)
+        {
+            int shown = Shown;
+            _layout.Split(Tab, Row);
             ShowRows(shown);
             KeepFocus(sender, RowList);
         }

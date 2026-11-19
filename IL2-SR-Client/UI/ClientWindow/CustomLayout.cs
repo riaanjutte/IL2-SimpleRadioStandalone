@@ -43,6 +43,8 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI.ClientWindow
 
     internal sealed class CustomLayout
     {
+        public const int MaxPanelsPerRow = 3;
+
         private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
 
         public List<LayoutTab> Tabs { get; set; } = new List<LayoutTab>();
@@ -162,7 +164,7 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI.ClientWindow
                 var rows = new List<List<string>>();
                 foreach (var row in tab.Rows ?? new List<List<string>>())
                 {
-                    var kept = (row ?? new List<string>()).Where(k => k != null && PanelKeys.All.Contains(k) && seen.Add(k)).Take(2).ToList();
+                    var kept = (row ?? new List<string>()).Where(k => k != null && PanelKeys.All.Contains(k) && seen.Add(k)).Take(MaxPanelsPerRow).ToList();
                     if (kept.Count > 0) rows.Add(kept);
                 }
 
@@ -249,48 +251,52 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI.ClientWindow
             Tabs[targetTab].Rows.Add(moved);
         }
 
-        public bool CanPair(int tab, int row)
+        public bool CanJoin(int tab, int row)
         {
-            return CanPair(tab, row, row + 1);
+            return CanJoin(tab, row, row + 1);
         }
 
-        /// <param name="below">A later row of the same tab; rows in between (ones the player can't see) stay below the pair.</param>
-        public bool CanPair(int tab, int row, int below)
+        /// <param name="below">A later row of the same tab; rows in between (ones the player can't see) stay below the joined row.</param>
+        public bool CanJoin(int tab, int row, int below)
         {
-            return below > row && ValidRow(tab, row) && ValidRow(tab, below) && Tabs[tab].Rows[row].Count == 1 && Tabs[tab].Rows[below].Count == 1;
+            return below > row && ValidRow(tab, row) && ValidRow(tab, below) &&
+                   Tabs[tab].Rows[row].Count + Tabs[tab].Rows[below].Count <= MaxPanelsPerRow;
         }
 
-        public bool Pair(int tab, int row, int below)
+        public bool Join(int tab, int row, int below)
         {
-            if (!CanPair(tab, row, below)) return false;
+            if (!CanJoin(tab, row, below)) return false;
             MoveRow(tab, below, row + 1 - below);
-            return Pair(tab, row);
+            return Join(tab, row);
         }
 
-        public bool Pair(int tab, int row)
+        /// <summary>Adds the next row's panels on the right of this row.</summary>
+        public bool Join(int tab, int row)
         {
-            if (!CanPair(tab, row)) return false;
+            if (!CanJoin(tab, row)) return false;
             var rows = Tabs[tab].Rows;
             Collapsed.Remove(RowKey(rows[row]));
             Collapsed.Remove(RowKey(rows[row + 1]));
-            rows[row].Add(rows[row + 1][0]);
+            rows[row].AddRange(rows[row + 1]);
             rows.RemoveAt(row + 1);
             return true;
         }
 
-        public bool CanUnpair(int tab, int row)
+        public bool CanSplit(int tab, int row)
         {
-            return ValidRow(tab, row) && Tabs[tab].Rows[row].Count == 2;
+            return ValidRow(tab, row) && Tabs[tab].Rows[row].Count > 1;
         }
 
-        public void Unpair(int tab, int row)
+        /// <summary>Moves the row's right-hand panel to a row of its own directly below.</summary>
+        public void Split(int tab, int row)
         {
-            if (!CanUnpair(tab, row)) return;
+            if (!CanSplit(tab, row)) return;
             var rows = Tabs[tab].Rows;
-            var pair = rows[row];
-            Collapsed.Remove(RowKey(pair));
-            rows[row] = new List<string> { pair[0] };
-            rows.Insert(row + 1, new List<string> { pair[1] });
+            var panels = rows[row];
+            Collapsed.Remove(RowKey(panels));
+            var last = panels[panels.Count - 1];
+            panels.RemoveAt(panels.Count - 1);
+            rows.Insert(row + 1, new List<string> { last });
         }
 
         public void HideRow(int tab, int row)

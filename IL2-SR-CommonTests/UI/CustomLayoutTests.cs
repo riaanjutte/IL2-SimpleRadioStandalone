@@ -95,17 +95,18 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Common.Tests.UI
         }
 
         [TestMethod]
-        public void NormaliseKeepsOnlyTheFirstTwoOfARowAndTheRestGoBackToTheFirstTab()
+        public void NormaliseKeepsOnlyTheFirstThreeOfARowAndTheRestGoBackToTheFirstTab()
         {
             var layout = CustomLayout.Default();
-            layout.Tabs[1].Rows[0] = new System.Collections.Generic.List<string> { "controls", "help", "favourites" };
+            layout.Tabs[1].Rows[0] = new System.Collections.Generic.List<string> { "controls", "help", "favourites", "server" };
             layout.Tabs[0].Rows.RemoveAt(2);
+            layout.Tabs[0].Rows[1].Remove("server");
             layout.Tabs.RemoveAt(3);
 
             layout.Normalise();
 
-            Assert.AreEqual("[controls,help]", Rows(layout, 1));
-            Assert.AreEqual("[microphone,speakers] [server,overlays] [favourites]", Rows(layout, 0));
+            Assert.AreEqual("[controls,help,favourites]", Rows(layout, 1));
+            Assert.AreEqual("[microphone,speakers] [overlays] [server]", Rows(layout, 0));
         }
 
         [TestMethod]
@@ -148,40 +149,65 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Common.Tests.UI
         }
 
         [TestMethod]
-        public void PairJoinsTwoSingleRowsAndUnpairSplitsThemBack()
+        public void JoinJoinsTwoSingleRowsAndSplitSplitsThemBack()
         {
             var layout = CustomLayout.Default();
 
-            Assert.IsTrue(layout.Pair(2, 0));
+            Assert.IsTrue(layout.Join(2, 0));
             Assert.AreEqual("[globalSettings,rciController] [audioOptions] [profile] [profileSettings]", Rows(layout, 2));
 
-            layout.Unpair(2, 0);
+            layout.Split(2, 0);
             Assert.AreEqual("[globalSettings] [rciController] [audioOptions] [profile] [profileSettings]", Rows(layout, 2));
         }
 
         [TestMethod]
-        public void PairFailsForAPairOrWhenThereIsNoRowBelow()
+        public void JoinFailsWhenThereIsNoRowBelowOrTheRowWouldPassThree()
         {
             var layout = CustomLayout.Default();
 
-            Assert.IsFalse(layout.Pair(0, 0));
-            Assert.IsFalse(layout.Pair(0, 1));
-            Assert.IsFalse(layout.Pair(0, 2));
-            Assert.IsFalse(layout.Pair(1, 0));
+            Assert.IsFalse(layout.Join(0, 0));
+            Assert.IsFalse(layout.Join(0, 2));
+            Assert.IsFalse(layout.Join(1, 0));
             Assert.AreEqual("[microphone,speakers] [server,overlays] [favourites]", Rows(layout, 0));
         }
 
         [TestMethod]
-        public void PairingMovingAndUnpairingClearTheCollapsedKey()
+        public void JoinAddsTheLowerRowsPanelsOnTheRightUpToThree()
+        {
+            var layout = CustomLayout.Default(); // general: [microphone,speakers] [server,overlays] [favourites]
+
+            Assert.IsFalse(layout.CanJoin(0, 0), "two pairs would make four");
+            Assert.IsFalse(layout.Join(0, 0));
+            Assert.IsTrue(layout.Join(0, 1));
+            Assert.AreEqual("[microphone,speakers] [server,overlays,favourites]", Rows(layout, 0));
+            Assert.IsFalse(layout.CanJoin(0, 0), "five panels");
+            Assert.IsFalse(layout.CanJoin(0, 1), "nothing below the last row");
+        }
+
+        [TestMethod]
+        public void SplitMovesTheRightHandPanelToARowBelow()
+        {
+            var layout = CustomLayout.Default();
+            layout.Join(0, 1);
+
+            layout.Split(0, 1);
+            Assert.AreEqual("[microphone,speakers] [server,overlays] [favourites]", Rows(layout, 0));
+            layout.Split(0, 1);
+            Assert.AreEqual("[microphone,speakers] [server] [overlays] [favourites]", Rows(layout, 0));
+            Assert.IsFalse(layout.CanSplit(0, 1));
+        }
+
+        [TestMethod]
+        public void JoiningMovingAndSplittingClearTheCollapsedKey()
         {
             var layout = CustomLayout.Default();
             layout.Collapsed.Add("server+overlays");
             layout.Collapsed.Add("favourites");
             layout.Collapsed.Add("globalSettings");
 
-            layout.Unpair(0, 1);
+            layout.Split(0, 1);
             layout.MoveRow(0, 3, -1);
-            layout.Pair(2, 0);
+            layout.Join(2, 0);
 
             Assert.AreEqual(0, layout.Collapsed.Count);
         }
@@ -353,7 +379,7 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Common.Tests.UI
 
             var layout = CustomLayout.Default();
             layout.MoveRowToTab(3, 0, 1);
-            layout.Pair(1, 0); // [controls,help]: still fills; Help's tab is now empty and does not
+            layout.Join(1, 0); // [controls,help]: still fills; Help's tab is now empty and does not
             layout.MoveRowToTab(0, 2, 1); // favourites joins: two rows, so the tab scrolls
 
             CollectionAssert.AreEqual(new[] { false, false, false, false }, layout.Tabs.Select(CustomLayout.FillsTab).ToArray());
@@ -366,12 +392,13 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Common.Tests.UI
         {
             var layout = CustomLayout.Default(); // general: [microphone,speakers] [server,overlays] [favourites]
 
-            Assert.IsFalse(layout.CanPair(0, 0), "a pair can't take a third panel");
-            Assert.IsFalse(layout.CanPair(0, 2), "nothing below the last row");
-            Assert.IsTrue(layout.CanUnpair(0, 1));
-            Assert.IsFalse(layout.CanUnpair(0, 2));
-            Assert.IsTrue(layout.CanPair(2, 0));
-            Assert.IsFalse(layout.CanPair(-1, 0));
+            Assert.IsFalse(layout.CanJoin(0, 0), "two pairs would make four");
+            Assert.IsTrue(layout.CanJoin(0, 1), "a pair takes a third panel");
+            Assert.IsFalse(layout.CanJoin(0, 2), "nothing below the last row");
+            Assert.IsTrue(layout.CanSplit(0, 1));
+            Assert.IsFalse(layout.CanSplit(0, 2));
+            Assert.IsTrue(layout.CanJoin(2, 0));
+            Assert.IsFalse(layout.CanJoin(-1, 0));
 
             Assert.IsFalse(layout.CanMoveRow(0, 0, -1));
             Assert.IsTrue(layout.CanMoveRow(0, 0, 1));
@@ -389,7 +416,7 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Common.Tests.UI
         }
 
         [TestMethod]
-        public void ShownRowsLeaveOutUnavailablePanelsAndPairActsOnTheNextShownRow()
+        public void ShownRowsLeaveOutUnavailablePanelsAndJoinActsOnTheNextShownRow()
         {
             var layout = CustomLayout.Default(); // settings: [globalSettings] [rciController] [audioOptions] [profile] [profileSettings]
             Func<string, bool> available = k => k != PanelKeys.RciController;
@@ -398,9 +425,9 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Common.Tests.UI
             CollectionAssert.AreEqual(new[] { 0, 2, 3, 4 }, shown);
             CollectionAssert.AreEqual(new[] { 0, 1, 2 }, CustomLayout.ShownRows(layout.Tabs[0], available));
 
-            Assert.IsFalse(layout.CanPair(2, 0, 0), "a row can't pair with itself");
-            Assert.IsFalse(layout.CanPair(2, 2, 0), "only with a later row");
-            Assert.IsTrue(layout.Pair(2, 0, shown[1]));
+            Assert.IsFalse(layout.CanJoin(2, 0, 0), "a row can't join itself");
+            Assert.IsFalse(layout.CanJoin(2, 2, 0), "only with a later row");
+            Assert.IsTrue(layout.Join(2, 0, shown[1]));
             Assert.AreEqual("[globalSettings,audioOptions] [rciController] [profile] [profileSettings]", Rows(layout, 2));
 
             // Moving a shown row by the gap to the next shown one steps over the unavailable row.

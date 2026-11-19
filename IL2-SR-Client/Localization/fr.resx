@@ -846,11 +846,11 @@
   <data name="Target tab" xml:space="preserve">
     <value>Onglet de destination</value>
   </data>
-  <data name="Pair with row below" xml:space="preserve">
-    <value>Associer à la ligne du dessous</value>
+  <data name="Join with row below" xml:space="preserve">
+    <value>Joindre à la ligne du dessous</value>
   </data>
-  <data name="Unpair" xml:space="preserve">
-    <value>Dissocier</value>
+  <data name="Split row" xml:space="preserve">
+    <value>Scinder la ligne</value>
   </data>
   <data name="Hide" xml:space="preserve">
     <value>Masquer</value>
