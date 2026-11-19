@@ -897,8 +897,8 @@
   <data name="Delete the tab &quot;{0}&quot;? Its panels will be hidden. You can add them back from Other panels." xml:space="preserve">
     <value>Supprimer l'onglet « {0} » ? Ses panneaux seront masqués. Vous pourrez les rajouter depuis Autres panneaux.</value>
   </data>
-  <data name="Reset the window layout to the default? Your tabs, tab names and hidden panels go back to the default, and every row is expanded, when you press OK or Apply." xml:space="preserve">
-    <value>Rétablir la disposition par défaut de la fenêtre ? Vos onglets, leurs noms et les panneaux masqués reviennent à leur état par défaut, et toutes les lignes sont dépliées, lorsque vous cliquez sur OK ou Appliquer.</value>
+  <data name="Reset the window layout to the default? Your tabs, tab names, hidden panels and panel widths go back to the default, and every row is expanded, when you press OK or Apply." xml:space="preserve">
+    <value>Rétablir la disposition par défaut de la fenêtre ? Vos onglets, leurs noms, les panneaux masqués et les largeurs des panneaux reviennent à leur état par défaut, et toutes les lignes sont dépliées, lorsque vous cliquez sur OK ou Appliquer.</value>
   </data>
   <data name="IL-2 IS FULLSCREEN" xml:space="preserve">
     <value>IL-2 EN PLEIN ÉCRAN</value>

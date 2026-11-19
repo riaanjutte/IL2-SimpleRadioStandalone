@@ -108,6 +108,7 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI.ClientWindow
             Fill(HiddenList, _panelsToAdd.Select(PanelToAddName), HiddenList.SelectedIndex);
             _filling = false;
             UpdateButtons();
+            FillFitBoxes();
         }
 
         /// <summary>A row of the selected tab as the list shows it, e.g. "Server (fit) + Favourites".</summary>
@@ -217,7 +218,12 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI.ClientWindow
             MoveToTabButton.IsEnabled = row >= 0 && TargetTab.SelectedItem != null;
             TargetTab.IsEnabled = TargetTab.Items.Count > 0;
             ShowPanelButton.IsEnabled = tab >= 0 && HiddenList.SelectedIndex >= 0;
-            FillFitBoxes();
+            // Only for a new row selection: rebuilding the boxes on any other update (ending a rename) would swallow
+            // a click on one of them.
+            if (sender == RowList)
+            {
+                FillFitBoxes();
+            }
         }
 
         /// <summary>A keyboard user whose button just greyed out carries on from the list it acted on.</summary>
@@ -418,7 +424,7 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI.ClientWindow
         private void Reset_Click(object sender, RoutedEventArgs e)
         {
             var answer = MessageBox.Show(this,
-                LocalizationManager.Get("Reset the window layout to the default? Your tabs, tab names and hidden panels go back to the default, and every row is expanded, when you press OK or Apply."),
+                LocalizationManager.Get("Reset the window layout to the default? Your tabs, tab names, hidden panels and panel widths go back to the default, and every row is expanded, when you press OK or Apply."),
                 LocalizationManager.Get("Reset layout"), MessageBoxButton.YesNo, MessageBoxImage.Question);
             if (answer == MessageBoxResult.Yes)
             {

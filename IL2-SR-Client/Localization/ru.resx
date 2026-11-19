@@ -897,8 +897,8 @@
   <data name="Delete the tab &quot;{0}&quot;? Its panels will be hidden. You can add them back from Other panels." xml:space="preserve">
     <value>Удалить вкладку «{0}»? Её панели будут скрыты. Их можно вернуть из списка «Другие панели».</value>
   </data>
-  <data name="Reset the window layout to the default? Your tabs, tab names and hidden panels go back to the default, and every row is expanded, when you press OK or Apply." xml:space="preserve">
-    <value>Сбросить макет окна к стандартному? Вкладки, их названия и скрытые панели вернутся к стандартным, а все строки развернутся, когда вы нажмёте «ОК» или «Применить».</value>
+  <data name="Reset the window layout to the default? Your tabs, tab names, hidden panels and panel widths go back to the default, and every row is expanded, when you press OK or Apply." xml:space="preserve">
+    <value>Сбросить макет окна к стандартному? Вкладки, их названия, скрытые панели и ширина панелей вернутся к стандартным, а все строки развернутся, когда вы нажмёте «ОК» или «Применить».</value>
   </data>
   <data name="IL-2 IS FULLSCREEN" xml:space="preserve">
     <value>IL-2 В ПОЛНОЭКРАННОМ РЕЖИМЕ</value>

@@ -897,8 +897,8 @@
   <data name="Delete the tab &quot;{0}&quot;? Its panels will be hidden. You can add them back from Other panels." xml:space="preserve">
     <value>¿Eliminar la pestaña «{0}»? Sus paneles se ocultarán. Puedes volver a añadirlos desde Otros paneles.</value>
   </data>
-  <data name="Reset the window layout to the default? Your tabs, tab names and hidden panels go back to the default, and every row is expanded, when you press OK or Apply." xml:space="preserve">
-    <value>¿Restablecer el diseño predeterminado de la ventana? Tus pestañas, sus nombres y los paneles ocultos vuelven a los predeterminados, y todas las filas se expanden, al pulsar Aceptar o Aplicar.</value>
+  <data name="Reset the window layout to the default? Your tabs, tab names, hidden panels and panel widths go back to the default, and every row is expanded, when you press OK or Apply." xml:space="preserve">
+    <value>¿Restablecer el diseño predeterminado de la ventana? Tus pestañas, sus nombres, los paneles ocultos y los anchos de los paneles vuelven a los predeterminados, y todas las filas se expanden, al pulsar Aceptar o Aplicar.</value>
   </data>
   <data name="IL-2 IS FULLSCREEN" xml:space="preserve">
     <value>IL-2 EN PANTALLA COMPLETA</value>

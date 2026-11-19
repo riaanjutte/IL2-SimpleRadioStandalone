@@ -408,6 +408,27 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Common.Tests.UI
         }
 
         [TestMethod]
+        public void JoinSplitAndAddPanelDropTheSplitOfARowTheyChange()
+        {
+            // Without waiting for Normalise: the editor works on one copy across several Applies.
+            var layout = CustomLayout.Default(); // general: [microphone,speakers] [server,overlays] [favourites]
+            layout.SetSplit(layout.Tabs[0].Rows[1], 0, 1, 100, 300);
+
+            layout.Split(0, 1);
+            Assert.AreEqual(0, layout.Splits.Count, "split");
+            layout.Join(0, 1);
+            AssertShares(new[] { 0.5, 0.5 }, layout.Shares(layout.Tabs[0].Rows[1]));
+
+            layout.SetSplit(layout.Tabs[0].Rows[1], 0, 1, 100, 300);
+            layout.Join(0, 1); // [server,overlays,favourites]
+            Assert.AreEqual(0, layout.Splits.Count, "join");
+
+            layout.SetSplit(layout.Tabs[0].Rows[1], 0, 1, 100, 300);
+            layout.AddPanel("overlays", 1);
+            Assert.AreEqual(0, layout.Splits.Count, "add to another tab");
+        }
+
+        [TestMethod]
         public void ALayoutSavedWithoutFitOrSplitsLoadsAsBefore()
         {
             // What 1.0.5.1 writes: no Fit, no Splits.

@@ -337,8 +337,8 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI.ClientWindow
         {
             if (!CanJoin(tab, row)) return false;
             var rows = Tabs[tab].Rows;
-            Collapsed.Remove(RowKey(rows[row]));
-            Collapsed.Remove(RowKey(rows[row + 1]));
+            Forget(rows[row]);
+            Forget(rows[row + 1]);
             rows[row].AddRange(rows[row + 1]);
             rows.RemoveAt(row + 1);
             return true;
@@ -355,7 +355,7 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI.ClientWindow
             if (!CanSplit(tab, row)) return;
             var rows = Tabs[tab].Rows;
             var panels = rows[row];
-            Collapsed.Remove(RowKey(panels));
+            Forget(panels);
             var last = panels[panels.Count - 1];
             panels.RemoveAt(panels.Count - 1);
             rows.Insert(row + 1, new List<string> { last });
@@ -386,12 +386,19 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI.ClientWindow
                 var from = Tabs.FirstOrDefault(t => t.Rows.Any(r => r.Contains(key)));
                 if (from == null) return;
                 var row = from.Rows.First(r => r.Contains(key));
-                Collapsed.Remove(RowKey(row));
+                Forget(row);
                 row.Remove(key);
                 if (row.Count == 0) from.Rows.Remove(row);
             }
 
             Tabs[tab].Rows.Add(new List<string> { key });
+        }
+
+        /// <summary>A row whose panels are about to change is no longer collapsed and loses its split.</summary>
+        private void Forget(IList<string> row)
+        {
+            Collapsed.Remove(RowKey(row));
+            Splits.Remove(RowKey(row));
         }
 
         private bool ValidTab(int tab)

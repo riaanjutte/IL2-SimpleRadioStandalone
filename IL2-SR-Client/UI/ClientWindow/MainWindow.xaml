@@ -1198,12 +1198,13 @@
                                    Width="200"
                                    HorizontalAlignment="Center"
                                    VerticalAlignment="Top" Margin="5"  Padding="5" />
-                            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="10">
+                            <!-- Wraps: in a narrow panel a single line would clip at both ends. -->
+                            <WrapPanel HorizontalAlignment="Center" Margin="10">
                                 <Button Margin="5" Padding="5" Content="Create Profile" Click="CreateProfile" />
                                 <Button Margin="5" Padding="5" Content="Copy Profile" Click="CopyProfile" />
                                 <Button  Margin="5"  Padding="5" Content="Rename Profile" Click="RenameProfile" />
                                 <Button  Margin="5"  Padding="5" Content="Delete Profile" Click="DeleteProfile" />
-                            </StackPanel>
+                            </WrapPanel>
                         </StackPanel>
                     </GroupBox>
                     <GroupBox x:Name="ProfileSettingsPanel" Header="Profile Settings">
