@@ -855,8 +855,14 @@
   <data name="Hide" xml:space="preserve">
     <value>Nascondi</value>
   </data>
-  <data name="Hidden panels" xml:space="preserve">
-    <value>Pannelli nascosti</value>
+  <data name="Other panels" xml:space="preserve">
+    <value>Altri pannelli</value>
+  </data>
+  <data name="{0} (hidden)" xml:space="preserve">
+    <value>{0} (nascosto)</value>
+  </data>
+  <data name="{0} (on {1})" xml:space="preserve">
+    <value>{0} (in {1})</value>
   </data>
   <data name="Add to this tab" xml:space="preserve">
     <value>Aggiungi a questa scheda</value>
@@ -879,8 +885,8 @@
   <data name="Delete tab" xml:space="preserve">
     <value>Elimina scheda</value>
   </data>
-  <data name="Delete the tab &quot;{0}&quot;? Its panels will be hidden. You can add them back from Hidden panels." xml:space="preserve">
-    <value>Eliminare la scheda «{0}»? I suoi pannelli verranno nascosti. Puoi aggiungerli di nuovo da Pannelli nascosti.</value>
+  <data name="Delete the tab &quot;{0}&quot;? Its panels will be hidden. You can add them back from Other panels." xml:space="preserve">
+    <value>Eliminare la scheda «{0}»? I suoi pannelli verranno nascosti. Puoi aggiungerli di nuovo da Altri pannelli.</value>
   </data>
   <data name="Reset the window layout to the default? Your tabs, tab names and hidden panels go back to the default, and every row is expanded, when you press OK or Apply." xml:space="preserve">
     <value>Ripristinare il layout predefinito della finestra? Le tue schede, i loro nomi e i pannelli nascosti tornano a quelli predefiniti, e tutte le righe vengono espanse, quando premi OK o Applica.</value>

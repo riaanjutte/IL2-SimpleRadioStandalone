@@ -855,8 +855,14 @@
   <data name="Hide" xml:space="preserve">
     <value>Masquer</value>
   </data>
-  <data name="Hidden panels" xml:space="preserve">
-    <value>Panneaux masqués</value>
+  <data name="Other panels" xml:space="preserve">
+    <value>Autres panneaux</value>
+  </data>
+  <data name="{0} (hidden)" xml:space="preserve">
+    <value>{0} (masqué)</value>
+  </data>
+  <data name="{0} (on {1})" xml:space="preserve">
+    <value>{0} (dans {1})</value>
   </data>
   <data name="Add to this tab" xml:space="preserve">
     <value>Ajouter à cet onglet</value>
@@ -879,8 +885,8 @@
   <data name="Delete tab" xml:space="preserve">
     <value>Supprimer l'onglet</value>
   </data>
-  <data name="Delete the tab &quot;{0}&quot;? Its panels will be hidden. You can add them back from Hidden panels." xml:space="preserve">
-    <value>Supprimer l'onglet « {0} » ? Ses panneaux seront masqués. Vous pourrez les rajouter depuis Panneaux masqués.</value>
+  <data name="Delete the tab &quot;{0}&quot;? Its panels will be hidden. You can add them back from Other panels." xml:space="preserve">
+    <value>Supprimer l'onglet « {0} » ? Ses panneaux seront masqués. Vous pourrez les rajouter depuis Autres panneaux.</value>
   </data>
   <data name="Reset the window layout to the default? Your tabs, tab names and hidden panels go back to the default, and every row is expanded, when you press OK or Apply." xml:space="preserve">
     <value>Rétablir la disposition par défaut de la fenêtre ? Vos onglets, leurs noms et les panneaux masqués reviennent à leur état par défaut, et toutes les lignes sont dépliées, lorsque vous cliquez sur OK ou Appliquer.</value>

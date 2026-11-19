@@ -21,7 +21,8 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI.ClientWindow
 
         // Model indices of what the lists show: panels unavailable in this build are left out (see Available).
         private List<int> _shownRows = new List<int>();
-        private List<string> _shownHidden = new List<string>();
+        // Panel key and the tab it is on now, -1 when hidden.
+        private List<KeyValuePair<string, int>> _panelsToAdd = new List<KeyValuePair<string, int>>();
 
         internal LayoutEditorWindow(CustomLayout layout, Action<CustomLayout> apply)
         {
@@ -30,7 +31,7 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI.ClientWindow
             LocalizationManager.LocalizeElement(this);
             AutomationProperties.SetName(TabList, LocalizationManager.Get("Tabs"));
             AutomationProperties.SetName(RowList, LocalizationManager.Get("Panels on this tab"));
-            AutomationProperties.SetName(HiddenList, LocalizationManager.Get("Hidden panels"));
+            AutomationProperties.SetName(HiddenList, LocalizationManager.Get("Other panels"));
             AutomationProperties.SetName(TargetTab, LocalizationManager.Get("Target tab"));
 
             _layout = layout.Clone();
@@ -66,21 +67,28 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI.ClientWindow
         {
             _filling = true;
             Fill(TabList, Enumerable.Range(0, _layout.Tabs.Count).Select(TabHeader), tab);
-            _shownHidden = _layout.Hidden.Where(Available).ToList();
-            Fill(HiddenList, _shownHidden.Select(PanelName), HiddenList.SelectedIndex);
             _filling = false;
             ShowRows(row);
         }
 
-        /// <summary>Fills the selected tab's rows and the tabs its rows can move to.</summary>
+        /// <summary>Fills the selected tab's rows, the tabs its rows can move to, and the panels that can be added to it.</summary>
         private void ShowRows(int shown)
         {
             _filling = true;
             _shownRows = Tab < 0 ? new List<int>() : CustomLayout.ShownRows(_layout.Tabs[Tab], Available);
             Fill(RowList, _shownRows.Select(r => string.Join(" + ", _layout.Tabs[Tab].Rows[r].Where(Available).Select(PanelName))), shown);
             FillTargetTabs();
+            _panelsToAdd = _layout.PanelsToAdd(Tab).Where(p => Available(p.Key)).ToList();
+            Fill(HiddenList, _panelsToAdd.Select(PanelToAddName), HiddenList.SelectedIndex);
             _filling = false;
             UpdateButtons();
+        }
+
+        private string PanelToAddName(KeyValuePair<string, int> panel)
+        {
+            return panel.Value < 0
+                ? LocalizationManager.Format("{0} (hidden)", PanelName(panel.Key))
+                : LocalizationManager.Format("{0} (on {1})", PanelName(panel.Key), TabHeader(panel.Value));
         }
 
         private void FillTargetTabs()
@@ -231,6 +239,11 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI.ClientWindow
 
             // Only this item and the combo change: rebuilding the lists here would swallow the click that took the focus.
             ((ListBoxItem) TabList.Items[tab]).Content = TabHeader(tab);
+            for (int i = 0; i < _panelsToAdd.Count; i++)
+            {
+                ((ListBoxItem) HiddenList.Items[i]).Content = PanelToAddName(_panelsToAdd[i]);
+            }
+
             _filling = true;
             FillTargetTabs();
             _filling = false;
@@ -241,7 +254,7 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI.ClientWindow
         {
             int tab = Tab;
             var answer = MessageBox.Show(this,
-                LocalizationManager.Format("Delete the tab \"{0}\"? Its panels will be hidden. You can add them back from Hidden panels.", TabHeader(tab)),
+                LocalizationManager.Format("Delete the tab \"{0}\"? Its panels will be hidden. You can add them back from Other panels.", TabHeader(tab)),
                 LocalizationManager.Get("Delete tab"), MessageBoxButton.YesNo, MessageBoxImage.Question);
             if (answer == MessageBoxResult.Yes && _layout.DeleteTab(tab))
             {
@@ -321,7 +334,7 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI.ClientWindow
         private void ShowPanel_Click(object sender, RoutedEventArgs e)
         {
             int tab = Tab;
-            _layout.ShowPanel(_shownHidden[HiddenList.SelectedIndex], tab);
+            _layout.AddPanel(_panelsToAdd[HiddenList.SelectedIndex].Key, tab);
             Refresh(tab, int.MaxValue); // the panel's new row, at the end
             KeepFocus(sender, HiddenList);
         }

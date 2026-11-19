@@ -855,8 +855,14 @@
   <data name="Hide" xml:space="preserve">
     <value>Ausblenden</value>
   </data>
-  <data name="Hidden panels" xml:space="preserve">
-    <value>Ausgeblendete Bereiche</value>
+  <data name="Other panels" xml:space="preserve">
+    <value>Weitere Bereiche</value>
+  </data>
+  <data name="{0} (hidden)" xml:space="preserve">
+    <value>{0} (ausgeblendet)</value>
+  </data>
+  <data name="{0} (on {1})" xml:space="preserve">
+    <value>{0} (auf {1})</value>
   </data>
   <data name="Add to this tab" xml:space="preserve">
     <value>Zu diesem Tab hinzufügen</value>
@@ -879,8 +885,8 @@
   <data name="Delete tab" xml:space="preserve">
     <value>Tab löschen</value>
   </data>
-  <data name="Delete the tab &quot;{0}&quot;? Its panels will be hidden. You can add them back from Hidden panels." xml:space="preserve">
-    <value>Den Tab „{0}“ löschen? Seine Bereiche werden ausgeblendet. Unter „Ausgeblendete Bereiche“ kannst du sie wieder hinzufügen.</value>
+  <data name="Delete the tab &quot;{0}&quot;? Its panels will be hidden. You can add them back from Other panels." xml:space="preserve">
+    <value>Den Tab „{0}“ löschen? Seine Bereiche werden ausgeblendet. Unter „Weitere Bereiche“ kannst du sie wieder hinzufügen.</value>
   </data>
   <data name="Reset the window layout to the default? Your tabs, tab names and hidden panels go back to the default, and every row is expanded, when you press OK or Apply." xml:space="preserve">
     <value>Das Fensterlayout auf den Standard zurücksetzen? Deine Tabs, ihre Namen und ausgeblendeten Bereiche werden zurückgesetzt und alle Zeilen ausgeklappt, sobald du OK oder Übernehmen drückst.</value>

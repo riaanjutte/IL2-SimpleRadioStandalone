@@ -301,9 +301,28 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI.ClientWindow
             Normalise();
         }
 
-        public void ShowPanel(string key, int tab)
+        /// <summary>The panels that could be added to a tab: hidden ones (tab -1) first, then other tabs' panels in order.</summary>
+        public IEnumerable<KeyValuePair<string, int>> PanelsToAdd(int tab)
         {
-            if (!ValidTab(tab) || !Hidden.Remove(key)) return;
+            return Hidden.Select(k => new KeyValuePair<string, int>(k, -1))
+                .Concat(Tabs.SelectMany((t, i) => i == tab ? Enumerable.Empty<KeyValuePair<string, int>>()
+                    : t.Rows.SelectMany(r => r).Select(k => new KeyValuePair<string, int>(k, i))));
+        }
+
+        /// <summary>Adds a hidden panel, or one from another tab, as a new row at the end of the tab; a pair it leaves keeps its other panel.</summary>
+        public void AddPanel(string key, int tab)
+        {
+            if (!ValidTab(tab) || Tabs[tab].Rows.Any(r => r.Contains(key))) return;
+            if (!Hidden.Remove(key))
+            {
+                var from = Tabs.FirstOrDefault(t => t.Rows.Any(r => r.Contains(key)));
+                if (from == null) return;
+                var row = from.Rows.First(r => r.Contains(key));
+                Collapsed.Remove(RowKey(row));
+                row.Remove(key);
+                if (row.Count == 0) from.Rows.Remove(row);
+            }
+
             Tabs[tab].Rows.Add(new List<string> { key });
         }
 

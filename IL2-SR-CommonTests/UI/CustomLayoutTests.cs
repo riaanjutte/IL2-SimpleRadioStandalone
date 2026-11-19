@@ -222,9 +222,59 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Common.Tests.UI
             CollectionAssert.AreEqual(new[] { "favourites" }, layout.Hidden.ToArray());
             Assert.AreEqual(0, layout.Collapsed.Count);
 
-            layout.ShowPanel("favourites", 1);
+            layout.AddPanel("favourites", 1);
             Assert.AreEqual(0, layout.Hidden.Count);
             Assert.AreEqual("[controls] [favourites]", Rows(layout, 1));
+        }
+
+        [TestMethod]
+        public void AddingAPanelFromAnotherTabTakesItOutOfItsPair()
+        {
+            var layout = CustomLayout.Default();
+            layout.Collapsed.Add("server+overlays");
+
+            layout.AddPanel("overlays", 1);
+
+            Assert.AreEqual("[microphone,speakers] [server] [favourites]", Rows(layout, 0));
+            Assert.AreEqual("[controls] [overlays]", Rows(layout, 1));
+            Assert.AreEqual(0, layout.Collapsed.Count);
+        }
+
+        [TestMethod]
+        public void AddingAPanelFromAnotherTabRemovesItsEmptyRow()
+        {
+            var layout = CustomLayout.Default();
+
+            layout.AddPanel("favourites", 3);
+            layout.AddPanel("controls", 3);
+
+            Assert.AreEqual("[microphone,speakers] [server,overlays]", Rows(layout, 0));
+            Assert.AreEqual("", Rows(layout, 1));
+            Assert.AreEqual("[help] [favourites] [controls]", Rows(layout, 3));
+        }
+
+        [TestMethod]
+        public void AddingAPanelAlreadyOnTheTabChangesNothing()
+        {
+            var layout = CustomLayout.Default();
+
+            layout.AddPanel("server", 0);
+
+            Assert.AreEqual("[microphone,speakers] [server,overlays] [favourites]", Rows(layout, 0));
+        }
+
+        [TestMethod]
+        public void PanelsToAddListsHiddenPanelsThenOtherTabsPanelsInOrder()
+        {
+            var layout = CustomLayout.Default();
+            layout.HideRow(1, 0);
+
+            var others = layout.PanelsToAdd(2).Select(p => p.Key + "@" + p.Value).ToArray();
+
+            CollectionAssert.AreEqual(new[]
+            {
+                "controls@-1", "microphone@0", "speakers@0", "server@0", "overlays@0", "favourites@0", "help@3"
+            }, others);
         }
 
         [TestMethod]

@@ -151,7 +151,7 @@
                     </DockPanel>
                 </GroupBox>
 
-                <GroupBox Grid.Row="1" Header="Hidden panels" Margin="0,3,0,0">
+                <GroupBox Grid.Row="1" Header="Other panels" Margin="0,3,0,0">
                     <DockPanel>
                         <Button x:Name="ShowPanelButton" DockPanel.Dock="Bottom" HorizontalAlignment="Left" Content="Add to this tab" Style="{StaticResource EditorButton}" Click="ShowPanel_Click" />
                         <ListBox x:Name="HiddenList" Style="{StaticResource EditorList}" SelectionChanged="UpdateButtons" />
