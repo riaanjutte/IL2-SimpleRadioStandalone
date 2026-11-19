@@ -2,6 +2,7 @@ using System;
 using System.Globalization;
 using System.Linq;
 using System.Windows;
+using System.Windows.Controls;
 using System.Windows.Media;
 using Ciribob.IL2.SimpleRadio.Standalone.Client.Settings;
 
@@ -19,6 +20,18 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI
         // The scale a window's content has now; 0 until Apply is first called for it.
         private static readonly DependencyProperty AppliedProperty = DependencyProperty.RegisterAttached(
             "Applied", typeof(double), typeof(UiScale), new PropertyMetadata(0d));
+
+        static UiScale()
+        {
+            // A tooltip opens in a window of its own, so it doesn't take its owner's scale by itself.
+            EventManager.RegisterClassHandler(typeof(ToolTip), ToolTip.OpenedEvent, new RoutedEventHandler((sender, e) =>
+            {
+                var tip = (ToolTip) sender;
+                var owner = tip.PlacementTarget == null ? null : Window.GetWindow(tip.PlacementTarget);
+                double scale = owner == null ? 1 : Of(owner);
+                tip.LayoutTransform = scale == 1 ? Transform.Identity : new ScaleTransform(scale, scale);
+            }));
+        }
 
         public static double Current =>
             Parse(GlobalSettingsStore.Instance.GetClientSetting(GlobalSettingsKeys.TextSize).RawValue);

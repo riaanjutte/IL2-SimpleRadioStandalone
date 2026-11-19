@@ -1156,11 +1156,20 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI
         private void ApplyUiScale()
         {
             double ratio = UiScale.Current / UiScale.Of(this);
-            double normalHeight = (Height + _heightReduction) * (_classicLayout ? ratio : 1);
+            // Read first: raising the minimum can resize the window, at once or when it is first shown.
+            double height = Height;
             UiScale.Apply(this, _classicLayout);
             _normalMinHeight *= ratio;
-            // The player's normal height stays, unless the bigger content needs more than that.
-            _heightReduction = Math.Max(normalHeight, _normalMinHeight) - Height;
+            if (_classicLayout)
+            {
+                _heightReduction *= ratio; // Apply scaled the height
+            }
+            else
+            {
+                // The player's normal height stays, unless the bigger content's minimum is more than that.
+                Height = height + Math.Max(0, _normalMinHeight - (height + _heightReduction));
+            }
+
             foreach (var tab in TabControl.Items.OfType<TabItem>())
             {
                 tab.Tag = null; // a height measured at the old scale
@@ -2470,6 +2479,25 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI
         /// <summary>
         /// The four Help tab buttons go in one row when they fit the window, otherwise in two rows of two.
         /// </summary>
+        /// <summary>
+        /// The Help text's viewer takes the mouse wheel even when it has nothing to scroll, which is always the case
+        /// now that Help fits its content. The wheel then goes to the tab's own scroll viewer instead.
+        /// </summary>
+        private void HelpDocument_PreviewMouseWheel(object sender, MouseWheelEventArgs e)
+        {
+            var viewer = (FlowDocumentScrollViewer) sender;
+            if (FindDescendant<ScrollViewer>(viewer)?.ScrollableHeight > 0)
+            {
+                return; // Classic: the text scrolls inside its panel
+            }
+
+            e.Handled = true;
+            ((UIElement) viewer.Parent).RaiseEvent(new MouseWheelEventArgs(e.MouseDevice, e.Timestamp, e.Delta)
+            {
+                RoutedEvent = MouseWheelEvent
+            });
+        }
+
         private void HelpLayout_SizeChanged(object sender, SizeChangedEventArgs e)
         {
             HelpButtonsGrid.Columns = ChooseHelpButtonColumns(MeasureHelpButtonsInOneRow(), HelpLayout.ActualWidth);

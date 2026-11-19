@@ -21,7 +21,8 @@ larger, with the layout following so nothing is cut off.
 - `UiScale.Apply(window)` puts a `ScaleTransform` on the window's content as its `LayoutTransform` and scales
   the window's minimum size, and its size, by the same factor.
 - Scaled: the main window, layout editor, server settings, input profile dialog, telemetry diagnostics, client
-  list and pilot roster, with their dropdowns and tooltips. Not scaled: the radio overlay (it scales with its
+  list and pilot roster, with their dropdowns and tooltips (a tooltip opens in a window of its own, so
+  `UiScale` scales each one as it opens). Not scaled: the radio overlay (it scales with its
   own window), window title bars, Windows message boxes.
 - The setting applies at once. The main window keeps its size and its minimum size grows; the other open
   windows grow or shrink with it. Classic's fixed-size main window grows with its content.

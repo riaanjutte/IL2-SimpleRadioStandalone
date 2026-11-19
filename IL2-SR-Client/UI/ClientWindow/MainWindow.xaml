@@ -1563,7 +1563,7 @@
                                     Content="Patreon - Support SRS" />
                         </UniformGrid>
                     </StackPanel>
-                    <FlowDocumentScrollViewer VerticalScrollBarVisibility="Auto">
+                    <FlowDocumentScrollViewer VerticalScrollBarVisibility="Auto" PreviewMouseWheel="HelpDocument_PreviewMouseWheel">
                     <FlowDocument x:Name="AboutFlowDocument"
                                   FontFamily="{StaticResource MilFontMono}"
                                   FontSize="14"
