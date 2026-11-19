@@ -17,7 +17,7 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI
     /// <summary>Outside Classic the tabs are built from the player's layout (see CustomLayout) out of the XAML panels.</summary>
     public partial class MainWindow
     {
-        // Controls and Help scroll inside themselves, so on a tab that scrolls they need a height of their own.
+        // Controls scrolls inside itself, so on a tab that scrolls it needs a height of its own.
         private const double SharedFillPanelMaxHeight = 400;
 
         private CustomLayout _layout;
@@ -229,7 +229,7 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI
             foreach (var panel in panels)
             {
                 Grid.SetColumn(panel, Math.Max(0, shown.IndexOf(panel)));
-                if (!fillsTab && (panel == ControlsGroupBox || panel == HelpPanel))
+                if (!fillsTab && panel == ControlsGroupBox)
                 {
                     panel.MaxHeight = SharedFillPanelMaxHeight;
                 }
@@ -427,7 +427,7 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI
             _collapsedPanelsHeight = 0;
             if (tabItem.Content is Grid rowGrid)
             {
-                // Controls or Help filling its tab: expanded it fills the whole viewport, so only collapsing it frees
+                // Controls filling its tab: expanded it fills the whole viewport, so only collapsing it frees
                 // space. Collapsed it is top-aligned, so its height doesn't depend on the window's and can't swing.
                 if (rows.Any(IsRowCollapsed))
                 {

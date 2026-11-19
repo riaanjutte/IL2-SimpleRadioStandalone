@@ -73,10 +73,11 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI.ClientWindow
             return tab.Name ?? translate(CultureInfo.InvariantCulture.TextInfo.ToTitleCase(tab.BuiltIn));
         }
 
-        // Controls and Help fill their tab and scroll inside, so a tab holding only them is not wrapped in a scroll viewer.
+        // Controls fills its tab and scrolls inside, so a tab holding only it is not wrapped in a scroll viewer.
+        // Help's text is short, so it fits its content like the other panels.
         public static bool FillsTab(LayoutTab tab)
         {
-            return tab.Rows.Count == 1 && tab.Rows[0].All(k => k == PanelKeys.Controls || k == PanelKeys.Help);
+            return tab.Rows.Count == 1 && tab.Rows[0].All(k => k == PanelKeys.Controls);
         }
 
         /// <summary>The tab to show after switching layouts: the same built-in tab, else a custom tab's position, else the first.</summary>

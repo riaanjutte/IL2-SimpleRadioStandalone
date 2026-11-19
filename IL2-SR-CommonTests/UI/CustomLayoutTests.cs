@@ -511,18 +511,19 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Common.Tests.UI
         }
 
         [TestMethod]
-        public void OnlyATabHoldingJustControlsOrHelpFillsTheTab()
+        public void OnlyATabHoldingJustControlsFillsTheTab()
         {
-            CollectionAssert.AreEqual(new[] { false, true, false, true },
+            // Help fits its content like any other panel.
+            CollectionAssert.AreEqual(new[] { false, true, false, false },
                 CustomLayout.Default().Tabs.Select(CustomLayout.FillsTab).ToArray());
 
             var layout = CustomLayout.Default();
             layout.MoveRowToTab(3, 0, 1);
-            layout.Join(1, 0); // [controls,help]: still fills; Help's tab is now empty and does not
-            layout.MoveRowToTab(0, 2, 1); // favourites joins: two rows, so the tab scrolls
+            layout.Join(1, 0); // [controls,help]: Controls shares its row, so the tab scrolls
+            Assert.IsFalse(CustomLayout.FillsTab(layout.Tabs[1]));
 
-            CollectionAssert.AreEqual(new[] { false, false, false, false }, layout.Tabs.Select(CustomLayout.FillsTab).ToArray());
-            layout.HideRow(1, 1);
+            layout.Split(1, 0);
+            layout.HideRow(1, 1); // Controls alone again
             Assert.IsTrue(CustomLayout.FillsTab(layout.Tabs[1]));
         }
 
