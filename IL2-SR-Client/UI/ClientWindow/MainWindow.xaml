@@ -1067,7 +1067,8 @@
                     <GroupBox x:Name="RciControllerGroup" Header="RCI Controller">
                         <Grid HorizontalAlignment="Center">
                             <Grid.ColumnDefinitions>
-                                <ColumnDefinition x:Name="RciControllerLabelColumn" Width="2*" MaxWidth="390" />
+                                <!-- The labels are short: they take what they need and the code box gets the rest. -->
+                                <ColumnDefinition x:Name="RciControllerLabelColumn" Width="Auto" MaxWidth="390" />
                                 <ColumnDefinition />
                             </Grid.ColumnDefinitions>
                             <Grid.RowDefinitions>
@@ -1128,8 +1129,10 @@
                     <GroupBox x:Name="AudioOptionsPanel" Header="Audio Options">
                         <Grid HorizontalAlignment="Center">
                             <Grid.ColumnDefinitions>
-                                <ColumnDefinition x:Name="AudioOptionsLabelColumn" Width="2*" MaxWidth="390" />
-                                <ColumnDefinition />
+                                <!-- The switch keeps its own width and the label gets the rest, so a long label is cut
+                                     off only when the panel has no room left. -->
+                                <ColumnDefinition x:Name="AudioOptionsLabelColumn" Width="*" MaxWidth="390" />
+                                <ColumnDefinition Width="Auto" />
                             </Grid.ColumnDefinitions>
                             <Grid.RowDefinitions>
                                 <RowDefinition />
