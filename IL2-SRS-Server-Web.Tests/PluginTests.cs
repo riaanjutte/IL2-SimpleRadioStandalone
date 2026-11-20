@@ -163,8 +163,13 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Server.Tests
             builder.AddServerPlugin(new WorkerPlugin("fails-to-build", s => s.AddHostedService<ThrowsWhenBuilt>()));
             builder.AddServerPlugin(new WorkerPlugin("fails-to-start", s => s.AddHostedService<ThrowsAtStart>()));
             builder.AddServerPlugin(new WorkerPlugin("fails-later", s => s.AddHostedService<ThrowsLater>()));
+            // A factory, as the Integrations plugin registers its dispatcher, that fails like a locked database.
+            builder.AddServerPlugin(new WorkerPlugin("factory-fails", s => s.AddHostedService<ThrowsLater>(
+                _ => throw new IOException("integrations.db is locked"))));
             builder.AddServerPlugin(new WorkerPlugin("healthy", s => s.AddSingleton<Microsoft.Extensions.Hosting.IHostedService>(
                 new Healthy(healthy))));
+            var lifecycle = new Lifecycle();
+            builder.AddServerPlugin(new WorkerPlugin("lifecycle", s => s.AddHostedService(_ => lifecycle)));
             await using var app = builder.Build();
             var lifetime = app.Services.GetRequiredService<Microsoft.Extensions.Hosting.IHostApplicationLifetime>();
 
@@ -174,6 +179,7 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Server.Tests
 
             Assert.False(lifetime.ApplicationStopping.IsCancellationRequested);
             await app.StopAsync(TestContext.Current.CancellationToken);
+            Assert.Equal("starting start started stopping stop stopped", string.Join(" ", lifecycle.Steps));
         }
 
         private sealed class WorkerPlugin(string id, Action<IServiceCollection> configure) : IServerPlugin
@@ -209,6 +215,24 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Server.Tests
                 await Task.Delay(50, stoppingToken);
                 throw new InvalidOperationException("lost the database");
             }
+        }
+
+        private sealed class Lifecycle : Microsoft.Extensions.Hosting.IHostedLifecycleService
+        {
+            public System.Collections.Generic.List<string> Steps { get; } = new();
+
+            private Task Add(string step)
+            {
+                Steps.Add(step);
+                return Task.CompletedTask;
+            }
+
+            public Task StartingAsync(System.Threading.CancellationToken cancellationToken) => Add("starting");
+            public Task StartAsync(System.Threading.CancellationToken cancellationToken) => Add("start");
+            public Task StartedAsync(System.Threading.CancellationToken cancellationToken) => Add("started");
+            public Task StoppingAsync(System.Threading.CancellationToken cancellationToken) => Add("stopping");
+            public Task StopAsync(System.Threading.CancellationToken cancellationToken) => Add("stop");
+            public Task StoppedAsync(System.Threading.CancellationToken cancellationToken) => Add("stopped");
         }
 
         private sealed class Healthy(TaskCompletionSource started) : Microsoft.Extensions.Hosting.BackgroundService

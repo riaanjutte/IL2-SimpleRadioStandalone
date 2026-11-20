@@ -299,8 +299,8 @@ WHERE id = $id;";
 
         /// <summary>
         /// Queues a run again for later without counting the attempt it just made (rate limits). A run that would
-        /// then be older than <see cref="MaxDeferAge"/> fails instead, so a service that keeps saying "slow down"
-        /// can't hold it, and the runs queued behind it, forever.
+        /// then have been pushed back for longer than <see cref="MaxDeferAge"/> since the first time fails instead,
+        /// so a service that keeps saying "slow down" can't hold it, and the runs queued behind it, forever.
         /// </summary>
         public void Defer(long executionId, string reason, DateTime nextAttemptAtUtc)
         {
@@ -308,11 +308,12 @@ WHERE id = $id;";
             using (var command = connection.CreateCommand())
             {
                 command.CommandText = @"UPDATE integration_executions SET
-    status = CASE WHEN created_at < $giveUp THEN 'failed' ELSE 'queued' END,
-    attempts = CASE WHEN created_at < $giveUp THEN attempts ELSE MAX(attempts - 1, 0) END,
-    last_error = CASE WHEN created_at < $giveUp THEN $gaveUp ELSE $reason END,
-    next_attempt_at = CASE WHEN created_at < $giveUp THEN NULL ELSE $next END,
-    finished_at = CASE WHEN created_at < $giveUp THEN $now ELSE NULL END
+    deferred_since = COALESCE(deferred_since, $now),
+    status = CASE WHEN COALESCE(deferred_since, $now) < $giveUp THEN 'failed' ELSE 'queued' END,
+    attempts = CASE WHEN COALESCE(deferred_since, $now) < $giveUp THEN attempts ELSE MAX(attempts - 1, 0) END,
+    last_error = CASE WHEN COALESCE(deferred_since, $now) < $giveUp THEN $gaveUp ELSE $reason END,
+    next_attempt_at = CASE WHEN COALESCE(deferred_since, $now) < $giveUp THEN NULL ELSE $next END,
+    finished_at = CASE WHEN COALESCE(deferred_since, $now) < $giveUp THEN $now ELSE NULL END
 WHERE id = $id;";
                 command.Parameters.AddWithValue("$id", executionId);
                 command.Parameters.AddWithValue("$reason", (object)Truncate(reason) ?? DBNull.Value);
@@ -337,7 +338,7 @@ WHERE id = $id;";
             {
                 // From attempt 1 again, so it gets the integration's retries.
                 command.CommandText = @"UPDATE integration_executions SET status = 'queued', attempts = 0,
-    interruptions = 0, next_attempt_at = $now, finished_at = NULL
+    interruptions = 0, deferred_since = NULL, next_attempt_at = $now, finished_at = NULL
 WHERE id = $id AND status IN ('failed', 'skipped', 'succeeded');";
                 command.Parameters.AddWithValue("$id", executionId);
                 command.Parameters.AddWithValue("$now", SqliteDatabase.FormatTimestamp(DateTime.UtcNow));

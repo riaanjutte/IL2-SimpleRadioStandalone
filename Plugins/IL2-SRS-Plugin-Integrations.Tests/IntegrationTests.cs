@@ -178,13 +178,27 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Server.Integrations.Tests
         public void ARunPushedBackForMoreThanMaxDeferAgeFails()
         {
             using var temp = new TempDirectory();
-            var (store, _) = CreateStore(temp);
+            var (store, database) = CreateStore(temp);
             var integration = store.Save(Integration(new JsonObject { ["token"] = "a-secret-token" }));
             var data = EventData.Sample(SrsEventTypes.ClientConnected);
             var id = store.Enqueue(integration, "client.connected", null, data);
 
+            // The age counts from the first time it was pushed back, not from when it was queued: a run queued
+            // before a long downtime, or an old run sent again with Run again, gets its hour too.
+            using (var connection = database.Open())
+            using (var command = connection.CreateCommand())
+            {
+                command.CommandText = "UPDATE integration_executions SET created_at = $old WHERE id = $id;";
+                command.Parameters.AddWithValue("$old", SqliteDatabase.FormatTimestamp(DateTime.UtcNow.AddHours(-3)));
+                command.Parameters.AddWithValue("$id", id);
+                command.ExecuteNonQuery();
+            }
+
             Assert.True(store.TryStart(id));
             store.Defer(id, "Slow down", DateTime.UtcNow.AddMinutes(1));
+            Assert.Equal(ExecutionStatus.Queued, store.GetExecution(id).Status);
+            Assert.True(store.TryStart(id));
+            store.Defer(id, "Slow down", DateTime.UtcNow.AddMinutes(30));
             Assert.Equal(ExecutionStatus.Queued, store.GetExecution(id).Status);
 
             Assert.True(store.TryStart(id));
@@ -195,6 +209,12 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Server.Integrations.Tests
             Assert.NotNull(run.FinishedAtUtc);
             Assert.Contains("Slow down", run.LastError);
             Assert.Empty(store.Due(DateTime.UtcNow.AddDays(1), 10));
+
+            // Run again starts its hour afresh.
+            Assert.True(store.Requeue(id));
+            Assert.True(store.TryStart(id));
+            store.Defer(id, "Slow down", DateTime.UtcNow.AddMinutes(1));
+            Assert.Equal(ExecutionStatus.Queued, store.GetExecution(id).Status);
         }
 
         [Fact]

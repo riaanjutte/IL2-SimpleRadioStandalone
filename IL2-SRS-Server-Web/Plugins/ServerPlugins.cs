@@ -189,12 +189,17 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Server.Plugins
                                  ActivatorUtilities.CreateInstance(provider, descriptor.ImplementationType));
         }
 
-        private sealed class PluginHostedService : IHostedService, IDisposable
+        /// <summary>
+        /// Runs a plugin's background service, made when the server starts, and logs its failures. Passes on the
+        /// lifecycle steps the host would have called on the service itself.
+        /// </summary>
+        private sealed class PluginHostedService : IHostedLifecycleService, IDisposable
         {
             private readonly string _pluginName;
             private readonly Func<IHostedService> _create;
             private readonly bool _owned;
             private IHostedService _service;
+            private bool _failed;
 
             public PluginHostedService(string pluginName, Func<IHostedService> create, bool owned)
             {
@@ -203,20 +208,13 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Server.Plugins
                 _owned = owned;
             }
 
+            public Task StartingAsync(CancellationToken cancellationToken) =>
+                Step(s => (s as IHostedLifecycleService)?.StartingAsync(cancellationToken), true, cancellationToken);
+
             public async Task StartAsync(CancellationToken cancellationToken)
             {
-                try
-                {
-                    _service = _create();
-                    await _service.StartAsync(cancellationToken);
-                }
-                catch (Exception ex) when (!cancellationToken.IsCancellationRequested)
-                {
-                    Logger.Error(ex, $"Plugin {_pluginName}: a background service failed to start; the server runs without it");
-                    return;
-                }
-
-                if (_service is BackgroundService { ExecuteTask: { } running })
+                await Step(s => s.StartAsync(cancellationToken), true, cancellationToken);
+                if (!_failed && _service is BackgroundService { ExecuteTask: { } running })
                 {
                     _ = running.ContinueWith(
                         task => Logger.Error(task.Exception?.GetBaseException(),
@@ -225,18 +223,41 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Server.Plugins
                 }
             }
 
-            public async Task StopAsync(CancellationToken cancellationToken)
+            public Task StartedAsync(CancellationToken cancellationToken) =>
+                Step(s => (s as IHostedLifecycleService)?.StartedAsync(cancellationToken), true, cancellationToken);
+
+            public Task StoppingAsync(CancellationToken cancellationToken) =>
+                Step(s => (s as IHostedLifecycleService)?.StoppingAsync(cancellationToken), false, cancellationToken);
+
+            public Task StopAsync(CancellationToken cancellationToken) =>
+                Step(s => s.StopAsync(cancellationToken), false, cancellationToken);
+
+            public Task StoppedAsync(CancellationToken cancellationToken) =>
+                Step(s => (s as IHostedLifecycleService)?.StoppedAsync(cancellationToken), false, cancellationToken);
+
+            /// <summary>One lifecycle step; a service that failed to start gets no further steps.</summary>
+            private async Task Step(Func<IHostedService, Task> step, bool starting, CancellationToken cancellationToken)
             {
+                if (_failed || (!starting && _service == null))
+                {
+                    return;
+                }
+
                 try
                 {
-                    if (_service != null)
+                    _service ??= _create();
+                    var task = step(_service);
+                    if (task != null)
                     {
-                        await _service.StopAsync(cancellationToken);
+                        await task;
                     }
                 }
-                catch (Exception ex) when (ex is not OperationCanceledException)
+                catch (Exception ex) when (ex is not OperationCanceledException || !cancellationToken.IsCancellationRequested)
                 {
-                    Logger.Error(ex, $"Plugin {_pluginName}: a background service failed to stop");
+                    _failed |= starting;
+                    Logger.Error(ex, starting
+                        ? $"Plugin {_pluginName}: a background service failed to start; the server runs without it"
+                        : $"Plugin {_pluginName}: a background service failed to stop");
                 }
             }
 
