@@ -9,6 +9,8 @@
 - The radio overlay shows **IL-2 IS FULLSCREEN** when IL-2 is set to fullscreen, because the overlay can't appear over the game in that mode. Hover over it for how to fix it.
 - Client: a **Text size** setting in Global Settings (100%, 110%, 120% or 130%) makes the text and controls larger, for high-resolution monitors. It applies at once to the main window, the layout editor, server settings, the profile dialog, telemetry diagnostics, the client list and the pilot roster. The radio overlay is not affected; resize it by dragging its corner.
 - Pilot Roster: an airfield of `Air start` (or `Air spawn`, `In air`) shows as **AST**, so a server's roster file can mark pilots who spawned in the air. Before, it showed as `AIR`, the code for Airaines.
+- Web server: **Integrations** post to Discord or send an HTTP request when something happens on the server, for example a pilot joining or the server starting. Conditions narrow them down, for example to one coalition, and messages are templates with a live preview. A Discord integration can keep updating one message, such as a pinned server status. Runs are queued, retried if allowed and listed under **Runs**. The REST API adds `/api/v1/integrations`.
+- Web server: **plugins** add pages, API endpoints and event handling without changing the server. Integrations are the first plugin and are included in the Docker image and the Windows build. The **Plugins** page and `GET /api/v1/plugins` show what loaded. Copy other plugins into `plugins` in the data folder; only install plugins you trust.
 - Web server: `SRS_TRUSTED_PROXIES` names the reverse proxy in front of the admin UI. Failed logins are then limited and logged per browser rather than for the proxy, and the login cookie is marked secure when the proxy serves HTTPS.
 
 ### Changed
@@ -25,8 +27,8 @@
 - Server: a new `server.cfg` no longer gets an empty `[External AWACS Mode Settings]` section. It was left over from DCS-SRS and did nothing; IL-2 SRS takes each player's side from the game, and **Coalition Security** keeps the sides apart. An existing section is ignored.
 - Client: removed leftover External AWACS Mode code from DCS-SRS, including a startup check for an AWACS overlay window that IL-2 SRS doesn't have.
 - Web server: panels in the IL-2 SRS theme have worn paint, with scratches, grime and dirt along the edges, and the whole theme uses the panels' olive grey.
-- Web server: confirmations such as "Saved Channel Limit." appear as a toast at the top of the page for a few seconds, instead of a line above the page content.
-- Web server: on a phone, the menu is a dropdown at the top of the page.
+- Web server: confirmations such as "Saved Channel Limit." appear as a toast at the top of the page for a few seconds, instead of a line above the page content. Plugins can show them too.
+- Web server: on a phone, the menu is a dropdown at the top of the page, and the Integrations pages show a card per item.
 - Web server: changing the admin password signs out every browser that logged in with the old one.
 - Web server: banning a client disconnects every client from that IP address, as banning the address directly already did.
 
@@ -41,6 +43,7 @@
 ### Compatibility
 
 - After updating the web server, log in to the admin UI again once.
+- Integrations keep their own database in `plugin-data/integrations`. Back up the `keys` folder with `srs.db`: it encrypts the integrations' webhook addresses, and without it they have to be entered again.
 
 ## IL2-SRS 1.0.5.1
 

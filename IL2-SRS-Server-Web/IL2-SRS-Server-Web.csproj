@@ -17,6 +17,10 @@
     <InternalsVisibleTo Include="IL2-SRS-Server-Web.Tests" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\IL2-SRS-Server-Abstractions\IL2-SRS-Server-Abstractions.csproj" />
+  </ItemGroup>
+
   <!-- IL2-SR-Common stays a .NET Framework project for the WPF client; compile its portable sources here. -->
   <ItemGroup>
     <Compile Include="..\IL2-SR-Common\**\*.cs"
@@ -32,6 +36,26 @@
     <None Include="scripts\Install-WindowsService.ps1" Link="Install-WindowsService.ps1"
           CopyToOutputDirectory="Never" CopyToPublishDirectory="PreserveNewest" />
   </ItemGroup>
+
+  <!-- Publishing the server also publishes the bundled plugins into plugins/<name>/, so the Windows build and the
+       image ship the same plugins. Plugins are framework-dependent and loaded into the server's runtime, so they
+       are published without the server's runtime identifier. Set PublishBundledPlugins=false to leave them out. -->
+  <ItemGroup>
+    <BundledPlugin Include="..\Plugins\IL2-SRS-Plugin-Integrations\IL2-SRS-Plugin-Integrations.csproj" />
+  </ItemGroup>
+
+  <Target Name="PublishBundledPlugins" AfterTargets="Publish" Condition="'$(PublishBundledPlugins)' != 'false'">
+    <PropertyGroup>
+      <_PluginGlobalProperties>RuntimeIdentifier;SelfContained;PublishSingleFile;PublishTrimmed;PublishReadyToRun;_CommandLineDefinedRuntimeIdentifier;_CommandLineDefinedSelfContained</_PluginGlobalProperties>
+    </PropertyGroup>
+    <!-- The plugins aren't referenced by the server, so its restore doesn't cover them. -->
+    <MSBuild Projects="@(BundledPlugin)" Targets="Restore"
+             Properties="Configuration=$(Configuration);MSBuildRestoreSessionId=$([System.Guid]::NewGuid())"
+             RemoveProperties="$(_PluginGlobalProperties)" />
+    <MSBuild Projects="@(BundledPlugin)" Targets="Publish"
+             Properties="Configuration=$(Configuration);PublishDir=$([MSBuild]::NormalizeDirectory('$(MSBuildProjectDirectory)', '$(PublishDir)', 'plugins', '%(BundledPlugin.Filename)'))"
+             RemoveProperties="$(_PluginGlobalProperties)" />
+  </Target>
 
   <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="10.0.12" />

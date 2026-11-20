@@ -3,6 +3,7 @@ using System.Text.Json.Nodes;
 using Ciribob.IL2.SimpleRadio.Standalone.Common;
 using Ciribob.IL2.SimpleRadio.Standalone.Common.Network;
 using Ciribob.IL2.SimpleRadio.Standalone.Server.Events;
+using Ciribob.IL2.SimpleRadio.Standalone.Server.Plugins;
 using NLog;
 
 namespace Ciribob.IL2.SimpleRadio.Standalone.Server.Network
@@ -12,7 +13,7 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Server.Network
     /// (replaces the Caliburn.Micro event aggregator used by the WPF server).
     /// Handlers run on the publishing thread and must not block.
     /// </summary>
-    public sealed class ServerEvents
+    public sealed class ServerEvents : IEventBus, IServerStatusEvents
     {
         private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
 
@@ -43,7 +44,7 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Server.Network
         /// </summary>
         public event Action<SRClient, string, int, PlayerGameState> ClientUpdated;
 
-        /// <summary>A typed event for the event log and other subscribers.</summary>
+        /// <summary>A typed event for the event log and plugins (see <see cref="IEventBus"/>).</summary>
         public event Action<SrsEvent> EventPublished;
 
         public void PublishClientsChanged() => Raise(ClientsChanged);

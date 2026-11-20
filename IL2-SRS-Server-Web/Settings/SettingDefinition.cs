@@ -11,7 +11,10 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Server.Settings
         Toggle,
         Number,
         Text,
-        FrequencyList
+        FrequencyList,
+
+        /// <summary>An http(s) address, or empty.</summary>
+        Url
     }
 
     /// <summary>How a setting is shown, validated and applied by the admin UI and API.</summary>
@@ -87,6 +90,11 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Server.Settings
             new SettingDefinition(ServerSettingsKeys.SHOW_SQUAD_CHANNEL_LABELS, ClientGroup, "Squad Channel Labels",
                 "Append the majority squad tag to channel names above channel 2.", SettingKind.Toggle),
 
+            new SettingDefinition(ServerSettingsKeys.SERVER_NAME, ServerGroup, "Server Name",
+                "How plugins name this server (IServerInfo.Name). Empty uses the host name.", SettingKind.Text),
+            new SettingDefinition(ServerSettingsKeys.PUBLIC_ADMIN_URL, ServerGroup, "Public Admin URL",
+                "Where admins reach this page, e.g. https://srs.example.com. Plugins can link to it " +
+                "(IServerInfo.AdminUrl).", SettingKind.Url),
             new SettingDefinition(ServerSettingsKeys.SERVER_PORT, ServerGroup, "Server Port",
                 "TCP and UDP port clients connect to.", SettingKind.Number, 1, 65535, requiresRestart: true),
             new SettingDefinition(ServerSettingsKeys.CLIENT_EXPORT_ENABLED, ServerGroup, "Auto Export List",
@@ -180,6 +188,16 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Server.Settings
                     }
 
                     normalized = string.Join(",", frequencies);
+                    return null;
+
+                case SettingKind.Url:
+                    if (value.Length > 0 &&
+                        (!Uri.TryCreate(value, UriKind.Absolute, out var uri) ||
+                         (uri.Scheme != Uri.UriSchemeHttp && uri.Scheme != Uri.UriSchemeHttps)))
+                    {
+                        return "an http:// or https:// address, or nothing";
+                    }
+
                     return null;
 
                 default:

@@ -1,0 +1,476 @@
+@page "/integrations/new"
+@page "/integrations/{Id:long}"
+@attribute [Authorize]
+@using System.Text.Json.Nodes
+@using Microsoft.JSInterop
+@inject IntegrationService Integrations
+@inject IAdminActor AdminActor
+@inject NavigationManager Navigation
+@inject IJSRuntime JS
+
+<PageTitle>@(Id.HasValue ? "Edit integration" : "New integration") · IL2-SRS Server</PageTitle>
+
+<div class="page-head">
+    <h1>@(Id.HasValue ? "Edit integration" : "New integration")</h1>
+</div>
+
+@if (_notFound)
+{
+    <p class="alert alert-error" role="alert">This integration no longer exists. <a href="integrations">Back to integrations</a></p>
+    return;
+}
+
+@{
+    // Checked on every render so errors follow the edits; FormState decides which ones show.
+    _validation = Integrations.Validate(Draft());
+}
+
+<form class="panel integration-form" novalidate @onsubmit="Save">
+    <p class="muted">Run an action when an event happens, optionally only when the event data matches conditions.</p>
+
+    <div class="field">
+        <label for="name">Name</label>
+        <input id="name" type="text" maxlength="100" placeholder="e.g. Post joins to Discord"
+               aria-invalid="@Invalid(IntegrationValidation.Name)" aria-describedby="@DescribedBy(IntegrationValidation.Name)"
+               @bind="_name" @bind:event="oninput" @onblur="() => _form.Touch(IntegrationValidation.Name)" />
+        <FieldError Id="@ErrorId(IntegrationValidation.Name)" Message="@Show(IntegrationValidation.Name)" />
+    </div>
+
+    <div class="field">
+        <label for="description">Description</label>
+        <input id="description" type="text" maxlength="500" placeholder="What does this integration do?"
+               @bind="_description" />
+    </div>
+
+    <div class="field field-inline">
+        <label class="switch">
+            <input id="enabled" type="checkbox" role="switch" @bind="_enabled" />
+            <span class="switch-track" aria-hidden="true"></span>
+        </label>
+        <label for="enabled">Enabled</label>
+    </div>
+
+    <div class="field">
+        <label for="add-trigger">Trigger events</label>
+        <span class="field-help">
+            Runs when any of these events happens. In a template, <code>@("{{ event.type }}")</code> tells them apart.
+        </span>
+        @foreach (var trigger in Triggers)
+        {
+            <div class="trigger-row" @key="trigger.Type">
+                <div class="trigger-text">
+                    <span><strong>@trigger.Label</strong> <code>@trigger.Type</code></span>
+                    <span class="field-help">@trigger.Description</span>
+                </div>
+                <button type="button" class="btn btn-quiet" title="Remove @trigger.Label"
+                        aria-label="Remove @trigger.Label" @onclick="() => RemoveTrigger(trigger.Type)">
+                    <Icon Name="x" />
+                </button>
+            </div>
+        }
+        <select id="add-trigger" value="" aria-invalid="@Invalid(IntegrationValidation.Triggers)"
+                aria-describedby="@DescribedBy(IntegrationValidation.Triggers)"
+                @onchange="e => AddTrigger(e.Value?.ToString())" @onblur="() => _form.Touch(IntegrationValidation.Triggers)">
+            <option value="">@(_triggerTypes.Count == 0 ? "Choose an event" : "Add another event")</option>
+            @foreach (var category in EventCategory.All)
+            {
+                <optgroup label="@category">
+                    @foreach (var eventType in Integrations.EventTypes.All.Where(t => t.Category == category && !_triggerTypes.Contains(t.Type)))
+                    {
+                        <option value="@eventType.Type">@eventType.Label (@eventType.Type)</option>
+                    }
+                </optgroup>
+            }
+        </select>
+        <FieldError Id="@ErrorId(IntegrationValidation.Triggers)" Message="@Show(IntegrationValidation.Triggers)" />
+        @if (Triggers.Count > 0)
+        {
+            <details class="schema">
+                <summary>Data available to conditions and templates</summary>
+                <table class="grid compact">
+                    <thead>
+                        <tr>
+                            <th>Field</th><th>Type</th><th>Description</th>
+                            @if (Triggers.Count > 1)
+                            {
+                                <th>Events</th>
+                            }
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var use in EventData.Fields(Triggers))
+                        {
+                            <tr>
+                                <td><code>@use.Field.Path</code></td><td>@use.Field.Type</td><td>@use.Field.Description</td>
+                                @if (Triggers.Count > 1)
+                                {
+                                    <td>@(use.OnlyIn.Count == 0 ? "All" : string.Join(", ", use.OnlyIn.Select(t => t.Label)))</td>
+                                }
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </details>
+        }
+    </div>
+
+    <div class="field">
+        <span class="field-label">Conditions</span>
+        <span class="field-help">
+            Optional. All conditions must match the event data for the action to run. Text comparisons ignore case.
+        </span>
+        @foreach (var (condition, index) in _conditions.Select((c, i) => (c, i)))
+        {
+            var valueKey = IntegrationValidation.Condition(index, "value");
+            <div class="condition" @key="condition">
+            <div class="condition-row">
+                <select aria-label="Field" @bind="condition.Field" disabled="@(Triggers.Count == 0)">
+                    <option value="">Field</option>
+                    @foreach (var use in EventData.Fields(Triggers))
+                    {
+                        <option value="@use.Field.Path">@use.Field.Path@(use.OnlyIn.Count == 0 ? "" : " (" + string.Join(", ", use.OnlyIn.Select(t => t.Label)) + " only)")</option>
+                    }
+                </select>
+                <select aria-label="Comparison" @bind="condition.Operator">
+                    @foreach (var op in ConditionOperator.All)
+                    {
+                        <option value="@op.Value">@op.Label</option>
+                    }
+                </select>
+                @if (ConditionOperator.NeedsValue(condition.Operator))
+                {
+                    <input type="text" aria-label="Value" placeholder="value"
+                           aria-invalid="@Invalid(valueKey)" aria-describedby="@DescribedBy(valueKey)"
+                           @bind="condition.Value" @bind:event="oninput" @onblur="() => _form.Touch(valueKey)" />
+                }
+                else
+                {
+                    <span></span>
+                }
+                <button type="button" class="btn btn-quiet" title="Remove condition" aria-label="Remove condition"
+                        @onclick="() => _conditions.Remove(condition)">
+                    <Icon Name="x" />
+                </button>
+            </div>
+            <FieldError Id="@ErrorId(valueKey)" Message="@Show(valueKey)" />
+            </div>
+        }
+        <div>
+            <button type="button" class="btn btn-quiet" @onclick="() => _conditions.Add(new ConditionRow())">+ Add condition</button>
+        </div>
+    </div>
+
+    <div class="field">
+        <label for="action">Action</label>
+        <select id="action" aria-invalid="@Invalid(IntegrationValidation.Action)"
+                aria-describedby="@DescribedBy(IntegrationValidation.Action)"
+                @bind="_actionType" @bind:after="ActionChanged" @onblur="() => _form.Touch(IntegrationValidation.Action)">
+            <option value="">Choose an action</option>
+            @foreach (var available in Integrations.Actions)
+            {
+                <option value="@available.Type">@available.Label</option>
+            }
+        </select>
+        <FieldError Id="@ErrorId(IntegrationValidation.Action)" Message="@Show(IntegrationValidation.Action)" />
+        @if (Action != null)
+        {
+            <span class="field-help">@Action.Description</span>
+        }
+        else if (!string.IsNullOrEmpty(_actionType))
+        {
+            <span class="field-help">The action "@_actionType" is not available on this server.</span>
+        }
+    </div>
+
+    @if (Action != null)
+    {
+        <div class="action-config">
+            <DynamicComponent Type="Action.ConfigEditor" Parameters="EditorParameters" />
+        </div>
+    }
+
+    <div class="field-grid">
+        <div class="field">
+            <label for="retryMode">Retry mode</label>
+            <select id="retryMode" @bind="_retryMode">
+                <option value="@RetryMode.None">No retries</option>
+                <option value="@RetryMode.Fixed">Every 30 seconds</option>
+                <option value="@RetryMode.Exponential">Backing off (10 s, 20 s, 40 s … up to 10 min)</option>
+            </select>
+        </div>
+        <div class="field">
+            <label for="maxRetries">Max retries</label>
+            <input id="maxRetries" type="number" class="input-narrow" min="1" max="@IntegrationDefinition.MaxRetriesLimit"
+                   aria-invalid="@Invalid(IntegrationValidation.MaxRetries)"
+                   aria-describedby="@DescribedBy(IntegrationValidation.MaxRetries)"
+                   disabled="@(_retryMode == RetryMode.None)" @bind="_maxRetries"
+                   @onblur="() => _form.Touch(IntegrationValidation.MaxRetries)" />
+            <FieldError Id="@ErrorId(IntegrationValidation.MaxRetries)" Message="@Show(IntegrationValidation.MaxRetries)" />
+        </div>
+    </div>
+
+    @if (_error != null)
+    {
+        <p class="alert alert-error" role="alert">@_error</p>
+    }
+    @if (_test != null)
+    {
+        @foreach (var run in _test.Runs)
+        {
+            <div class="alert @(run.Result.IsSuccess ? "alert-ok" : "alert-error")" role="status">
+                <strong>@(run.Result.IsSuccess ? "Test succeeded" : "Test failed")@(_test.Runs.Count > 1 && run.Event != null ? " · " + run.Event.Label : "")</strong>
+                @if (!string.IsNullOrEmpty(run.Result.Message))
+                {
+                    <text>: @run.Result.Message</text>
+                }
+                @if (run.Event != null && !run.ConditionsMatchSample)
+                {
+                    <div class="small">The example event does not match the conditions; real events like it would be skipped.</div>
+                }
+            </div>
+        }
+    }
+
+    <div class="form-actions">
+        <a class="btn btn-quiet" href="integrations">Cancel</a>
+        <button type="button" class="btn btn-quiet" disabled="@_testing" @onclick="Test">
+            @(_testing ? "Testing…" : "Test")
+        </button>
+        <button type="submit" class="btn btn-primary" disabled="@_saved">@(Id.HasValue ? "Save" : "Create integration")</button>
+    </div>
+</form>
+
+@code {
+    [Parameter] public long? Id { get; set; }
+
+    private sealed class ConditionRow
+    {
+        public string Field { get; set; } = string.Empty;
+        public string Operator { get; set; } = ConditionOperator.Is;
+        public string Value { get; set; }
+    }
+
+    private string _name;
+    private string _description;
+    private bool _enabled = true;
+    private readonly List<string> _triggerTypes = new();
+    private readonly List<ConditionRow> _conditions = new();
+    private string _actionType = string.Empty;
+    private JsonObject _config = new();
+    private IReadOnlyDictionary<string, string> _hints = new Dictionary<string, string>();
+    private IReadOnlyDictionary<string, string> _actionState = new Dictionary<string, string>();
+    private RetryMode _retryMode = RetryMode.None;
+    private int _maxRetries = 3;
+    private IntegrationDefinition _stored;
+    private bool _notFound;
+    private string _error;
+    private IntegrationTestResult _test;
+    private bool _testing;
+    // Set once a save succeeds, so a double-click queued behind it does not create the integration twice.
+    private bool _saved;
+    private readonly FormState _form = new();
+    private IntegrationValidation _validation;
+    private bool _focusFirstError;
+
+    private IReadOnlyList<SrsEventType> Triggers =>
+        _triggerTypes.Select(Integrations.EventTypes.Find).Where(t => t != null).ToList();
+    private IIntegrationAction Action => Integrations.FindAction(_actionType);
+    private string Actor => AdminActor.Name;
+
+    private Dictionary<string, object> EditorParameters => new()
+    {
+        [nameof(IntegrationActionEditor.Config)] = _config,
+        [nameof(IntegrationActionEditor.SecretHints)] = _hints,
+        [nameof(IntegrationActionEditor.Triggers)] = Triggers,
+        [nameof(IntegrationActionEditor.State)] = _stored != null && _stored.ActionType == _actionType
+            ? _actionState
+            : new Dictionary<string, string>(),
+        [nameof(IntegrationActionEditor.ConfigChanged)] = EventCallback.Factory.Create(this, () => _test = null),
+        [nameof(IntegrationActionEditor.Errors)] = ConfigErrors(),
+        [nameof(IntegrationActionEditor.FieldTouched)] = EventCallback.Factory.Create<string>(this,
+            name => _form.Touch(IntegrationValidation.Config(name)))
+    };
+
+    /// <summary>The error to show for a field now, or null.</summary>
+    private string Show(string key) =>
+        _validation != null && _validation.Errors.TryGetValue(key, out var error) ? _form.Show(key, error) : null;
+
+    private string Invalid(string key) => FieldError.Invalid(Show(key));
+    private string DescribedBy(string key) => FieldError.DescribedBy(ErrorId(key), Show(key));
+    private static string ErrorId(string key) => key.Replace('[', '-').Replace("]", "").Replace('.', '-') + "-error";
+
+    /// <summary>The action settings' errors to show, keyed by settings field for the editor.</summary>
+    private Dictionary<string, string> ConfigErrors()
+    {
+        var prefix = IntegrationValidation.Config(string.Empty);
+        return (_validation?.Errors ?? new Dictionary<string, string>())
+            .Where(e => e.Key.StartsWith(prefix, StringComparison.Ordinal) && Show(e.Key) != null)
+            .ToDictionary(e => e.Key[prefix.Length..], e => e.Value);
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (_focusFirstError)
+        {
+            _focusFirstError = false;
+            await JS.InvokeVoidAsync("il2srs.focusFirstInvalid");
+        }
+    }
+
+    /// <summary>Shows every error after Save or Test; returns false (and moves to the first error) when invalid.</summary>
+    private bool CheckBeforeSubmit()
+    {
+        _form.Submit();
+        _validation = Integrations.Validate(Draft());
+        if (_validation.IsValid)
+        {
+            return true;
+        }
+
+        _test = null;
+        _focusFirstError = true;
+        return false;
+    }
+
+    protected override void OnParametersSet()
+    {
+        if (!Id.HasValue)
+        {
+            if (Integrations.Actions.Count == 1)
+            {
+                _actionType = Integrations.Actions[0].Type;
+            }
+
+            return;
+        }
+
+        _stored = Integrations.Store.Get(Id.Value);
+        if (_stored == null)
+        {
+            _notFound = true;
+            return;
+        }
+
+        _name = _stored.Name;
+        _description = _stored.Description;
+        _enabled = _stored.Enabled;
+        _triggerTypes.Clear();
+        _triggerTypes.AddRange(_stored.TriggerTypes);
+        _conditions.Clear();
+        _conditions.AddRange(_stored.Conditions.Select(c => new ConditionRow
+        {
+            Field = c.Field, Operator = c.Operator, Value = c.Value
+        }));
+        _actionType = _stored.ActionType;
+        _config = (JsonObject)_stored.ActionConfig.DeepClone();
+        _hints = _stored.SecretHints;
+        _actionState = Integrations.DescribeState(_stored.Id);
+        _retryMode = _stored.RetryMode;
+        _maxRetries = _stored.RetryMode == RetryMode.None ? 3 : _stored.MaxRetries;
+    }
+
+    private void AddTrigger(string type)
+    {
+        if (!string.IsNullOrEmpty(type) && !_triggerTypes.Contains(type))
+        {
+            _triggerTypes.Add(type);
+            _form.Touch(IntegrationValidation.Triggers);
+            TriggersChanged();
+        }
+    }
+
+    private void RemoveTrigger(string type)
+    {
+        _triggerTypes.Remove(type);
+        _form.Touch(IntegrationValidation.Triggers);
+        TriggersChanged();
+    }
+
+    /// <summary>Clears condition fields that none of the trigger events have any more.</summary>
+    private void TriggersChanged()
+    {
+        var fields = EventData.Fields(Triggers).Select(f => f.Field.Path).ToHashSet();
+        foreach (var condition in _conditions.Where(c => !fields.Contains(c.Field)))
+        {
+            condition.Field = string.Empty;
+        }
+
+        _test = null;
+    }
+
+    private void ActionChanged()
+    {
+        if (_stored != null && _stored.ActionType == _actionType)
+        {
+            _config = (JsonObject)_stored.ActionConfig.DeepClone();
+            _hints = _stored.SecretHints;
+        }
+        else
+        {
+            _config = new JsonObject();
+            _hints = new Dictionary<string, string>();
+        }
+
+        _test = null;
+    }
+
+    private IntegrationDefinition Draft() => new()
+    {
+        Id = Id ?? 0,
+        Name = _name?.Trim(),
+        Description = _description,
+        Enabled = _enabled,
+        TriggerTypes = _triggerTypes.ToList(),
+        // Every row, so errors line up with the rows; rows without a field are dropped when saving.
+        Conditions = _conditions
+            .Select(c => new IntegrationCondition(c.Field, c.Operator,
+                ConditionOperator.NeedsValue(c.Operator) ? c.Value?.Trim() : null))
+            .ToList(),
+        ActionType = _actionType,
+        ActionConfig = (JsonObject)_config.DeepClone(),
+        RetryMode = _retryMode,
+        MaxRetries = _retryMode == RetryMode.None ? 0 : _maxRetries
+    };
+
+    private void Save()
+    {
+        if (_saved)
+        {
+            return;
+        }
+
+        _test = null;
+        _error = null;
+        if (!CheckBeforeSubmit())
+        {
+            return;
+        }
+
+        _error = Integrations.Save(Draft(), Actor, out _);
+        if (_error == null)
+        {
+            _saved = true;
+            Navigation.NavigateTo("integrations");
+        }
+    }
+
+    private async Task Test()
+    {
+        _error = null;
+        _test = null;
+        if (!CheckBeforeSubmit())
+        {
+            return;
+        }
+
+        _testing = true;
+        try
+        {
+            _test = await Integrations.TestAsync(Draft(), System.Threading.CancellationToken.None);
+        }
+        finally
+        {
+            _testing = false;
+        }
+    }
+}

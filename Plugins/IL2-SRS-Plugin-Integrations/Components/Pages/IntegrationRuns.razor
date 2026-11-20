@@ -1,0 +1,200 @@
+@page "/integrations/runs"
+@* Its old address, from when it had its own menu item. *@
+@page "/integration-runs"
+@attribute [Authorize]
+@inherits LiveComponentBase
+@using System.Text.Json
+@inject IntegrationService Integrations
+
+<PageTitle>Integration Runs · IL2-SRS Server</PageTitle>
+
+<div class="page-head">
+    <h1>Integration Runs</h1>
+    <div class="actions">
+        <a class="btn btn-quiet" href="integrations">Integrations</a>
+    </div>
+</div>
+
+<p class="muted">
+    Each time an event matches an integration, a run is queued and its action is attempted, oldest first and one at
+    a time per integration. Finished runs are kept as long as events.
+</p>
+
+<div class="filters">
+    <label>
+        <span>Status</span>
+        <select @bind="Status" @bind:after="Load">
+            <option value="">All</option>
+            @foreach (var status in ExecutionStatus.All)
+            {
+                <option value="@status">@status</option>
+            }
+        </select>
+    </label>
+    <label>
+        <span>Integration</span>
+        <select @bind="IntegrationFilter" @bind:after="IntegrationFilterChanged">
+            <option value="">All</option>
+            @foreach (var integration in _integrations)
+            {
+                <option value="@integration.Id">@integration.Name</option>
+            }
+        </select>
+    </label>
+    <label>
+        <span>Show</span>
+        <select @bind="Limit" @bind:after="Load">
+            <option value="100">100</option>
+            <option value="500">500</option>
+            <option value="1000">1000</option>
+        </select>
+    </label>
+</div>
+
+@if (_error != null)
+{
+    <p class="alert alert-error" role="alert">@_error</p>
+}
+
+@if (_runs.Count == 0)
+{
+    <p class="muted empty">No runs.</p>
+}
+else
+{
+    @* A card per run on phones (integrations.css); data-label names the field there. *@
+    <div class="table-wrap mobile-cards">
+        <table class="grid events">
+            <thead>
+                <tr>
+                    <th>Queued</th>
+                    <th>Integration</th>
+                    <th>Event</th>
+                    <th>Status</th>
+                    <th class="num">Attempts</th>
+                    <th>Result</th>
+                    <th class="actions-col"></th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var run in _runs)
+                {
+                    var expanded = _expanded.Contains(run.Id);
+                    <tr @key="run.Id" class="expandable" aria-expanded="@expanded.ToString().ToLowerInvariant()"
+                        @onclick="() => Toggle(run.Id)">
+                        <td data-label="Queued"><LocalTime Value="run.CreatedAtUtc" Format="seconds" /></td>
+                        <td class="card-title">@run.IntegrationName</td>
+                        <td data-label="Event">
+                            <code>@run.EventType</code>
+                            @if (!string.IsNullOrEmpty(run.EventMessage))
+                            {
+                                <div class="muted small">@run.EventMessage</div>
+                            }
+                        </td>
+                        <td class="nowrap card-corner">
+                            <StatusPill Status="@run.Status" />
+                            @if (run.Status == ExecutionStatus.Queued && run.Attempts > 0 && run.NextAttemptAtUtc.HasValue)
+                            {
+                                <div class="muted small">retry at <LocalTime Value="run.NextAttemptAtUtc.Value" Format="time" /></div>
+                            }
+                        </td>
+                        <td class="num" data-label="Attempts">@run.Attempts</td>
+                        <td data-label="Result">@(run.LastError ?? run.Result)</td>
+                        <td class="actions-col" @onclick:stopPropagation="true">
+                            @if (ExecutionStatus.IsFinished(run.Status))
+                            {
+                                <button type="button" class="btn btn-quiet" title="Run again now" @onclick="() => RunAgain(run)">Run again</button>
+                            }
+                        </td>
+                    </tr>
+                    @if (expanded)
+                    {
+                        <tr class="payload-row">
+                            <td colspan="7">
+                                @if (run.FinishedAtUtc.HasValue)
+                                {
+                                    <p class="small">Finished <LocalTime Value="run.FinishedAtUtc.Value" Format="seconds" /></p>
+                                }
+                                @if (run.LastError != null && run.Result != null)
+                                {
+                                    <p class="small">Result: @run.Result</p>
+                                }
+                                <pre class="payload">@FormatData(run.Data)</pre>
+                            </td>
+                        </tr>
+                    }
+                }
+            </tbody>
+        </table>
+    </div>
+}
+
+@code {
+    private static readonly JsonSerializerOptions Indented = new() { WriteIndented = true };
+
+    private IReadOnlyList<IntegrationExecution> _runs = Array.Empty<IntegrationExecution>();
+    private IReadOnlyList<IntegrationDefinition> _integrations = Array.Empty<IntegrationDefinition>();
+    private readonly HashSet<long> _expanded = new();
+    private string _error;
+
+    [SupplyParameterFromQuery(Name = "integration")] public long? IntegrationQuery { get; set; }
+
+    private string Status { get; set; } = string.Empty;
+    private string IntegrationFilter { get; set; } = string.Empty;
+    private int Limit { get; set; } = 100;
+
+    protected override bool RefreshEverySecond => false;
+
+    protected override void OnInitialized()
+    {
+        base.OnInitialized();
+        Integrations.Store.ExecutionsChanged += QueueRefresh;
+        IntegrationFilter = IntegrationQuery?.ToString(CultureInfo.InvariantCulture) ?? string.Empty;
+        Load();
+    }
+
+    protected override void OnLiveRefresh() => Load();
+
+    private void Load()
+    {
+        _integrations = Integrations.Store.List();
+        _runs = Integrations.Store.QueryExecutions(Status,
+            long.TryParse(IntegrationFilter, NumberStyles.Integer, CultureInfo.InvariantCulture, out var id) ? id : null,
+            Limit);
+    }
+
+    private void IntegrationFilterChanged() => Load();
+
+    private void Toggle(long id)
+    {
+        if (!_expanded.Remove(id))
+        {
+            _expanded.Add(id);
+        }
+    }
+
+    private void RunAgain(IntegrationExecution run)
+    {
+        _error = Integrations.Store.Requeue(run.Id) ? null : "This run is already queued or running.";
+        Load();
+    }
+
+    private static string FormatData(string data)
+    {
+        try
+        {
+            using var document = JsonDocument.Parse(data);
+            return JsonSerializer.Serialize(document.RootElement, Indented);
+        }
+        catch (JsonException)
+        {
+            return data;
+        }
+    }
+
+    public override void Dispose()
+    {
+        Integrations.Store.ExecutionsChanged -= QueueRefresh;
+        base.Dispose();
+    }
+}

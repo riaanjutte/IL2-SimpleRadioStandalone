@@ -1,3 +1,5 @@
+@inject IEnumerable<AdminStylesheet> PluginStylesheets
+
 <!DOCTYPE html>
 <html lang="en">
 
@@ -12,6 +14,10 @@
     <script src="@Assets["app.js"]"></script>
     <ResourcePreloader />
     <link rel="stylesheet" href="@Assets["app.css"]" />
+    @foreach (var stylesheet in PluginStylesheets)
+    {
+        <link rel="stylesheet" href="@stylesheet.Href" />
+    }
     <ImportMap />
     <HeadOutlet @rendermode="PageRenderMode" />
 </head>

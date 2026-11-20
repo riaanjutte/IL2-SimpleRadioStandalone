@@ -4,38 +4,7 @@ using System.Linq;
 
 namespace Ciribob.IL2.SimpleRadio.Standalone.Server.Events
 {
-    /// <summary>
-    /// A field in an event payload, addressed by a dotted path such as <c>client.name</c>. The example value
-    /// is used for test runs and template previews.
-    /// </summary>
-    public sealed record SrsEventField(string Path, string Type, string Description, object Example = null);
-
-    /// <summary>
-    /// One kind of event the server publishes: its type name (e.g. <c>client.connected</c>), the event log
-    /// category it is stored under, and the payload fields it carries (listed by the API at /event-types).
-    /// </summary>
-    public sealed class SrsEventType
-    {
-        public SrsEventType(string type, string category, string label, string description,
-            params IEnumerable<SrsEventField>[] fields)
-        {
-            Type = type;
-            Category = category;
-            Label = label;
-            Description = description;
-            Fields = fields.SelectMany(group => group).ToArray();
-        }
-
-        public string Type { get; }
-        public string Category { get; }
-        public string Label { get; }
-        public string Description { get; }
-        public IReadOnlyList<SrsEventField> Fields { get; }
-
-        public override string ToString() => Type;
-    }
-
-    /// <summary>Every event type the server publishes.</summary>
+    /// <summary>Every event type the server itself publishes; plugins add theirs (see <see cref="IEventTypeRegistry"/>).</summary>
     public static class SrsEventTypes
     {
         private static readonly SrsEventField[] ClientFields =
@@ -209,6 +178,34 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Server.Events
         public static SrsEventType Find(string type)
         {
             return type != null && ByType.TryGetValue(type, out var eventType) ? eventType : null;
+        }
+    }
+
+    /// <summary>The built-in event types and those plugins registered.</summary>
+    public sealed class EventTypeRegistry : IEventTypeRegistry
+    {
+        private readonly Dictionary<string, SrsEventType> _byType;
+
+        public EventTypeRegistry(IEnumerable<EventTypeRegistration> registrations)
+        {
+            var all = new List<SrsEventType>(SrsEventTypes.All);
+            _byType = all.ToDictionary(type => type.Type, StringComparer.Ordinal);
+            foreach (var type in registrations.SelectMany(registration => registration.Types))
+            {
+                if (_byType.TryAdd(type.Type, type))
+                {
+                    all.Add(type);
+                }
+            }
+
+            All = all;
+        }
+
+        public IReadOnlyList<SrsEventType> All { get; }
+
+        public SrsEventType Find(string type)
+        {
+            return type != null && _byType.TryGetValue(type, out var eventType) ? eventType : null;
         }
     }
 }

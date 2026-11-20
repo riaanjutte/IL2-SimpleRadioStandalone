@@ -30,15 +30,6 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Server.Audit
         public string Payload { get; init; }
     }
 
-    public sealed class AuditRetention
-    {
-        public const string DaysKey = "SRS_EVENT_RETENTION_DAYS";
-        public const string MaxRowsKey = "SRS_EVENT_MAX_ROWS";
-
-        public int Days { get; init; } = 30;
-        public int MaxRows { get; init; } = 100_000;
-    }
-
     /// <summary>
     /// The event log admins see in the UI and API: every event published on <see cref="ServerEvents"/>.
     /// Writes are queued and stored in batches so network threads never wait on the database.
