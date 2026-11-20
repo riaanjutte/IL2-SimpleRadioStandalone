@@ -5643,6 +5643,15 @@
       "names": [
         "Wavrechain sous Denain"
       ]
+    },
+    {
+      "map": "Any",
+      "code": "AST",
+      "names": [
+        "Air start",
+        "Air spawn",
+        "In air"
+      ]
     }
   ],
   "sources": [

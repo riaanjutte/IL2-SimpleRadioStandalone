@@ -11,7 +11,7 @@
                       xmlns:converters="clr-namespace:Ciribob.IL2.SimpleRadio.Standalone.Client.Utils.ValueConverters"
                       Title="IL2-SRS Client"
                       Width="700"
-                      MinWidth="640"
+                      MinWidth="400"
                       Height="650"
                       MinHeight="560"
                       Background="{DynamicResource MilWindowBackgroundBrush}"
@@ -33,6 +33,43 @@
             </ResourceDictionary.MergedDictionaries>
             <converters:MicAvailabilityTooltipConverter x:Key="MicAvailabilityTooltipConverter" />
             <converters:BooleanToLedBrushConverter x:Key="LedBrushConverter" />
+
+            <!-- Small arrow over the top-right of a General-tab section's header: checked = collapsed. -->
+            <Style x:Key="PanelCollapseToggleStyle" TargetType="{x:Type ToggleButton}">
+                <Setter Property="Width" Value="16" />
+                <Setter Property="Height" Value="14" />
+                <Setter Property="Margin" Value="0,11,18,0" />
+                <Setter Property="HorizontalAlignment" Value="Right" />
+                <Setter Property="VerticalAlignment" Value="Top" />
+                <Setter Property="Background" Value="{DynamicResource MilPanelFaceBrush}" />
+                <Setter Property="Cursor" Value="Hand" />
+                <Setter Property="Template">
+                    <Setter.Value>
+                        <ControlTemplate TargetType="{x:Type ToggleButton}">
+                            <Border Background="{TemplateBinding Background}">
+                                <Path x:Name="Arrow"
+                                      Width="8"
+                                      Height="5"
+                                      HorizontalAlignment="Center"
+                                      VerticalAlignment="Center"
+                                      Data="M0,5 L4,0 L8,5 Z"
+                                      Fill="{DynamicResource MilAccentBrush}" />
+                            </Border>
+                            <ControlTemplate.Triggers>
+                                <Trigger Property="IsChecked" Value="True">
+                                    <Setter TargetName="Arrow" Property="Data" Value="M0,0 L8,0 L4,5 Z" />
+                                </Trigger>
+                                <Trigger Property="IsMouseOver" Value="True">
+                                    <Setter TargetName="Arrow" Property="Fill" Value="{DynamicResource MilTextPrimaryBrush}" />
+                                </Trigger>
+                                <Trigger Property="IsKeyboardFocused" Value="True">
+                                    <Setter TargetName="Arrow" Property="Fill" Value="{DynamicResource MilTextPrimaryBrush}" />
+                                </Trigger>
+                            </ControlTemplate.Triggers>
+                        </ControlTemplate>
+                    </Setter.Value>
+                </Setter>
+            </Style>
         </ResourceDictionary>
     </controls:MetroWindow.Resources>
 
@@ -52,8 +89,8 @@
                 Background="{DynamicResource MilWellBrush}"
                 BorderBrush="{DynamicResource MilBorderBrush}"
                 BorderThickness="0,1,0,0">
-            <DockPanel Margin="10,3" LastChildFill="False">
-                <StackPanel DockPanel.Dock="Left" Orientation="Horizontal">
+            <DockPanel x:Name="StatusBarDock" Margin="10,3" LastChildFill="False" SizeChanged="StatusBarDock_SizeChanged">
+                <StackPanel x:Name="StatusBarLeft" DockPanel.Dock="Left" Orientation="Horizontal">
                     <Grid Width="13" Height="13" VerticalAlignment="Center">
                         <Ellipse Fill="{DynamicResource MilLampBezelBrush}" />
                         <Ellipse Margin="2"
@@ -91,7 +128,8 @@
                            FontFamily="{StaticResource MilFontMono}" FontSize="13"
                            Foreground="{DynamicResource MilTextSecondaryBrush}" />
                 </StackPanel>
-                <StackPanel DockPanel.Dock="Right" Orientation="Horizontal">
+                <!-- SizeChanged here too: the client count or profile name can widen this half without the dock resizing. -->
+                <StackPanel x:Name="StatusBarRight" DockPanel.Dock="Right" HorizontalAlignment="Right" Orientation="Horizontal" SizeChanged="StatusBarDock_SizeChanged">
                     <Label Content="Connected Clients:" Padding="2,0"
                            FontFamily="{StaticResource MilFontMono}" FontSize="13"
                            Foreground="{DynamicResource MilTextSecondaryBrush}" />
@@ -112,6 +150,40 @@
             </DockPanel>
         </Border>
 
+        <!-- Combat Box RCI: shown only while connected to srs.combatbox.net (ShouldShowRciStatus). -->
+        <Border x:Name="RciStatusPanel"
+                DockPanel.Dock="Bottom"
+                Visibility="Collapsed"
+                Background="{DynamicResource MilWellBrush}"
+                BorderBrush="{DynamicResource MilBorderBrush}"
+                BorderThickness="0,1,0,0">
+            <!-- Same lamp and lettering as the status bar below; the lamp takes the RCI state's colour. -->
+            <!-- DockPanel so the callsign gets only the width left and its ellipsis can apply. -->
+            <DockPanel Margin="10,3" LastChildFill="True">
+                <Grid Width="13" Height="13" VerticalAlignment="Center">
+                    <Ellipse Fill="{DynamicResource MilLampBezelBrush}" />
+                    <Ellipse x:Name="RciStatusIndicator" Margin="2" Fill="{DynamicResource MilLedOffBrush}" />
+                    <Ellipse Margin="2" Fill="{DynamicResource MilLampGlassBrush}" />
+                </Grid>
+                <TextBlock x:Name="RciStatusLabel"
+                           Margin="3,0,0,0"
+                           VerticalAlignment="Center"
+                           FontFamily="{StaticResource MilFontMono}"
+                           FontSize="13"
+                           Foreground="{DynamicResource MilTextSecondaryBrush}"
+                           Text="RCI" />
+                <TextBlock x:Name="RciCallsignLabel"
+                           Margin="12,0,0,0"
+                           VerticalAlignment="Center"
+                           FontFamily="{StaticResource MilFontMono}"
+                           FontSize="13"
+                           Foreground="{DynamicResource MilTextPrimaryBrush}"
+                           TextTrimming="CharacterEllipsis"
+                           Visibility="Collapsed" />
+            </DockPanel>
+        </Border>
+
+        <Grid>
         <TabControl x:Name="TabControl">
         <TabItem Header="General">
             <ScrollViewer HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto">
@@ -122,7 +194,7 @@
                             <ColumnDefinition Width="*" />
                         </Grid.ColumnDefinitions>
 
-                        <GroupBox Grid.Column="0" Header="Microphone">
+                        <GroupBox x:Name="MicrophonePanel" Grid.Column="0" Header="Microphone">
                             <Grid x:Name="MicrophoneGrid">
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition Width="*" />
@@ -144,6 +216,11 @@
                                                  Maximum="18"
                                                  Minimum="-100"
                                                  ToolTip="{Binding Path=AudioInput.MicrophoneAvailable, Converter={StaticResource MicAvailabilityTooltipConverter}}" />
+                                    <clientWindow:LedVuMeter x:Name="Mic_LED"
+                                                             HorizontalAlignment="Center"
+                                                             Value="{Binding Value, ElementName=Mic_VU}"
+                                                             ToolTip="{Binding Path=AudioInput.MicrophoneAvailable, Converter={StaticResource MicAvailabilityTooltipConverter}}"
+                                                             Visibility="Collapsed" />
                                     <Button x:Name="Preview"
                                             Margin="0,8,0,0"
                                             HorizontalAlignment="Center"
@@ -157,7 +234,7 @@
                             </Grid>
                         </GroupBox>
 
-                        <GroupBox Grid.Column="1" Header="Speakers &amp; Optional Mic Output">
+                        <GroupBox x:Name="SpeakersPanel" Grid.Column="1" Header="Speakers &amp; Optional Mic Output">
                             <Grid>
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition Width="*" />
@@ -183,6 +260,10 @@
                                                  Value="-100"
                                                  Maximum="18"
                                                  Minimum="-100" />
+                                    <clientWindow:LedVuMeter x:Name="Speaker_LED"
+                                                             HorizontalAlignment="Center"
+                                                             Value="{Binding Value, ElementName=Speaker_VU}"
+                                                             Visibility="Collapsed" />
                                     <Slider x:Name="SpeakerBoost"
                                             Width="150"
                                             Margin="0,8,0,0"
@@ -206,7 +287,7 @@
                             <ColumnDefinition Width="*" />
                         </Grid.ColumnDefinitions>
 
-                        <GroupBox Grid.Column="0" Header="Server">
+                        <GroupBox x:Name="ServerPanel" Grid.Column="0" Header="Server">
                             <StackPanel x:Name="ServerLayout" HorizontalAlignment="Center">
                                 <ComboBox x:Name="ServerAddressPicker"
                                           Width="220"
@@ -334,11 +415,6 @@
                         <Grid x:Name="OverlaysColumn"
                               Grid.Column="1"
                               Margin="0,5,0,5">
-                            <Grid.RowDefinitions>
-                                <RowDefinition Height="*" />
-                                <RowDefinition Height="Auto" />
-                            </Grid.RowDefinitions>
-
                             <GroupBox Grid.Row="0" Header="Overlays" Margin="0">
                                 <StackPanel x:Name="OverlaysLayout"
                                             HorizontalAlignment="Center"
@@ -409,48 +485,18 @@
                                 </StackPanel>
                             </GroupBox>
 
-                            <GroupBox x:Name="CombatBoxRciPanel"
-                                      Grid.Row="1"
-                                      Header="Combat Box RCI"
-                                      Margin="0"
-                                      Visibility="Collapsed">
-                                <StackPanel x:Name="RciStatusPanel"
-                                            Margin="0,4,0,5"
-                                            HorizontalAlignment="Center"
-                                            Visibility="Collapsed">
-                                    <Grid Width="220"
-                                          Height="18">
-                                        <Border x:Name="RciStatusIndicator"
-                                                Background="{DynamicResource MilRciInactiveBackgroundBrush}"
-                                                BorderBrush="#666"
-                                                BorderThickness="1" />
-                                        <TextBlock x:Name="RciStatusLabel"
-                                                   HorizontalAlignment="Center"
-                                                   VerticalAlignment="Center"
-                                                   FontFamily="Courier New"
-                                                   FontSize="12"
-                                                   FontWeight="Bold"
-                                                   Foreground="{DynamicResource MilRciInactiveTextBrush}"
-                                                   Text="RCI" />
-                                    </Grid>
-                                    <TextBlock x:Name="RciCallsignLabel"
-                                               Width="220"
-                                               Margin="0,2,0,0"
-                                               HorizontalAlignment="Center"
-                                               FontFamily="Courier New"
-                                               FontSize="12"
-                                               FontWeight="Bold"
-                                               Foreground="{StaticResource ForegroundBrush}"
-                                               TextAlignment="Center"
-                                               TextTrimming="CharacterEllipsis"
-                                               Visibility="Collapsed" />
-                                </StackPanel>
-                            </GroupBox>
+                            <ToggleButton x:Name="ServerOverlaysCollapseToggle"
+                                          Grid.Row="0"
+                                          Checked="PanelCollapseToggle_Changed"
+                                          Style="{StaticResource PanelCollapseToggleStyle}"
+                                          Unchecked="PanelCollapseToggle_Changed" />
                         </Grid>
                     </Grid>
-                    <GroupBox x:Name="FavouritesGroupBox" Header="Favourites">
-                        <clientWindow:FavouriteServersView DataContext="{Binding Path=FavouriteServersViewModel}" MaxHeight="230" />
-                    </GroupBox>
+                    <Grid x:Name="FavouritesSection">
+                        <GroupBox x:Name="FavouritesGroupBox" Header="Favourites">
+                            <clientWindow:FavouriteServersView DataContext="{Binding Path=FavouriteServersViewModel}" MaxHeight="230" />
+                        </GroupBox>
+                    </Grid>
 
                 </StackPanel>
             </ScrollViewer>
@@ -459,7 +505,7 @@
         <TabItem Header="Controls">
             <GroupBox x:Name="ControlsGroupBox" Header="Controls">
 
-                <ScrollViewer HorizontalScrollBarVisibility="Hidden" VerticalScrollBarVisibility="Visible">
+                <ScrollViewer HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Visible">
                     <StackPanel x:Name="ControlsLayout" HorizontalAlignment="Center">
                         <Button Width="320"
                                 Padding="10,4"
@@ -729,15 +775,16 @@
         <TabItem Header="Settings">
             <ScrollViewer HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Visible">
                 <StackPanel Margin="10,0,10,0">
-                    <GroupBox Header="Global Settings">
+                    <GroupBox x:Name="GlobalSettingsPanel" Header="Global Settings">
 
                         <Grid>
                             <Grid.ColumnDefinitions>
-                                <ColumnDefinition x:Name="GlobalSettingsLabelColumn" Width="390" />
+                                <ColumnDefinition x:Name="GlobalSettingsLabelColumn" Width="2*" MaxWidth="390" />
                                 <ColumnDefinition />
 
                             </Grid.ColumnDefinitions>
                             <Grid.RowDefinitions>
+                                <RowDefinition />
                                 <RowDefinition />
                                 <RowDefinition />
                                 <RowDefinition />
@@ -974,23 +1021,37 @@
                                    Grid.Column="0"
                                    HorizontalContentAlignment="Center"
                                    VerticalContentAlignment="Center"
+                                   Content="Text size" />
+
+                            <ComboBox Name="TextSizePicker"
+                                      Grid.Row="15"
+                                      Grid.Column="1"
+                                      HorizontalContentAlignment="Center"
+                                      VerticalContentAlignment="Center"
+                                      ToolTip="Makes the text and controls in the SRS windows larger. To resize the radio overlay, drag its corner."
+                                      SelectionChanged="TextSizePicker_SelectionChanged" />
+
+                            <Label Grid.Row="16"
+                                   Grid.Column="0"
+                                   HorizontalContentAlignment="Center"
+                                   VerticalContentAlignment="Center"
                                    Content="3D Effects" />
 
                             <ToggleButton Name="ThreeDEffectsToggle"
-                                          Grid.Row="15"
+                                          Grid.Row="16"
                                           Grid.Column="1"
                                           HorizontalContentAlignment="Center"
                                           VerticalContentAlignment="Center"
                                           Click="ThreeDEffectsToggle_Click">
                             </ToggleButton>
 
-                            <Label Grid.Row="16"
+                            <Label Grid.Row="17"
                                    Grid.Column="0"
                                    HorizontalContentAlignment="Center"
                                    VerticalContentAlignment="Center"
                                    Content="Weathering" />
 
-                            <Grid Grid.Row="16"
+                            <Grid Grid.Row="17"
                                   Grid.Column="1"
                                   HorizontalAlignment="Stretch">
                                 <Grid.ColumnDefinitions>
@@ -1021,7 +1082,8 @@
                     <GroupBox x:Name="RciControllerGroup" Header="RCI Controller">
                         <Grid HorizontalAlignment="Center">
                             <Grid.ColumnDefinitions>
-                                <ColumnDefinition x:Name="RciControllerLabelColumn" Width="390" />
+                                <!-- The labels are short: they take what they need and the code box gets the rest. -->
+                                <ColumnDefinition x:Name="RciControllerLabelColumn" Width="Auto" MaxWidth="390" />
                                 <ColumnDefinition />
                             </Grid.ColumnDefinitions>
                             <Grid.RowDefinitions>
@@ -1079,11 +1141,13 @@
                                        TextWrapping="Wrap" />
                         </Grid>
                     </GroupBox>
-                    <GroupBox Header="Audio Options">
+                    <GroupBox x:Name="AudioOptionsPanel" Header="Audio Options">
                         <Grid HorizontalAlignment="Center">
                             <Grid.ColumnDefinitions>
-                                <ColumnDefinition x:Name="AudioOptionsLabelColumn" Width="390" />
-                                <ColumnDefinition />
+                                <!-- The switch keeps its own width and the label gets the rest, so a long label is cut
+                                     off only when the panel has no room left. -->
+                                <ColumnDefinition x:Name="AudioOptionsLabelColumn" Width="*" MaxWidth="390" />
+                                <ColumnDefinition Width="Auto" />
                             </Grid.ColumnDefinitions>
                             <Grid.RowDefinitions>
                                 <RowDefinition />
@@ -1146,21 +1210,22 @@
 
                         </Grid>
                     </GroupBox>
-                    <GroupBox Header="Profile">
-                        <StackPanel Orientation="Vertical" HorizontalAlignment="Center" Margin="10">
+                    <GroupBox x:Name="ProfilePanel" Header="Profile">
+                        <StackPanel Orientation="Vertical" HorizontalAlignment="Center" Margin="0,10">
                             <ComboBox x:Name="ControlsProfile"
                                    Width="200"
                                    HorizontalAlignment="Center"
                                    VerticalAlignment="Top" Margin="5"  Padding="5" />
-                            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="10">
+                            <!-- Wraps: in a narrow panel a single line would clip at both ends. -->
+                            <WrapPanel HorizontalAlignment="Center" Margin="0,10">
                                 <Button Margin="5" Padding="5" Content="Create Profile" Click="CreateProfile" />
                                 <Button Margin="5" Padding="5" Content="Copy Profile" Click="CopyProfile" />
                                 <Button  Margin="5"  Padding="5" Content="Rename Profile" Click="RenameProfile" />
                                 <Button  Margin="5"  Padding="5" Content="Delete Profile" Click="DeleteProfile" />
-                            </StackPanel>
+                            </WrapPanel>
                         </StackPanel>
                     </GroupBox>
-                    <GroupBox Header="Profile Settings">
+                    <GroupBox x:Name="ProfileSettingsPanel" Header="Profile Settings">
                         <Grid>
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="2*" />
@@ -1462,7 +1527,7 @@
         </TabItem>
 
         <TabItem Header="Help">
-            <GroupBox Header="Help &amp; About">
+            <GroupBox x:Name="HelpPanel" Header="Help &amp; About">
                 <DockPanel x:Name="HelpLayout" SizeChanged="HelpLayout_SizeChanged">
                     <StackPanel DockPanel.Dock="Bottom"
                                 Margin="0,10,0,4"
@@ -1498,7 +1563,7 @@
                                     Content="Patreon - Support SRS" />
                         </UniformGrid>
                     </StackPanel>
-                    <FlowDocumentScrollViewer VerticalScrollBarVisibility="Auto">
+                    <FlowDocumentScrollViewer VerticalScrollBarVisibility="Auto" PreviewMouseWheel="HelpDocument_PreviewMouseWheel">
                     <FlowDocument x:Name="AboutFlowDocument"
                                   FontFamily="{StaticResource MilFontMono}"
                                   FontSize="14"
@@ -1575,5 +1640,19 @@
         </TabItem>
 
     </TabControl>
+        <Button x:Name="CustomiseLayoutButton"
+                Width="24"
+                Height="22"
+                Margin="0,4,6,0"
+                Padding="0"
+                HorizontalAlignment="Right"
+                VerticalAlignment="Top"
+                Content="&#x2699;"
+                FontFamily="Segoe UI Symbol"
+                FontSize="13"
+                ToolTip="Customise layout" />
+        <!-- Panels left off every tab: kept in the window so their bindings, hotkeys and features keep working. -->
+        <Grid x:Name="HiddenPanelsHost" Visibility="Collapsed" />
+        </Grid>
     </DockPanel>
 </controls:MetroWindow>

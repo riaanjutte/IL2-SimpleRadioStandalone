@@ -225,6 +225,12 @@
   <data name="VU Meter" xml:space="preserve">
     <value>Medidor VU</value>
   </data>
+  <data name="Text size" xml:space="preserve">
+    <value>Tamaño del texto</value>
+  </data>
+  <data name="Makes the text and controls in the SRS windows larger. To resize the radio overlay, drag its corner." xml:space="preserve">
+    <value>Agranda el texto y los controles de las ventanas de SRS. Para cambiar el tamaño del overlay de radio, arrastra su esquina.</value>
+  </data>
   <data name="Auto" xml:space="preserve">
     <value>Auto</value>
   </data>
@@ -809,6 +815,102 @@
   </data>
   <data name="No RCI active" xml:space="preserve">
     <value>RCI no activo</value>
+  </data>
+  <data name="LED" xml:space="preserve">
+    <value>LED</value>
+  </data>
+  <data name="Collapse" xml:space="preserve">
+    <value>Contraer</value>
+  </data>
+  <data name="Expand" xml:space="preserve">
+    <value>Expandir</value>
+  </data>
+  <data name="Customise layout" xml:space="preserve">
+    <value>Personalizar diseño</value>
+  </data>
+  <data name="Tabs" xml:space="preserve">
+    <value>Pestañas</value>
+  </data>
+  <data name="Add tab" xml:space="preserve">
+    <value>Añadir pestaña</value>
+  </data>
+  <data name="Delete" xml:space="preserve">
+    <value>Eliminar</value>
+  </data>
+  <data name="Move up" xml:space="preserve">
+    <value>Subir</value>
+  </data>
+  <data name="Move down" xml:space="preserve">
+    <value>Bajar</value>
+  </data>
+  <data name="Panels on this tab" xml:space="preserve">
+    <value>Paneles de esta pestaña</value>
+  </data>
+  <data name="Move to tab" xml:space="preserve">
+    <value>Mover a la pestaña</value>
+  </data>
+  <data name="Target tab" xml:space="preserve">
+    <value>Pestaña de destino</value>
+  </data>
+  <data name="Join with row below" xml:space="preserve">
+    <value>Unir con la fila de abajo</value>
+  </data>
+  <data name="Split row" xml:space="preserve">
+    <value>Dividir fila</value>
+  </data>
+  <data name="Fit to content:" xml:space="preserve">
+    <value>Ajustar al contenido:</value>
+  </data>
+  <data name="{0} (fit)" xml:space="preserve">
+    <value>{0} (ajustado)</value>
+  </data>
+  <data name="Drag to resize the panels. Double-click to make them equal." xml:space="preserve">
+    <value>Arrastra para cambiar el tamaño de los paneles. Doble clic para igualarlos.</value>
+  </data>
+  <data name="Hide" xml:space="preserve">
+    <value>Ocultar</value>
+  </data>
+  <data name="Other panels" xml:space="preserve">
+    <value>Otros paneles</value>
+  </data>
+  <data name="{0} (hidden)" xml:space="preserve">
+    <value>{0} (oculto)</value>
+  </data>
+  <data name="{0} (on {1})" xml:space="preserve">
+    <value>{0} (en {1})</value>
+  </data>
+  <data name="Add to this tab" xml:space="preserve">
+    <value>Añadir a esta pestaña</value>
+  </data>
+  <data name="Reset layout" xml:space="preserve">
+    <value>Restablecer diseño</value>
+  </data>
+  <data name="OK" xml:space="preserve">
+    <value>Aceptar</value>
+  </data>
+  <data name="Apply" xml:space="preserve">
+    <value>Aplicar</value>
+  </data>
+  <data name="New tab" xml:space="preserve">
+    <value>Nueva pestaña</value>
+  </data>
+  <data name="Tab name" xml:space="preserve">
+    <value>Nombre de la pestaña</value>
+  </data>
+  <data name="Delete tab" xml:space="preserve">
+    <value>Eliminar pestaña</value>
+  </data>
+  <data name="Delete the tab &quot;{0}&quot;? Its panels will be hidden. You can add them back from Other panels." xml:space="preserve">
+    <value>¿Eliminar la pestaña «{0}»? Sus paneles se ocultarán. Puedes volver a añadirlos desde Otros paneles.</value>
+  </data>
+  <data name="Reset the window layout to the default? Your tabs, tab names, hidden panels and panel widths go back to the default, and every row is expanded, when you press OK or Apply." xml:space="preserve">
+    <value>¿Restablecer el diseño predeterminado de la ventana? Tus pestañas, sus nombres, los paneles ocultos y los anchos de los paneles vuelven a los predeterminados, y todas las filas se expanden, al pulsar Aceptar o Aplicar.</value>
+  </data>
+  <data name="IL-2 IS FULLSCREEN" xml:space="preserve">
+    <value>IL-2 EN PANTALLA COMPLETA</value>
+  </data>
+  <data name="IL-2 is set to fullscreen, so this overlay can't show over the game. Turn off Fullscreen in IL-2's graphics settings and restart IL-2." xml:space="preserve">
+    <value>IL-2 está en pantalla completa, así que esta superposición no puede mostrarse sobre el juego. Desactiva la pantalla completa en los ajustes gráficos de IL-2 y reinicia IL-2.</value>
   </data>
   <data name="Friendly RCI active" xml:space="preserve">
     <value>RCI - Friendly only</value>

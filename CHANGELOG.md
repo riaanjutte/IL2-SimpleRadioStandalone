@@ -4,12 +4,28 @@
 
 ### Added
 
+- The ⚙ button at the right end of the tab strip opens a layout editor for the main window: add, rename, delete and reorder tabs, move panels between tabs, put two panels side by side or give each its own row, and hide panels you don't use. **Reset layout** goes back to the default. Every row has a small arrow in its top-right corner that collapses or expands it, and SRS remembers which rows are collapsed. The window fits the tab shown: a tab with fewer panels, or with rows collapsed, makes it shorter, and full tabs such as Settings get your normal height back. You can still drag it smaller. The Classic theme keeps its fixed layout, with no ⚙ and only the Server and Overlays arrow.
+- Settings › **VU Meter** has an **LED** choice: realistic LED bargraph meters with peak hold instead of the analogue dials. The Microphone and Speakers panels shrink to fit them.
+- The radio overlay shows **IL-2 IS FULLSCREEN** when IL-2 is set to fullscreen, because the overlay can't appear over the game in that mode. Hover over it for how to fix it.
+- Client: a **Text size** setting in Global Settings (100%, 110%, 120% or 130%) makes the text and controls larger, for high-resolution monitors. It applies at once to the main window, the layout editor, server settings, the profile dialog, telemetry diagnostics, the client list and the pilot roster. The radio overlay is not affected; resize it by dragging its corner.
+- Pilot Roster: an airfield of `Air start` (or `Air spawn`, `In air`) shows as **AST**, so a server's roster file can mark pilots who spawned in the air. Before, it showed as `AIR`, the code for Airaines.
 - Web server: **Integrations** post to Discord or send an HTTP request when something happens on the server, for example a pilot joining or the server starting. Conditions narrow them down, for example to one coalition, and messages are templates with a live preview. A Discord integration can keep updating one message, such as a pinned server status. Runs are queued, retried if allowed and listed under **Runs**. The REST API adds `/api/v1/integrations`.
 - Web server: **plugins** add pages, API endpoints and event handling without changing the server. Integrations are the first plugin and are included in the Docker image and the Windows build. The **Plugins** page and `GET /api/v1/plugins` show what loaded. Copy other plugins into `plugins` in the data folder; only install plugins you trust.
 - Web server: `SRS_TRUSTED_PROXIES` names the reverse proxy in front of the admin UI. Failed logins are then limited and logged per browser rather than for the proxy, and the login cookie is marked secure when the proxy serves HTTPS.
 
 ### Changed
 
+- Client: the layout editor no longer blocks the main window, so you can keep using SRS while it is open. Pressing ⚙ again brings the open editor to the front.
+- Client: in the layout editor, **Other panels** (formerly Hidden panels) also lists the panels on other tabs, so **Add to this tab** can bring a panel from any tab to the one selected. A panel taken from a pair leaves its partner on a row of its own.
+- Client: a row of the main window can hold up to three panels. In the layout editor, **Join with row below** and **Split row** replace Pair and Unpair, and **Fit to content** makes a panel only as wide as its controls, leaving the rest of the row to its neighbours. Drag the gap between two panels to resize them; double-click it to make them equal again.
+- Client: the Help & About panel fits its content like the other panels, so the Help tab is only as tall as its text and buttons. Before, it filled the window's full height. Only Controls still fills its tab.
+- Client: panels in the military themes leave less empty space at the left and right of their content (8 units instead of 22), so controls in a narrow panel are cut off later. The Profile panel also lost its extra side margins.
+- Client: in a narrow Audio Options panel the labels use all the width the switches don't need, so a long label is cut off much later. In RCI Controller the labels take only the width they need and the access-code box gets the rest.
+- Client: the tabs at the top of the main window are more compact, with smaller lettering, and still fit their names in every language.
+- Client: the main window can be made narrower, down to 400 pixels. The Settings labels share the width with their switches, the Controls table scrolls sideways when it doesn't fit, and the status bar moves its right-hand part to a second line.
+- Client: the Combat Box RCI status moved from a box under Overlays to its own bar just above the status bar, so it shows on every tab. It appears only while connected to Combat Box (`srs.combatbox.net`). It uses the status bar's lamp and lettering.
+- Server: a new `server.cfg` no longer gets an empty `[External AWACS Mode Settings]` section. It was left over from DCS-SRS and did nothing; IL-2 SRS takes each player's side from the game, and **Coalition Security** keeps the sides apart. An existing section is ignored.
+- Client: removed leftover External AWACS Mode code from DCS-SRS, including a startup check for an AWACS overlay window that IL-2 SRS doesn't have.
 - Web server: panels in the IL-2 SRS theme have worn paint, with scratches, grime and dirt along the edges, and the whole theme uses the panels' olive grey.
 - Web server: confirmations such as "Saved Channel Limit." appear as a toast at the top of the page for a few seconds, instead of a line above the page content. Plugins can show them too.
 - Web server: on a phone, the menu is a dropdown at the top of the page, and the Integrations pages show a card per item.
@@ -18,6 +34,8 @@
 
 ### Fixed
 
+- Client: the Profile panel's four buttons wrap onto a second line in a narrow panel, instead of being cut off at both ends.
+- Client: a Classic theme written as `Theme="Classic"` (with quotes) in `global.cfg` now loads the full Classic look, instead of Classic colours on the military controls.
 - Web server: an address that doesn't exist shows the **Page not found** page with a link to the dashboard, instead of an empty page.
 - Web server: two bans added at the same moment could leave one of them out of the list checked when clients connect, until the next ban change.
 - Web server: the Docker image is built on .NET 10.0.14 and a patched musl, fixing the vulnerabilities scanners reported in .NET 10.0.12 (two of them critical HTTP request smuggling issues) and in musl.

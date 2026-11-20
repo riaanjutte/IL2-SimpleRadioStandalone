@@ -186,6 +186,23 @@
                 </StackPanel>
             </StackPanel>
         </ContentControl>
+
+        <!-- Plate 5: warning when IL-2 is set to exclusive fullscreen -->
+        <ContentControl x:Name="FullscreenWarningPlate"
+                        Style="{StaticResource OverlayPlate}"
+                        Visibility="Collapsed">
+            <TextBlock Width="122"
+                       HorizontalAlignment="Center"
+                       FontFamily="Courier New"
+                       FontSize="7"
+                       FontWeight="Bold"
+                       Foreground="#FFB000"
+                       Style="{x:Null}"
+                       Text="IL-2 IS FULLSCREEN"
+                       TextAlignment="Center"
+                       TextTrimming="CharacterEllipsis"
+                       ToolTip="IL-2 is set to fullscreen, so this overlay can't show over the game. Turn off Fullscreen in IL-2's graphics settings and restart IL-2." />
+        </ContentControl>
         </StackPanel>
     </WrapPanel>
     </Grid>

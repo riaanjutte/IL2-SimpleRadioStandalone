@@ -615,8 +615,10 @@
                                          HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="0,0,5,5"
                                          Opacity="{DynamicResource ThreeDScrewOpacity}" />
 
-                                <DockPanel Margin="20,6,20,10">
-                                    <DockPanel DockPanel.Dock="Top" Margin="0,2,0,6" LastChildFill="True">
+                                <!-- The header clears the corner screws; the content below them runs closer to the
+                                     edges, so a narrow panel clips its controls later. -->
+                                <DockPanel Margin="0,6,0,10">
+                                    <DockPanel DockPanel.Dock="Top" Margin="20,2,20,6" LastChildFill="True">
                                         <ContentPresenter DockPanel.Dock="Left"
                                                           ContentSource="Header"
                                                           VerticalAlignment="Center"
@@ -636,7 +638,7 @@
                                             <Border Height="1" Background="{DynamicResource ThreeDSoftHighlightBrush}" />
                                         </StackPanel>
                                     </DockPanel>
-                                    <ContentPresenter Margin="2,0,2,2" />
+                                    <ContentPresenter Margin="8,0,8,2" />
                                 </DockPanel>
                             </Grid>
                         </Border>
@@ -659,7 +661,7 @@
             <Setter.Value>
                 <DataTemplate>
                     <TextBlock FontFamily="{StaticResource MilFontStencil}"
-                               FontSize="16"
+                               FontSize="12"
                                Text="{Binding Converter={StaticResource MilUpperConverter}}"
                                TextWrapping="NoWrap" />
                 </DataTemplate>
@@ -671,18 +673,18 @@
                     <Border x:Name="Rim"
                             Background="#15100A"
                             CornerRadius="4,4,0,0"
-                            Margin="0,3,3,0"
+                            Margin="0,2,2,0"
                             Padding="1,1,1,0">
                         <Border x:Name="Face"
                                 Background="{DynamicResource MilBtnDarkFaceBrush}"
                                 BorderBrush="{DynamicResource ThreeDHighlightBrush}"
                                 BorderThickness="1,1,1,0"
                                 CornerRadius="3,3,0,0"
-                                Padding="12,5">
+                                Padding="8,3">
                             <StackPanel Orientation="Horizontal">
-                                <Grid Width="9"
-                                      Height="9"
-                                      Margin="0,0,7,0"
+                                <Grid Width="7"
+                                      Height="7"
+                                      Margin="0,0,5,0"
                                       VerticalAlignment="Center">
                                     <Ellipse Fill="{DynamicResource MilLampBezelBrush}" />
                                     <Ellipse x:Name="Lamp"
@@ -696,7 +698,7 @@
                     </Border>
                     <ControlTemplate.Triggers>
                         <Trigger Property="IsSelected" Value="True">
-                            <Setter TargetName="Rim" Property="Margin" Value="0,0,3,0" />
+                            <Setter TargetName="Rim" Property="Margin" Value="0,0,2,0" />
                             <Setter TargetName="Face" Property="Background" Value="{DynamicResource MilPanelFaceBrush}" />
                             <Setter TargetName="Lamp" Property="Fill" Value="{DynamicResource MilLedOnBrush}" />
                             <Setter TargetName="Lamp" Property="Effect">

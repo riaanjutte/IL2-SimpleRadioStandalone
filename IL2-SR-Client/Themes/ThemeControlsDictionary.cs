@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using System.Windows;
 using Ciribob.IL2.SimpleRadio.Standalone.Client.Settings;
 using Ciribob.IL2.SimpleRadio.Standalone.Client.Utils.ValueConverters;
@@ -50,9 +51,10 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.Themes
             }
         }
 
+        // Letters and digits only, like App.SelectedPalette, so a quoted value in global.cfg picks the same theme.
         private static string Normalize(string theme)
         {
-            return (theme ?? string.Empty).Trim().ToLowerInvariant();
+            return new string((theme ?? string.Empty).Where(char.IsLetterOrDigit).Select(char.ToLowerInvariant).ToArray());
         }
     }
 }

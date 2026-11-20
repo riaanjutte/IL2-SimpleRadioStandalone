@@ -225,6 +225,12 @@
   <data name="VU Meter" xml:space="preserve">
     <value>VU-индикатор</value>
   </data>
+  <data name="Text size" xml:space="preserve">
+    <value>Размер текста</value>
+  </data>
+  <data name="Makes the text and controls in the SRS windows larger. To resize the radio overlay, drag its corner." xml:space="preserve">
+    <value>Увеличивает текст и элементы управления в окнах SRS. Чтобы изменить размер радио-оверлея, потяните за его угол.</value>
+  </data>
   <data name="Auto" xml:space="preserve">
     <value>Авто</value>
   </data>
@@ -809,6 +815,102 @@
   </data>
   <data name="No RCI active" xml:space="preserve">
     <value>RCI не активен</value>
+  </data>
+  <data name="LED" xml:space="preserve">
+    <value>LED</value>
+  </data>
+  <data name="Collapse" xml:space="preserve">
+    <value>Свернуть</value>
+  </data>
+  <data name="Expand" xml:space="preserve">
+    <value>Развернуть</value>
+  </data>
+  <data name="Customise layout" xml:space="preserve">
+    <value>Настроить макет</value>
+  </data>
+  <data name="Tabs" xml:space="preserve">
+    <value>Вкладки</value>
+  </data>
+  <data name="Add tab" xml:space="preserve">
+    <value>Добавить вкладку</value>
+  </data>
+  <data name="Delete" xml:space="preserve">
+    <value>Удалить</value>
+  </data>
+  <data name="Move up" xml:space="preserve">
+    <value>Вверх</value>
+  </data>
+  <data name="Move down" xml:space="preserve">
+    <value>Вниз</value>
+  </data>
+  <data name="Panels on this tab" xml:space="preserve">
+    <value>Панели на этой вкладке</value>
+  </data>
+  <data name="Move to tab" xml:space="preserve">
+    <value>Переместить на вкладку</value>
+  </data>
+  <data name="Target tab" xml:space="preserve">
+    <value>Целевая вкладка</value>
+  </data>
+  <data name="Join with row below" xml:space="preserve">
+    <value>Объединить со строкой ниже</value>
+  </data>
+  <data name="Split row" xml:space="preserve">
+    <value>Разделить строку</value>
+  </data>
+  <data name="Fit to content:" xml:space="preserve">
+    <value>По размеру содержимого:</value>
+  </data>
+  <data name="{0} (fit)" xml:space="preserve">
+    <value>{0} (по содержимому)</value>
+  </data>
+  <data name="Drag to resize the panels. Double-click to make them equal." xml:space="preserve">
+    <value>Перетащите, чтобы изменить размер панелей. Двойной щелчок делает их равными.</value>
+  </data>
+  <data name="Hide" xml:space="preserve">
+    <value>Скрыть</value>
+  </data>
+  <data name="Other panels" xml:space="preserve">
+    <value>Другие панели</value>
+  </data>
+  <data name="{0} (hidden)" xml:space="preserve">
+    <value>{0} (скрыта)</value>
+  </data>
+  <data name="{0} (on {1})" xml:space="preserve">
+    <value>{0} (на вкладке {1})</value>
+  </data>
+  <data name="Add to this tab" xml:space="preserve">
+    <value>Добавить на эту вкладку</value>
+  </data>
+  <data name="Reset layout" xml:space="preserve">
+    <value>Сбросить макет</value>
+  </data>
+  <data name="OK" xml:space="preserve">
+    <value>ОК</value>
+  </data>
+  <data name="Apply" xml:space="preserve">
+    <value>Применить</value>
+  </data>
+  <data name="New tab" xml:space="preserve">
+    <value>Новая вкладка</value>
+  </data>
+  <data name="Tab name" xml:space="preserve">
+    <value>Название вкладки</value>
+  </data>
+  <data name="Delete tab" xml:space="preserve">
+    <value>Удалить вкладку</value>
+  </data>
+  <data name="Delete the tab &quot;{0}&quot;? Its panels will be hidden. You can add them back from Other panels." xml:space="preserve">
+    <value>Удалить вкладку «{0}»? Её панели будут скрыты. Их можно вернуть из списка «Другие панели».</value>
+  </data>
+  <data name="Reset the window layout to the default? Your tabs, tab names, hidden panels and panel widths go back to the default, and every row is expanded, when you press OK or Apply." xml:space="preserve">
+    <value>Сбросить макет окна к стандартному? Вкладки, их названия, скрытые панели и ширина панелей вернутся к стандартным, а все строки развернутся, когда вы нажмёте «ОК» или «Применить».</value>
+  </data>
+  <data name="IL-2 IS FULLSCREEN" xml:space="preserve">
+    <value>IL-2 В ПОЛНОЭКРАННОМ РЕЖИМЕ</value>
+  </data>
+  <data name="IL-2 is set to fullscreen, so this overlay can't show over the game. Turn off Fullscreen in IL-2's graphics settings and restart IL-2." xml:space="preserve">
+    <value>IL-2 запущен в полноэкранном режиме, поэтому этот оверлей не может отображаться поверх игры. Отключите полноэкранный режим в настройках графики IL-2 и перезапустите IL-2.</value>
   </data>
   <data name="Friendly RCI active" xml:space="preserve">
     <value>RCI - только союзный</value>

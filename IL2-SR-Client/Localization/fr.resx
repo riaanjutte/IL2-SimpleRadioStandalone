@@ -225,6 +225,12 @@
   <data name="VU Meter" xml:space="preserve">
     <value>VU-metre</value>
   </data>
+  <data name="Text size" xml:space="preserve">
+    <value>Taille du texte</value>
+  </data>
+  <data name="Makes the text and controls in the SRS windows larger. To resize the radio overlay, drag its corner." xml:space="preserve">
+    <value>Agrandit le texte et les commandes des fenêtres SRS. Pour redimensionner l’overlay radio, faites glisser son coin.</value>
+  </data>
   <data name="Auto" xml:space="preserve">
     <value>Auto</value>
   </data>
@@ -809,6 +815,102 @@
   </data>
   <data name="No RCI active" xml:space="preserve">
     <value>RCI inactif</value>
+  </data>
+  <data name="LED" xml:space="preserve">
+    <value>LED</value>
+  </data>
+  <data name="Collapse" xml:space="preserve">
+    <value>Réduire</value>
+  </data>
+  <data name="Expand" xml:space="preserve">
+    <value>Développer</value>
+  </data>
+  <data name="Customise layout" xml:space="preserve">
+    <value>Personnaliser la disposition</value>
+  </data>
+  <data name="Tabs" xml:space="preserve">
+    <value>Onglets</value>
+  </data>
+  <data name="Add tab" xml:space="preserve">
+    <value>Ajouter un onglet</value>
+  </data>
+  <data name="Delete" xml:space="preserve">
+    <value>Supprimer</value>
+  </data>
+  <data name="Move up" xml:space="preserve">
+    <value>Monter</value>
+  </data>
+  <data name="Move down" xml:space="preserve">
+    <value>Descendre</value>
+  </data>
+  <data name="Panels on this tab" xml:space="preserve">
+    <value>Panneaux de cet onglet</value>
+  </data>
+  <data name="Move to tab" xml:space="preserve">
+    <value>Déplacer vers l'onglet</value>
+  </data>
+  <data name="Target tab" xml:space="preserve">
+    <value>Onglet de destination</value>
+  </data>
+  <data name="Join with row below" xml:space="preserve">
+    <value>Joindre à la ligne du dessous</value>
+  </data>
+  <data name="Split row" xml:space="preserve">
+    <value>Scinder la ligne</value>
+  </data>
+  <data name="Fit to content:" xml:space="preserve">
+    <value>Ajuster au contenu :</value>
+  </data>
+  <data name="{0} (fit)" xml:space="preserve">
+    <value>{0} (ajusté)</value>
+  </data>
+  <data name="Drag to resize the panels. Double-click to make them equal." xml:space="preserve">
+    <value>Faites glisser pour redimensionner les panneaux. Double-cliquez pour les égaliser.</value>
+  </data>
+  <data name="Hide" xml:space="preserve">
+    <value>Masquer</value>
+  </data>
+  <data name="Other panels" xml:space="preserve">
+    <value>Autres panneaux</value>
+  </data>
+  <data name="{0} (hidden)" xml:space="preserve">
+    <value>{0} (masqué)</value>
+  </data>
+  <data name="{0} (on {1})" xml:space="preserve">
+    <value>{0} (dans {1})</value>
+  </data>
+  <data name="Add to this tab" xml:space="preserve">
+    <value>Ajouter à cet onglet</value>
+  </data>
+  <data name="Reset layout" xml:space="preserve">
+    <value>Réinitialiser la disposition</value>
+  </data>
+  <data name="OK" xml:space="preserve">
+    <value>OK</value>
+  </data>
+  <data name="Apply" xml:space="preserve">
+    <value>Appliquer</value>
+  </data>
+  <data name="New tab" xml:space="preserve">
+    <value>Nouvel onglet</value>
+  </data>
+  <data name="Tab name" xml:space="preserve">
+    <value>Nom de l'onglet</value>
+  </data>
+  <data name="Delete tab" xml:space="preserve">
+    <value>Supprimer l'onglet</value>
+  </data>
+  <data name="Delete the tab &quot;{0}&quot;? Its panels will be hidden. You can add them back from Other panels." xml:space="preserve">
+    <value>Supprimer l'onglet « {0} » ? Ses panneaux seront masqués. Vous pourrez les rajouter depuis Autres panneaux.</value>
+  </data>
+  <data name="Reset the window layout to the default? Your tabs, tab names, hidden panels and panel widths go back to the default, and every row is expanded, when you press OK or Apply." xml:space="preserve">
+    <value>Rétablir la disposition par défaut de la fenêtre ? Vos onglets, leurs noms, les panneaux masqués et les largeurs des panneaux reviennent à leur état par défaut, et toutes les lignes sont dépliées, lorsque vous cliquez sur OK ou Appliquer.</value>
+  </data>
+  <data name="IL-2 IS FULLSCREEN" xml:space="preserve">
+    <value>IL-2 EN PLEIN ÉCRAN</value>
+  </data>
+  <data name="IL-2 is set to fullscreen, so this overlay can't show over the game. Turn off Fullscreen in IL-2's graphics settings and restart IL-2." xml:space="preserve">
+    <value>IL-2 est en plein écran, donc cette superposition ne peut pas s'afficher par-dessus le jeu. Désactivez le plein écran dans les paramètres graphiques d'IL-2 et redémarrez IL-2.</value>
   </data>
   <data name="Friendly RCI active" xml:space="preserve">
     <value>RCI - Friendly only</value>

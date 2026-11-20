@@ -15,6 +15,7 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI.ClientWindow.Diagnostics
         public TelemetryDiagnosticsWindow()
         {
             InitializeComponent();
+            UiScale.Apply(this);
         }
 
         private async void RunTelemetryDiagnostics_OnClick(object sender, RoutedEventArgs e)

@@ -26,6 +26,7 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI
         public ServerSettingsWindow()
         {
             InitializeComponent();
+            UiScale.Apply(this);
             LocalizationManager.LocalizeElement(this);
 
             _updateTimer = new DispatcherTimer {Interval = TimeSpan.FromSeconds(1)};

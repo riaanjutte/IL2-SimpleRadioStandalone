@@ -31,6 +31,7 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI.InputProfileWindow
         public InputProfileWindow(CreateProfileCallback callback, bool rename = false, string initialText = "")
         {
             InitializeComponent();
+            UiScale.Apply(this);
             LocalizationManager.LocalizeElement(this);
             _callback = callback;
             if (rename)

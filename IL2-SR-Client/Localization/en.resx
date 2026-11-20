@@ -225,6 +225,12 @@
   <data name="VU Meter" xml:space="preserve">
     <value>VU Meter</value>
   </data>
+  <data name="Text size" xml:space="preserve">
+    <value>Text size</value>
+  </data>
+  <data name="Makes the text and controls in the SRS windows larger. To resize the radio overlay, drag its corner." xml:space="preserve">
+    <value>Makes the text and controls in the SRS windows larger. To resize the radio overlay, drag its corner.</value>
+  </data>
   <data name="Auto" xml:space="preserve">
     <value>Auto</value>
   </data>
@@ -809,6 +815,102 @@
   </data>
   <data name="No RCI active" xml:space="preserve">
     <value>RCI not active</value>
+  </data>
+  <data name="LED" xml:space="preserve">
+    <value>LED</value>
+  </data>
+  <data name="Collapse" xml:space="preserve">
+    <value>Collapse</value>
+  </data>
+  <data name="Expand" xml:space="preserve">
+    <value>Expand</value>
+  </data>
+  <data name="Customise layout" xml:space="preserve">
+    <value>Customise layout</value>
+  </data>
+  <data name="Tabs" xml:space="preserve">
+    <value>Tabs</value>
+  </data>
+  <data name="Add tab" xml:space="preserve">
+    <value>Add tab</value>
+  </data>
+  <data name="Delete" xml:space="preserve">
+    <value>Delete</value>
+  </data>
+  <data name="Move up" xml:space="preserve">
+    <value>Move up</value>
+  </data>
+  <data name="Move down" xml:space="preserve">
+    <value>Move down</value>
+  </data>
+  <data name="Panels on this tab" xml:space="preserve">
+    <value>Panels on this tab</value>
+  </data>
+  <data name="Move to tab" xml:space="preserve">
+    <value>Move to tab</value>
+  </data>
+  <data name="Target tab" xml:space="preserve">
+    <value>Target tab</value>
+  </data>
+  <data name="Join with row below" xml:space="preserve">
+    <value>Join with row below</value>
+  </data>
+  <data name="Split row" xml:space="preserve">
+    <value>Split row</value>
+  </data>
+  <data name="Fit to content:" xml:space="preserve">
+    <value>Fit to content:</value>
+  </data>
+  <data name="{0} (fit)" xml:space="preserve">
+    <value>{0} (fit)</value>
+  </data>
+  <data name="Drag to resize the panels. Double-click to make them equal." xml:space="preserve">
+    <value>Drag to resize the panels. Double-click to make them equal.</value>
+  </data>
+  <data name="Hide" xml:space="preserve">
+    <value>Hide</value>
+  </data>
+  <data name="Other panels" xml:space="preserve">
+    <value>Other panels</value>
+  </data>
+  <data name="{0} (hidden)" xml:space="preserve">
+    <value>{0} (hidden)</value>
+  </data>
+  <data name="{0} (on {1})" xml:space="preserve">
+    <value>{0} (on {1})</value>
+  </data>
+  <data name="Add to this tab" xml:space="preserve">
+    <value>Add to this tab</value>
+  </data>
+  <data name="Reset layout" xml:space="preserve">
+    <value>Reset layout</value>
+  </data>
+  <data name="OK" xml:space="preserve">
+    <value>OK</value>
+  </data>
+  <data name="Apply" xml:space="preserve">
+    <value>Apply</value>
+  </data>
+  <data name="New tab" xml:space="preserve">
+    <value>New tab</value>
+  </data>
+  <data name="Tab name" xml:space="preserve">
+    <value>Tab name</value>
+  </data>
+  <data name="Delete tab" xml:space="preserve">
+    <value>Delete tab</value>
+  </data>
+  <data name="Delete the tab &quot;{0}&quot;? Its panels will be hidden. You can add them back from Other panels." xml:space="preserve">
+    <value>Delete the tab "{0}"? Its panels will be hidden. You can add them back from Other panels.</value>
+  </data>
+  <data name="Reset the window layout to the default? Your tabs, tab names, hidden panels and panel widths go back to the default, and every row is expanded, when you press OK or Apply." xml:space="preserve">
+    <value>Reset the window layout to the default? Your tabs, tab names, hidden panels and panel widths go back to the default, and every row is expanded, when you press OK or Apply.</value>
+  </data>
+  <data name="IL-2 IS FULLSCREEN" xml:space="preserve">
+    <value>IL-2 IS FULLSCREEN</value>
+  </data>
+  <data name="IL-2 is set to fullscreen, so this overlay can't show over the game. Turn off Fullscreen in IL-2's graphics settings and restart IL-2." xml:space="preserve">
+    <value>IL-2 is set to fullscreen, so this overlay can't show over the game. Turn off Fullscreen in IL-2's graphics settings and restart IL-2.</value>
   </data>
   <data name="Friendly RCI active" xml:space="preserve">
     <value>RCI - Friendly only</value>

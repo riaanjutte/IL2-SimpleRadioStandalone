@@ -55,7 +55,6 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI
         }
 
         public Brush StatusBackground => GetStatusBackground(Status);
-        public Brush MainWindowStatusForeground => GetMainWindowStatusForeground(Status);
         public Brush OverlayStatusForeground => GetOverlayStatusForeground(Status);
 
         private static string FormatRcoOnDutyCallsign(string callsigns)
@@ -95,18 +94,6 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI
                     return NeutralBrush;
                 default:
                     return NoneBrush;
-            }
-        }
-
-        private static Brush GetMainWindowStatusForeground(RciStatus status)
-        {
-            switch (status)
-            {
-                case RciStatus.FriendlyOnly:
-                case RciStatus.Both:
-                    return Brushes.Black;
-                default:
-                    return Brushes.White;
             }
         }
 

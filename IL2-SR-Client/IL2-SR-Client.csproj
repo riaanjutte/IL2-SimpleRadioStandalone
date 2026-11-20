@@ -251,6 +251,9 @@
     <Compile Include="Themes\ThemeControlsDictionary.cs" />
     <Compile Include="Settings\RciAccessCode.cs" />
     <Compile Include="Settings\RciControllerMode.cs" />
+    <Compile Include="UI\ClientWindow\MainWindow.Layout.cs">
+      <DependentUpon>MainWindow.xaml</DependentUpon>
+    </Compile>
     <Compile Include="UI\ClientWindow\MainWindow.RciController.cs">
       <DependentUpon>MainWindow.xaml</DependentUpon>
     </Compile>
@@ -302,6 +305,13 @@
     <Compile Include="Settings\RadioChannels\PresetChannel.cs" />
     <Compile Include="Settings\RadioChannels\IPresetChannelsStore.cs" />
     <Compile Include="UI\ClientWindow\AudioDeviceListItem.cs" />
+    <Compile Include="UI\ClientWindow\CollapsedPanelsHeight.cs" />
+    <Compile Include="UI\ClientWindow\CustomLayout.cs" />
+    <Compile Include="UI\ClientWindow\LayoutEditorWindow.xaml.cs">
+      <DependentUpon>LayoutEditorWindow.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UI\ClientWindow\LedVuMeter.cs" />
+    <Compile Include="UI\ClientWindow\LedVuMeterScale.cs" />
     <Compile Include="UI\Images.cs" />
     <Compile Include="UI\InputProfileWindow\InputProfileWindow.xaml.cs">
       <DependentUpon>InputProfileWindow.xaml</DependentUpon>
@@ -316,6 +326,7 @@
     </Compile>
     <Compile Include="UI\ClientWindow\Favourites\FavouriteServersViewModel.cs" />
     <Compile Include="UI\RciDisplayState.cs" />
+    <Compile Include="UI\UiScale.cs" />
     <Compile Include="UI\RadioOverlayWindow\IntercomControlGroup.xaml.cs">
       <DependentUpon>IntercomControlGroup.xaml</DependentUpon>
     </Compile>
@@ -337,7 +348,6 @@
     <Compile Include="Settings\UserDataPaths.cs" />
     <Compile Include="UI\RadioOverlayWindow\WindowHelper.cs" />
     <Compile Include="UI\Sounds.cs" />
-    <Compile Include="UI\ToolTips.cs" />
     <Compile Include="Utils\AudioDeviceHelper.cs" />
     <Compile Include="Utils\DelegateCommand.cs" />
     <Compile Include="Utils\PanelWeathering.cs" />
@@ -361,6 +371,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="UI\ClientWindow\PilotRoster\PilotRosterWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UI\ClientWindow\LayoutEditorWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

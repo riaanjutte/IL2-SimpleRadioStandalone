@@ -51,8 +51,6 @@
     <SolidColorBrush x:Key="MilStatusErrorBackgroundBrush" Color="#321C18" />
     <SolidColorBrush x:Key="MilStatusConnectedTextBrush" Color="{StaticResource MilLedOnColor}" />
     <SolidColorBrush x:Key="MilStatusErrorTextBrush" Color="{StaticResource MilLedErrorColor}" />
-    <SolidColorBrush x:Key="MilRciInactiveBackgroundBrush" Color="#444444" />
-    <SolidColorBrush x:Key="MilRciInactiveTextBrush" Color="#FFFFFF" />
 
     <FontFamily x:Key="MilFontStencil">pack://application:,,,/IL2-SR-ClientRadio;component/Fonts/#Allerta Stencil</FontFamily>
     <FontFamily x:Key="MilFontMono">pack://application:,,,/IL2-SR-ClientRadio;component/Fonts/#Share Tech Mono</FontFamily>
