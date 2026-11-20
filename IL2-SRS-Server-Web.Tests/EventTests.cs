@@ -104,7 +104,8 @@ PRAGMA user_version = 1;";
         [Theory]
         // Upstream 1.0.5.0: version 2 is the coalition channel names, without typed events.
         [InlineData(2, false)]
-        // A fork's database at version 5: typed events, but here without the coalition names.
+        // This fork's databases before the integrations plugin: version 5, with typed events and integration
+        // tables (which the plugin moves out), here without the coalition names.
         [InlineData(5, true)]
         // A newer build or another branch numbered it past this build's migrations, without some of its tables.
         [InlineData(99, false)]
@@ -121,7 +122,7 @@ CREATE TABLE events (id INTEGER PRIMARY KEY AUTOINCREMENT, occurred_at TEXT NOT 
     actor TEXT NOT NULL, message TEXT NOT NULL" + (hasTypedEvents ? ", type TEXT, client_guid TEXT, payload TEXT" : "") + @");
 CREATE TABLE channel_names (channel INTEGER PRIMARY KEY, name TEXT NOT NULL);
 " + (hasTypedEvents
-                    ? ""
+                    ? "CREATE TABLE integrations (id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT NOT NULL);"
                     : "CREATE TABLE coalition_channel_names (coalition INTEGER NOT NULL, channel INTEGER NOT NULL, " +
                       "name TEXT NOT NULL, PRIMARY KEY (coalition, channel));") + @"
 PRAGMA user_version = " + userVersion + ";";
@@ -166,21 +167,33 @@ PRAGMA user_version = " + userVersion + ";";
             var before = Snapshot(database);
 
             // As when a database numbered by another build is opened: every migration runs again.
-            using (var connection = database.Open())
-            using (var command = connection.CreateCommand())
-            {
-                command.CommandText = "PRAGMA user_version = 0;";
-                command.ExecuteNonQuery();
-            }
-
-            SrsDatabase.ClearPool(path);
+            SetVersion(database, 0);
             var reopened = new SrsDatabase(path);
 
             Assert.Equal(before, Snapshot(reopened));
         }
 
+        [Fact]
+        public void RunsStatementsAsWrittenSemicolonsIncluded()
+        {
+            using var temp = new TempDirectory();
+            var database = new SqliteDatabase(temp.File("notes.db"), new[]
+            {
+                new[]
+                {
+                    "CREATE TABLE IF NOT EXISTS notes (id INTEGER PRIMARY KEY, text TEXT NOT NULL)",
+                    "INSERT OR IGNORE INTO notes (id, text) VALUES (1, 'Welcome; be nice')"
+                }
+            });
+
+            using var connection = database.Open();
+            using var command = connection.CreateCommand();
+            command.CommandText = "SELECT text FROM notes;";
+            Assert.Equal("Welcome; be nice", command.ExecuteScalar());
+        }
+
         /// <summary>Every table's definition and rows, as text.</summary>
-        private static string Snapshot(SrsDatabase database)
+        internal static string Snapshot(SqliteDatabase database)
         {
             using var connection = database.Open();
             var tables = new List<string>();
@@ -213,6 +226,18 @@ PRAGMA user_version = " + userVersion + ";";
             }
 
             return text.ToString();
+        }
+
+        private static void SetVersion(SqliteDatabase database, int version)
+        {
+            using (var connection = database.Open())
+            using (var command = connection.CreateCommand())
+            {
+                command.CommandText = "PRAGMA user_version = " + version + ";";
+                command.ExecuteNonQuery();
+            }
+
+            SqliteDatabase.ClearPool(database.DatabasePath);
         }
     }
 

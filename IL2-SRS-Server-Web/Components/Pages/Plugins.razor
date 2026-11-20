@@ -1,0 +1,50 @@
+@page "/plugins"
+@attribute [Authorize]
+@inject PluginCatalog Catalog
+
+<PageTitle>Plugins · IL2-SRS Server</PageTitle>
+
+<div class="page-head">
+    <h1>Plugins</h1>
+</div>
+
+<p class="muted">
+    Plugins add pages, API endpoints and event handling to the server. To install one, copy its folder to
+    <code>plugins/</code> in the data directory and restart the server. Plugins run inside the server with its
+    permissions: only install plugins you trust.
+</p>
+
+@if (Catalog.Loaded.Count == 0 && Catalog.Failed.Count == 0)
+{
+    <p class="muted empty">No plugins are installed.</p>
+}
+else
+{
+    <div class="table-wrap">
+        <table class="grid">
+            <thead>
+                <tr><th>Plugin</th><th>Id</th><th>Version</th><th>Status</th></tr>
+            </thead>
+            <tbody>
+                @foreach (var plugin in Catalog.Loaded)
+                {
+                    <tr>
+                        <td>@plugin.Name</td>
+                        <td><code>@plugin.Id</code></td>
+                        <td>@plugin.Version</td>
+                        <td><span class="pill pill-ok">Running</span></td>
+                    </tr>
+                }
+                @foreach (var failure in Catalog.Failed)
+                {
+                    <tr>
+                        <td><code>@failure.Source</code></td>
+                        <td></td>
+                        <td></td>
+                        <td class="field-error">Not loaded: @failure.Error</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+}

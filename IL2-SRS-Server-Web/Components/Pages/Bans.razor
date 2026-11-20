@@ -1,7 +1,7 @@
 @page "/bans"
 @attribute [Authorize]
 @inject ServerAdminService Admin
-@inject AdminAuthOptions AuthOptions
+@inject IAdminActor AdminActor
 @inject ToastService Toast
 
 <PageTitle>Bans · IL2-SRS Server</PageTitle>
@@ -117,7 +117,7 @@ else
 
     private const string IpField = "ip";
     private string IpError => _form.Show(IpField, ServerAdminService.ValidateIpAddress(_ip));
-    private string Actor => AuthOptions.Disabled ? "admin (no login)" : "admin";
+    private string Actor => AdminActor.Name;
 
     protected override void OnInitialized() => _bans = Admin.GetBans();
 

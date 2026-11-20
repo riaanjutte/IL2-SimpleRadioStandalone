@@ -9,6 +9,7 @@ using Ciribob.IL2.SimpleRadio.Standalone.Server.Admin;
 using Ciribob.IL2.SimpleRadio.Standalone.Server.Audit;
 using Ciribob.IL2.SimpleRadio.Standalone.Server.Events;
 using Ciribob.IL2.SimpleRadio.Standalone.Server.Network;
+using Ciribob.IL2.SimpleRadio.Standalone.Server.Plugins;
 using Ciribob.IL2.SimpleRadio.Standalone.Server.Settings;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
@@ -45,10 +46,11 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Server.Api
     public sealed record EventTypeResponse(string Type, string Category, string Label, string Description,
         IReadOnlyList<EventFieldResponse> Fields);
 
-    public sealed record ErrorResponse(string Error);
+    public sealed record PluginResponse(string Id, string Name, string Version);
 
-    /// <summary>A rejected request: the first problem, and every problem keyed by field.</summary>
-    public sealed record ValidationErrorResponse(string Error, IReadOnlyDictionary<string, string> Errors);
+    public sealed record PluginFailureResponse(string Source, string Error);
+
+    public sealed record PluginsResponse(IReadOnlyList<PluginResponse> Loaded, IReadOnlyList<PluginFailureResponse> Failed);
 
     /// <summary>
     /// REST API under /api/v1. Requires an API key; GET needs the read scope, everything else the write scope.
@@ -156,11 +158,18 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Server.Api
                     audit.Query(category, search, since?.ToUniversalTime(), limit ?? 200, type, client).Select(ToEvent))
                 .WithSummary("Event log, newest first (category: server, client, radio, admin, auth; type: see " +
                              "/event-types; client: client guid; limit up to 1000)");
-            api.MapGet("/event-types", () => SrsEventTypes.All.Select(ToEventType))
+            api.MapGet("/event-types", (IEventTypeRegistry types) => types.All.Select(ToEventType))
                 .WithSummary("Event types with their payload fields");
             Write(api.MapDelete("/events", (AuditLog audit, ClaimsPrincipal user) =>
                     Results.Ok(new { deleted = audit.Clear(Actor(user)) })))
                 .WithSummary("Clear the event log");
+
+            // Plugins
+            api.MapGet("/plugins", (PluginCatalog plugins) => new PluginsResponse(
+                    plugins.Loaded.Select(p => new PluginResponse(p.Id, p.Name, p.Version)).ToList(),
+                    plugins.Failed.Select(f => new PluginFailureResponse(f.Source, f.Error)).ToList()))
+                .WithSummary("Plugins this server runs, and plugins it could not load");
+            ServerPlugins.MapApis(api);
 
             // Server lifecycle
             Write(api.MapPost("/server/start", (ServerAdminService admin, ClaimsPrincipal user) =>

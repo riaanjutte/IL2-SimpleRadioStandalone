@@ -1,0 +1,15 @@
+@* How to write templates, shown under a template field. *@
+
+<span class="field-help">
+    A <a href="https://github.com/scriban/scriban/blob/master/doc/language.md" target="_blank" rel="noopener">Scriban</a>
+    template: <code>@("{{ client.name }}")</code> inserts a field from the data for the trigger event,
+    <code>@("{{ if client.coalitionName == \"Red\" }}…{{ end }}")</code> adds a condition.
+    @if (!string.IsNullOrEmpty(Escaping))
+    {
+        <text>@Escaping Use <code>@("{{ raw.client.name }}")</code> for a value as it is.</text>
+    }
+</span>
+
+@code {
+    [Parameter] public string Escaping { get; set; }
+}

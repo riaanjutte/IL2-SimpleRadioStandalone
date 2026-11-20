@@ -1,7 +1,7 @@
 @page "/channels"
 @attribute [Authorize]
 @inject ServerAdminService Admin
-@inject AdminAuthOptions AuthOptions
+@inject IAdminActor AdminActor
 @inject ToastService Toast
 
 <PageTitle>Channel Names · IL2-SRS Server</PageTitle>
@@ -63,7 +63,7 @@
 
     private readonly Dictionary<int, Dictionary<int, string>> _names = new Dictionary<int, Dictionary<int, string>>();
 
-    private string Actor => AuthOptions.Disabled ? "admin (no login)" : "admin";
+    private string Actor => AdminActor.Name;
 
     protected override void OnInitialized() => Load();
 

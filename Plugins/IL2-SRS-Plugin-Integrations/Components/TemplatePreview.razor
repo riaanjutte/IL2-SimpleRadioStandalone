@@ -1,0 +1,59 @@
+@* Shows what a template produces with example data, once for each trigger event. *@
+@using System.Text.Json
+@inject IServiceProvider Services
+
+<div class="template-preview">
+    @if (Triggers.Count == 0)
+    {
+        <span class="field-label">@Label</span>
+        <span class="field-help">Add a trigger event to see a preview.</span>
+    }
+    else
+    {
+        @foreach (var preview in _previews)
+        {
+            <span class="field-label">@Label@(Triggers.Count > 1 ? " · " + preview.Event.Label : "")</span>
+            @if (preview.Error != null)
+            {
+                <p class="alert alert-error small" role="alert">@preview.Error</p>
+            }
+            else
+            {
+                <pre class="preview-output">@preview.Output</pre>
+            }
+        }
+        <span class="field-help">With example data for @(Triggers.Count > 1 ? "each event" : "the " + Triggers[0].Label.ToLowerInvariant() + " event").</span>
+    }
+</div>
+
+@code {
+    [Parameter] public string Label { get; set; } = "Preview";
+    [Parameter] public IReadOnlyList<SrsEventType> Triggers { get; set; } = Array.Empty<SrsEventType>();
+
+    /// <summary>Builds the preview from example data; throws <see cref="TemplateException"/> for errors.</summary>
+    [Parameter, EditorRequired] public Func<JsonElement, string> Render { get; set; }
+
+    private sealed record Preview(SrsEventType Event, string Output, string Error);
+
+    private List<Preview> _previews = new();
+
+    // Optional, as for the integration service: without it the preview keeps the example server.* values.
+    private IServerInfo _server;
+
+    protected override void OnInitialized() => _server = (IServerInfo)Services.GetService(typeof(IServerInfo));
+
+    protected override void OnParametersSet()
+    {
+        _previews = Triggers.Select(trigger =>
+        {
+            try
+            {
+                return new Preview(trigger, Render(EventData.SampleFor(trigger, _server)), null);
+            }
+            catch (TemplateException ex)
+            {
+                return new Preview(trigger, null, ex.Message);
+            }
+        }).ToList();
+    }
+}
