@@ -30,7 +30,8 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Server.Integrations
 
         /// <summary>
         /// Top-level settings that are secrets (webhook URLs, API keys). They are encrypted at rest, never sent
-        /// back to the browser or API, and masked in the event log.
+        /// back to the browser or API, and masked in the event log. Put the field that says where requests go (the
+        /// URL) first: when it changes, the other stored secrets must be entered again or cleared.
         /// </summary>
         IReadOnlyCollection<string> SecretFields { get; }
 

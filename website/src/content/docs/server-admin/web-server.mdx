@@ -96,6 +96,8 @@ The admin UI and API use plain HTTP. You can publish port 8080 to the internet, 
 
    The script asks for the admin password, writes it to `srs-server.json` in the data folder (readable only by Administrators and SYSTEM), adds firewall rules for the SRS port, and sets the service to restart after a crash.
 
+   The service runs as SYSTEM and loads its program and plugins from these two folders, so the script also takes away other users' rights to change them: only Administrators and SYSTEM can change the app folder, and only they can open the data folder. Use folders of their own, as above. The script refuses a drive root, `Program Files`, `ProgramData`, Windows or a user's profile folder.
+
 3. Open `http://localhost:8080` on the server and log in.
 
 To test without a service, run `IL2-SRS-Server.exe --data-dir C:\IL2-SRS\main` from a console with `SRS_ADMIN_PASSWORD` set. Without `--data-dir`, the server keeps its data next to the exe, or in `C:\ProgramData\IL2-SRS-Server` when that folder is not writable (for example under `C:\Program Files`).

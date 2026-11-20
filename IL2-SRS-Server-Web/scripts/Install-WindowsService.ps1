@@ -33,9 +33,51 @@ if (-not $principal.IsInRole([Security.Principal.WindowsBuiltInRole]::Administra
     throw 'Run this script from an elevated (Administrator) PowerShell prompt.'
 }
 
+function Protect-ServiceFolder {
+    <#
+        The service runs as SYSTEM and loads IL2-SRS-Server.exe and plugins\<name>\<name>.dll from the app and data
+        folders. A folder made under C:\ lets any signed-in user add files, so they could run code as SYSTEM. Removes
+        the inherited permissions: Administrators and SYSTEM get full control, and $ReadSid (if given) may only read.
+    #>
+    param([string] $Path, [string] $ReadSid)
+
+    # Windows PowerShell turns icacls's warnings into terminating errors under 'Stop' when output is redirected;
+    # its exit code says whether it worked.
+    $ErrorActionPreference = 'Continue'
+    $full = [IO.Path]::GetFullPath($Path).TrimEnd('\')
+    $shared = @($env:SystemRoot, $env:ProgramFiles, ${env:ProgramFiles(x86)}, $env:ProgramData, $env:USERPROFILE,
+        (Split-Path $env:USERPROFILE), (Join-Path $env:USERPROFILE 'Desktop'), (Join-Path $env:USERPROFILE 'Downloads')) |
+        Where-Object { $_ } | ForEach-Object { $_.TrimEnd('\') }
+    if ($full -eq [IO.Path]::GetPathRoot($full).TrimEnd('\') -or $shared -contains $full) {
+        throw "Put the server and its data in folders of their own, such as C:\IL2-SRS\app and C:\IL2-SRS\main, not ${full}. The script restricts who can change those folders."
+    }
+
+    $grants = @('*S-1-5-32-544:(OI)(CI)F', '*S-1-5-18:(OI)(CI)F')
+    if ($ReadSid) {
+        $grants += "*${ReadSid}:(OI)(CI)RX"
+    }
+
+    icacls $full /inheritance:r /grant:r @grants | Out-Null
+    if ($LASTEXITCODE -ne 0) {
+        throw "Could not set the permissions on $full (icacls exit code $LASTEXITCODE)."
+    }
+
+    # Explicit entries survive /inheritance:r: Everyone, Users, Authenticated Users, Interactive, Creator Owner.
+    foreach ($sid in 'S-1-1-0', 'S-1-5-32-545', 'S-1-5-11', 'S-1-5-4', 'S-1-3-0') {
+        if ($sid -ne $ReadSid) {
+            icacls $full /remove:g "*$sid" /T /C /Q | Out-Null
+        }
+    }
+}
+
 $ExecutablePath = (Resolve-Path $ExecutablePath).Path
 New-Item -ItemType Directory -Force -Path $DataDirectory | Out-Null
 $DataDirectory = (Resolve-Path $DataDirectory).Path
+
+# Users may run nothing from the app folder that they could have changed; the data folder holds the database and keys.
+Protect-ServiceFolder -Path (Split-Path $ExecutablePath) -ReadSid 'S-1-5-32-545'
+Protect-ServiceFolder -Path $DataDirectory
+Write-Host "Only Administrators and SYSTEM can change $(Split-Path $ExecutablePath) and $DataDirectory"
 
 # Service accounts do not see your shell's environment variables, so settings go in srs-server.json.
 $configFile = Join-Path $DataDirectory 'srs-server.json'

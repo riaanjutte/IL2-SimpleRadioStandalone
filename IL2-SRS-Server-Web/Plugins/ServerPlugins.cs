@@ -5,11 +5,14 @@ using System.Linq;
 using System.Reflection;
 using System.Runtime.Loader;
 using System.Text.RegularExpressions;
+using System.Threading;
+using System.Threading.Tasks;
 using Ciribob.IL2.SimpleRadio.Standalone.Server.Hosting;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.FileProviders;
+using Microsoft.Extensions.Hosting;
 using NLog;
 
 namespace Ciribob.IL2.SimpleRadio.Standalone.Server.Plugins
@@ -124,6 +127,7 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Server.Plugins
                 return builder;
             }
 
+            ContainBackgroundServices(builder.Services, servicesBefore, plugin.Name);
             builder.Services.AddAdminPages(plugin.GetType().Assembly);
             var loaded = new LoadedPlugin(plugin,
                 plugin.GetType().Assembly.GetCustomAttribute<AssemblyInformationalVersionAttribute>()?.InformationalVersion
@@ -157,6 +161,92 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Server.Plugins
             foreach (var plugin in api.ServiceProvider.GetRequiredService<PluginCatalog>().Loaded)
             {
                 plugin.Plugin.MapApi(api);
+            }
+        }
+
+        /// <summary>
+        /// Wraps the background services a plugin added, so one that can't be created, fails to start or throws
+        /// later is logged instead of stopping the server (.NET stops the host when a background service throws).
+        /// </summary>
+        private static void ContainBackgroundServices(IServiceCollection services, List<ServiceDescriptor> before,
+            string pluginName)
+        {
+            for (var i = 0; i < services.Count; i++)
+            {
+                var descriptor = services[i];
+                if (descriptor.ServiceType == typeof(IHostedService) && !descriptor.IsKeyedService &&
+                    !before.Contains(descriptor))
+                {
+                    services[i] = ServiceDescriptor.Singleton<IHostedService>(provider =>
+                        new PluginHostedService(pluginName, () => Create(provider, descriptor),
+                            owned: descriptor.ImplementationType != null));
+                }
+            }
+
+            static IHostedService Create(IServiceProvider provider, ServiceDescriptor descriptor) =>
+                (IHostedService)(descriptor.ImplementationInstance ??
+                                 descriptor.ImplementationFactory?.Invoke(provider) ??
+                                 ActivatorUtilities.CreateInstance(provider, descriptor.ImplementationType));
+        }
+
+        private sealed class PluginHostedService : IHostedService, IDisposable
+        {
+            private readonly string _pluginName;
+            private readonly Func<IHostedService> _create;
+            private readonly bool _owned;
+            private IHostedService _service;
+
+            public PluginHostedService(string pluginName, Func<IHostedService> create, bool owned)
+            {
+                _pluginName = pluginName;
+                _create = create;
+                _owned = owned;
+            }
+
+            public async Task StartAsync(CancellationToken cancellationToken)
+            {
+                try
+                {
+                    _service = _create();
+                    await _service.StartAsync(cancellationToken);
+                }
+                catch (Exception ex) when (!cancellationToken.IsCancellationRequested)
+                {
+                    Logger.Error(ex, $"Plugin {_pluginName}: a background service failed to start; the server runs without it");
+                    return;
+                }
+
+                if (_service is BackgroundService { ExecuteTask: { } running })
+                {
+                    _ = running.ContinueWith(
+                        task => Logger.Error(task.Exception?.GetBaseException(),
+                            $"Plugin {_pluginName}: a background service stopped with an error; the server runs without it"),
+                        CancellationToken.None, TaskContinuationOptions.OnlyOnFaulted, TaskScheduler.Default);
+                }
+            }
+
+            public async Task StopAsync(CancellationToken cancellationToken)
+            {
+                try
+                {
+                    if (_service != null)
+                    {
+                        await _service.StopAsync(cancellationToken);
+                    }
+                }
+                catch (Exception ex) when (ex is not OperationCanceledException)
+                {
+                    Logger.Error(ex, $"Plugin {_pluginName}: a background service failed to stop");
+                }
+            }
+
+            // A service made from its type here is not the container's, so it is not disposed by it.
+            public void Dispose()
+            {
+                if (_owned)
+                {
+                    (_service as IDisposable)?.Dispose();
+                }
             }
         }
 
