@@ -99,6 +99,11 @@ if (-not $DataDirectory -and $existing) {
     }
 }
 
+if ($DataDirectory -and -not (Test-Path $DataDirectory)) {
+    # Carrying on would start the service with new, empty data.
+    throw "The data folder $DataDirectory does not exist."
+}
+
 # Any user may create a folder in ProgramData, and plant a plugin in it, before an administrator does.
 if ((Test-Path $dataRoot) -and -not (Test-AdministratorOwned $dataRoot)) {
     throw "$dataRoot was not created by an administrator. Check what is in it and delete it, then run this script again."
@@ -128,6 +133,7 @@ Invoke-Icacls $dataRoot /setowner '*S-1-5-32-544' /T /C /Q
 Invoke-Icacls $dataRoot /inheritance:r /grant:r @grants
 
 $copiedFrom = $null
+$skippedPlugins = @()
 if ($DataDirectory -and (Test-Path $DataDirectory)) {
     $oldDataDirectory = (Resolve-Path $DataDirectory).Path
     if ($oldDataDirectory.TrimEnd('\') -ne $serviceDataDirectory.TrimEnd('\')) {
@@ -135,8 +141,11 @@ if ($DataDirectory -and (Test-Path $DataDirectory)) {
             Write-Warning "$serviceDataDirectory already holds a server's data, so $oldDataDirectory was not copied into it."
         }
         else {
-            Invoke-Robocopy -From $oldDataDirectory -To $serviceDataDirectory -Options @('/E')
+            # Plugins are code the service runs as SYSTEM, and any Windows user could add them to the old folder.
+            Invoke-Robocopy -From $oldDataDirectory -To $serviceDataDirectory -Options @('/E', '/XD',
+                (Join-Path $oldDataDirectory 'plugins'))
             $copiedFrom = $oldDataDirectory
+            $skippedPlugins = @(Get-ChildItem -Directory (Join-Path $oldDataDirectory 'plugins') -ErrorAction SilentlyContinue)
         }
     }
 }
@@ -148,6 +157,14 @@ if (Get-ChildItem -Force $dataRoot) {
 
 # Service accounts do not see your shell's environment variables, so settings go in srs-server.json.
 $configFile = Join-Path $serviceDataDirectory 'srs-server.json'
+if ((Test-Path $configFile) -and -not $PSBoundParameters.ContainsKey('SrsPort')) {
+    # An update keeps the port the server was set up with, for its firewall rules.
+    $configuredPort = (Get-Content $configFile -Raw | ConvertFrom-Json).SRS_SERVER_PORT
+    if ($configuredPort) {
+        $SrsPort = [int]$configuredPort
+    }
+}
+
 if (-not (Test-Path $configFile)) {
     if (-not $AdminPassword) {
         $secure = Read-Host -AsSecureString 'Admin password for the web UI (at least 8 characters)'
@@ -172,11 +189,12 @@ else {
 
 $binaryPath = "`"$executablePath`" --data-dir `"$serviceDataDirectory`""
 if ($existing) {
-    $ErrorActionPreference = 'Continue'
-    sc.exe config $ServiceName binPath= $binaryPath start= auto | Out-Null
-    $ErrorActionPreference = 'Stop'
-    if ($LASTEXITCODE -ne 0) {
-        throw "Could not update service $ServiceName (sc.exe exit code $LASTEXITCODE)."
+    # Not sc.exe: Windows PowerShell passes quoted paths with spaces to native programs broken up.
+    $result = Invoke-CimMethod -InputObject $existing -MethodName Change -Arguments @{
+        PathName = $binaryPath; StartMode = 'Automatic' }
+    $updated = Get-CimInstance Win32_Service -Filter "Name='$ServiceName'"
+    if ($result.ReturnValue -ne 0 -or $updated.PathName -ne $binaryPath) {
+        throw "Could not update service $ServiceName (error $($result.ReturnValue)); it still runs $($updated.PathName)"
     }
 
     Write-Host "Updated service $ServiceName"
@@ -191,14 +209,15 @@ else {
 sc.exe failure $ServiceName reset= 86400 actions= restart/10000/restart/30000/restart/60000 | Out-Null
 
 if (-not $NoFirewallRules) {
+    # Rules from an older install allow the program where it used to be.
+    $oldRules = @(Get-NetFirewallRule -DisplayName "$ServiceName *" -ErrorAction SilentlyContinue)
+    if ($oldRules) {
+        $oldRules | Get-NetFirewallApplicationFilter | Set-NetFirewallApplicationFilter -Program $executablePath
+    }
+
     foreach ($protocol in 'TCP', 'UDP') {
         $ruleName = "$ServiceName $protocol $SrsPort"
-        $rule = Get-NetFirewallRule -DisplayName $ruleName -ErrorAction SilentlyContinue
-        if ($rule) {
-            # A rule from an older install allows the program where it used to be.
-            $rule | Get-NetFirewallApplicationFilter | Set-NetFirewallApplicationFilter -Program $executablePath
-        }
-        else {
+        if (-not ($oldRules | Where-Object { $_.DisplayName -eq $ruleName })) {
             New-NetFirewallRule -DisplayName $ruleName -Direction Inbound -Action Allow -Protocol $protocol `
                 -LocalPort $SrsPort -Program $executablePath | Out-Null
             Write-Host "Added firewall rule $ruleName"
@@ -212,4 +231,10 @@ Write-Host "Program: $appDirectory  Data: $serviceDataDirectory (only Administra
 if ($copiedFrom) {
     Write-Warning ("Copied the data from $copiedFrom. That folder still holds the admin password and the keys that " +
         "encrypt webhooks: delete it, and the old program folder, once the service works.")
+}
+
+if ($skippedPlugins) {
+    Write-Warning ("Plugins in the old data folder were not copied, since other Windows users could have added or " +
+        "changed them: $(($skippedPlugins | ForEach-Object Name) -join ', '). Copy the ones you installed, from " +
+        "their original download, into $(Join-Path $serviceDataDirectory 'plugins') and restart the service.")
 }

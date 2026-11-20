@@ -156,7 +156,7 @@ Then run the `docker run` command above again, or use `docker compose pull` and 
 
 On Windows, extract the new release to any folder and run its `Install-WindowsService.ps1` from an elevated PowerShell prompt. It stops the service, replaces the program in `C:\Program Files\IL2-SRS\IL2-SRS-Server`, keeps the data, and starts the service again.
 
-An install from before 1.0.6.0 kept its program and data in folders such as `C:\IL2-SRS\app` and `C:\IL2-SRS\main`, which other Windows users on the server could change. Running the new script moves it: it copies the data to `C:\ProgramData\IL2-SRS\IL2-SRS-Server` and points the service at the new folders. Once the service works, delete the old folders: the old data folder still holds the admin password and the keys that encrypt webhooks.
+An install from before 1.0.6.0 kept its program and data in folders such as `C:\IL2-SRS\app` and `C:\IL2-SRS\main`, which other Windows users on the server could change. Running the new script moves it: it copies the data to `C:\ProgramData\IL2-SRS\IL2-SRS-Server` and points the service and its firewall rules at the new folders. It does not copy plugins you added yourself, since other users could have changed them: copy those again from their original download. Once the service works, delete the old folders: the old data folder still holds the admin password and the keys that encrypt webhooks.
 
 The server upgrades its database on first start, so back up the data folder before updating if you might want to go back.
 
