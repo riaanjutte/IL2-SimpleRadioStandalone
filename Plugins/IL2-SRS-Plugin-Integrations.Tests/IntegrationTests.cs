@@ -151,6 +151,73 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Server.Integrations.Tests
         }
 
         [Fact]
+        public void EachIntegrationQueuesAtMostMaxQueuedRuns()
+        {
+            using var temp = new TempDirectory();
+            var (store, _) = CreateStore(temp);
+            var busy = store.Save(Integration(new JsonObject { ["token"] = "a-secret-token" }, name: "Busy"));
+            var quiet = store.Save(Integration(new JsonObject { ["token"] = "a-secret-token" }, name: "Quiet"));
+            var data = EventData.Sample(SrsEventTypes.ClientConnected);
+
+            for (var i = 0; i < IntegrationStore.MaxQueuedRuns; i++)
+            {
+                Assert.True(store.Enqueue(busy, "client.connected", null, data) > 0);
+            }
+
+            Assert.Equal(0, store.Enqueue(busy, "client.connected", null, data));
+            Assert.True(store.Enqueue(quiet, "client.connected", null, data) > 0);
+
+            // Once a run finishes there is room again.
+            var oldest = store.Due(DateTime.UtcNow, 1).Single(e => e.IntegrationId == busy.Id);
+            Assert.True(store.TryStart(oldest.Id));
+            store.Finish(oldest.Id, ExecutionStatus.Succeeded, null, "ok", null);
+            Assert.True(store.Enqueue(busy, "client.connected", null, data) > 0);
+        }
+
+        [Fact]
+        public void ARunPushedBackForMoreThanMaxDeferAgeFails()
+        {
+            using var temp = new TempDirectory();
+            var (store, database) = CreateStore(temp);
+            var integration = store.Save(Integration(new JsonObject { ["token"] = "a-secret-token" }));
+            var data = EventData.Sample(SrsEventTypes.ClientConnected);
+            var id = store.Enqueue(integration, "client.connected", null, data);
+
+            // The age counts from the first time it was pushed back, not from when it was queued: a run queued
+            // before a long downtime, or an old run sent again with Run again, gets its hour too.
+            using (var connection = database.Open())
+            using (var command = connection.CreateCommand())
+            {
+                command.CommandText = "UPDATE integration_executions SET created_at = $old WHERE id = $id;";
+                command.Parameters.AddWithValue("$old", SqliteDatabase.FormatTimestamp(DateTime.UtcNow.AddHours(-3)));
+                command.Parameters.AddWithValue("$id", id);
+                command.ExecuteNonQuery();
+            }
+
+            Assert.True(store.TryStart(id));
+            store.Defer(id, "Slow down", DateTime.UtcNow.AddMinutes(1));
+            Assert.Equal(ExecutionStatus.Queued, store.GetExecution(id).Status);
+            Assert.True(store.TryStart(id));
+            store.Defer(id, "Slow down", DateTime.UtcNow.AddMinutes(30));
+            Assert.Equal(ExecutionStatus.Queued, store.GetExecution(id).Status);
+
+            Assert.True(store.TryStart(id));
+            store.Defer(id, "Slow down", DateTime.UtcNow + IntegrationStore.MaxDeferAge + TimeSpan.FromMinutes(1));
+            var run = store.GetExecution(id);
+            Assert.Equal(ExecutionStatus.Failed, run.Status);
+            Assert.Null(run.NextAttemptAtUtc);
+            Assert.NotNull(run.FinishedAtUtc);
+            Assert.Contains("Slow down", run.LastError);
+            Assert.Empty(store.Due(DateTime.UtcNow.AddDays(1), 10));
+
+            // Run again starts its hour afresh.
+            Assert.True(store.Requeue(id));
+            Assert.True(store.TryStart(id));
+            store.Defer(id, "Slow down", DateTime.UtcNow.AddMinutes(1));
+            Assert.Equal(ExecutionStatus.Queued, store.GetExecution(id).Status);
+        }
+
+        [Fact]
         public void ClearsAStoredSecretWhenAsked()
         {
             using var temp = new TempDirectory();
@@ -413,6 +480,52 @@ WHERE pending.integration_id = 1 AND pending.status IN ('queued', 'running');";
             Assert.Equal(new[] { SrsEventTypes.ServerStarted, SrsEventTypes.ServerStopped }, test.Runs.Select(r => r.Event));
             Assert.Equal(new[] { "server.started", "server.stopped" },
                 action.Runs.Select(r => EventData.AsText(EventData.Resolve(r.Data, "event.type"))));
+        }
+
+        [Fact]
+        public void StoredHeadersDoNotFollowANewUrl()
+        {
+            using var temp = new TempDirectory();
+            var webhook = new FakeWebhook();
+            var action = new HttpWebhookAction(webhook);
+            var store = new IntegrationStore(temp.CreateIntegrationDatabase(),
+                new SecretProtector(new EphemeralDataProtectionProvider()), new IIntegrationAction[] { action });
+            var service = new IntegrationService(store, new ServerEvents(), new IIntegrationAction[] { action }, EventTypes);
+            IntegrationDefinition Draft(long id, JsonObject config) => new()
+            {
+                Id = id, Name = "Hook", TriggerTypes = new[] { "client.connected" },
+                ActionType = HttpWebhookAction.ActionType, ActionConfig = config
+            };
+            Assert.Null(service.Save(Draft(0, new JsonObject
+            {
+                ["url"] = "https://hooks.example.com/a", ["headers"] = "Authorization: Bearer stored-token"
+            }), "admin", out var saved));
+
+            // A new URL with the headers left empty would send the stored token to the new host.
+            var moved = Draft(saved.Id, new JsonObject { ["url"] = "https://attacker.example.net/" });
+            Assert.Contains("config.headers", service.Validate(moved).Errors.Keys);
+            Assert.NotNull(service.Save(moved, "api", out _));
+            Assert.Equal("https://hooks.example.com/a", store.GetForExecution(saved.Id).ActionConfig.GetText("url"));
+
+            // Same URL again, or a rename: the headers are kept.
+            Assert.True(service.Validate(Draft(saved.Id, new JsonObject { ["url"] = " https://hooks.example.com/a " })).IsValid);
+            Assert.Null(service.Save(Draft(saved.Id, new JsonObject()), "admin", out _));
+            Assert.Equal("Authorization: Bearer stored-token",
+                store.GetForExecution(saved.Id).ActionConfig.GetText("headers"));
+
+            // New headers, or clearing them, makes the new URL acceptable.
+            Assert.True(service.Validate(Draft(saved.Id, new JsonObject
+            {
+                ["url"] = "https://hooks.example.com/b", ["headers"] = "Authorization: Bearer new-token"
+            })).IsValid);
+            Assert.Null(service.Save(Draft(saved.Id, new JsonObject
+            {
+                ["url"] = "https://hooks.example.com/b",
+                [ActionConfigExtensions.ClearSecretsField] = new JsonArray("headers")
+            }), "admin", out _));
+            var config = store.GetForExecution(saved.Id).ActionConfig;
+            Assert.Equal("https://hooks.example.com/b", config.GetText("url"));
+            Assert.Null(config.GetText("headers"));
         }
 
         /// <summary>The server's event types and the plugin's, as a server running the plugin has them.</summary>

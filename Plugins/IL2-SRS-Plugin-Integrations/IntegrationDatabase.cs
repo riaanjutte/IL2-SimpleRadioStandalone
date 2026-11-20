@@ -83,6 +83,11 @@ CREATE TABLE IF NOT EXISTS integration_state (
             new[]
             {
                 "ALTER TABLE integration_executions ADD COLUMN interruptions INTEGER NOT NULL DEFAULT 0"
+            },
+            // 5: when a run was first pushed back by a rate limit, so one pushed back for too long gives up.
+            new[]
+            {
+                "ALTER TABLE integration_executions ADD COLUMN deferred_since TEXT"
             }
         };
 

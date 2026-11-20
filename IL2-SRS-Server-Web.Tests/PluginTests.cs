@@ -10,6 +10,7 @@ using Ciribob.IL2.SimpleRadio.Standalone.Server.Api;
 using Ciribob.IL2.SimpleRadio.Standalone.Server.Hosting;
 using Ciribob.IL2.SimpleRadio.Standalone.Server.Plugins;
 using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Hosting.Server;
 using Microsoft.AspNetCore.Hosting.Server.Features;
 using Microsoft.Extensions.DependencyInjection;
@@ -149,6 +150,98 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Server.Tests
             Assert.DoesNotContain(builder.Services, s => s.ImplementationType == typeof(FailingPlugin.Worker));
             var failed = Assert.Single(ServerPlugins.Catalog(builder.Services).Failed);
             Assert.Equal("Setting up the plugin failed: Missing setting", failed.Error);
+        }
+
+        [Fact]
+        public async Task ABackgroundServiceThatFailsDoesNotStopTheServer()
+        {
+            using var data = new TempDirectory();
+            ServerPaths.UseDataDirectory(data.Path);
+            var builder = WebApplication.CreateBuilder();
+            builder.WebHost.UseUrls("http://127.0.0.1:0");
+            var healthy = new TaskCompletionSource();
+            builder.AddServerPlugin(new WorkerPlugin("fails-to-build", s => s.AddHostedService<ThrowsWhenBuilt>()));
+            builder.AddServerPlugin(new WorkerPlugin("fails-to-start", s => s.AddHostedService<ThrowsAtStart>()));
+            builder.AddServerPlugin(new WorkerPlugin("fails-later", s => s.AddHostedService<ThrowsLater>()));
+            // A factory, as the Integrations plugin registers its dispatcher, that fails like a locked database.
+            builder.AddServerPlugin(new WorkerPlugin("factory-fails", s => s.AddHostedService<ThrowsLater>(
+                _ => throw new IOException("integrations.db is locked"))));
+            builder.AddServerPlugin(new WorkerPlugin("healthy", s => s.AddSingleton<Microsoft.Extensions.Hosting.IHostedService>(
+                new Healthy(healthy))));
+            var lifecycle = new Lifecycle();
+            builder.AddServerPlugin(new WorkerPlugin("lifecycle", s => s.AddHostedService(_ => lifecycle)));
+            await using var app = builder.Build();
+            var lifetime = app.Services.GetRequiredService<Microsoft.Extensions.Hosting.IHostApplicationLifetime>();
+
+            await app.StartAsync(TestContext.Current.CancellationToken);
+            await healthy.Task.WaitAsync(TimeSpan.FromSeconds(5), TestContext.Current.CancellationToken);
+            await Task.Delay(500, TestContext.Current.CancellationToken); // ThrowsLater fails after 50 ms.
+
+            Assert.False(lifetime.ApplicationStopping.IsCancellationRequested);
+            await app.StopAsync(TestContext.Current.CancellationToken);
+            Assert.Equal("starting start started stopping stop stopped", string.Join(" ", lifecycle.Steps));
+        }
+
+        private sealed class WorkerPlugin(string id, Action<IServiceCollection> configure) : IServerPlugin
+        {
+            public string Id => id;
+
+            public string Name => id;
+
+            public void ConfigureServices(PluginContext context, IServiceCollection services) => configure(services);
+
+            public void MapApi(Microsoft.AspNetCore.Routing.IEndpointRouteBuilder api)
+            {
+            }
+        }
+
+        private sealed class ThrowsWhenBuilt : Microsoft.Extensions.Hosting.BackgroundService
+        {
+            public ThrowsWhenBuilt() => throw new IOException("integrations.db is locked");
+
+            protected override Task ExecuteAsync(System.Threading.CancellationToken stoppingToken) => Task.CompletedTask;
+        }
+
+        private sealed class ThrowsAtStart : Microsoft.Extensions.Hosting.BackgroundService
+        {
+            protected override Task ExecuteAsync(System.Threading.CancellationToken stoppingToken) =>
+                throw new InvalidOperationException("database disk image is malformed");
+        }
+
+        private sealed class ThrowsLater : Microsoft.Extensions.Hosting.BackgroundService
+        {
+            protected override async Task ExecuteAsync(System.Threading.CancellationToken stoppingToken)
+            {
+                await Task.Delay(50, stoppingToken);
+                throw new InvalidOperationException("lost the database");
+            }
+        }
+
+        private sealed class Lifecycle : Microsoft.Extensions.Hosting.IHostedLifecycleService
+        {
+            public System.Collections.Generic.List<string> Steps { get; } = new();
+
+            private Task Add(string step)
+            {
+                Steps.Add(step);
+                return Task.CompletedTask;
+            }
+
+            public Task StartingAsync(System.Threading.CancellationToken cancellationToken) => Add("starting");
+            public Task StartAsync(System.Threading.CancellationToken cancellationToken) => Add("start");
+            public Task StartedAsync(System.Threading.CancellationToken cancellationToken) => Add("started");
+            public Task StoppingAsync(System.Threading.CancellationToken cancellationToken) => Add("stopping");
+            public Task StopAsync(System.Threading.CancellationToken cancellationToken) => Add("stop");
+            public Task StoppedAsync(System.Threading.CancellationToken cancellationToken) => Add("stopped");
+        }
+
+        private sealed class Healthy(TaskCompletionSource started) : Microsoft.Extensions.Hosting.BackgroundService
+        {
+            protected override Task ExecuteAsync(System.Threading.CancellationToken stoppingToken)
+            {
+                started.TrySetResult();
+                return Task.CompletedTask;
+            }
         }
 
         private sealed class FailingPlugin : IServerPlugin
