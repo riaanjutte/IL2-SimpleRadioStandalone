@@ -252,6 +252,10 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.Settings
         ToggleRadio2Mute = 147,
         ModifierToggleRadio2Mute = 247,
 
+        Radio1VolumeAxis = 148,
+        Radio2VolumeAxis = 149,
+        IntercomVolumeAxis = 150,
+
     }
 
 

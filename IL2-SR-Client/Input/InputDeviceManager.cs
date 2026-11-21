@@ -80,6 +80,11 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.Settings
         private bool _pilotRosterTogglePressed;
         private bool _clientListTogglePressed;
 
+        // Volume axis state (PTT thread only, so unlocked).
+        private readonly Dictionary<InputBinding, float> _lastAxisVolumes = new Dictionary<InputBinding, float>();
+        private readonly Dictionary<InputBinding, RadioInformation> _lastAxisRadios = new Dictionary<InputBinding, RadioInformation>();
+        private readonly AxisReportWatch<Device> _axisReportWatch = new AxisReportWatch<Device>();
+
         private Settings.GlobalSettingsStore _globalSettings = Settings.GlobalSettingsStore.Instance;
 
 
@@ -209,6 +214,7 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.Settings
 
                             device.SetCooperativeLevel(_windowHandle,
                                 CooperativeLevel.Background | CooperativeLevel.NonExclusive);
+                            SetAxisRange(device);
                             device.Acquire();
 
                             _inputDevices.Add(deviceInstance.InstanceGuid, device);
@@ -223,6 +229,7 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.Settings
 
                             device.SetCooperativeLevel(_windowHandle,
                                 CooperativeLevel.Background | CooperativeLevel.NonExclusive);
+                            SetAxisRange(device);
                             device.Acquire();
 
                             _inputDevices.Add(deviceInstance.InstanceGuid, device);
@@ -879,6 +886,8 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.Settings
                             }
                         }
                     }
+
+                    PollVolumeAxes(deviceStateCache);
                     }
                     catch (Exception ex)
                     {
@@ -937,6 +946,218 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.Settings
             _clientListTogglePressed = clientListPressed;
         }
 
+
+        private void SetAxisRange(Joystick joystick)
+        {
+            // Devices report axes in their own ranges; one range lets a volume axis read the same on any device.
+            IList<DeviceObjectInstance> axes;
+            try
+            {
+                axes = joystick.GetObjects(DeviceObjectTypeFlags.Axis);
+            }
+            catch (Exception ex)
+            {
+                Logger.Warn(ex, "Unable to list the axes of input device " + GetDeviceName(joystick));
+                return;
+            }
+
+            foreach (var axis in axes)
+            {
+                try
+                {
+                    joystick.GetObjectPropertiesById(axis.ObjectId).Range =
+                        new InputRange(VolumeAxis.RangeMin, VolumeAxis.RangeMax);
+                }
+                catch (Exception ex)
+                {
+                    Logger.Warn(ex, $"Unable to set the range of axis {NormalizeDeviceName(axis.Name)} on input device {GetDeviceName(joystick)}");
+                }
+            }
+        }
+
+        /// <summary>The detected InputDevice carries the axis index in Button.</summary>
+        public void AssignAxis(DetectButton callback)
+        {
+            Task.Run(() =>
+            {
+                var joysticks = GetInputDeviceSnapshot()
+                    .OfType<Joystick>()
+                    .Where(joystick => !joystick.IsDisposed)
+                    .ToList();
+                var initial = new int[joysticks.Count][];
+                var restarted = new bool[joysticks.Count];
+
+                for (var i = 0; i < joysticks.Count; i++)
+                {
+                    initial[i] = ReadAxesForAssign(joysticks[i]);
+                }
+
+                while (true)
+                {
+                    Thread.Sleep(100);
+
+                    for (var i = 0; i < joysticks.Count; i++)
+                    {
+                        if (initial[i] == null)
+                        {
+                            continue;
+                        }
+
+                        var current = ReadAxesForAssign(joysticks[i]);
+                        if (current == null)
+                        {
+                            initial[i] = null;
+                            continue;
+                        }
+
+                        var moved = VolumeAxis.FindMovedAxes(initial[i], current);
+                        if (moved.Count == 0)
+                        {
+                            continue;
+                        }
+
+                        if (moved.Count > 1 && !restarted[i])
+                        {
+                            // Every axis jumps at once when a device sends its first report (see
+                            // AxisReportWatch), so the first multi-axis change is a new starting point. A later one
+                            // is a single control driving two axes.
+                            initial[i] = current;
+                            restarted[i] = true;
+                            continue;
+                        }
+
+                        var information = joysticks[i].Information;
+                        var inputDevice = new InputDevice
+                        {
+                            DeviceName = information.ProductName.Trim().Replace("\0", ""),
+                            Button = moved[0],
+                            InstanceGuid = information.InstanceGuid,
+                            ProductGuid = information.ProductGuid,
+                            ButtonValue = 0
+                        };
+
+                        Application.Current.Dispatcher.Invoke(() => { callback(inputDevice); });
+                        return;
+                    }
+                }
+            });
+        }
+
+        private int[] ReadAxesForAssign(Joystick joystick)
+        {
+            if (joystick == null || joystick.IsDisposed)
+            {
+                return null;
+            }
+
+            try
+            {
+                joystick.Poll();
+                return VolumeAxis.ReadAxes(joystick.GetCurrentState());
+            }
+            catch (Exception e)
+            {
+                Logger.Error(e, $"Failed to get current state of input device {GetDeviceName(joystick)} " +
+                    $"(ID: {GetProductGuid(joystick)}) while assigning an axis, ignoring it for this assignment");
+                return null;
+            }
+        }
+
+        private void PollVolumeAxes(Dictionary<Guid, object> deviceStateCache)
+        {
+            var currentInputProfile = _globalSettings.ProfileSettingsStore.GetCurrentInputProfile();
+
+            foreach (var binding in VolumeAxis.Bindings)
+            {
+                InputDevice axisBinding;
+                if (!currentInputProfile.TryGetValue(binding, out axisBinding) || axisBinding == null)
+                {
+                    _lastAxisVolumes.Remove(binding);
+                    _lastAxisRadios.Remove(binding);
+                    continue;
+                }
+
+                float volume;
+                if (!TryGetAxisVolume(axisBinding, deviceStateCache, out volume))
+                {
+                    continue;
+                }
+
+                var radioId = VolumeAxis.GetRadioId(binding);
+                var radio = RadioHelper.GetRadio(radioId);
+                if (radio == null)
+                {
+                    continue;
+                }
+
+                // Applied only on movement, so the overlay slider still works in between. A new radio object
+                // (new aircraft or reconnect) starts at 100%, so it gets the axis position at once.
+                float lastVolume;
+                RadioInformation lastRadio;
+                if (_lastAxisVolumes.TryGetValue(binding, out lastVolume) &&
+                    _lastAxisRadios.TryGetValue(binding, out lastRadio) &&
+                    ReferenceEquals(lastRadio, radio) &&
+                    !VolumeAxis.HasMoved(lastVolume, volume))
+                {
+                    continue;
+                }
+
+                // A disabled radio, or one whose volume the game sets, is retried on the next poll.
+                if (RadioHelper.SetRadioVolume(volume, radioId))
+                {
+                    _lastAxisVolumes[binding] = volume;
+                    _lastAxisRadios[binding] = radio;
+                }
+            }
+        }
+
+        private bool TryGetAxisVolume(InputDevice axisBinding, Dictionary<Guid, object> deviceStateCache, out float volume)
+        {
+            volume = 0;
+
+            Guid instanceGuid;
+            Device device;
+            if (!TryGetInputDeviceForBinding(axisBinding, out instanceGuid, out device))
+            {
+                _missingBoundDevicesThisPoll.Add($"{NormalizeDeviceName(axisBinding.DeviceName)} ({axisBinding.InputBind})");
+                RequestDeviceReconnect();
+                return false;
+            }
+
+            var joystick = device as Joystick;
+            if (joystick == null)
+            {
+                return false;
+            }
+
+            try
+            {
+                var state = GetDeviceState<JoystickState>(device, instanceGuid, deviceStateCache,
+                    () =>
+                    {
+                        joystick.Poll();
+                        return joystick.GetCurrentState();
+                    });
+
+                if (!_axisReportWatch.HasReported(device, VolumeAxis.ReadAxes(state)))
+                {
+                    return false;
+                }
+
+                volume = VolumeAxis.ToVolume(VolumeAxis.ReadAxis(state, axisBinding.Button),
+                    VolumeAxis.IsInverted(axisBinding));
+                return true;
+            }
+            catch (Exception e)
+            {
+                Logger.Error(e, $"Failed to get current state of input device {GetDeviceName(device)} " +
+                    $"(ID: {GetProductGuid(device)}) while reading a volume axis. Removing device and waiting for automatic rediscovery.");
+
+                RemoveInputDevice(instanceGuid, device);
+                RequestDeviceReconnect();
+                return false;
+            }
+        }
 
         public void StopPtt()
         {

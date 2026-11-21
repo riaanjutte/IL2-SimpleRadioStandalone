@@ -555,6 +555,7 @@
                                 <RowDefinition Height="Auto" />
                                 <RowDefinition Height="Auto" />
                                 <RowDefinition Height="Auto" />
+                                <RowDefinition Height="Auto" />
                             </Grid.RowDefinitions>
 
                             <Label x:Name="DeviceLabel"
@@ -764,6 +765,17 @@
                                                        Grid.ColumnSpan="5"
                                                        ControlInputBinding="{x:Static settings:InputBinding.RestartSrs}"
                                                        InputName="Restart SRS" />
+                            <StackPanel Grid.Row="34" Grid.ColumnSpan="5">
+                                <local:InputBindingControl x:Name="Radio1VolumeAxis"
+                                                           ControlInputBinding="{x:Static settings:InputBinding.Radio1VolumeAxis}"
+                                                           InputName="Radio 1 Volume (Axis)" />
+                                <local:InputBindingControl x:Name="Radio2VolumeAxis"
+                                                           ControlInputBinding="{x:Static settings:InputBinding.Radio2VolumeAxis}"
+                                                           InputName="Radio 2 Volume (Axis)" />
+                                <local:InputBindingControl x:Name="IntercomVolumeAxis"
+                                                           ControlInputBinding="{x:Static settings:InputBinding.IntercomVolumeAxis}"
+                                                           InputName="Intercom Volume (Axis)" />
+                            </StackPanel>
                         </Grid>
                     </StackPanel>
                 </ScrollViewer>

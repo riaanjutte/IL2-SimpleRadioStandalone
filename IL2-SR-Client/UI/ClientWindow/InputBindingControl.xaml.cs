@@ -32,11 +32,15 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI
         public InputBinding ModifierBinding { get; set; }
         public string InputName { get; set; }
 
+        public bool IsAxis => VolumeAxis.IsVolumeAxisBinding(ControlInputBinding);
+
         public void LoadInputSettings()
         {
             DeviceLabel.Text = InputName;
             ModifierLabel.Text = InputName + " " + LocalizationManager.Get("Modifier");
             ModifierBinding = (InputBinding) ((int) ControlInputBinding) + 100; //add 100 gets the enum of the modifier
+
+            ApplyAxisLayout();
 
             var currentInputProfile = GlobalSettingsStore.Instance.ProfileSettingsStore.GetCurrentInputProfile();
 
@@ -45,20 +49,20 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI
                 var devices = currentInputProfile;
                 if (currentInputProfile.ContainsKey(ControlInputBinding))
                 {
-                    var button = devices[ControlInputBinding].Button;
-                    DeviceText.Text = button < 128 ? (button+1).ToString() : "POV " + (button - 127); //output POV info
+                    DeviceText.Text = FormatInput(devices[ControlInputBinding]);
                     Device.Text = devices[ControlInputBinding].DeviceName;
+                    InvertAxis.IsChecked = IsAxis && VolumeAxis.IsInverted(devices[ControlInputBinding]);
                 }
                 else
                 {
                     DeviceText.Text = LocalizationManager.Get("None");
                     Device.Text = LocalizationManager.Get("None");
+                    InvertAxis.IsChecked = false;
                 }
 
-                if (currentInputProfile.ContainsKey(ModifierBinding))
+                if (!IsAxis && currentInputProfile.ContainsKey(ModifierBinding))
                 {
-                    var button = devices[ModifierBinding].Button;
-                    ModifierText.Text = button < 128 ? (button + 1).ToString() : "POV " + (button - 127); //output POV info
+                    ModifierText.Text = FormatInput(devices[ModifierBinding]);
                     ModifierDevice.Text = devices[ModifierBinding].DeviceName;
                 }
                 else
@@ -69,25 +73,60 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI
             }
         }
 
+        private void ApplyAxisLayout()
+        {
+            var modifierVisibility = IsAxis ? Visibility.Collapsed : Visibility.Visible;
+            ModifierLabel.Visibility = modifierVisibility;
+            ModifierDevice.Visibility = modifierVisibility;
+            ModifierText.Visibility = modifierVisibility;
+            ModifierButton.Visibility = modifierVisibility;
+            ModifierButtonClear.Visibility = modifierVisibility;
+
+            InvertAxis.Visibility = IsAxis ? Visibility.Visible : Visibility.Collapsed;
+        }
+
+        private string FormatInput(InputDevice device)
+        {
+            if (IsAxis)
+            {
+                return VolumeAxis.GetAxisName(device.Button);
+            }
+
+            //output POV info
+            return device.Button < 128 ? (device.Button + 1).ToString() : "POV " + (device.Button - 127);
+        }
+
         private void Device_Click(object sender, RoutedEventArgs e)
         {
             DeviceClear.IsEnabled = false;
             DeviceButton.IsEnabled = false;
 
-
-            InputDeviceManager.AssignButton(device =>
+            InputDeviceManager.DetectButton onDetected = device =>
             {
                 DeviceClear.IsEnabled = true;
                 DeviceButton.IsEnabled = true;
 
                 Device.Text = device.DeviceName;
-                DeviceText.Text = device.Button < 128 ? (device.Button+1).ToString() : "POV " + (device.Button - 127);
-                //output POV info;
+                DeviceText.Text = FormatInput(device);
 
                 device.InputBind = ControlInputBinding;
 
+                if (IsAxis)
+                {
+                    device.ButtonValue = InvertAxis.IsChecked == true ? 1 : 0;
+                }
+
                 GlobalSettingsStore.Instance.ProfileSettingsStore.SetControlSetting(device);
-            });
+            };
+
+            if (IsAxis)
+            {
+                InputDeviceManager.AssignAxis(onDetected);
+            }
+            else
+            {
+                InputDeviceManager.AssignButton(onDetected);
+            }
         }
 
 
@@ -97,6 +136,20 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI
 
             Device.Text = LocalizationManager.Get("None");
             DeviceText.Text = LocalizationManager.Get("None");
+        }
+
+        private void InvertAxis_Click(object sender, RoutedEventArgs e)
+        {
+            var currentInputProfile = GlobalSettingsStore.Instance.ProfileSettingsStore.GetCurrentInputProfile();
+            InputDevice device;
+            if (currentInputProfile == null || !currentInputProfile.TryGetValue(ControlInputBinding, out device))
+            {
+                // Nothing bound yet: the choice is applied when an axis is set.
+                return;
+            }
+
+            device.ButtonValue = InvertAxis.IsChecked == true ? 1 : 0;
+            GlobalSettingsStore.Instance.ProfileSettingsStore.SetControlSetting(device);
         }
 
         private void Modifier_Click(object sender, RoutedEventArgs e)
@@ -110,8 +163,7 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI
                 ModifierButton.IsEnabled = true;
 
                 ModifierDevice.Text = device.DeviceName;
-                ModifierText.Text = device.Button < 128 ? (device.Button + 1).ToString() : "POV " + (device.Button - 127);
-                //output POV info;
+                ModifierText.Text = FormatInput(device);
 
                 device.InputBind = ModifierBinding;
 

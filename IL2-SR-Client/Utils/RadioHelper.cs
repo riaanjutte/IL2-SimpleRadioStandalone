@@ -223,7 +223,8 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.Utils
             }
         }
 
-        public static void SetRadioVolume(float volume, int radioId)
+        /// <returns>False when the radio is missing, disabled or its volume is set by the game.</returns>
+        public static bool SetRadioVolume(float volume, int radioId)
         {
             if (volume > 1.0)
             {
@@ -240,7 +241,10 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.Utils
                 && currentRadio.volMode == RadioInformation.VolumeMode.OVERLAY)
             {
                 currentRadio.volume = volume;
+                return true;
             }
+
+            return false;
         }
 
         public static float GetEffectiveReceiveVolume(int radioId, RadioInformation radio)

@@ -80,9 +80,11 @@
     <Compile Include="DCSState\PlayerGameStateTests.cs" />
     <Compile Include="Helpers\AirfieldCodeLookupTests.cs" />
     <Compile Include="Helpers\ConversionHelpersTests.cs" />
+    <Compile Include="Input\AxisReportWatchTests.cs" />
     <Compile Include="Input\DeviceIdentityCacheTests.cs" />
     <Compile Include="Input\InputBindingLayoutTests.cs" />
     <Compile Include="Input\InputPollingCycleCacheTests.cs" />
+    <Compile Include="Input\VolumeAxisTests.cs" />
     <Compile Include="Installer\Il2InstallDiscoveryTests.cs" />
     <Compile Include="Installer\SteamGameDiscoveryTests.cs" />
     <Compile Include="Installer\InstallerTelemetryConfigurationTests.cs" />

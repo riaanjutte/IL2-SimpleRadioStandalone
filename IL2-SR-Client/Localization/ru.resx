@@ -1014,4 +1014,16 @@
   <data name="SuggestionPageOpenFailed" xml:space="preserve">
     <value>Не удалось открыть страницу предложений GitHub.</value>
   </data>
+  <data name="Radio 1 Volume (Axis)" xml:space="preserve">
+    <value>Громкость радио 1 (ось)</value>
+  </data>
+  <data name="Radio 2 Volume (Axis)" xml:space="preserve">
+    <value>Громкость радио 2 (ось)</value>
+  </data>
+  <data name="Intercom Volume (Axis)" xml:space="preserve">
+    <value>Громкость интеркома (ось)</value>
+  </data>
+  <data name="Invert axis" xml:space="preserve">
+    <value>Инвертировать ось</value>
+  </data>
 </root>

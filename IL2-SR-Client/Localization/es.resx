@@ -1014,4 +1014,16 @@ Adjunte este ZIP al issue de GitHub que se abrio en el navegador.</value>
   <data name="SuggestionPageOpenFailed" xml:space="preserve">
     <value>No se pudo abrir la pagina de sugerencias de GitHub.</value>
   </data>
+  <data name="Radio 1 Volume (Axis)" xml:space="preserve">
+    <value>Volumen de radio 1 (eje)</value>
+  </data>
+  <data name="Radio 2 Volume (Axis)" xml:space="preserve">
+    <value>Volumen de radio 2 (eje)</value>
+  </data>
+  <data name="Intercom Volume (Axis)" xml:space="preserve">
+    <value>Volumen de intercomunicador (eje)</value>
+  </data>
+  <data name="Invert axis" xml:space="preserve">
+    <value>Invertir eje</value>
+  </data>
 </root>

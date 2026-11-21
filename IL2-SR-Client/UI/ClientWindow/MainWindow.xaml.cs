@@ -778,6 +778,18 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI
             RestartSrs.InputName = LocalizationManager.Get("Restart SRS");
             RestartSrs.ControlInputBinding = InputBinding.RestartSrs;
             RestartSrs.InputDeviceManager = InputManager;
+
+            Radio1VolumeAxis.InputName = LocalizationManager.Get("Radio 1 Volume (Axis)");
+            Radio1VolumeAxis.ControlInputBinding = InputBinding.Radio1VolumeAxis;
+            Radio1VolumeAxis.InputDeviceManager = InputManager;
+
+            Radio2VolumeAxis.InputName = LocalizationManager.Get("Radio 2 Volume (Axis)");
+            Radio2VolumeAxis.ControlInputBinding = InputBinding.Radio2VolumeAxis;
+            Radio2VolumeAxis.InputDeviceManager = InputManager;
+
+            IntercomVolumeAxis.InputName = LocalizationManager.Get("Intercom Volume (Axis)");
+            IntercomVolumeAxis.ControlInputBinding = InputBinding.IntercomVolumeAxis;
+            IntercomVolumeAxis.InputDeviceManager = InputManager;
         }
 
         private void RefreshInputBindingLabels()
@@ -819,6 +831,9 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI
             Radio2ChannelUp.InputName = LocalizationManager.Get("Radio 2 Channel Up");
             Radio2ChannelDown.InputName = LocalizationManager.Get("Radio 2 Channel Down");
             RestartSrs.InputName = LocalizationManager.Get("Restart SRS");
+            Radio1VolumeAxis.InputName = LocalizationManager.Get("Radio 1 Volume (Axis)");
+            Radio2VolumeAxis.InputName = LocalizationManager.Get("Radio 2 Volume (Axis)");
+            IntercomVolumeAxis.InputName = LocalizationManager.Get("Intercom Volume (Axis)");
 
             ReloadInputBindings();
         }
@@ -868,6 +883,9 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI
             Radio2ChannelUp.LoadInputSettings();
             Radio2ChannelDown.LoadInputSettings();
             RestartSrs.LoadInputSettings();
+            Radio1VolumeAxis.LoadInputSettings();
+            Radio2VolumeAxis.LoadInputSettings();
+            IntercomVolumeAxis.LoadInputSettings();
         }
 
         private void ReloadRadioAudioChannelSettings()

@@ -1014,4 +1014,16 @@ Joignez ce fichier ZIP au ticket GitHub ouvert dans votre navigateur.</value>
   <data name="SuggestionPageOpenFailed" xml:space="preserve">
     <value>Impossible d'ouvrir la page GitHub de suggestion.</value>
   </data>
+  <data name="Radio 1 Volume (Axis)" xml:space="preserve">
+    <value>Volume radio 1 (axe)</value>
+  </data>
+  <data name="Radio 2 Volume (Axis)" xml:space="preserve">
+    <value>Volume radio 2 (axe)</value>
+  </data>
+  <data name="Intercom Volume (Axis)" xml:space="preserve">
+    <value>Volume intercom (axe)</value>
+  </data>
+  <data name="Invert axis" xml:space="preserve">
+    <value>Inverser l'axe</value>
+  </data>
 </root>
