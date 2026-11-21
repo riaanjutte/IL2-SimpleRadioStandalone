@@ -126,6 +126,7 @@
     <Compile Include="UI\PilotRosterScreenBoundsTests.cs" />
     <Compile Include="UI\WindowsFirewallTelemetryDiagnosticTests.cs" />
     <Compile Include="Utils\RadioHelperMuteTests.cs" />
+    <Compile Include="Utils\RadioHelperVolumeTests.cs" />
     <Compile Include="Utils\RadioHelperChannelNameTests.cs" />
     <Compile Include="Utils\StartupConfigTelemetryTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

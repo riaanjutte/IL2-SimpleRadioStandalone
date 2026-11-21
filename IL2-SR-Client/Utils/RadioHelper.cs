@@ -22,6 +22,7 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.Utils
         private const float MinimumMutedVolume = 0.05f;
         private const float MaximumMutedVolume = 0.50f;
         private const float DefaultMutedVolume = 0.25f;
+        private const float VolumeStep = 0.05f;
         private static readonly HashSet<int> MutedRadios = new HashSet<int>();
         private static readonly object MutedRadiosLock = new object();
         private static bool _microphoneMuted;
@@ -245,6 +246,29 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.Utils
             }
 
             return false;
+        }
+
+        public static void RadioVolumeUp(int radioId)
+        {
+            StepRadioVolume(radioId, 1);
+        }
+
+        public static void RadioVolumeDown(int radioId)
+        {
+            StepRadioVolume(radioId, -1);
+        }
+
+        private static void StepRadioVolume(int radioId, int steps)
+        {
+            var currentRadio = GetRadio(radioId);
+            if (currentRadio == null)
+            {
+                return;
+            }
+
+            // Rounded to whole steps, so a volume set by an axis or the slider falls back in line with the buttons.
+            var volume = (float)Math.Round(currentRadio.volume / VolumeStep + steps) * VolumeStep;
+            SetRadioVolume(volume, radioId);
         }
 
         public static float GetEffectiveReceiveVolume(int radioId, RadioInformation radio)

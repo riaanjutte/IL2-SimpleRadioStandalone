@@ -876,6 +876,24 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.Settings
                                         case InputBinding.ToggleMicrophoneMute:
                                             RadioHelper.ToggleMicrophoneMute();
                                             break;
+                                        case InputBinding.Radio1VolumeUp:
+                                            RadioHelper.RadioVolumeUp(1);
+                                            break;
+                                        case InputBinding.Radio1VolumeDown:
+                                            RadioHelper.RadioVolumeDown(1);
+                                            break;
+                                        case InputBinding.Radio2VolumeUp:
+                                            RadioHelper.RadioVolumeUp(2);
+                                            break;
+                                        case InputBinding.Radio2VolumeDown:
+                                            RadioHelper.RadioVolumeDown(2);
+                                            break;
+                                        case InputBinding.IntercomVolumeUp:
+                                            RadioHelper.RadioVolumeUp(0);
+                                            break;
+                                        case InputBinding.IntercomVolumeDown:
+                                            RadioHelper.RadioVolumeDown(0);
+                                            break;
 
                                         default:
                                             break;
@@ -1168,7 +1186,8 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.Settings
         {
             return (binding >= InputBinding.RadioChannel1 && binding <= InputBinding.Radio2ChannelDown)
                    || binding == InputBinding.ToggleRadio1Mute
-                   || binding == InputBinding.ToggleRadio2Mute;
+                   || binding == InputBinding.ToggleRadio2Mute
+                   || (binding >= InputBinding.Radio1VolumeUp && binding <= InputBinding.IntercomVolumeDown);
         }
 
         private void MarkPttInputPoll()
@@ -1557,9 +1576,9 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.Settings
 
             //REMEMBER TO UPDATE THIS WHEN NEW BINDINGS ARE ADDED
             //MIN + MAX bind numbers
-            for (int i = (int)InputBinding.Intercom; i <= (int)InputBinding.ToggleRadio2Mute; i++)
+            for (int i = (int)InputBinding.Intercom; i <= (int)InputBinding.IntercomVolumeDown; i++)
             {
-                if (!currentInputProfile.ContainsKey((InputBinding)i))
+                if (VolumeAxis.IsVolumeAxisBinding((InputBinding)i) || !currentInputProfile.ContainsKey((InputBinding)i))
                 {
                     continue;
                 }

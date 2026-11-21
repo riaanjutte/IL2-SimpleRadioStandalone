@@ -1026,4 +1026,22 @@ Haenge diese ZIP-Datei an das GitHub-Issue an, das im Browser geoeffnet wurde.</
   <data name="Invert axis" xml:space="preserve">
     <value>Achse umkehren</value>
   </data>
+  <data name="Radio 1 Volume Up" xml:space="preserve">
+    <value>Funkgerät 1 lauter</value>
+  </data>
+  <data name="Radio 1 Volume Down" xml:space="preserve">
+    <value>Funkgerät 1 leiser</value>
+  </data>
+  <data name="Radio 2 Volume Up" xml:space="preserve">
+    <value>Funkgerät 2 lauter</value>
+  </data>
+  <data name="Radio 2 Volume Down" xml:space="preserve">
+    <value>Funkgerät 2 leiser</value>
+  </data>
+  <data name="Intercom Volume Up" xml:space="preserve">
+    <value>Intercom lauter</value>
+  </data>
+  <data name="Intercom Volume Down" xml:space="preserve">
+    <value>Intercom leiser</value>
+  </data>
 </root>

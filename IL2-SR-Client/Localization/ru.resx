@@ -1026,4 +1026,22 @@
   <data name="Invert axis" xml:space="preserve">
     <value>Инвертировать ось</value>
   </data>
+  <data name="Radio 1 Volume Up" xml:space="preserve">
+    <value>Радио 1 громче</value>
+  </data>
+  <data name="Radio 1 Volume Down" xml:space="preserve">
+    <value>Радио 1 тише</value>
+  </data>
+  <data name="Radio 2 Volume Up" xml:space="preserve">
+    <value>Радио 2 громче</value>
+  </data>
+  <data name="Radio 2 Volume Down" xml:space="preserve">
+    <value>Радио 2 тише</value>
+  </data>
+  <data name="Intercom Volume Up" xml:space="preserve">
+    <value>Интерком громче</value>
+  </data>
+  <data name="Intercom Volume Down" xml:space="preserve">
+    <value>Интерком тише</value>
+  </data>
 </root>

@@ -766,6 +766,24 @@
                                                        ControlInputBinding="{x:Static settings:InputBinding.RestartSrs}"
                                                        InputName="Restart SRS" />
                             <StackPanel Grid.Row="34" Grid.ColumnSpan="5">
+                                <local:InputBindingControl x:Name="Radio1VolumeUp"
+                                                           ControlInputBinding="{x:Static settings:InputBinding.Radio1VolumeUp}"
+                                                           InputName="Radio 1 Volume Up" />
+                                <local:InputBindingControl x:Name="Radio1VolumeDown"
+                                                           ControlInputBinding="{x:Static settings:InputBinding.Radio1VolumeDown}"
+                                                           InputName="Radio 1 Volume Down" />
+                                <local:InputBindingControl x:Name="Radio2VolumeUp"
+                                                           ControlInputBinding="{x:Static settings:InputBinding.Radio2VolumeUp}"
+                                                           InputName="Radio 2 Volume Up" />
+                                <local:InputBindingControl x:Name="Radio2VolumeDown"
+                                                           ControlInputBinding="{x:Static settings:InputBinding.Radio2VolumeDown}"
+                                                           InputName="Radio 2 Volume Down" />
+                                <local:InputBindingControl x:Name="IntercomVolumeUp"
+                                                           ControlInputBinding="{x:Static settings:InputBinding.IntercomVolumeUp}"
+                                                           InputName="Intercom Volume Up" />
+                                <local:InputBindingControl x:Name="IntercomVolumeDown"
+                                                           ControlInputBinding="{x:Static settings:InputBinding.IntercomVolumeDown}"
+                                                           InputName="Intercom Volume Down" />
                                 <local:InputBindingControl x:Name="Radio1VolumeAxis"
                                                            ControlInputBinding="{x:Static settings:InputBinding.Radio1VolumeAxis}"
                                                            InputName="Radio 1 Volume (Axis)" />

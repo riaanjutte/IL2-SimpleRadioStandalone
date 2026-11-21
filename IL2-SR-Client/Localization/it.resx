@@ -1026,4 +1026,22 @@ Allega questo ZIP all'issue GitHub aperta nel browser.</value>
   <data name="Invert axis" xml:space="preserve">
     <value>Inverti asse</value>
   </data>
+  <data name="Radio 1 Volume Up" xml:space="preserve">
+    <value>Alza volume radio 1</value>
+  </data>
+  <data name="Radio 1 Volume Down" xml:space="preserve">
+    <value>Abbassa volume radio 1</value>
+  </data>
+  <data name="Radio 2 Volume Up" xml:space="preserve">
+    <value>Alza volume radio 2</value>
+  </data>
+  <data name="Radio 2 Volume Down" xml:space="preserve">
+    <value>Abbassa volume radio 2</value>
+  </data>
+  <data name="Intercom Volume Up" xml:space="preserve">
+    <value>Alza volume intercom</value>
+  </data>
+  <data name="Intercom Volume Down" xml:space="preserve">
+    <value>Abbassa volume intercom</value>
+  </data>
 </root>

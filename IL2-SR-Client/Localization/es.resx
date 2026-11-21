@@ -1026,4 +1026,22 @@ Adjunte este ZIP al issue de GitHub que se abrio en el navegador.</value>
   <data name="Invert axis" xml:space="preserve">
     <value>Invertir eje</value>
   </data>
+  <data name="Radio 1 Volume Up" xml:space="preserve">
+    <value>Subir volumen de radio 1</value>
+  </data>
+  <data name="Radio 1 Volume Down" xml:space="preserve">
+    <value>Bajar volumen de radio 1</value>
+  </data>
+  <data name="Radio 2 Volume Up" xml:space="preserve">
+    <value>Subir volumen de radio 2</value>
+  </data>
+  <data name="Radio 2 Volume Down" xml:space="preserve">
+    <value>Bajar volumen de radio 2</value>
+  </data>
+  <data name="Intercom Volume Up" xml:space="preserve">
+    <value>Subir volumen de intercomunicador</value>
+  </data>
+  <data name="Intercom Volume Down" xml:space="preserve">
+    <value>Bajar volumen de intercomunicador</value>
+  </data>
 </root>

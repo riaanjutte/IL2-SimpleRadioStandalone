@@ -256,6 +256,24 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.Settings
         Radio2VolumeAxis = 149,
         IntercomVolumeAxis = 150,
 
+        Radio1VolumeUp = 151,
+        ModifierRadio1VolumeUp = 251,
+
+        Radio1VolumeDown = 152,
+        ModifierRadio1VolumeDown = 252,
+
+        Radio2VolumeUp = 153,
+        ModifierRadio2VolumeUp = 253,
+
+        Radio2VolumeDown = 154,
+        ModifierRadio2VolumeDown = 254,
+
+        IntercomVolumeUp = 155,
+        ModifierIntercomVolumeUp = 255,
+
+        IntercomVolumeDown = 156,
+        ModifierIntercomVolumeDown = 256,
+
     }
 
 

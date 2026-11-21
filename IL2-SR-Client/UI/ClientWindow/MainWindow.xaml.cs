@@ -779,6 +779,30 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI
             RestartSrs.ControlInputBinding = InputBinding.RestartSrs;
             RestartSrs.InputDeviceManager = InputManager;
 
+            Radio1VolumeUp.InputName = LocalizationManager.Get("Radio 1 Volume Up");
+            Radio1VolumeUp.ControlInputBinding = InputBinding.Radio1VolumeUp;
+            Radio1VolumeUp.InputDeviceManager = InputManager;
+
+            Radio1VolumeDown.InputName = LocalizationManager.Get("Radio 1 Volume Down");
+            Radio1VolumeDown.ControlInputBinding = InputBinding.Radio1VolumeDown;
+            Radio1VolumeDown.InputDeviceManager = InputManager;
+
+            Radio2VolumeUp.InputName = LocalizationManager.Get("Radio 2 Volume Up");
+            Radio2VolumeUp.ControlInputBinding = InputBinding.Radio2VolumeUp;
+            Radio2VolumeUp.InputDeviceManager = InputManager;
+
+            Radio2VolumeDown.InputName = LocalizationManager.Get("Radio 2 Volume Down");
+            Radio2VolumeDown.ControlInputBinding = InputBinding.Radio2VolumeDown;
+            Radio2VolumeDown.InputDeviceManager = InputManager;
+
+            IntercomVolumeUp.InputName = LocalizationManager.Get("Intercom Volume Up");
+            IntercomVolumeUp.ControlInputBinding = InputBinding.IntercomVolumeUp;
+            IntercomVolumeUp.InputDeviceManager = InputManager;
+
+            IntercomVolumeDown.InputName = LocalizationManager.Get("Intercom Volume Down");
+            IntercomVolumeDown.ControlInputBinding = InputBinding.IntercomVolumeDown;
+            IntercomVolumeDown.InputDeviceManager = InputManager;
+
             Radio1VolumeAxis.InputName = LocalizationManager.Get("Radio 1 Volume (Axis)");
             Radio1VolumeAxis.ControlInputBinding = InputBinding.Radio1VolumeAxis;
             Radio1VolumeAxis.InputDeviceManager = InputManager;
@@ -831,6 +855,12 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI
             Radio2ChannelUp.InputName = LocalizationManager.Get("Radio 2 Channel Up");
             Radio2ChannelDown.InputName = LocalizationManager.Get("Radio 2 Channel Down");
             RestartSrs.InputName = LocalizationManager.Get("Restart SRS");
+            Radio1VolumeUp.InputName = LocalizationManager.Get("Radio 1 Volume Up");
+            Radio1VolumeDown.InputName = LocalizationManager.Get("Radio 1 Volume Down");
+            Radio2VolumeUp.InputName = LocalizationManager.Get("Radio 2 Volume Up");
+            Radio2VolumeDown.InputName = LocalizationManager.Get("Radio 2 Volume Down");
+            IntercomVolumeUp.InputName = LocalizationManager.Get("Intercom Volume Up");
+            IntercomVolumeDown.InputName = LocalizationManager.Get("Intercom Volume Down");
             Radio1VolumeAxis.InputName = LocalizationManager.Get("Radio 1 Volume (Axis)");
             Radio2VolumeAxis.InputName = LocalizationManager.Get("Radio 2 Volume (Axis)");
             IntercomVolumeAxis.InputName = LocalizationManager.Get("Intercom Volume (Axis)");
@@ -883,6 +913,12 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI
             Radio2ChannelUp.LoadInputSettings();
             Radio2ChannelDown.LoadInputSettings();
             RestartSrs.LoadInputSettings();
+            Radio1VolumeUp.LoadInputSettings();
+            Radio1VolumeDown.LoadInputSettings();
+            Radio2VolumeUp.LoadInputSettings();
+            Radio2VolumeDown.LoadInputSettings();
+            IntercomVolumeUp.LoadInputSettings();
+            IntercomVolumeDown.LoadInputSettings();
             Radio1VolumeAxis.LoadInputSettings();
             Radio2VolumeAxis.LoadInputSettings();
             IntercomVolumeAxis.LoadInputSettings();
