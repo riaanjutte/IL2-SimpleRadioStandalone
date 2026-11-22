@@ -157,11 +157,14 @@ if (Get-ChildItem -Force $dataRoot) {
 
 # Service accounts do not see your shell's environment variables, so settings go in srs-server.json.
 $configFile = Join-Path $serviceDataDirectory 'srs-server.json'
-if ((Test-Path $configFile) -and -not $PSBoundParameters.ContainsKey('SrsPort')) {
-    # An update keeps the port the server was set up with, for its firewall rules.
-    $configuredPort = (Get-Content $configFile -Raw | ConvertFrom-Json).SRS_SERVER_PORT
-    if ($configuredPort) {
-        $SrsPort = [int]$configuredPort
+if (Test-Path $configFile) {
+    # An update keeps the ports the server was set up with, for its firewall rules and the address shown at the end.
+    $existingConfig = Get-Content $configFile -Raw | ConvertFrom-Json
+    if ($existingConfig.SRS_SERVER_PORT -and -not $PSBoundParameters.ContainsKey('SrsPort')) {
+        $SrsPort = [int]$existingConfig.SRS_SERVER_PORT
+    }
+    if ($existingConfig.urls -and -not $PSBoundParameters.ContainsKey('WebUrl')) {
+        $WebUrl = $existingConfig.urls
     }
 }
 
