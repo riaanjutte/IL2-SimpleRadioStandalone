@@ -141,6 +141,12 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Server.Integrations
                 {
                     errors[IntegrationValidation.Config(field)] = error;
                 }
+
+                foreach (var field in StoredSecretsLeftForANewDestination(draft, action))
+                {
+                    errors[IntegrationValidation.Config(field)] =
+                        "Enter this again, or clear it: a stored secret is not sent to a new address.";
+                }
             }
 
             if (draft.RetryMode != RetryMode.None &&
@@ -329,6 +335,32 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Server.Integrations
             }
 
             return config;
+        }
+
+        /// <summary>
+        /// Secret fields left empty, so they would keep their stored values, while the first secret field (where
+        /// requests go) changes. Without this, an API key that may edit integrations could point one at its own
+        /// server and receive its stored Authorization header.
+        /// </summary>
+        private IEnumerable<string> StoredSecretsLeftForANewDestination(IntegrationDefinition draft, IIntegrationAction action)
+        {
+            var destination = action.SecretFields.FirstOrDefault();
+            var newDestination = destination == null ? null : draft.ActionConfig?.GetText(destination)?.Trim();
+            if (draft.Id == 0 || newDestination == null)
+            {
+                return Array.Empty<string>();
+            }
+
+            var stored = Store.GetForExecution(draft.Id);
+            if (stored == null || stored.ActionType != draft.ActionType ||
+                stored.ActionConfig.GetText(destination)?.Trim() == newDestination)
+            {
+                return Array.Empty<string>();
+            }
+
+            return action.SecretFields.Skip(1).Where(field =>
+                draft.ActionConfig.GetText(field) == null && !draft.ActionConfig.ClearsSecret(field) &&
+                stored.ActionConfig.GetText(field) != null).ToList();
         }
 
         private void Publish(SrsEventType type, string actor, string message, IntegrationDefinition integration)

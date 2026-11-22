@@ -127,7 +127,7 @@ Use `-Suffix '' -Channel latest` for a release. The repository category can only
 Publish a self-contained build (no .NET installation needed on the server):
 
 ```powershell
-dotnet publish IL2-SRS-Server-Web -c Release -r win-x64 --self-contained -o C:\IL2-SRS\app
+dotnet publish IL2-SRS-Server-Web -c Release -r win-x64 --self-contained -o C:\Downloads\IL2-SRS
 ```
 
 Publishing the server also publishes the integrations plugin into `plugins\IL2-SRS-Plugin-Integrations`; add
@@ -137,25 +137,31 @@ Run it in a console (without `--data-dir`, see [Data directory](#data-directory)
 
 ```powershell
 $env:SRS_ADMIN_PASSWORD = 'a-long-password'
-C:\IL2-SRS\app\IL2-SRS-Server.exe --data-dir C:\IL2-SRS\main
+C:\Downloads\IL2-SRS\IL2-SRS-Server.exe --data-dir C:\IL2-SRS-test
 ```
 
-Or install it as a Windows service from an elevated PowerShell prompt. The script writes
-`srs-server.json` (readable only by Administrators and SYSTEM), adds firewall rules for the SRS port
-and starts the service:
+Or install it as a Windows service from an elevated PowerShell prompt:
 
 ```powershell
-C:\IL2-SRS\app\Install-WindowsService.ps1 -DataDirectory C:\IL2-SRS\main
+C:\Downloads\IL2-SRS\Install-WindowsService.ps1
 ```
+
+The script copies the server to `C:\Program Files\IL2-SRS\<service>` and keeps its data in
+`C:\ProgramData\IL2-SRS\<service>`, which only Administrators and SYSTEM can open: the service runs as
+SYSTEM and loads its program and plugins from these folders. It writes `srs-server.json`, adds firewall
+rules for the SRS port and starts the service. To update, run the script of the new release. An install
+with its data elsewhere (as older versions of the script set up) has the data copied into the new
+folder; pass `-DataDirectory` if the service has no `--data-dir`.
 
 Manage it with `Get-Service IL2-SRS-Server`, `Restart-Service IL2-SRS-Server`, or `sc.exe`. Remove it
 with `Stop-Service IL2-SRS-Server; sc.exe delete IL2-SRS-Server`. Without the script:
 
 ```bat
-sc.exe create IL2-SRS-Server binPath= "\"C:\IL2-SRS\app\IL2-SRS-Server.exe\" --data-dir \"C:\IL2-SRS\main\"" start= auto
+sc.exe create IL2-SRS-Server binPath= "\"C:\Program Files\IL2-SRS\IL2-SRS-Server\IL2-SRS-Server.exe\" --data-dir \"C:\ProgramData\IL2-SRS\IL2-SRS-Server\"" start= auto
 ```
 
-and put `SRS_ADMIN_PASSWORD` in `C:\IL2-SRS\main\srs-server.json`:
+Keep both folders where other Windows users cannot change them, and put `SRS_ADMIN_PASSWORD` in
+`srs-server.json` in the data folder:
 
 ```json
 { "SRS_ADMIN_PASSWORD": "a-long-password", "urls": "http://localhost:8080" }

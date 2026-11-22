@@ -31,6 +31,10 @@
 - Web server: on a phone, the menu is a dropdown at the top of the page, and the Integrations pages show a card per item.
 - Web server: changing the admin password signs out every browser that logged in with the old one.
 - Web server: banning a client disconnects every client from that IP address, as banning the address directly already did.
+- Web server: `Install-WindowsService.ps1` installs the server in `C:\Program Files\IL2-SRS\<service>` and keeps its data in `C:\ProgramData\IL2-SRS\<service>`, which only Administrators and SYSTEM can open. The service runs as SYSTEM and loads its program and plugins from these folders; in folders such as `C:\IL2-SRS\app`, any signed-in Windows user could change them. To update, run the new release's script. An existing install's data is copied to the new folder, except plugins you added yourself, which you copy again from their download. Delete the old folders once the service works, since the old data folder still holds the admin password.
+- Web server: a plugin's background service that fails to start or stops with an error is logged, and the server keeps running without it. Before, a damaged `integrations.db` could stop the whole SRS server.
+- Web server: changing an integration's URL needs its stored headers entered again or cleared, so a stored `Authorization` header is never sent to a new address.
+- Web server: each integration keeps at most 1,000 runs waiting, and a run a service keeps asking to wait (HTTP 429) fails after an hour. Before, a busy event on a rate-limited service could grow `integrations.db` without limit.
 
 ### Fixed
 

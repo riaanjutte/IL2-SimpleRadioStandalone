@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.Json;
@@ -165,6 +166,18 @@ DELETE FROM integrations WHERE id = $id;";
 
         // Runs
 
+        /// <summary>
+        /// Runs an integration may have waiting. Each integration sends one run at a time, so a busy event on a
+        /// rate-limited or unreachable service would otherwise grow the database without end.
+        /// </summary>
+        public const int MaxQueuedRuns = 1000;
+
+        /// <summary>How long a run may keep being pushed back (rate limits) before it fails.</summary>
+        public static readonly TimeSpan MaxDeferAge = TimeSpan.FromHours(1);
+
+        private readonly ConcurrentDictionary<long, DateTime> _fullQueueWarnedAt = new();
+
+        /// <summary>Queues a run; 0 when the integration already has <see cref="MaxQueuedRuns"/> waiting.</summary>
         public long Enqueue(IntegrationDefinition integration, string eventType, string eventMessage, JsonElement data)
         {
             long id;
@@ -174,8 +187,11 @@ DELETE FROM integrations WHERE id = $id;";
                 command.CommandText = @"
 INSERT INTO integration_executions (integration_id, integration_name, action_type, event_type, event_message, data,
     status, attempts, created_at, next_attempt_at)
-VALUES ($integration, $name, $action, $eventType, $message, $data, 'queued', 0, $now, $now);
-SELECT last_insert_rowid();";
+SELECT $integration, $name, $action, $eventType, $message, $data, 'queued', 0, $now, $now
+WHERE (SELECT COUNT(*) FROM integration_executions INDEXED BY ix_integration_executions_pending
+       WHERE integration_id = $integration AND status IN ('queued', 'running')) < $max;
+SELECT CASE WHEN changes() > 0 THEN last_insert_rowid() ELSE 0 END;";
+                command.Parameters.AddWithValue("$max", MaxQueuedRuns);
                 command.Parameters.AddWithValue("$integration", integration.Id);
                 command.Parameters.AddWithValue("$name", integration.Name);
                 command.Parameters.AddWithValue("$action", integration.ActionType);
@@ -184,6 +200,19 @@ SELECT last_insert_rowid();";
                 command.Parameters.AddWithValue("$data", data.GetRawText());
                 command.Parameters.AddWithValue("$now", SqliteDatabase.FormatTimestamp(DateTime.UtcNow));
                 id = (long)command.ExecuteScalar();
+            }
+
+            if (id == 0)
+            {
+                var now = DateTime.UtcNow;
+                if (!_fullQueueWarnedAt.TryGetValue(integration.Id, out var warned) || now - warned > TimeSpan.FromMinutes(10))
+                {
+                    _fullQueueWarnedAt[integration.Id] = now;
+                    Logger.Warn($"Integration \"{integration.Name}\" has {MaxQueuedRuns} runs waiting; new events for " +
+                                "it are dropped until it catches up");
+                }
+
+                return 0;
             }
 
             RaiseExecutionsChanged();
@@ -268,18 +297,32 @@ WHERE id = $id;";
             RaiseExecutionsChanged();
         }
 
-        /// <summary>Queues a run again for later without counting the attempt it just made (rate limits).</summary>
+        /// <summary>
+        /// Queues a run again for later without counting the attempt it just made (rate limits). A run that would
+        /// then have been pushed back for longer than <see cref="MaxDeferAge"/> since the first time fails instead,
+        /// so a service that keeps saying "slow down" can't hold it, and the runs queued behind it, forever.
+        /// </summary>
         public void Defer(long executionId, string reason, DateTime nextAttemptAtUtc)
         {
             using (var connection = _database.Open())
             using (var command = connection.CreateCommand())
             {
-                command.CommandText = @"UPDATE integration_executions SET status = 'queued', attempts = MAX(attempts - 1, 0),
-    last_error = $reason, next_attempt_at = $next
+                command.CommandText = @"UPDATE integration_executions SET
+    deferred_since = COALESCE(deferred_since, $now),
+    status = CASE WHEN COALESCE(deferred_since, $now) < $giveUp THEN 'failed' ELSE 'queued' END,
+    attempts = CASE WHEN COALESCE(deferred_since, $now) < $giveUp THEN attempts ELSE MAX(attempts - 1, 0) END,
+    last_error = CASE WHEN COALESCE(deferred_since, $now) < $giveUp THEN $gaveUp ELSE $reason END,
+    next_attempt_at = CASE WHEN COALESCE(deferred_since, $now) < $giveUp THEN NULL ELSE $next END,
+    finished_at = CASE WHEN COALESCE(deferred_since, $now) < $giveUp THEN $now ELSE NULL END
 WHERE id = $id;";
                 command.Parameters.AddWithValue("$id", executionId);
                 command.Parameters.AddWithValue("$reason", (object)Truncate(reason) ?? DBNull.Value);
+                command.Parameters.AddWithValue("$gaveUp",
+                    Truncate($"Not sent: the service kept asking to wait for over {MaxDeferAge.TotalMinutes:0} minutes. " +
+                             reason));
                 command.Parameters.AddWithValue("$next", SqliteDatabase.FormatTimestamp(nextAttemptAtUtc));
+                command.Parameters.AddWithValue("$giveUp", SqliteDatabase.FormatTimestamp(nextAttemptAtUtc - MaxDeferAge));
+                command.Parameters.AddWithValue("$now", SqliteDatabase.FormatTimestamp(DateTime.UtcNow));
                 command.ExecuteNonQuery();
             }
 
@@ -295,7 +338,7 @@ WHERE id = $id;";
             {
                 // From attempt 1 again, so it gets the integration's retries.
                 command.CommandText = @"UPDATE integration_executions SET status = 'queued', attempts = 0,
-    interruptions = 0, next_attempt_at = $now, finished_at = NULL
+    interruptions = 0, deferred_since = NULL, next_attempt_at = $now, finished_at = NULL
 WHERE id = $id AND status IN ('failed', 'skipped', 'succeeded');";
                 command.Parameters.AddWithValue("$id", executionId);
                 command.Parameters.AddWithValue("$now", SqliteDatabase.FormatTimestamp(DateTime.UtcNow));

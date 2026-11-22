@@ -110,10 +110,18 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Server.Integrations
 
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
-            var requeued = _store.ResetRunning();
-            if (requeued > 0)
+            try
             {
-                Logger.Info($"Queued {requeued} integration run(s) interrupted by the last shutdown again");
+                var requeued = _store.ResetRunning();
+                if (requeued > 0)
+                {
+                    Logger.Info($"Queued {requeued} integration run(s) interrupted by the last shutdown again");
+                }
+            }
+            catch (Exception ex)
+            {
+                // Runs left running stay so until the next start; the loops below retry the database themselves.
+                Logger.Error(ex, "Unable to queue integration runs interrupted by the last shutdown again");
             }
 
             // Runs are cancelled ShutdownGrace after the stop, so the shutdown's own events can still go out.

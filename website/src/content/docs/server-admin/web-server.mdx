@@ -74,10 +74,10 @@ The admin UI and API use plain HTTP. You can publish port 8080 to the internet, 
 
 ## Run as a Windows service
 
-1. Get a self-contained build, which needs no .NET installation on the server. Download `IL2-SRS-Server-Web-<version>-win-x64.zip` from the latest [GitHub release](https://github.com/riaanjutte/IL2-SimpleRadioStandalone/releases/latest) and extract it to `C:\IL2-SRS\app`, or publish one yourself:
+1. Get a self-contained build, which needs no .NET installation on the server. Download `IL2-SRS-Server-Web-<version>-win-x64.zip` from the latest [GitHub release](https://github.com/riaanjutte/IL2-SimpleRadioStandalone/releases/latest) and extract it to any folder, for example `C:\Downloads\IL2-SRS`, or publish one yourself:
 
    ```powershell
-   dotnet publish IL2-SRS-Server-Web -c Release -r win-x64 --self-contained -o C:\IL2-SRS\app
+   dotnet publish IL2-SRS-Server-Web -c Release -r win-x64 --self-contained -o C:\Downloads\IL2-SRS
    ```
 
    The build includes the Integrations plugin, in `plugins\IL2-SRS-Plugin-Integrations`.
@@ -85,20 +85,22 @@ The admin UI and API use plain HTTP. You can publish port 8080 to the internet, 
    Windows marks files extracted from a downloaded ZIP as coming from the internet. If PowerShell refuses to run the install script, unblock the folder first:
 
    ```powershell
-   Get-ChildItem C:\IL2-SRS\app -Recurse | Unblock-File
+   Get-ChildItem C:\Downloads\IL2-SRS -Recurse | Unblock-File
    ```
 
 2. From an elevated PowerShell prompt, install and start the service:
 
    ```powershell
-   C:\IL2-SRS\app\Install-WindowsService.ps1 -DataDirectory C:\IL2-SRS\main
+   C:\Downloads\IL2-SRS\Install-WindowsService.ps1
    ```
 
-   The script asks for the admin password, writes it to `srs-server.json` in the data folder (readable only by Administrators and SYSTEM), adds firewall rules for the SRS port, and sets the service to restart after a crash.
+   The script copies the server to `C:\Program Files\IL2-SRS\IL2-SRS-Server` and keeps its data in `C:\ProgramData\IL2-SRS\IL2-SRS-Server`. It asks for the admin password and writes it to `srs-server.json` in the data folder, adds firewall rules for the SRS port, and sets the service to restart after a crash. You can delete the extracted folder afterwards.
+
+   The service runs as SYSTEM and loads its program and plugins from these folders, so only Administrators and SYSTEM may change them: Windows protects `Program Files`, and the script lets only Administrators and SYSTEM open the data folder.
 
 3. Open `http://localhost:8080` on the server and log in.
 
-To test without a service, run `IL2-SRS-Server.exe --data-dir C:\IL2-SRS\main` from a console with `SRS_ADMIN_PASSWORD` set. Without `--data-dir`, the server keeps its data next to the exe, or in `C:\ProgramData\IL2-SRS-Server` when that folder is not writable (for example under `C:\Program Files`).
+To test without a service, run `IL2-SRS-Server.exe --data-dir C:\IL2-SRS-test` from a console with `SRS_ADMIN_PASSWORD` set. Without `--data-dir`, the server keeps its data next to the exe, or in `C:\ProgramData\IL2-SRS-Server` when that folder is not writable (for example under `C:\Program Files`).
 
 ## Reach the admin UI remotely
 
@@ -152,7 +154,9 @@ docker rm -f il2-srs-server
 
 Then run the `docker run` command above again, or use `docker compose pull` and `docker compose up -d`.
 
-On Windows, stop the service with `Stop-Service IL2-SRS-Server`, replace the files in `C:\IL2-SRS\app` with the new build, and start it again with `Start-Service IL2-SRS-Server`.
+On Windows, extract the new release to any folder and run its `Install-WindowsService.ps1` from an elevated PowerShell prompt. It stops the service, replaces the program in `C:\Program Files\IL2-SRS\IL2-SRS-Server`, keeps the data, and starts the service again.
+
+An install from before 1.0.6.0 kept its program and data in folders such as `C:\IL2-SRS\app` and `C:\IL2-SRS\main`, which other Windows users on the server could change. Running the new script moves it: it copies the data to `C:\ProgramData\IL2-SRS\IL2-SRS-Server` and points the service and its firewall rules at the new folders. It does not copy plugins you added yourself, since other users could have changed them: copy those again from their original download. Once the service works, delete the old folders: the old data folder still holds the admin password and the keys that encrypt webhooks.
 
 The server upgrades its database on first start, so back up the data folder before updating if you might want to go back.
 
@@ -194,7 +198,7 @@ Integrations post to Discord or call a web address when something happens on the
 
 Integrations are a plugin, included in the Docker image and the Windows build. The **Plugins** page shows the plugins the server runs, and why a plugin did not load.
 
-To add a plugin, copy its folder into `plugins` in the data folder and restart the server. Plugins run inside the server with its permissions, so only install plugins you trust. For writing your own, see [Plugins in the web server README](https://github.com/riaanjutte/IL2-SimpleRadioStandalone/blob/master/IL2-SRS-Server-Web/README.md#plugins).
+To add a plugin, copy its folder into `plugins` in the data folder (`C:\ProgramData\IL2-SRS\IL2-SRS-Server\plugins` for the Windows service, from an elevated prompt) and restart the server. Plugins run inside the server with its permissions, so only install plugins you trust. For writing your own, see [Plugins in the web server README](https://github.com/riaanjutte/IL2-SimpleRadioStandalone/blob/master/IL2-SRS-Server-Web/README.md#plugins).
 
 ## Differences from the server window
 
