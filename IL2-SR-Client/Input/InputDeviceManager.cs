@@ -69,6 +69,9 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.Settings
         private const int MinDeviceReconnectRetryMs = 2000;
         private const int MaxDeviceReconnectRetryMs = 30000;
         private const int SlowPttInputPollWarningMs = 750;
+
+        // Any key press ends a wait for a button, but nothing else ends a wait for an axis.
+        private static readonly TimeSpan AssignAxisTimeout = TimeSpan.FromSeconds(10);
         private long _lastPttInputPollUtcTicks = DateTime.UtcNow.Ticks;
         private long _lastSlowPttInputPollLogTicks;
 
@@ -993,7 +996,8 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.Settings
         }
 
         /// <summary>The detected InputDevice carries the axis index in Button.</summary>
-        public void AssignAxis(DetectButton callback)
+        /// <param name="noAxisMoved">Called when no joystick can be read, or no axis moves before the timeout.</param>
+        public void AssignAxis(DetectButton callback, Action noAxisMoved)
         {
             Task.Run(() =>
             {
@@ -1001,62 +1005,30 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.Settings
                     .OfType<Joystick>()
                     .Where(joystick => !joystick.IsDisposed)
                     .ToList();
-                var initial = new int[joysticks.Count][];
-                var restarted = new bool[joysticks.Count];
+                var readers = joysticks
+                    .Select(joystick => (Func<int[]>)(() => ReadAxesForAssign(joystick)))
+                    .ToList();
 
-                for (var i = 0; i < joysticks.Count; i++)
+                int device;
+                int axis;
+                if (!VolumeAxis.TryWaitForMovedAxis(readers, AssignAxisTimeout, () => Thread.Sleep(100),
+                        out device, out axis))
                 {
-                    initial[i] = ReadAxesForAssign(joysticks[i]);
+                    Application.Current.Dispatcher.Invoke(noAxisMoved);
+                    return;
                 }
 
-                while (true)
+                var information = joysticks[device].Information;
+                var inputDevice = new InputDevice
                 {
-                    Thread.Sleep(100);
+                    DeviceName = information.ProductName.Trim().Replace("\0", ""),
+                    Button = axis,
+                    InstanceGuid = information.InstanceGuid,
+                    ProductGuid = information.ProductGuid,
+                    ButtonValue = 0
+                };
 
-                    for (var i = 0; i < joysticks.Count; i++)
-                    {
-                        if (initial[i] == null)
-                        {
-                            continue;
-                        }
-
-                        var current = ReadAxesForAssign(joysticks[i]);
-                        if (current == null)
-                        {
-                            initial[i] = null;
-                            continue;
-                        }
-
-                        var moved = VolumeAxis.FindMovedAxes(initial[i], current);
-                        if (moved.Count == 0)
-                        {
-                            continue;
-                        }
-
-                        if (moved.Count > 1 && !restarted[i])
-                        {
-                            // Every axis jumps at once when a device sends its first report (see
-                            // AxisReportWatch), so the first multi-axis change is a new starting point. A later one
-                            // is a single control driving two axes.
-                            initial[i] = current;
-                            restarted[i] = true;
-                            continue;
-                        }
-
-                        var information = joysticks[i].Information;
-                        var inputDevice = new InputDevice
-                        {
-                            DeviceName = information.ProductName.Trim().Replace("\0", ""),
-                            Button = moved[0],
-                            InstanceGuid = information.InstanceGuid,
-                            ProductGuid = information.ProductGuid,
-                            ButtonValue = 0
-                        };
-
-                        Application.Current.Dispatcher.Invoke(() => { callback(inputDevice); });
-                        return;
-                    }
-                }
+                Application.Current.Dispatcher.Invoke(() => { callback(inputDevice); });
             });
         }
 

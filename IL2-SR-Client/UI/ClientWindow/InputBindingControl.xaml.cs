@@ -121,7 +121,11 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI
 
             if (IsAxis)
             {
-                InputDeviceManager.AssignAxis(onDetected);
+                InputDeviceManager.AssignAxis(onDetected, () =>
+                {
+                    DeviceClear.IsEnabled = true;
+                    DeviceButton.IsEnabled = true;
+                });
             }
             else
             {

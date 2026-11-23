@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using SharpDX.DirectInput;
 
@@ -93,6 +94,59 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.Settings
                 .Where(axis => Math.Abs(current[axis] - initial[axis]) >= DetectThreshold)
                 .OrderByDescending(axis => Math.Abs(current[axis] - initial[axis]))
                 .ToList();
+        }
+
+        /// <param name="readAxes">One reader per device; a reader returns null once its device can't be read.</param>
+        public static bool TryWaitForMovedAxis(IReadOnlyList<Func<int[]>> readAxes, TimeSpan timeout, Action pause,
+            out int device, out int axis)
+        {
+            var initial = readAxes.Select(read => read()).ToArray();
+            var restarted = new bool[initial.Length];
+            var waited = Stopwatch.StartNew();
+
+            while (initial.Any(axes => axes != null) && waited.Elapsed < timeout)
+            {
+                pause();
+
+                for (var i = 0; i < initial.Length; i++)
+                {
+                    if (initial[i] == null)
+                    {
+                        continue;
+                    }
+
+                    var current = readAxes[i]();
+                    if (current == null)
+                    {
+                        initial[i] = null;
+                        continue;
+                    }
+
+                    var moved = FindMovedAxes(initial[i], current);
+                    if (moved.Count == 0)
+                    {
+                        continue;
+                    }
+
+                    if (moved.Count > 1 && !restarted[i])
+                    {
+                        // Every axis jumps at once when a device sends its first report (see AxisReportWatch),
+                        // so the first multi-axis change is a new starting point. A later one is a single
+                        // control driving two axes.
+                        initial[i] = current;
+                        restarted[i] = true;
+                        continue;
+                    }
+
+                    device = i;
+                    axis = moved[0];
+                    return true;
+                }
+            }
+
+            device = -1;
+            axis = -1;
+            return false;
         }
 
         public static int[] ReadAxes(JoystickState state)
