@@ -38,6 +38,7 @@
 
 ### Fixed
 
+- Client on Linux (Proton or Wine): your voice is sent again. Wine's audio resampler rejected the microphone format, so capture kept restarting and nothing was transmitted on radio or intercom, and the audio test stayed silent. SRS now switches to its own resampler when that happens.
 - Client: the Profile panel's four buttons wrap onto a second line in a narrow panel, instead of being cut off at both ends.
 - Client: a Classic theme written as `Theme="Classic"` (with quotes) in `global.cfg` now loads the full Classic look, instead of Classic colours on the military controls.
 - Web server: an address that doesn't exist shows the **Page not found** page with a link to the dashboard, instead of an empty page.

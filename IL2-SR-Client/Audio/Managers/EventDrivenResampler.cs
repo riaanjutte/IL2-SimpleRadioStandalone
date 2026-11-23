@@ -4,13 +4,15 @@ using NAudio.Dmo;
 using NAudio.Dsp;
 using NAudio.Wave;
 using NAudio.Wave.SampleProviders;
+using NLog;
 
 namespace Ciribob.IL2.SimpleRadio.Standalone.Client.Audio.Managers
 {
 
     public class EventDrivenResampler
     {
-        private readonly bool windowsN;
+        private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
+        private bool windowsN;
         private ResamplerDmoStream dmoResampler;
 
         private WaveFormat input;
@@ -35,16 +37,28 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.Audio.Managers
             }
 
 
-            if (windowsN)
+            if (!this.windowsN)
+            {
+                try
+                {
+                    dmoResampler = new ResamplerDmoStream(buf, output);
+                }
+                catch (ArgumentException ex)
+                {
+                    // Wine/Proton can create the DMO resampler but it rejects the microphone format.
+                    Logger.Warn(ex, $"DMO resampler rejected {input.Encoding} {input.BitsPerSample}-bit {input.Channels}ch {input.SampleRate}Hz - using inbuilt resampler");
+                    this.windowsN = true;
+                }
+            }
+
+            if (this.windowsN)
             {
                 mediaFoundationResampler = new WdlResamplingSampleProvider(buf.ToSampleProvider(), output.SampleRate);
                 waveOut = mediaFoundationResampler.ToMono().ToWaveProvider16();
             }
-            else
-            {
-                dmoResampler = new ResamplerDmoStream(buf,output);
-            }
         }
+
+        public bool UsesInbuiltResampler => windowsN;
 
         private byte[] ResampleBytesDMO(byte[] inputByteArray, int length)
         {
