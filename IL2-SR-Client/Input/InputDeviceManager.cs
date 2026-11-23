@@ -82,7 +82,6 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.Settings
 
         // Volume axis state (PTT thread only, so unlocked).
         private readonly Dictionary<InputBinding, float> _lastAxisVolumes = new Dictionary<InputBinding, float>();
-        private readonly Dictionary<InputBinding, RadioInformation> _lastAxisRadios = new Dictionary<InputBinding, RadioInformation>();
         private readonly AxisReportWatch<Device> _axisReportWatch = new AxisReportWatch<Device>();
 
         private Settings.GlobalSettingsStore _globalSettings = Settings.GlobalSettingsStore.Instance;
@@ -1091,7 +1090,6 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.Settings
                 if (!currentInputProfile.TryGetValue(binding, out axisBinding) || axisBinding == null)
                 {
                     _lastAxisVolumes.Remove(binding);
-                    _lastAxisRadios.Remove(binding);
                     continue;
                 }
 
@@ -1101,30 +1099,17 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.Settings
                     continue;
                 }
 
-                var radioId = VolumeAxis.GetRadioId(binding);
-                var radio = RadioHelper.GetRadio(radioId);
-                if (radio == null)
-                {
-                    continue;
-                }
-
-                // Applied only on movement, so the overlay slider still works in between. A new radio object
-                // (new aircraft or reconnect) starts at 100%, so it gets the axis position at once.
+                // Applied only on movement, so the overlay slider still works in between.
                 float lastVolume;
-                RadioInformation lastRadio;
-                if (_lastAxisVolumes.TryGetValue(binding, out lastVolume) &&
-                    _lastAxisRadios.TryGetValue(binding, out lastRadio) &&
-                    ReferenceEquals(lastRadio, radio) &&
-                    !VolumeAxis.HasMoved(lastVolume, volume))
+                if (_lastAxisVolumes.TryGetValue(binding, out lastVolume) && !VolumeAxis.HasMoved(lastVolume, volume))
                 {
                     continue;
                 }
 
-                // A disabled radio, or one whose volume the game sets, is retried on the next poll.
-                if (RadioHelper.SetRadioVolume(volume, radioId))
+                // A missing or disabled radio, or one whose volume the game sets, is retried on the next poll.
+                if (RadioHelper.SetRadioVolume(volume, VolumeAxis.GetRadioId(binding)))
                 {
                     _lastAxisVolumes[binding] = volume;
-                    _lastAxisRadios[binding] = radio;
                 }
             }
         }
