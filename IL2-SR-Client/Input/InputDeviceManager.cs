@@ -71,7 +71,7 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.Settings
         private const int SlowPttInputPollWarningMs = 750;
 
         // Any key press ends a wait for a button, but nothing else ends a wait for an axis.
-        private static readonly TimeSpan AssignAxisTimeout = TimeSpan.FromSeconds(10);
+        private static readonly TimeSpan AssignAxisTimeout = TimeSpan.FromSeconds(5);
         private long _lastPttInputPollUtcTicks = DateTime.UtcNow.Ticks;
         private long _lastSlowPttInputPollLogTicks;
 
