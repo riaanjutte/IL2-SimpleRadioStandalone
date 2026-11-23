@@ -77,6 +77,7 @@
   <ItemGroup>
     <Compile Include="Audio\AudioProviderBalanceTests.cs" />
     <Compile Include="Audio\RadioCollisionEffectProcessorTests.cs" />
+    <Compile Include="Audio\EventDrivenResamplerTests.cs" />
     <Compile Include="DCSState\PlayerGameStateTests.cs" />
     <Compile Include="Helpers\AirfieldCodeLookupTests.cs" />
     <Compile Include="Helpers\ConversionHelpersTests.cs" />
@@ -141,6 +142,10 @@
     <ProjectReference Include="..\IL2-SR-Common\IL2-SR-Common.csproj">
       <Project>{CF8DA5C1-0105-4486-9E28-CB2321D8F122}</Project>
       <Name>IL2-SR-Common</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\NAudio\NAudio.csproj">
+      <Project>{da4f02e3-0b5e-42cd-b8d9-5583fa51d66e}</Project>
+      <Name>NAudio</Name>
     </ProjectReference>
     <ProjectReference Include="..\IL2-SimpleRadio Server\IL2-SimpleRadio Server.csproj">
       <Project>{8579C7DA-206F-4705-B073-D3CC946DC8EC}</Project>

@@ -289,7 +289,7 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.Audio.Managers
                     var device = ResolveCaptureDevice();
                     AudioDeviceHelper.TryUnmute(device);
 
-                    Logger.Info($"Starting microphone capture on {device.FriendlyName} {device.ID} CHN:{device.AudioClient.MixFormat.Channels} Rate:{device.AudioClient.MixFormat.SampleRate}");
+                    Logger.Info($"Starting microphone capture on {device.FriendlyName} {device.ID} CHN:{device.AudioClient.MixFormat.Channels} Rate:{device.AudioClient.MixFormat.SampleRate} Format:{device.AudioClient.MixFormat.AsStandardWaveFormat().Encoding} {device.AudioClient.MixFormat.BitsPerSample}-bit");
                     _wasapiCapture = new WasapiCapture(device, true);
                     _wasapiCapture.ShareMode = AudioClientShareMode.Shared;
                     _wasapiCapture.DataAvailable += WasapiCaptureOnDataAvailable;
