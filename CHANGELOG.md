@@ -15,6 +15,7 @@
 
 ### Changed
 
+- Client: panels are spaced evenly on every tab: the same small gap separates them from each other, from the tab strip and from the window edges, as on the Controls tab. Side-by-side panels no longer touch. The Settings scroll bar only appears when the tab doesn't fit.
 - Client: the layout editor no longer blocks the main window, so you can keep using SRS while it is open. Pressing ⚙ again brings the open editor to the front.
 - Client: in the layout editor, **Other panels** (formerly Hidden panels) also lists the panels on other tabs, so **Add to this tab** can bring a panel from any tab to the one selected. A panel taken from a pair leaves its partner on a row of its own.
 - Client: a row of the main window can hold up to three panels. In the layout editor, **Join with row below** and **Split row** replace Pair and Unpair, and **Fit to content** makes a panel only as wide as its controls, leaving the rest of the row to its neighbours. Drag the gap between two panels to resize them; double-click it to make them equal again.
