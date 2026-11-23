@@ -28,6 +28,9 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI
         // Set while ApplyLayout swaps the tabs, so the TabControl's selection changes don't resize the window.
         private bool _rebuildingTabs;
 
+        // Space between panels: the TabControl's padding, so it matches the gap to the window edge.
+        private const double PanelGap = 4;
+
         /// <summary>Called from the constructor after ApplyClassicThemeLayout.</summary>
         private void InitCustomLayout()
         {
@@ -179,7 +182,9 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI
                 }
                 else
                 {
-                    var rows = new StackPanel { Margin = new Thickness(10, 0, 10, 0) };
+                    // Every row's panels keep PanelGap above them (see BuildRow). Pulling the rows up by that much
+                    // puts the first shown row on the tab's padding, even when a row above it is hidden.
+                    var rows = new StackPanel { Margin = new Thickness(0, -PanelGap, 0, 0) };
                     foreach (var row in tab.Rows)
                     {
                         rows.Children.Add(BuildRow(row, false));
@@ -188,8 +193,7 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI
                     content = new ScrollViewer
                     {
                         HorizontalScrollBarVisibility = ScrollBarVisibility.Disabled,
-                        // Settings always showed its scroll bar; keep it so the tab looks as it did.
-                        VerticalScrollBarVisibility = tab.BuiltIn == "settings" ? ScrollBarVisibility.Visible : ScrollBarVisibility.Auto,
+                        VerticalScrollBarVisibility = ScrollBarVisibility.Auto,
                         Content = rows
                     };
                 }
@@ -229,6 +233,8 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI
             foreach (var panel in panels)
             {
                 Grid.SetColumn(panel, Math.Max(0, shown.IndexOf(panel)));
+                // Replaces the theme's 5px above and below: panels sit PanelGap apart, as far as from the window edge.
+                panel.Margin = new Thickness(shown.IndexOf(panel) > 0 ? PanelGap : 0, fillsTab ? 0 : PanelGap, 0, 0);
                 if (!fillsTab && panel == ControlsGroupBox)
                 {
                     panel.MaxHeight = SharedFillPanelMaxHeight;
@@ -250,7 +256,7 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI
             var toggle = new ToggleButton
             {
                 Style = (Style) FindResource("PanelCollapseToggleStyle"),
-                Margin = new Thickness(0, 16, 18, 0),
+                Margin = new Thickness(0, (fillsTab ? 0 : PanelGap) + 11, 18, 0),
                 IsChecked = collapsed
             };
             Grid.SetColumn(toggle, grid.ColumnDefinitions.Count - 1);
@@ -317,9 +323,9 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI
                 int column = i, left = row.IndexOf(keys[i]), right = row.IndexOf(keys[i + 1]);
                 var divider = new GridSplitter
                 {
-                    // Centred on the gap between the two panels.
+                    // Centred on the gap between the two panels (the right one's PanelGap margin).
                     Width = 6,
-                    Margin = new Thickness(0, 0, -3, 0),
+                    Margin = new Thickness(0, 0, -3 - PanelGap / 2, 0),
                     HorizontalAlignment = HorizontalAlignment.Right,
                     VerticalAlignment = VerticalAlignment.Stretch,
                     Background = Brushes.Transparent,
