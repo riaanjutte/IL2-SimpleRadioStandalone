@@ -1044,4 +1044,7 @@
   <data name="Intercom Volume Down" xml:space="preserve">
     <value>Интерком тише</value>
   </data>
+  <data name="No axis moved" xml:space="preserve">
+    <value>Ось не сдвинулась</value>
+  </data>
 </root>

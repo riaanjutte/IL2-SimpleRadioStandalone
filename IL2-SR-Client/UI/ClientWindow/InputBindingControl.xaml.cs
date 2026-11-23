@@ -83,6 +83,7 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI
             ModifierButtonClear.Visibility = modifierVisibility;
 
             InvertAxis.Visibility = IsAxis ? Visibility.Visible : Visibility.Collapsed;
+            NoAxisMoved.Visibility = Visibility.Collapsed;
         }
 
         private string FormatInput(InputDevice device)
@@ -100,6 +101,7 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI
         {
             DeviceClear.IsEnabled = false;
             DeviceButton.IsEnabled = false;
+            NoAxisMoved.Visibility = Visibility.Collapsed;
 
             InputDeviceManager.DetectButton onDetected = device =>
             {
@@ -125,6 +127,7 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI
                 {
                     DeviceClear.IsEnabled = true;
                     DeviceButton.IsEnabled = true;
+                    NoAxisMoved.Visibility = Visibility.Visible;
                 });
             }
             else
@@ -140,6 +143,7 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI
 
             Device.Text = LocalizationManager.Get("None");
             DeviceText.Text = LocalizationManager.Get("None");
+            NoAxisMoved.Visibility = Visibility.Collapsed;
         }
 
         private void InvertAxis_Click(object sender, RoutedEventArgs e)

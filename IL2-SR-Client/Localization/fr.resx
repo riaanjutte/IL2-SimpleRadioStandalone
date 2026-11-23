@@ -1044,4 +1044,7 @@ Joignez ce fichier ZIP au ticket GitHub ouvert dans votre navigateur.</value>
   <data name="Intercom Volume Down" xml:space="preserve">
     <value>Baisser le volume intercom</value>
   </data>
+  <data name="No axis moved" xml:space="preserve">
+    <value>Aucun axe déplacé</value>
+  </data>
 </root>

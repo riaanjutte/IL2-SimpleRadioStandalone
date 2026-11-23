@@ -1044,4 +1044,7 @@ Attach this ZIP to the GitHub issue that opened in your browser.</value>
   <data name="Intercom Volume Down" xml:space="preserve">
     <value>Intercom Volume Down</value>
   </data>
+  <data name="No axis moved" xml:space="preserve">
+    <value>No axis moved</value>
+  </data>
 </root>
