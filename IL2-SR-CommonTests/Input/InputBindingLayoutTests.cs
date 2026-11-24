@@ -51,6 +51,29 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Common.Tests.Input
         }
 
         [TestMethod]
+        public void VolumeButtonBindingsAreInsideScannedInputRangeAndHaveModifiers()
+        {
+            Assert.IsTrue(InputBinding.Radio1VolumeUp > InputBinding.IntercomVolumeAxis);
+            Assert.IsTrue(InputBinding.IntercomVolumeDown < InputBinding.ModifierIntercom);
+            Assert.AreEqual((int)InputBinding.Radio1VolumeUp + 100, (int)InputBinding.ModifierRadio1VolumeUp);
+            Assert.AreEqual((int)InputBinding.Radio1VolumeDown + 100, (int)InputBinding.ModifierRadio1VolumeDown);
+            Assert.AreEqual((int)InputBinding.Radio2VolumeUp + 100, (int)InputBinding.ModifierRadio2VolumeUp);
+            Assert.AreEqual((int)InputBinding.Radio2VolumeDown + 100, (int)InputBinding.ModifierRadio2VolumeDown);
+            Assert.AreEqual((int)InputBinding.IntercomVolumeUp + 100, (int)InputBinding.ModifierIntercomVolumeUp);
+            Assert.AreEqual((int)InputBinding.IntercomVolumeDown + 100, (int)InputBinding.ModifierIntercomVolumeDown);
+        }
+
+        [TestMethod]
+        public void VolumeButtonBindingsReachRadioControlDispatcher()
+        {
+            Assert.IsTrue(InputDeviceManager.IsRadioControlBinding(InputBinding.Radio1VolumeUp));
+            Assert.IsTrue(InputDeviceManager.IsRadioControlBinding(InputBinding.Radio2VolumeDown));
+            Assert.IsTrue(InputDeviceManager.IsRadioControlBinding(InputBinding.IntercomVolumeUp));
+            Assert.IsTrue(InputDeviceManager.IsRadioControlBinding(InputBinding.IntercomVolumeDown));
+            Assert.IsFalse(InputDeviceManager.IsRadioControlBinding(InputBinding.IntercomVolumeAxis));
+        }
+
+        [TestMethod]
         public void RestartSrsBindingIsInsideScannedInputRange()
         {
             Assert.IsTrue(InputBinding.RestartSrs >= InputBinding.Intercom);

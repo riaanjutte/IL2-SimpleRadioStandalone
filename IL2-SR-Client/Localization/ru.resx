@@ -1014,4 +1014,37 @@
   <data name="SuggestionPageOpenFailed" xml:space="preserve">
     <value>Не удалось открыть страницу предложений GitHub.</value>
   </data>
+  <data name="Radio 1 Volume (Axis)" xml:space="preserve">
+    <value>Громкость радио 1 (ось)</value>
+  </data>
+  <data name="Radio 2 Volume (Axis)" xml:space="preserve">
+    <value>Громкость радио 2 (ось)</value>
+  </data>
+  <data name="Intercom Volume (Axis)" xml:space="preserve">
+    <value>Громкость интеркома (ось)</value>
+  </data>
+  <data name="Invert axis" xml:space="preserve">
+    <value>Инвертировать ось</value>
+  </data>
+  <data name="Radio 1 Volume Up" xml:space="preserve">
+    <value>Радио 1 громче</value>
+  </data>
+  <data name="Radio 1 Volume Down" xml:space="preserve">
+    <value>Радио 1 тише</value>
+  </data>
+  <data name="Radio 2 Volume Up" xml:space="preserve">
+    <value>Радио 2 громче</value>
+  </data>
+  <data name="Radio 2 Volume Down" xml:space="preserve">
+    <value>Радио 2 тише</value>
+  </data>
+  <data name="Intercom Volume Up" xml:space="preserve">
+    <value>Интерком громче</value>
+  </data>
+  <data name="Intercom Volume Down" xml:space="preserve">
+    <value>Интерком тише</value>
+  </data>
+  <data name="No axis moved" xml:space="preserve">
+    <value>Ось не сдвинулась</value>
+  </data>
 </root>

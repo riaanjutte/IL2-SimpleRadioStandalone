@@ -69,6 +69,9 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.Settings
         private const int MinDeviceReconnectRetryMs = 2000;
         private const int MaxDeviceReconnectRetryMs = 30000;
         private const int SlowPttInputPollWarningMs = 750;
+
+        // Any key press ends a wait for a button, but nothing else ends a wait for an axis.
+        private static readonly TimeSpan AssignAxisTimeout = TimeSpan.FromSeconds(5);
         private long _lastPttInputPollUtcTicks = DateTime.UtcNow.Ticks;
         private long _lastSlowPttInputPollLogTicks;
 
@@ -79,6 +82,10 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.Settings
             ; //intercom used to represent null as we cant
         private bool _pilotRosterTogglePressed;
         private bool _clientListTogglePressed;
+
+        // Volume axis state (PTT thread only, so unlocked).
+        private readonly Dictionary<InputBinding, float> _lastAxisVolumes = new Dictionary<InputBinding, float>();
+        private readonly AxisReportWatch<Device> _axisReportWatch = new AxisReportWatch<Device>();
 
         private Settings.GlobalSettingsStore _globalSettings = Settings.GlobalSettingsStore.Instance;
 
@@ -209,6 +216,7 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.Settings
 
                             device.SetCooperativeLevel(_windowHandle,
                                 CooperativeLevel.Background | CooperativeLevel.NonExclusive);
+                            SetAxisRange(device);
                             device.Acquire();
 
                             _inputDevices.Add(deviceInstance.InstanceGuid, device);
@@ -223,6 +231,7 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.Settings
 
                             device.SetCooperativeLevel(_windowHandle,
                                 CooperativeLevel.Background | CooperativeLevel.NonExclusive);
+                            SetAxisRange(device);
                             device.Acquire();
 
                             _inputDevices.Add(deviceInstance.InstanceGuid, device);
@@ -869,6 +878,24 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.Settings
                                         case InputBinding.ToggleMicrophoneMute:
                                             RadioHelper.ToggleMicrophoneMute();
                                             break;
+                                        case InputBinding.Radio1VolumeUp:
+                                            RadioHelper.RadioVolumeUp(1);
+                                            break;
+                                        case InputBinding.Radio1VolumeDown:
+                                            RadioHelper.RadioVolumeDown(1);
+                                            break;
+                                        case InputBinding.Radio2VolumeUp:
+                                            RadioHelper.RadioVolumeUp(2);
+                                            break;
+                                        case InputBinding.Radio2VolumeDown:
+                                            RadioHelper.RadioVolumeDown(2);
+                                            break;
+                                        case InputBinding.IntercomVolumeUp:
+                                            RadioHelper.RadioVolumeUp(0);
+                                            break;
+                                        case InputBinding.IntercomVolumeDown:
+                                            RadioHelper.RadioVolumeDown(0);
+                                            break;
 
                                         default:
                                             break;
@@ -879,6 +906,8 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.Settings
                             }
                         }
                     }
+
+                    PollVolumeAxes(deviceStateCache);
                     }
                     catch (Exception ex)
                     {
@@ -938,6 +967,173 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.Settings
         }
 
 
+        private void SetAxisRange(Joystick joystick)
+        {
+            // Devices report axes in their own ranges; one range lets a volume axis read the same on any device.
+            IList<DeviceObjectInstance> axes;
+            try
+            {
+                axes = joystick.GetObjects(DeviceObjectTypeFlags.Axis);
+            }
+            catch (Exception ex)
+            {
+                Logger.Warn(ex, "Unable to list the axes of input device " + GetDeviceName(joystick));
+                return;
+            }
+
+            foreach (var axis in axes)
+            {
+                try
+                {
+                    joystick.GetObjectPropertiesById(axis.ObjectId).Range =
+                        new InputRange(VolumeAxis.RangeMin, VolumeAxis.RangeMax);
+                }
+                catch (Exception ex)
+                {
+                    Logger.Warn(ex, $"Unable to set the range of axis {NormalizeDeviceName(axis.Name)} on input device {GetDeviceName(joystick)}");
+                }
+            }
+        }
+
+        /// <summary>The detected InputDevice carries the axis index in Button.</summary>
+        /// <param name="noAxisMoved">Called when no joystick can be read, or no axis moves before the timeout.</param>
+        public void AssignAxis(DetectButton callback, Action noAxisMoved)
+        {
+            Task.Run(() =>
+            {
+                var joysticks = GetInputDeviceSnapshot()
+                    .OfType<Joystick>()
+                    .Where(joystick => !joystick.IsDisposed)
+                    .ToList();
+                var readers = joysticks
+                    .Select(joystick => (Func<int[]>)(() => ReadAxesForAssign(joystick)))
+                    .ToList();
+
+                int device;
+                int axis;
+                if (!VolumeAxis.TryWaitForMovedAxis(readers, AssignAxisTimeout, () => Thread.Sleep(100),
+                        out device, out axis))
+                {
+                    Application.Current.Dispatcher.Invoke(noAxisMoved);
+                    return;
+                }
+
+                var information = joysticks[device].Information;
+                var inputDevice = new InputDevice
+                {
+                    DeviceName = information.ProductName.Trim().Replace("\0", ""),
+                    Button = axis,
+                    InstanceGuid = information.InstanceGuid,
+                    ProductGuid = information.ProductGuid,
+                    ButtonValue = 0
+                };
+
+                Application.Current.Dispatcher.Invoke(() => { callback(inputDevice); });
+            });
+        }
+
+        private int[] ReadAxesForAssign(Joystick joystick)
+        {
+            if (joystick == null || joystick.IsDisposed)
+            {
+                return null;
+            }
+
+            try
+            {
+                joystick.Poll();
+                return VolumeAxis.ReadAxes(joystick.GetCurrentState());
+            }
+            catch (Exception e)
+            {
+                Logger.Error(e, $"Failed to get current state of input device {GetDeviceName(joystick)} " +
+                    $"(ID: {GetProductGuid(joystick)}) while assigning an axis, ignoring it for this assignment");
+                return null;
+            }
+        }
+
+        private void PollVolumeAxes(Dictionary<Guid, object> deviceStateCache)
+        {
+            var currentInputProfile = _globalSettings.ProfileSettingsStore.GetCurrentInputProfile();
+
+            foreach (var binding in VolumeAxis.Bindings)
+            {
+                InputDevice axisBinding;
+                if (!currentInputProfile.TryGetValue(binding, out axisBinding) || axisBinding == null)
+                {
+                    _lastAxisVolumes.Remove(binding);
+                    continue;
+                }
+
+                float volume;
+                if (!TryGetAxisVolume(axisBinding, deviceStateCache, out volume))
+                {
+                    continue;
+                }
+
+                // Applied only on movement, so the overlay slider still works in between.
+                float lastVolume;
+                if (_lastAxisVolumes.TryGetValue(binding, out lastVolume) && !VolumeAxis.HasMoved(lastVolume, volume))
+                {
+                    continue;
+                }
+
+                // A missing or disabled radio, or one whose volume the game sets, is retried on the next poll.
+                if (RadioHelper.SetRadioVolume(volume, VolumeAxis.GetRadioId(binding)))
+                {
+                    _lastAxisVolumes[binding] = volume;
+                }
+            }
+        }
+
+        private bool TryGetAxisVolume(InputDevice axisBinding, Dictionary<Guid, object> deviceStateCache, out float volume)
+        {
+            volume = 0;
+
+            Guid instanceGuid;
+            Device device;
+            if (!TryGetInputDeviceForBinding(axisBinding, out instanceGuid, out device))
+            {
+                _missingBoundDevicesThisPoll.Add($"{NormalizeDeviceName(axisBinding.DeviceName)} ({axisBinding.InputBind})");
+                RequestDeviceReconnect();
+                return false;
+            }
+
+            var joystick = device as Joystick;
+            if (joystick == null)
+            {
+                return false;
+            }
+
+            try
+            {
+                var state = GetDeviceState<JoystickState>(device, instanceGuid, deviceStateCache,
+                    () =>
+                    {
+                        joystick.Poll();
+                        return joystick.GetCurrentState();
+                    });
+
+                if (!_axisReportWatch.HasReported(device, VolumeAxis.ReadAxes(state)))
+                {
+                    return false;
+                }
+
+                volume = VolumeAxis.ToVolume(VolumeAxis.ReadAxis(state, axisBinding.Button),
+                    VolumeAxis.IsInverted(axisBinding));
+                return true;
+            }
+            catch (Exception e)
+            {
+                Logger.Error(e, $"Failed to get current state of input device {GetDeviceName(device)} " +
+                    $"(ID: {GetProductGuid(device)}) while reading a volume axis. Removing device and waiting for automatic rediscovery.");
+
+                RemoveInputDevice(instanceGuid, device);
+                RequestDeviceReconnect();
+                return false;
+            }
+        }
+
         public void StopPtt()
         {
             _detectPtt = false;
@@ -947,7 +1143,8 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.Settings
         {
             return (binding >= InputBinding.RadioChannel1 && binding <= InputBinding.Radio2ChannelDown)
                    || binding == InputBinding.ToggleRadio1Mute
-                   || binding == InputBinding.ToggleRadio2Mute;
+                   || binding == InputBinding.ToggleRadio2Mute
+                   || (binding >= InputBinding.Radio1VolumeUp && binding <= InputBinding.IntercomVolumeDown);
         }
 
         private void MarkPttInputPoll()
@@ -1336,9 +1533,9 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.Settings
 
             //REMEMBER TO UPDATE THIS WHEN NEW BINDINGS ARE ADDED
             //MIN + MAX bind numbers
-            for (int i = (int)InputBinding.Intercom; i <= (int)InputBinding.ToggleRadio2Mute; i++)
+            for (int i = (int)InputBinding.Intercom; i <= (int)InputBinding.IntercomVolumeDown; i++)
             {
-                if (!currentInputProfile.ContainsKey((InputBinding)i))
+                if (VolumeAxis.IsVolumeAxisBinding((InputBinding)i) || !currentInputProfile.ContainsKey((InputBinding)i))
                 {
                     continue;
                 }

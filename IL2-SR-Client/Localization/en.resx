@@ -1014,4 +1014,37 @@ Attach this ZIP to the GitHub issue that opened in your browser.</value>
   <data name="SuggestionPageOpenFailed" xml:space="preserve">
     <value>Failed to open the GitHub suggestion page.</value>
   </data>
+  <data name="Radio 1 Volume (Axis)" xml:space="preserve">
+    <value>Radio 1 Volume (Axis)</value>
+  </data>
+  <data name="Radio 2 Volume (Axis)" xml:space="preserve">
+    <value>Radio 2 Volume (Axis)</value>
+  </data>
+  <data name="Intercom Volume (Axis)" xml:space="preserve">
+    <value>Intercom Volume (Axis)</value>
+  </data>
+  <data name="Invert axis" xml:space="preserve">
+    <value>Invert axis</value>
+  </data>
+  <data name="Radio 1 Volume Up" xml:space="preserve">
+    <value>Radio 1 Volume Up</value>
+  </data>
+  <data name="Radio 1 Volume Down" xml:space="preserve">
+    <value>Radio 1 Volume Down</value>
+  </data>
+  <data name="Radio 2 Volume Up" xml:space="preserve">
+    <value>Radio 2 Volume Up</value>
+  </data>
+  <data name="Radio 2 Volume Down" xml:space="preserve">
+    <value>Radio 2 Volume Down</value>
+  </data>
+  <data name="Intercom Volume Up" xml:space="preserve">
+    <value>Intercom Volume Up</value>
+  </data>
+  <data name="Intercom Volume Down" xml:space="preserve">
+    <value>Intercom Volume Down</value>
+  </data>
+  <data name="No axis moved" xml:space="preserve">
+    <value>No axis moved</value>
+  </data>
 </root>

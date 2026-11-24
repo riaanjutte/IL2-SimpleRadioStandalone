@@ -81,9 +81,11 @@
     <Compile Include="DCSState\PlayerGameStateTests.cs" />
     <Compile Include="Helpers\AirfieldCodeLookupTests.cs" />
     <Compile Include="Helpers\ConversionHelpersTests.cs" />
+    <Compile Include="Input\AxisReportWatchTests.cs" />
     <Compile Include="Input\DeviceIdentityCacheTests.cs" />
     <Compile Include="Input\InputBindingLayoutTests.cs" />
     <Compile Include="Input\InputPollingCycleCacheTests.cs" />
+    <Compile Include="Input\VolumeAxisTests.cs" />
     <Compile Include="Installer\Il2InstallDiscoveryTests.cs" />
     <Compile Include="Installer\SteamGameDiscoveryTests.cs" />
     <Compile Include="Installer\InstallerTelemetryConfigurationTests.cs" />
@@ -125,6 +127,7 @@
     <Compile Include="UI\PilotRosterScreenBoundsTests.cs" />
     <Compile Include="UI\WindowsFirewallTelemetryDiagnosticTests.cs" />
     <Compile Include="Utils\RadioHelperMuteTests.cs" />
+    <Compile Include="Utils\RadioHelperVolumeTests.cs" />
     <Compile Include="Utils\RadioHelperChannelNameTests.cs" />
     <Compile Include="Utils\StartupConfigTelemetryTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
