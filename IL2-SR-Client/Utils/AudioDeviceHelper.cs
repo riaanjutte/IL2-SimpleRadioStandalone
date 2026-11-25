@@ -8,6 +8,7 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.Utils
     public static class AudioDeviceHelper
     {
         private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
+        private static bool _unmuteNotImplementedLogged;
 
         /// <summary>
         /// Attempts to unmute the given audio device.
@@ -23,9 +24,14 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.Utils
             {
                 device.AudioEndpointVolume.Mute = false;
             }
-            catch (NotImplementedException ex)
+            catch (NotImplementedException)
             {
-                Logger.Warn(ex, $"Unable to unmute audio device {device.FriendlyName} - continuing anyway");
+                // Always the case under Wine, on every capture start: once is enough, and the stack trace says nothing.
+                if (!_unmuteNotImplementedLogged)
+                {
+                    _unmuteNotImplementedLogged = true;
+                    Logger.Warn($"Unable to unmute audio device {device.FriendlyName} (not implemented, as under Wine) - continuing anyway");
+                }
             }
             catch (COMException ex)
             {

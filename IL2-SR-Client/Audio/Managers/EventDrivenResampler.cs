@@ -12,6 +12,7 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.Audio.Managers
     public class EventDrivenResampler
     {
         private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
+        private static bool _dmoRejectionLogged;
         private bool windowsN;
         private ResamplerDmoStream dmoResampler;
 
@@ -46,7 +47,13 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.Audio.Managers
                 catch (ArgumentException ex)
                 {
                     // Wine/Proton can create the DMO resampler but it rejects the microphone format.
-                    Logger.Warn(ex, $"DMO resampler rejected {input.Encoding} {input.BitsPerSample}-bit {input.Channels}ch {input.SampleRate}Hz - using inbuilt resampler");
+                    // Logged once per run: it repeats on every capture start and the stack trace says nothing.
+                    if (!_dmoRejectionLogged)
+                    {
+                        _dmoRejectionLogged = true;
+                        Logger.Warn($"DMO resampler rejected {input.Encoding} {input.BitsPerSample}-bit {input.Channels}ch {input.SampleRate}Hz ({ex.Message.Split('\n')[0].Trim()}) - using inbuilt resampler");
+                    }
+
                     this.windowsN = true;
                 }
             }
