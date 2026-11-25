@@ -18,6 +18,7 @@
 
 ### Changed
 
+- Client on Linux (Proton or Wine): `clientlog.txt` is much shorter. Three harmless Wine warnings (the microphone can't be unmuted, SRS uses its own audio resampler, and there are no text-to-speech voices) are now logged once per run instead of on every microphone start or announcement, and without stack traces.
 - Client: panels are spaced evenly on every tab: the same small gap separates them from each other, from the tab strip and from the window edges, as on the Controls tab. Side-by-side panels no longer touch. The Settings scroll bar only appears when the tab doesn't fit.
 - Client: the layout editor no longer blocks the main window, so you can keep using SRS while it is open. Pressing ⚙ again brings the open editor to the front.
 - Client: in the layout editor, **Other panels** (formerly Hidden panels) also lists the panels on other tabs, so **Add to this tab** can bring a panel from any tab to the one selected. A panel taken from a pair leaves its partner on a row of its own.

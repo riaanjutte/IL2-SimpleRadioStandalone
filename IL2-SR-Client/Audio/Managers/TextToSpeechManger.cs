@@ -20,6 +20,7 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.Audio.Managers
     public class TextToSpeechManger:IDisposable
     {
         private readonly Logger Logger = LogManager.GetCurrentClassLogger();
+        private static bool _noVoiceLogged;
         private readonly MixingSampleProvider mixer;
         private ISampleProvider sampleProvider;
         private Guid sub;
@@ -88,6 +89,15 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.Audio.Managers
                         buffer.ClearBuffer();
                         byte[] byteArr = stream.ToArray();
                         buffer.AddSamples(byteArr, 0, byteArr.Length);
+                    }
+                }
+                catch (InvalidOperationException ex)
+                {
+                    // No speech voices installed, as under Wine: every announcement fails the same way, so log it once.
+                    if (!_noVoiceLogged)
+                    {
+                        _noVoiceLogged = true;
+                        Logger.Warn($"Text to Speech unavailable, announcements will be silent: {ex.Message}");
                     }
                 }
                 catch (Exception ex)
