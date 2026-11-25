@@ -1047,4 +1047,10 @@
   <data name="No axis moved" xml:space="preserve">
     <value>Ось не сдвинулась</value>
   </data>
+  <data name="Mute player" xml:space="preserve">
+    <value>Заглушить игрока</value>
+  </data>
+  <data name="Unmute player" xml:space="preserve">
+    <value>Включить звук игрока</value>
+  </data>
 </root>

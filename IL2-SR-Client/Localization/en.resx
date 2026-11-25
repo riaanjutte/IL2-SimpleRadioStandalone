@@ -1047,4 +1047,10 @@ Attach this ZIP to the GitHub issue that opened in your browser.</value>
   <data name="No axis moved" xml:space="preserve">
     <value>No axis moved</value>
   </data>
+  <data name="Mute player" xml:space="preserve">
+    <value>Mute player</value>
+  </data>
+  <data name="Unmute player" xml:space="preserve">
+    <value>Unmute player</value>
+  </data>
 </root>

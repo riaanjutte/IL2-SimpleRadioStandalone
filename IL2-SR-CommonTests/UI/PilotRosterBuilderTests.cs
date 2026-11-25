@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using Ciribob.IL2.SimpleRadio.Standalone.Client.Settings;
+using Ciribob.IL2.SimpleRadio.Standalone.Client.Singletons;
 using Ciribob.IL2.SimpleRadio.Standalone.Client.UI.ClientWindow.PilotRoster;
 using Ciribob.IL2.SimpleRadio.Standalone.Common;
 using Ciribob.IL2.SimpleRadio.Standalone.Common.Network;
@@ -45,6 +46,32 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Common.Tests.UI
 
             CollectionAssert.AreEquivalent(new[] { "BROADWAY", "BLUE TOWER 2" }, roster,
                 "The server's names and the built-in tower and command names are not pilots; only whole names match.");
+        }
+
+        [TestMethod]
+        public void MutedPlayersAreMarkedAndOthersAreNot()
+        {
+            var clients = ConnectedClientsSingleton.Instance;
+            clients.SetMuted("pilot-1", true);
+            try
+            {
+                var roster = PilotRosterBuilder.Build(CreateState(FriendlyCoalition, 1, 2), new[]
+                {
+                    CreateClient("pilot-1", "Haluter", "", FriendlyCoalition, 1, 2),
+                    CreateClient("pilot-2", "Pazuzu", "", FriendlyCoalition, 2, 3)
+                }, clients.IsMuted);
+
+                Assert.IsTrue(roster.Single(entry => entry.ClientGuid == "pilot-1").IsMuted);
+                Assert.IsFalse(roster.Single(entry => entry.ClientGuid == "pilot-2").IsMuted);
+
+                clients.SetMuted("pilot-1", false);
+                Assert.IsFalse(clients.IsMuted("pilot-1"), "unmuting removes the mute");
+                Assert.IsFalse(clients.IsMuted(null), "a client without a GUID is never muted");
+            }
+            finally
+            {
+                clients.SetMuted("pilot-1", false);
+            }
         }
 
         [TestMethod]

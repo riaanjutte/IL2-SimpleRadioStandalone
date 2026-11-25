@@ -1047,4 +1047,10 @@ Allega questo ZIP all'issue GitHub aperta nel browser.</value>
   <data name="No axis moved" xml:space="preserve">
     <value>Nessun asse mosso</value>
   </data>
+  <data name="Mute player" xml:space="preserve">
+    <value>Silenzia giocatore</value>
+  </data>
+  <data name="Unmute player" xml:space="preserve">
+    <value>Riattiva audio giocatore</value>
+  </data>
 </root>

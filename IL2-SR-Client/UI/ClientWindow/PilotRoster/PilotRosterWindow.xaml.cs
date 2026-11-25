@@ -169,7 +169,7 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI.ClientWindow.PilotRoster
         {
             var localState = ClientStateSingleton.Instance.PlayerGameState;
             var connectedClients = ConnectedClientsSingleton.Instance.Values;
-            var entries = PilotRosterBuilder.Build(localState, connectedClients);
+            var entries = PilotRosterBuilder.Build(localState, connectedClients, ConnectedClientsSingleton.Instance.IsMuted);
             var activeSquadOps = PilotRosterBuilder.BuildActiveSquadOpsSummary(localState, connectedClients);
 
             _pilotRoster.Clear();
@@ -184,6 +184,18 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI.ClientWindow.PilotRoster
                 : Visibility.Visible;
 
             Dispatcher.BeginInvoke(new Action(RefreshRosterLayout), DispatcherPriority.Loaded);
+        }
+
+        private void MuteButton_Click(object sender, RoutedEventArgs e)
+        {
+            var entry = (sender as FrameworkElement)?.DataContext as PilotRosterEntry;
+            if (entry == null)
+            {
+                return;
+            }
+
+            ConnectedClientsSingleton.Instance.SetMuted(entry.ClientGuid, !entry.IsMuted);
+            UpdateRoster();
         }
 
         private void PilotList_Sorting(object sender, DataGridSortingEventArgs e)

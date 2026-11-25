@@ -1047,4 +1047,10 @@ Joignez ce fichier ZIP au ticket GitHub ouvert dans votre navigateur.</value>
   <data name="No axis moved" xml:space="preserve">
     <value>Aucun axe déplacé</value>
   </data>
+  <data name="Mute player" xml:space="preserve">
+    <value>Couper le son du joueur</value>
+  </data>
+  <data name="Unmute player" xml:space="preserve">
+    <value>Rétablir le son du joueur</value>
+  </data>
 </root>

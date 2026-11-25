@@ -19,7 +19,9 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI.ClientWindow.PilotRoster
             "UN Airfield", "UN Command", "CF Airfield", "CF Command"
         };
 
-        public static IList<PilotRosterEntry> Build(PlayerGameState localState, IEnumerable<SRClient> connectedClients)
+        /// <param name="isMuted">Whether a client GUID is muted; null when nobody is.</param>
+        public static IList<PilotRosterEntry> Build(PlayerGameState localState, IEnumerable<SRClient> connectedClients,
+            System.Func<string, bool> isMuted = null)
         {
             var ownCoalition = localState?.coalition ?? 0;
             if (ownCoalition <= 0)
@@ -40,7 +42,9 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI.ClientWindow.PilotRoster
                     client.AssignedVehicle,
                     client.AssignedAirfield,
                     GetRadioChannel(client.GameState, 1),
-                    GetRadioChannel(client.GameState, 2)));
+                    GetRadioChannel(client.GameState, 2),
+                    client.ClientGuid,
+                    isMuted != null && isMuted(client.ClientGuid)));
 
             return entries
                 .OrderBy(entry => entry.Callsign == "--" ? 1 : 0)

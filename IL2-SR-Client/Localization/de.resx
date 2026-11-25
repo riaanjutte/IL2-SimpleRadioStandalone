@@ -1047,4 +1047,10 @@ Haenge diese ZIP-Datei an das GitHub-Issue an, das im Browser geoeffnet wurde.</
   <data name="No axis moved" xml:space="preserve">
     <value>Keine Achse bewegt</value>
   </data>
+  <data name="Mute player" xml:space="preserve">
+    <value>Spieler stummschalten</value>
+  </data>
+  <data name="Unmute player" xml:space="preserve">
+    <value>Stummschaltung des Spielers aufheben</value>
+  </data>
 </root>

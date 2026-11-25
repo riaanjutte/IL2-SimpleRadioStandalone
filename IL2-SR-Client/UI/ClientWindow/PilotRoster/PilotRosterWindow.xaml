@@ -237,6 +237,46 @@
                                         Width="SizeToHeader"
                                         HeaderStyle="{StaticResource RosterRightAlignedHeaderStyle}"
                                         ElementStyle="{StaticResource RosterRightAlignedCellTextStyle}" />
+                    <DataGridTemplateColumn x:Name="MuteColumn"
+                                            Width="34"
+                                            CanUserSort="False">
+                        <DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate>
+                                <Button Click="MuteButton_Click"
+                                        Width="28"
+                                        Height="24"
+                                        Padding="0"
+                                        Cursor="Hand"
+                                        Focusable="False"
+                                        Background="Transparent"
+                                        BorderThickness="0"
+                                        ToolTip="{Binding MuteToolTip}"
+                                        AutomationProperties.Name="{Binding MuteToolTip}">
+                                    <Button.Template>
+                                        <ControlTemplate TargetType="{x:Type Button}">
+                                            <Border Background="Transparent">
+                                                <Canvas Width="16" Height="16">
+                                                    <!-- Speaker; sound waves when unmuted, a cross when muted. -->
+                                                    <Path x:Name="Speaker" Data="M1,6 H4 L8,2 V14 L4,10 H1 Z" Fill="#8C8C8C" />
+                                                    <Path x:Name="Waves" Data="M10.5,5.5 A3.5,3.5 0 0 1 10.5,10.5 M12.5,3.5 A6,6 0 0 1 12.5,12.5"
+                                                          Stroke="#8C8C8C" StrokeThickness="1.4" />
+                                                    <Path x:Name="Cross" Data="M10.5,5.5 L15,10 M15,5.5 L10.5,10"
+                                                          Stroke="#D9382B" StrokeThickness="1.8" Visibility="Collapsed" />
+                                                </Canvas>
+                                            </Border>
+                                            <ControlTemplate.Triggers>
+                                                <DataTrigger Binding="{Binding IsMuted}" Value="True">
+                                                    <Setter TargetName="Speaker" Property="Fill" Value="#D9382B" />
+                                                    <Setter TargetName="Waves" Property="Visibility" Value="Collapsed" />
+                                                    <Setter TargetName="Cross" Property="Visibility" Value="Visible" />
+                                                </DataTrigger>
+                                            </ControlTemplate.Triggers>
+                                        </ControlTemplate>
+                                    </Button.Template>
+                                </Button>
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+                    </DataGridTemplateColumn>
                 </DataGrid.Columns>
             </DataGrid>
 
