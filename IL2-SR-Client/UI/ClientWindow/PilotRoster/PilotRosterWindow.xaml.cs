@@ -128,6 +128,11 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI.ClientWindow.PilotRoster
 
             _globalSettings.SetPositionSetting(GlobalSettingsKeys.PilotRosterX, Left);
             _globalSettings.SetPositionSetting(GlobalSettingsKeys.PilotRosterY, Top);
+            if (IsUnavailableMode)
+            {
+                return; // the message's size is not the roster's
+            }
+
             _globalSettings.SetPositionSetting(GlobalSettingsKeys.PilotRosterWidth, Width);
             _globalSettings.SetPositionSetting(GlobalSettingsKeys.PilotRosterHeight, Height);
         }
@@ -146,7 +151,8 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI.ClientWindow.PilotRoster
                 + "\r\n\r\n"
                 + LocalizationManager.Get(PilotRosterAccessPolicy.ReconnectInstruction);
             UnavailableMessage.Visibility = Visibility.Visible;
-
+            // The saved size fits the roster, which can be too short for the message.
+            SizeToContent = SizeToContent.Height;
         }
 
         private void RosterFrame_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
