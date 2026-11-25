@@ -4,6 +4,7 @@
 
 ### Added
 
+- Client: each player in the Pilot Roster has a mute button at the end of the row. Click it to stop hearing that player on every radio; the speaker turns red with a cross. Click again to hear them again. Mutes last until you close SRS.
 - Client: the volume sliders on the radio overlay can follow a joystick axis, such as a throttle slider or rotary. Controls has **Radio 1 Volume (Axis)**, **Radio 2 Volume (Axis)** and **Intercom Volume (Axis)**: press **Set** and move the axis you want. If no axis moves within 5 seconds, or no game controller is connected, **Set** stops waiting and shows "No axis moved". Tick **Invert axis** if the volume goes the wrong way. The slider follows the axis whenever the axis moves, so you can still drag it with the mouse in between. Each axis sets the volume of its radio, whichever channel that radio is on. Any axis Windows lists for a game controller works: sticks, throttles, pedals, wheels, gamepads and knobs on button boxes. If SRS doesn't see a device, switch on **Allow More Input Devices** and restart SRS.
 - Client: Controls has **Volume Up** and **Volume Down** for Radio 1, Radio 2 and the Intercom. Each press moves that radio's volume by 5%, so a key, a button or a rotary encoder that sends button presses can set the volume. A volume between steps, set with an axis or the slider, moves to the next whole step.
 - The ⚙ button at the right end of the tab strip opens a layout editor for the main window: add, rename, delete and reorder tabs, move panels between tabs, put two panels side by side or give each its own row, and hide panels you don't use. **Reset layout** goes back to the default. Every row has a small arrow in its top-right corner that collapses or expands it, and SRS remembers which rows are collapsed. The window fits the tab shown: a tab with fewer panels, or with rows collapsed, makes it shorter, and full tabs such as Settings get your normal height back. You can still drag it smaller. The Classic theme keeps its fixed layout, with no ⚙ and only the Server and Overlays arrow.
@@ -41,6 +42,7 @@
 
 ### Fixed
 
+- Client: the Pilot Roster's "only available on servers that provide Pilot Roster data" message is no longer cut off when the roster window was last short; the window grows to fit it.
 - Client on Linux (Proton or Wine): your voice is sent again. Wine's audio resampler rejected the microphone format, so capture kept restarting and nothing was transmitted on radio or intercom, and the audio test stayed silent. SRS now switches to its own resampler when that happens.
 - Client: the Profile panel's four buttons wrap onto a second line in a narrow panel, instead of being cut off at both ends.
 - Client: a Classic theme written as `Theme="Classic"` (with quotes) in `global.cfg` now loads the full Classic look, instead of Classic colours on the military controls.

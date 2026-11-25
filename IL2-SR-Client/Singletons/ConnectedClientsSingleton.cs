@@ -228,6 +228,31 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.Singletons
             NotifyPropertyChanged("Total");
         }
 
+        // Players muted from the Pilot Roster, by client GUID. Kept until SRS closes, across reconnects.
+        private readonly ConcurrentDictionary<string, byte> _muted = new ConcurrentDictionary<string, byte>();
+
+        public bool IsMuted(string clientGuid)
+        {
+            return !string.IsNullOrEmpty(clientGuid) && _muted.ContainsKey(clientGuid);
+        }
+
+        public void SetMuted(string clientGuid, bool muted)
+        {
+            if (string.IsNullOrEmpty(clientGuid))
+            {
+                return;
+            }
+
+            if (muted)
+            {
+                _muted[clientGuid] = 0;
+            }
+            else
+            {
+                _muted.TryRemove(clientGuid, out _);
+            }
+        }
+
         public bool TryGetValue(string key, out SRClient value)
         {
             return _clients.TryGetValue(key, out value);

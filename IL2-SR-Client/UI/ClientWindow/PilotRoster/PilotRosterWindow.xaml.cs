@@ -128,6 +128,11 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI.ClientWindow.PilotRoster
 
             _globalSettings.SetPositionSetting(GlobalSettingsKeys.PilotRosterX, Left);
             _globalSettings.SetPositionSetting(GlobalSettingsKeys.PilotRosterY, Top);
+            if (IsUnavailableMode)
+            {
+                return; // the message's size is not the roster's
+            }
+
             _globalSettings.SetPositionSetting(GlobalSettingsKeys.PilotRosterWidth, Width);
             _globalSettings.SetPositionSetting(GlobalSettingsKeys.PilotRosterHeight, Height);
         }
@@ -146,7 +151,8 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI.ClientWindow.PilotRoster
                 + "\r\n\r\n"
                 + LocalizationManager.Get(PilotRosterAccessPolicy.ReconnectInstruction);
             UnavailableMessage.Visibility = Visibility.Visible;
-
+            // The saved size fits the roster, which can be too short for the message.
+            SizeToContent = SizeToContent.Height;
         }
 
         private void RosterFrame_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
@@ -163,7 +169,7 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI.ClientWindow.PilotRoster
         {
             var localState = ClientStateSingleton.Instance.PlayerGameState;
             var connectedClients = ConnectedClientsSingleton.Instance.Values;
-            var entries = PilotRosterBuilder.Build(localState, connectedClients);
+            var entries = PilotRosterBuilder.Build(localState, connectedClients, ConnectedClientsSingleton.Instance.IsMuted);
             var activeSquadOps = PilotRosterBuilder.BuildActiveSquadOpsSummary(localState, connectedClients);
 
             _pilotRoster.Clear();
@@ -178,6 +184,18 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI.ClientWindow.PilotRoster
                 : Visibility.Visible;
 
             Dispatcher.BeginInvoke(new Action(RefreshRosterLayout), DispatcherPriority.Loaded);
+        }
+
+        private void MuteButton_Click(object sender, RoutedEventArgs e)
+        {
+            var entry = (sender as FrameworkElement)?.DataContext as PilotRosterEntry;
+            if (entry == null)
+            {
+                return;
+            }
+
+            ConnectedClientsSingleton.Instance.SetMuted(entry.ClientGuid, !entry.IsMuted);
+            UpdateRoster();
         }
 
         private void PilotList_Sorting(object sender, DataGridSortingEventArgs e)

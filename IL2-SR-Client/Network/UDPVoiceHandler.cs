@@ -454,6 +454,15 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.Network
                                 //Decode bytes
                                 var udpVoicePacket = UDPVoicePacket.DecodeVoicePacket(encodedOpusAudio);
 
+                                // A relayed packet carries the speaker in OriginalClientGuid.
+                                if (udpVoicePacket != null && ConnectedClientsSingleton.Instance.IsMuted(
+                                        string.IsNullOrWhiteSpace(udpVoicePacket.OriginalClientGuid)
+                                            ? udpVoicePacket.Guid
+                                            : udpVoicePacket.OriginalClientGuid))
+                                {
+                                    continue;
+                                }
+
                                 if (udpVoicePacket != null)
                                 {
                                     var vehicleId = -1;

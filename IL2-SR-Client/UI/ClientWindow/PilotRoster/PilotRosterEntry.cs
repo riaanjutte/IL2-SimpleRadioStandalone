@@ -18,8 +18,11 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI.ClientWindow.PilotRoster
 
     public class PilotRosterEntry
     {
-        public PilotRosterEntry(string callsign, string pilotName, string vehicle, string airfield, int radio1Channel, int radio2Channel)
+        public PilotRosterEntry(string callsign, string pilotName, string vehicle, string airfield, int radio1Channel, int radio2Channel,
+            string clientGuid = null, bool isMuted = false)
         {
+            ClientGuid = clientGuid;
+            IsMuted = isMuted;
             Callsign = Normalize(callsign, "--");
             PilotName = Normalize(pilotName, "---");
             Vehicle = Callsign == "--" ? "Req. Callsign" : Normalize(vehicle, string.Empty);
@@ -30,6 +33,13 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.Client.UI.ClientWindow.PilotRoster
             Radio1Channel = FormatChannel(Radio1ChannelNumber);
             Radio2Channel = FormatChannel(Radio2ChannelNumber);
         }
+
+        public string ClientGuid { get; }
+
+        public bool IsMuted { get; }
+
+        // Read only by the roster's mute button, so building entries doesn't need the translations loaded.
+        public string MuteToolTip => Localization.LocalizationManager.Get(IsMuted ? "Unmute player" : "Mute player");
 
         public string Callsign { get; }
 
