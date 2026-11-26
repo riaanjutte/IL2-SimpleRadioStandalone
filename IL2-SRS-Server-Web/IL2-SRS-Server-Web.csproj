@@ -13,6 +13,21 @@
     <ConcurrentGarbageCollection>true</ConcurrentGarbageCollection>
   </PropertyGroup>
 
+  <!-- A self-contained build (the Windows download) ships the runtime the build machine's SDK knows about, which can
+       be an older patch with known vulnerabilities (SDK 10.0.401 gives 10.0.12). Take the runtime packs of the patch
+       named here from NuGet instead, whichever .NET 10 SDK builds it. Keep it at the patch the Docker image's base has
+       (IL2-SRS-Server-Web/Dockerfile), and raise both together. Framework-dependent builds are unaffected. -->
+  <PropertyGroup>
+    <SrsRuntimePatchVersion>10.0.15</SrsRuntimePatchVersion>
+  </PropertyGroup>
+  <Target Name="PinRuntimePatchVersion" BeforeTargets="ProcessFrameworkReferences">
+    <ItemGroup>
+      <KnownFrameworkReference Condition="('%(Identity)' == 'Microsoft.NETCore.App' or '%(Identity)' == 'Microsoft.AspNetCore.App') and '%(TargetFramework)' == '$(TargetFramework)'">
+        <LatestRuntimeFrameworkVersion>$(SrsRuntimePatchVersion)</LatestRuntimeFrameworkVersion>
+      </KnownFrameworkReference>
+    </ItemGroup>
+  </Target>
+
   <ItemGroup>
     <InternalsVisibleTo Include="IL2-SRS-Server-Web.Tests" />
   </ItemGroup>
