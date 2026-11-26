@@ -50,7 +50,7 @@
 - Web server: an address that doesn't exist shows the **Page not found** page with a link to the dashboard, instead of an empty page.
 - Web server: two bans added at the same moment could leave one of them out of the list checked when clients connect, until the next ban change.
 - Web server: the Docker image is built on .NET 10.0.15 with patched openssl, zlib and musl, fixing the vulnerabilities scanners reported in .NET 10.0.12 and 10.0.14 (among them critical HTTP request smuggling issues), openssl, zlib and musl.
-- Web server: the Windows download includes .NET 10.0.15, whichever .NET SDK builds it. Before, it shipped the runtime of the build machine's SDK, which could be an older patch with known vulnerabilities (10.0.12 for 1.0.5.1).
+- Web server: the Windows download includes at least .NET 10.0.15, whichever .NET SDK builds it. Before, it shipped the runtime of the build machine's SDK, which could be an older patch with known vulnerabilities (10.0.14 for 1.0.5.1).
 
 ### Compatibility
 
