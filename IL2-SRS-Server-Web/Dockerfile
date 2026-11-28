@@ -22,10 +22,18 @@ RUN dotnet publish IL2-SRS-Server-Web/IL2-SRS-Server-Web.csproj -c Release -o /a
 # (login, tar, ICU, systemd libraries, ...), which carried unfixable scanner findings.
 # Pinned by digest so every build of a commit starts from the same base. When Microsoft republishes
 # 10.0-alpine, update the digest here and in the base.digest label below.
-FROM mcr.microsoft.com/dotnet/aspnet:10.0-alpine@sha256:254fe017495996d3abcc487ffacdcce2b73affb380d3af87af12c8dff41fe0b0
+FROM mcr.microsoft.com/dotnet/aspnet:10.0-alpine@sha256:21c3f9798416cba4c0576a947c286231cb71ea2884896cb968253f5c9668f930
 WORKDIR /app
 
-# The pinned base (built 2026-10-24: Alpine 3.24.3, .NET 10.0.14) ships musl 1.2.6-r3, vulnerable to
+# The pinned base (built 2026-11-10: Alpine 3.24.4, .NET 10.0.15) ships libssl3 and libcrypto3 3.5.9-r0, vulnerable
+# to CVE-2026-95691, CVE-2026-95692, CVE-2026-88822, CVE-2026-88823 and CVE-2026-107496 (fixed in 3.5.9-r1, which
+# Alpine 3.24 has). Upgrade them from the base's own repository; the build fails if 3.24 still has an older one.
+# Remove this step once a newer base digest includes the fix.
+RUN apk upgrade --no-cache libssl3 libcrypto3 \
+    && ssl="$(apk info -v 2>/dev/null | sed -n 's/^libssl3-\([0-9].*\)$/\1/p')" \
+    && if [ "$(apk version -t "$ssl" 3.5.9-r1)" = "<" ]; then echo "libssl3 $ssl is older than 3.5.9-r1" >&2; exit 1; fi
+
+# The pinned base also ships musl 1.2.6-r3, vulnerable to
 # CVE-2026-107891 (fixed in 1.2.6-r6). Alpine 3.24 doesn't have the fix yet, so take musl and musl-utils (and the
 # scanelf they need) from edge. "~1.2.6" keeps them on 1.2.6, so a newer musl release in edge (and whatever it
 # needs from edge) can't come along; the build fails if edge's 1.2.6 is older than the fix. (apk keeps only one
@@ -49,7 +57,7 @@ LABEL org.opencontainers.image.title="IL2-SRS Server" \
       org.opencontainers.image.url="$IMAGE_URL" \
       org.opencontainers.image.licenses="GPL-3.0-only" \
       org.opencontainers.image.base.name="mcr.microsoft.com/dotnet/aspnet:10.0-alpine" \
-      org.opencontainers.image.base.digest="sha256:254fe017495996d3abcc487ffacdcce2b73affb380d3af87af12c8dff41fe0b0"
+      org.opencontainers.image.base.digest="sha256:21c3f9798416cba4c0576a947c286231cb71ea2884896cb968253f5c9668f930"
 
 ENV SRS_DATA_DIR=/data \
     SRS_IMAGE_VERSION=$VERSION \
